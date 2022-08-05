@@ -1,6 +1,6 @@
 {
   "name": "flet",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Fluent Ergo Toolkit",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
