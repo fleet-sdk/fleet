@@ -13,6 +13,10 @@ export type SignedInput = {
 
 export type UnsignedInput = {
   boxId: BoxId;
+  extension: ContextExtension;
+};
+
+export type EIP12UnsignedInput = UnsignedInput & {
   transactionId: TransactionId;
   index: number;
   ergoTree: ErgoTree;
@@ -20,7 +24,6 @@ export type UnsignedInput = {
   value: Amount;
   assets: TokenAmount[];
   additionalRegisters: NonMandatoryRegisters;
-  extension: ContextExtension;
 };
 
 export type DataInput = {
