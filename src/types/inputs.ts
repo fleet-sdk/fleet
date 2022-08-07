@@ -1,7 +1,7 @@
 import { BoxId } from "./boxes";
-import { ContextExtension } from "./context-extension";
+import { ContextExtension } from "./contextExtension";
 import { ErgoTree, Amount } from "./primitives";
-import { ProverResult } from "./prover-result";
+import { ProverResult } from "./proverResult";
 import { NonMandatoryRegisters } from "./registers";
 import { TokenAmount } from "./token";
 import { TransactionId } from "./transactions";

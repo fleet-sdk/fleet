@@ -7,8 +7,8 @@ import {
   UnsignedInput,
   UnsignedTransaction
 } from "../types";
-import { OutputBuilder } from "./output-builder";
-import { TransactionBuilderSettings } from "./transaction-builder-settings";
+import { OutputBuilder } from "./outputBuilder";
+import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
 export class TransactionBuilder {
   public from(inputs: UnsignedInput[] | Box[] | BoxCandidate[]): TransactionBuilder {

@@ -1,4 +1,4 @@
-import { ContextExtension } from "./context-extension";
+import { ContextExtension } from "./contextExtension";
 import { HexString } from "./primitives";
 
 export type ProverResult = {

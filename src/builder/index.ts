@@ -1,1 +1,1 @@
-export { TransactionBuilder } from "./transaction-builder";
+export { TransactionBuilder } from "./transactionBuilder";
