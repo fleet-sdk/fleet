@@ -4,6 +4,14 @@ export default {
   coverageDirectory: "./coverage",
   coverageProvider: "v8",
   coverageReporters: ["text", "lcov"],
+  coverageThreshold: {
+    global: {
+      statements: "100",
+      lines: "100",
+      branches: "100",
+      functions: "100"
+    }
+  },
   preset: "ts-jest",
   roots: ["./src"]
 };
