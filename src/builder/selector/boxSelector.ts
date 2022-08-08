@@ -1,8 +1,8 @@
-import { Amount, Box, TokenAmount } from "../../types";
+import { Box, TokenAmount } from "../../types";
 import { CustomSelection, SelectorFunction } from "./customSelection";
 import { ISelectionStrategy, isISelectionStrategyImplementation } from "./ISelectionStrategy";
 
-export type SelectionTarget = { nanoErgs: Amount; tokens?: TokenAmount[] };
+export type SelectionTarget = { nanoErgs: bigint; tokens?: TokenAmount<bigint>[] };
 
 export class BoxSelector {
   private readonly _inputs: Box[];
