@@ -13,7 +13,7 @@ describe("Box selector", () => {
 
     const strategy = new CustomStrategy();
     const selectSpy = jest.spyOn(strategy, "select");
-    const selector = new BoxSelector(unspentBoxes, { nanoErgs: 1000000n }).defineStrategy(strategy);
+    const selector = new BoxSelector(unspentBoxes).defineStrategy(strategy);
 
     expect(selector.select()).toBe(unspentBoxes);
     expect(selectSpy).toBeCalled();
@@ -24,9 +24,7 @@ describe("Box selector", () => {
       return inputs;
     });
 
-    const selector = new BoxSelector(unspentBoxes, { nanoErgs: 1000000n }).defineStrategy(
-      mockSelectorFunction
-    );
+    const selector = new BoxSelector(unspentBoxes).defineStrategy(mockSelectorFunction);
 
     expect(selector.select()).toBe(unspentBoxes);
     expect(mockSelectorFunction).toBeCalled();

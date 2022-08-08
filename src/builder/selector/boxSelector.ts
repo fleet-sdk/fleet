@@ -1,15 +1,15 @@
 import { Box, TokenAmount } from "../../types";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
-import { CustomSelection, SelectorFunction } from "./strategies/customSelectionStrategy";
+import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSelectionStrategy";
 
 export type SelectionTarget = { nanoErgs: bigint; tokens?: TokenAmount<bigint>[] };
 
 export class BoxSelector {
   private readonly _inputs: Box[];
-  private readonly _target: SelectionTarget;
+  private readonly _target?: SelectionTarget;
   private _strategy?: ISelectionStrategy;
 
-  constructor(inputs: Box[], target: SelectionTarget) {
+  constructor(inputs: Box[], target?: SelectionTarget) {
     this._inputs = inputs;
     this._target = target;
   }
@@ -18,7 +18,7 @@ export class BoxSelector {
     if (this._isISelectionStrategyImplementation(strategy)) {
       this._strategy = strategy;
     } else {
-      this._strategy = new CustomSelection(strategy);
+      this._strategy = new CustomSelectionStrategy(strategy);
     }
 
     return this;
