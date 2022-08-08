@@ -1,7 +1,7 @@
 export default {
-  collectCoverageFrom: ["./src/**/*.ts"],
-  coverageDirectory: "./coverage",
+  collectCoverageFrom: ["./src/**/*.ts", "!./src/**/I[A-Z]*.ts", "!./src/**/index.ts"],
   coveragePathIgnorePatterns: ["/node_modules/", "./src/types"],
+  coverageDirectory: "./coverage",
   coverageProvider: "v8",
   coverageReporters: ["text", "lcov"],
   preset: "ts-jest",
