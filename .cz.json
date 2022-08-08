@@ -1,5 +1,3 @@
 {
-  "commitizen": {
-    "path": "cz-conventional-changelog"
-  }
+  "path": "cz-conventional-changelog"
 }
