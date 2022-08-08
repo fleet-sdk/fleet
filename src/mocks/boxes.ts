@@ -1,7 +1,4 @@
-import { Box } from "../../types";
-import { CustomSelection } from "./customSelection";
-
-const unspentBoxes: Box[] = [
+export const unspentBoxes = [
   {
     boxId: "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
     value: 67500000000n,
@@ -33,15 +30,3 @@ const unspentBoxes: Box[] = [
     }
   }
 ];
-
-describe("Custom selection strategy", () => {
-  it("Should use custom selection function to select boxes", () => {
-    const mockSelector = jest.fn((inputs: Box[]) => {
-      return inputs;
-    });
-    const selection = new CustomSelection(mockSelector);
-
-    expect(selection.select(unspentBoxes, { nanoErgs: 1000000n })).toBe(unspentBoxes);
-    expect(mockSelector).toBeCalled();
-  });
-});

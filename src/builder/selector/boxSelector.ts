@@ -1,6 +1,6 @@
 import { Box, TokenAmount } from "../../types";
-import { ISelectionStrategy, isISelectionStrategyImplementation } from "./ISelectionStrategy";
-import { CustomSelection, SelectorFunction } from "./customSelection";
+import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
+import { CustomSelection, SelectorFunction } from "./strategies/customSelectionStrategy";
 
 export type SelectionTarget = { nanoErgs: bigint; tokens?: TokenAmount<bigint>[] };
 
@@ -15,7 +15,7 @@ export class BoxSelector {
   }
 
   public defineStrategy(strategy: ISelectionStrategy | SelectorFunction): BoxSelector {
-    if (isISelectionStrategyImplementation(strategy)) {
+    if (this._isISelectionStrategyImplementation(strategy)) {
       this._strategy = strategy;
     } else {
       this._strategy = new CustomSelection(strategy);
@@ -25,15 +25,26 @@ export class BoxSelector {
   }
 
   public select(): Box[] {
-    // return this._selector(this._inputs, this._target);
-    throw Error("Not implemented");
+    if (!this._strategy) {
+      return this._inputs;
+    }
+
+    return this._strategy.select(this._inputs, this._target);
   }
 
-  public ensureInclusion(selector: (box: Box) => boolean): BoxSelector {
-    throw Error("Not implemented");
-  }
+  // public ensureInclusion(selector: (box: Box) => boolean): BoxSelector {
+  //   throw Error("Not implemented");
+  // }
 
-  public orderBy(selector: (box: Box) => boolean): BoxSelector {
-    throw Error("Not implemented");
+  // public orderBy(selector: (box: Box) => boolean): BoxSelector {
+  //   throw Error("Not implemented");
+  // }
+
+  private _isISelectionStrategyImplementation(obj: unknown): obj is ISelectionStrategy {
+    if ((obj as ISelectionStrategy).select) {
+      return true;
+    }
+
+    return false;
   }
 }
