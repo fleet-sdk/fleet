@@ -1,12 +1,12 @@
 import {
   Amount,
+  BoxCandidate,
   ErgoAddress,
   ErgoTree,
   NewToken,
   NonMandatoryRegisters,
-  TokenId,
-  BoxCandidate,
   TokenAmount,
+  TokenId,
   UnsignedInput
 } from "../types";
 import { toBigInt } from "../utils/bigIntUtils";
