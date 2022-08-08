@@ -14,7 +14,7 @@ export class OutputBuilder {
   private readonly _value: Amount;
   private readonly _recipient: ErgoAddress | ErgoTree;
   private readonly _height: number;
-  private readonly _tokens: TokenAmount[];
+  private readonly _tokens: TokenAmount<bigint>[];
   private _minting?: NewToken;
   private _registers: NonMandatoryRegisters;
 
@@ -42,7 +42,7 @@ export class OutputBuilder {
     return this._height;
   }
 
-  public get tokens(): (TokenAmount | NewToken)[] {
+  public get tokens(): (TokenAmount<bigint> | NewToken)[] {
     if (this._minting) {
       return [this._minting, ...this._tokens];
     }
@@ -57,7 +57,7 @@ export class OutputBuilder {
     return this._minting;
   }
 
-  public addToken(tokenId: TokenId, amount: Amount): OutputBuilder {
+  public addToken(tokenId: TokenId, amount: bigint): OutputBuilder {
     this._tokens.push({ tokenId, amount });
 
     return this;
