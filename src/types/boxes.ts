@@ -9,7 +9,7 @@ type BoxBaseType = {
   ergoTree: ErgoTree;
   creationHeight: number;
   value: Amount;
-  assets: TokenAmount[];
+  assets: TokenAmount<Amount>[];
   additionalRegisters: NonMandatoryRegisters;
 };
 

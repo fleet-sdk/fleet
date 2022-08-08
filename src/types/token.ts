@@ -1,18 +1,16 @@
-import { Amount } from "./primitives";
-
 export type TokenId = string;
 
-type TokenBase = {
-  amount: Amount;
+type TokenBase<AmountType> = {
+  amount: AmountType;
   name?: string;
   decimals?: number;
 };
 
-export type TokenAmount = TokenBase & {
+export type TokenAmount<AmountType> = TokenBase<AmountType> & {
   tokenId: TokenId;
 };
 
-export type NewToken = TokenBase & {
+export type NewToken = TokenBase<bigint> & {
   tokenId?: TokenId;
   description: string;
 };

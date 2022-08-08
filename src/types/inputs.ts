@@ -22,7 +22,7 @@ export type EIP12UnsignedInput = UnsignedInput & {
   ergoTree: ErgoTree;
   creationHeight: number;
   value: Amount;
-  assets: TokenAmount[];
+  assets: TokenAmount<string>[];
   additionalRegisters: NonMandatoryRegisters;
 };
 
