@@ -5,7 +5,7 @@ export interface ISelectionStrategy {
   select(inputs: Box[], target: SelectionTarget): Box[];
 }
 
-export function isISelectionStrategyImplementation(obj: any): obj is ISelectionStrategy {
+export function isISelectionStrategyImplementation(obj: unknown): obj is ISelectionStrategy {
   if ((obj as ISelectionStrategy).select) {
     return true;
   }

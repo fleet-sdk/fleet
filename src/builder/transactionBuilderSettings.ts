@@ -1,6 +1,6 @@
 export class TransactionBuilderSettings {
-  private _maxDistinctTokensPerChangeBox;
-  private _allowTokenBurn;
+  private _maxDistinctTokensPerChangeBox: number;
+  private _allowTokenBurn: boolean;
 
   constructor() {
     this._maxDistinctTokensPerChangeBox = 100;
@@ -17,11 +17,13 @@ export class TransactionBuilderSettings {
 
   public setMaxDistinctTokensPerChangeBox(max: number): TransactionBuilderSettings {
     this._maxDistinctTokensPerChangeBox = max;
+
     return this;
   }
 
   public allowTokenBurn(allow: boolean): TransactionBuilderSettings {
     this._allowTokenBurn = allow;
+
     return this;
   }
 }

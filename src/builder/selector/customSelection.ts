@@ -1,6 +1,6 @@
 import { Box } from "../../types";
-import { SelectionTarget } from "./boxSelector";
 import { ISelectionStrategy } from "./ISelectionStrategy";
+import { SelectionTarget } from "./boxSelector";
 
 export type SelectorFunction = (inputs: Box[], target: SelectionTarget) => Box[];
 

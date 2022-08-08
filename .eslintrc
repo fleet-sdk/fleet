@@ -1,0 +1,58 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": { "project": "./tsconfig.json" },
+  "env": { "es6": true },
+  "ignorePatterns": ["node_modules", "build", "coverage"],
+  "plugins": ["import", "eslint-comments", "functional"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:eslint-comments/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
+    "prettier"
+  ],
+  "globals": { "BigInt": true, "console": true, "WebAssembly": true },
+  "rules": {
+    "no-magic-numbers": "warn",
+    "newline-before-return": "warn",
+    "camelcase": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "default",
+        "format": ["camelCase"]
+      },
+      {
+        "selector": "objectLiteralProperty",
+        "format": ["camelCase", "UPPER_CASE"]
+      },
+      {
+        "selector": "variable",
+        "format": ["camelCase", "UPPER_CASE"]
+      },
+      {
+        "selector": "parameter",
+        "format": ["camelCase"],
+        "leadingUnderscore": "allow"
+      },
+
+      {
+        "selector": "memberLike",
+        "modifiers": ["private"],
+        "format": ["camelCase"],
+        "leadingUnderscore": "require"
+      },
+
+      {
+        "selector": "typeLike",
+        "format": ["PascalCase"]
+      }
+    ],
+    "eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }],
+    "eslint-comments/no-unused-disable": "error",
+    "import/order": ["error", { "alphabetize": { "order": "asc" } }],
+    "sort-imports": ["error", { "ignoreDeclarationSort": true, "ignoreCase": true }]
+  }
+}
