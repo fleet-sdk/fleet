@@ -8,6 +8,6 @@ describe("BigInt utils", () => {
   });
 
   it("Should bypass conversion when using an bigint as argument", () => {
-    expect(toBigInt(1298379183)).toBe(1298379183n);
+    expect(toBigInt(1298379183n)).toBe(1298379183n);
   });
 });
