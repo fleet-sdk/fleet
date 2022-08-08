@@ -10,7 +10,7 @@ export type TokenAmount<AmountType> = TokenBase<AmountType> & {
   tokenId: TokenId;
 };
 
-export type NewToken = TokenBase<bigint> & {
+export type NewToken<AmountType> = TokenBase<AmountType> & {
   tokenId?: TokenId;
   description: string;
 };

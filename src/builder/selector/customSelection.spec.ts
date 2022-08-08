@@ -34,8 +34,8 @@ const unspentBoxes: Box[] = [
   }
 ];
 
-describe("custom selection strategy", () => {
-  it("binds selection function", () => {
+describe("Custom selection strategy", () => {
+  it("Should use custom selection function to select boxes", () => {
     const selection = new CustomSelection((inputs) => {
       return inputs;
     });

@@ -9,17 +9,18 @@ import {
   TokenAmount,
   UnsignedInput
 } from "../types";
+import { toBigInt } from "../utils/bigIntUtils";
 
 export class OutputBuilder {
-  private readonly _value: Amount;
+  private readonly _value: bigint;
   private readonly _recipient: ErgoAddress | ErgoTree;
   private readonly _height: number;
   private readonly _tokens: TokenAmount<bigint>[];
-  private _minting?: NewToken;
   private _registers: NonMandatoryRegisters;
+  private _minting?: NewToken<bigint>;
 
   constructor(value: Amount, recipient: ErgoAddress | ErgoTree, creationHeight: number) {
-    this._value = value;
+    this._value = toBigInt(value);
     this._recipient = recipient;
     this._height = creationHeight;
     this._tokens = [];
@@ -42,10 +43,11 @@ export class OutputBuilder {
     return this._height;
   }
 
-  public get tokens(): (TokenAmount<bigint> | NewToken)[] {
+  public get tokens(): (TokenAmount<bigint> | NewToken<bigint>)[] {
     if (this._minting) {
       return [this._minting, ...this._tokens];
     }
+
     return this._tokens;
   }
 
@@ -53,18 +55,18 @@ export class OutputBuilder {
     return this._registers;
   }
 
-  public get minting(): NewToken | undefined {
+  public get minting(): NewToken<bigint> | undefined {
     return this._minting;
   }
 
-  public addToken(tokenId: TokenId, amount: bigint): OutputBuilder {
-    this._tokens.push({ tokenId, amount });
+  public addToken(tokenId: TokenId, amount: Amount): OutputBuilder {
+    this._tokens.push({ tokenId, amount: toBigInt(amount) });
 
     return this;
   }
 
-  public mintToken(token: NewToken): OutputBuilder {
-    this._minting = token;
+  public mintToken(token: NewToken<Amount>): OutputBuilder {
+    this._minting = { ...token, amount: toBigInt(token.amount) };
 
     return this;
   }

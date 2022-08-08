@@ -1,9 +1,13 @@
 import { toBigInt } from "./bigIntUtils";
 
-it("converts string to bigint", () => {
-  expect(toBigInt("1298379183")).toBe(1298379183n);
-});
+describe("BigInt utils", () => {
+  it("Should convert arbitrary types to bigint", () => {
+    expect(toBigInt("1298379183")).toBe(1298379183n);
+    expect(toBigInt(10)).toBe(10n);
+    expect(toBigInt(true)).toBe(1n);
+  });
 
-it("try to convert a bigint", () => {
-  expect(toBigInt(1298379183)).toBe(1298379183n);
+  it("Should bypass conversion when using an bigint as argument", () => {
+    expect(toBigInt(1298379183)).toBe(1298379183n);
+  });
 });
