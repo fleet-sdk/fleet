@@ -20,7 +20,7 @@ describe("Accumulative selection strategy", () => {
   it("Should select for nanoErgs only", () => {
     const selector = new AccumulativeSelectionStrategy();
     const target = {
-      nanoErgs: 10000n,
+      nanoErgs: 100000n,
       tokens: [
         {
           tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",

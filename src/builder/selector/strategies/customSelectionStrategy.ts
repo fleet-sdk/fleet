@@ -4,6 +4,9 @@ import { ISelectionStrategy } from "./ISelectionStrategy";
 
 export type SelectorFunction = (inputs: Box<bigint>[], target?: SelectionTarget) => Box<bigint>[];
 
+/**
+ * Custom selection strategy supports custom selections implementations.
+ */
 export class CustomSelectionStrategy implements ISelectionStrategy {
   private readonly _selector: SelectorFunction;
 

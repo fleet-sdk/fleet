@@ -4,6 +4,10 @@ import { sumBy } from "../../../utils/bigIntUtils";
 import { SelectionTarget } from "../boxSelector";
 import { ISelectionStrategy } from "./ISelectionStrategy";
 
+/**
+ * Accumulative selection strategy accumulates inputs until the target
+ * value is reached, skipping detrimental inputs.
+ */
 export class AccumulativeSelectionStrategy implements ISelectionStrategy {
   select(inputs: Box<bigint>[], target?: SelectionTarget): Box<bigint>[] {
     if (!target) {
