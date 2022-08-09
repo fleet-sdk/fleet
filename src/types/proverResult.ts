@@ -1,5 +1,5 @@
 import { ContextExtension } from "./contextExtension";
-import { HexString } from "./primitives";
+import { HexString } from "./common";
 
 export type ProverResult = {
   readonly proofBytes: HexString;

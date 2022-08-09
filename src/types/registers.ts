@@ -1,4 +1,4 @@
-import { HexString } from "./primitives";
+import { HexString } from "./common";
 
 export type NonMandatoryRegisters = {
   R4?: HexString;

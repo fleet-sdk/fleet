@@ -1,4 +1,4 @@
-import { ErgoTree } from "./primitives";
+import { ErgoTree } from "./common";
 import { NonMandatoryRegisters } from "./registers";
 import { TokenAmount } from "./token";
 import { TransactionId } from "./transactions";
