@@ -34,6 +34,7 @@ describe("Accumulative selection strategy", () => {
     };
     const boxes = selector.select(mockUnspentBoxes, target);
 
+    expect(boxes.length).toBeLessThan(mockUnspentBoxes.length);
     expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
     expect(
       sumBy(
