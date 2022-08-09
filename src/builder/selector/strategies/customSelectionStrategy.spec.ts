@@ -1,15 +1,15 @@
-import { unspentBoxes } from "../../../mocks/boxes";
+import { mockUnspentBoxes } from "../../../mocks/mockBoxes";
 import { Box } from "../../../types";
 import { CustomSelectionStrategy } from "./customSelectionStrategy";
 
 describe("Custom selection strategy", () => {
   it("Should use custom selection function to select boxes", () => {
-    const mockSelector = jest.fn((inputs: Box[]) => {
+    const mockSelector = jest.fn((inputs: Box<bigint>[]) => {
       return inputs;
     });
     const selection = new CustomSelectionStrategy(mockSelector);
 
-    expect(selection.select(unspentBoxes)).toBe(unspentBoxes);
+    expect(selection.select(mockUnspentBoxes)).toBe(mockUnspentBoxes);
     expect(mockSelector).toBeCalled();
   });
 });

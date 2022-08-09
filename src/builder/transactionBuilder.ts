@@ -11,7 +11,9 @@ import { OutputBuilder } from "./outputBuilder";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
 export class TransactionBuilder {
-  public from(inputs: UnsignedInput[] | Box[] | BoxCandidate[]): TransactionBuilder {
+  public from(
+    inputs: UnsignedInput[] | Box<Amount>[] | BoxCandidate<Amount>[]
+  ): TransactionBuilder {
     throw Error("Not implemented");
   }
 

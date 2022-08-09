@@ -9,6 +9,7 @@ import {
   TokenId,
   UnsignedInput
 } from "../types";
+import { isEmpty } from "../utils/arrayUtils";
 import { toBigInt } from "../utils/bigIntUtils";
 
 export class OutputBuilder {
@@ -27,7 +28,7 @@ export class OutputBuilder {
     this._registers = {};
   }
 
-  public get value(): Amount {
+  public get value(): bigint {
     return this._value;
   }
 
@@ -77,12 +78,14 @@ export class OutputBuilder {
     return this;
   }
 
-  public build(): BoxCandidate;
-  public build(mintingContext?: UnsignedInput[] /** todo: replace by selection */): BoxCandidate {
+  public build(): BoxCandidate<string>;
+  public build(
+    mintingContext?: UnsignedInput[] /** todo: replace by selection */
+  ): BoxCandidate<string> {
     let tokens = this._tokens;
 
     if (this.minting) {
-      if (!mintingContext || mintingContext.length === 0) {
+      if (isEmpty(mintingContext)) {
         throw Error("Minting context is undefined.");
       }
 
@@ -92,7 +95,9 @@ export class OutputBuilder {
     return {
       ergoTree: this.ergoTree,
       value: this.value.toString(),
-      assets: tokens,
+      assets: tokens.map((token) => {
+        return { tokenId: token.tokenId, amount: token.amount.toString() };
+      }),
       creationHeight: this.height,
       additionalRegisters: this.additionalRegisters
     };

@@ -1,23 +1,23 @@
-import { Amount, ErgoTree } from "./primitives";
+import { ErgoTree } from "./primitives";
 import { NonMandatoryRegisters } from "./registers";
 import { TokenAmount } from "./token";
 import { TransactionId } from "./transactions";
 
 export type BoxId = string;
 
-type BoxBaseType = {
+type BoxBaseType<AmountType> = {
   ergoTree: ErgoTree;
   creationHeight: number;
-  value: Amount;
-  assets: TokenAmount<Amount>[];
+  value: AmountType;
+  assets: TokenAmount<AmountType>[];
   additionalRegisters: NonMandatoryRegisters;
 };
 
-export type BoxCandidate = BoxBaseType & {
+export type BoxCandidate<AmountType> = BoxBaseType<AmountType> & {
   boxId?: BoxId;
 };
 
-export type Box = BoxBaseType & {
+export type Box<AmountType> = BoxBaseType<AmountType> & {
   boxId: BoxId;
   transactionId: TransactionId;
   index: number;

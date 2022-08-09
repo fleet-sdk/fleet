@@ -5,11 +5,11 @@ import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSe
 export type SelectionTarget = { nanoErgs: bigint; tokens?: TokenAmount<bigint>[] };
 
 export class BoxSelector {
-  private readonly _inputs: Box[];
+  private readonly _inputs: Box<bigint>[];
   private readonly _target?: SelectionTarget;
   private _strategy?: ISelectionStrategy;
 
-  constructor(inputs: Box[], target?: SelectionTarget) {
+  constructor(inputs: Box<bigint>[], target?: SelectionTarget) {
     this._inputs = inputs;
     this._target = target;
   }
@@ -24,7 +24,7 @@ export class BoxSelector {
     return this;
   }
 
-  public select(): Box[] {
+  public select(): Box<bigint>[] {
     if (!this._strategy) {
       return this._inputs;
     }

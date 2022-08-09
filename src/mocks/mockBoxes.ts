@@ -1,6 +1,6 @@
 import { Box } from "../types";
 
-export const mockUnspentBoxes: Box[] = [
+export const mockUnspentBoxes: Box<bigint>[] = [
   {
     boxId: "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
     value: 67500000000n,
@@ -37,91 +37,91 @@ export const mockUnspentBoxes: Box[] = [
     index: 1,
     ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
     creationHeight: 804158,
-    value: "389063261",
+    value: 389063261n,
     assets: [
       {
         tokenId: "5a34d53ca483924b9a6aa0c771f11888881b516a8d1a9cdc535d063fe26d065e",
-        amount: "33"
+        amount: 33n
       },
       {
         tokenId: "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2",
-        amount: "1"
+        amount: 1n
       },
       {
         tokenId: "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489",
-        amount: "896549"
+        amount: 896549n
       },
       {
         tokenId: "c4494f3bd96821f21d7a83b2baa640dfbe16f15853eb63a553bc840739b12f62",
-        amount: "1"
+        amount: 1n
       },
       {
         tokenId: "a3b3fa62124ef52209a46121e3f93ca98d7fc24198009e90fde8205ef9d3fc33",
-        amount: "1"
+        amount: 1n
       },
       {
         tokenId: "003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0",
-        amount: "1"
+        amount: 1n
       },
       {
         tokenId: "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5",
-        amount: "1234567890123456789"
+        amount: 1234567890123456789n
       },
       {
         tokenId: "ee105e8290b090a773b7c56756507d45a76743d73bce54e8a915e95d9eb97360",
-        amount: "316227766"
+        amount: 316227766n
       },
       {
         tokenId: "30974274078845f263b4f21787e33cc99e9ec19a17ad85a5bc6da2cca91c5a2e",
-        amount: "506432873054"
+        amount: 506432873054n
       },
       {
         tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
-        amount: "27380"
+        amount: 27380n
       },
       {
         tokenId: "1c51c3a53abfe87e6db9a03c649e8360f255ffc4bd34303d30fc7db23ae551db",
-        amount: "540"
+        amount: 540n
       },
       {
         tokenId: "fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40",
-        amount: "1985"
+        amount: 1985n
       },
       {
         tokenId: "74251ce2cb4eb2024a1a155e19ad1d1f58ff8b9e6eb034a3bb1fd58802757d23",
-        amount: "200000000000"
+        amount: 200000000000n
       },
       {
         tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
-        amount: "3809"
+        amount: 3809n
       },
       {
         tokenId: "d601123e8838b95cdaebe24e594276b2a89cd38e98add98405bb5327520ecf6c",
-        amount: "15923500"
+        amount: 15923500n
       },
       {
         tokenId: "d71693c49a84fbbecd4908c94813b46514b18b67a99952dc1e6e4791556de413",
-        amount: "1883"
+        amount: 1883n
       },
       {
         tokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
-        amount: "50"
+        amount: 50n
       },
       {
         tokenId: "ef802b475c06189fdbf844153cdc1d449a5ba87cce13d11bb47b5a539f27f12b",
-        amount: "1585999996837"
+        amount: 1585999996837n
       },
       {
         tokenId: "bf337a2ce726259ad31e043c5b3d432e31b403fc6686691171e0e0a319b9ae7a",
-        amount: "1"
+        amount: 1n
       },
       {
         tokenId: "36aba4b4a97b65be491cf9f5ca57b5408b0da8d0194f30ec8330d1e8946161c1",
-        amount: "3"
+        amount: 3n
       },
       {
         tokenId: "02f31739e2e4937bb9afb552943753d1e3e9cdd1a5e5661949cb0cef93f907ea",
-        amount: "216926"
+        amount: 216926n
       }
     ],
     additionalRegisters: {},
@@ -133,7 +133,7 @@ export const mockUnspentBoxes: Box[] = [
     index: 0,
     ergoTree: "0008cd029a879c50408a569fa1a7661935759cf61fe770e4953359a73df17b91659723bd",
     creationHeight: 804158,
-    value: "1000000000",
+    value: 1000000000n,
     assets: [],
     additionalRegisters: {},
     confirmed: true
@@ -144,11 +144,11 @@ export const mockUnspentBoxes: Box[] = [
     index: 0,
     ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
     creationHeight: 804138,
-    value: "1000000",
+    value: 1000000n,
     assets: [
       {
         tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
-        amount: "10000"
+        amount: 10000n
       }
     ],
     additionalRegisters: {},
@@ -160,11 +160,11 @@ export const mockUnspentBoxes: Box[] = [
     index: 0,
     ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
     creationHeight: 804138,
-    value: "1000000000",
+    value: 1000000000n,
     assets: [
       {
         tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
-        amount: "10"
+        amount: 10n
       }
     ],
     additionalRegisters: {},

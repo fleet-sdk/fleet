@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
 describe("Transaction builder settings", () => {
