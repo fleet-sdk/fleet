@@ -5,3 +5,5 @@ export type Amount = string | bigint;
 
 export type SortingSelector<T> = (item: T) => unknown;
 export type SortingDirection = "asc" | "desc";
+
+export type FilterPredicate<T> = (item: T) => boolean;

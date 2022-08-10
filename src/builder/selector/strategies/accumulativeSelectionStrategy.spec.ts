@@ -1,5 +1,6 @@
 import { mockUnspentBoxes } from "../../../mocks/mockBoxes";
 import { sumBy } from "../../../utils/bigIntUtils";
+import { sumByTokenId } from "../../../utils/boxUtils";
 import { AccumulativeSelectionStrategy } from "./accumulativeSelectionStrategy";
 
 describe("Accumulative selection strategy", () => {
@@ -8,16 +9,16 @@ describe("Accumulative selection strategy", () => {
     expect(selector.select(mockUnspentBoxes)).toEqual(mockUnspentBoxes);
   });
 
-  it("Should select for nanoErgs only", () => {
+  it("Should select inputs for nanoErgs only", () => {
     const selector = new AccumulativeSelectionStrategy();
     const target = { nanoErgs: 10000n };
     const boxes = selector.select(mockUnspentBoxes, target);
 
     expect(boxes).toHaveLength(1);
-    expect(sumBy(mockUnspentBoxes, (x) => x.value)).toBeGreaterThanOrEqual(10000n);
+    expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(10000n);
   });
 
-  it("Should select for nanoErgs only", () => {
+  it("Should select inputs for tokens", () => {
     const selector = new AccumulativeSelectionStrategy();
     const target = {
       nanoErgs: 100000n,
@@ -34,13 +35,13 @@ describe("Accumulative selection strategy", () => {
     };
     const boxes = selector.select(mockUnspentBoxes, target);
 
-    expect(boxes.length).toBeLessThan(mockUnspentBoxes.length);
+    expect(boxes).toHaveLength(1); // should try to reuse already selected inputs
     expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
     expect(
-      sumBy(
-        boxes.flatMap((x) => x.assets).filter((x) => x.tokenId == target.tokens[0].tokenId),
-        (x) => x.amount
-      )
-    ).toBeGreaterThanOrEqual(target.tokens[0].amount);
+      sumByTokenId(boxes, "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
+    ).toBeGreaterThanOrEqual(100n);
+    expect(
+      sumByTokenId(boxes, "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283")
+    ).toBeGreaterThanOrEqual(10n);
   });
 });

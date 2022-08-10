@@ -1,7 +1,11 @@
 import { orderBy as lodashOrderBy } from "lodash";
-import { Box, SortingDirection, SortingSelector, TokenAmount } from "../../types";
+import { Box, FilterPredicate, SortingDirection, SortingSelector, TokenAmount } from "../../types";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
+import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
 import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSelectionStrategy";
+import { sumBy } from "../../utils/bigIntUtils";
+import { isEmpty } from "../../utils/arrayUtils";
+import { sumByTokenId } from "../../utils/boxUtils";
 
 export type SelectionTarget = { nanoErgs: bigint; tokens?: TokenAmount<bigint>[] };
 
@@ -11,6 +15,7 @@ export class BoxSelector {
   private _strategy?: ISelectionStrategy;
   private _inputsSortSelector?: SortingSelector<Box<bigint>>;
   private _inputsSortDir?: SortingDirection;
+  private _ensureFilterPredicate?: FilterPredicate<Box<bigint>>;
 
   constructor(inputs: Box<bigint>[], target?: SelectionTarget) {
     this._inputs = inputs;
@@ -29,10 +34,33 @@ export class BoxSelector {
 
   public select(): Box<bigint>[] {
     if (!this._strategy) {
-      return this._sort(this._inputs);
+      this._strategy = new AccumulativeSelectionStrategy();
     }
 
-    return this._strategy.select(this._sort(this._inputs), this._target);
+    const target = this._target ? { ...this._target } : undefined;
+    let unselected = this._inputs;
+    let selected = this._ensureFilterPredicate
+      ? unselected.filter(this._ensureFilterPredicate)
+      : [];
+
+    if (this._ensureFilterPredicate) {
+      const predicate = this._ensureFilterPredicate;
+      unselected = unselected.filter((input) => !predicate(input));
+
+      if (target) {
+        target.nanoErgs -= sumBy(selected, (input) => input.value);
+        if (target.tokens && selected.some((input) => !isEmpty(input.assets))) {
+          target.tokens.forEach((tokenTarget) => {
+            tokenTarget.amount -= sumByTokenId(selected, tokenTarget.tokenId);
+          });
+        }
+      }
+    }
+    console.log(target);
+    unselected = this._sort(unselected);
+    selected = selected.concat(this._strategy.select(unselected, target));
+
+    return selected;
   }
 
   private _sort(inputs: Box<bigint>[]) {
@@ -43,9 +71,11 @@ export class BoxSelector {
     return lodashOrderBy(inputs, this._inputsSortSelector, this._inputsSortDir || "asc");
   }
 
-  // public ensureInclusion(selector: (box: Box) => boolean): BoxSelector {
-  //   throw Error("Not implemented");
-  // }
+  public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector {
+    this._ensureFilterPredicate = predicate;
+
+    return this;
+  }
 
   public orderBy(
     selector: SortingSelector<Box<bigint>>,

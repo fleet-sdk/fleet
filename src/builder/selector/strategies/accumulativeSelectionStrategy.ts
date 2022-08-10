@@ -1,6 +1,7 @@
 import { Box, TokenAmount, TokenId } from "../../../types";
 import { isEmpty } from "../../../utils/arrayUtils";
 import { sumBy } from "../../../utils/bigIntUtils";
+import { sumByTokenId } from "../../../utils/boxUtils";
 import { SelectionTarget } from "../boxSelector";
 import { ISelectionStrategy } from "./ISelectionStrategy";
 
@@ -31,12 +32,12 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
     let selection: Box<bigint>[] = [];
 
     for (const target of targets) {
-      const amount = target.amount - this._sumTokenAmount(selection, target.tokenId);
-      if (amount <= 0n) {
+      const targetAmount = target.amount - sumByTokenId(selection, target.tokenId);
+      if (targetAmount <= 0n) {
         continue;
       }
 
-      selection = selection.concat(this._select(inputs, amount, target.tokenId));
+      selection = selection.concat(this._select(inputs, targetAmount, target.tokenId));
     }
 
     return selection;
@@ -52,34 +53,16 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
           if (token.tokenId !== tokenId) {
             continue;
           }
+
           acc += token.amount;
+          selection.push(inputs[i]);
         }
       } else {
         acc += inputs[i].value;
+        selection.push(inputs[i]);
       }
-
-      selection.push(inputs[i]);
     }
 
     return selection;
-  }
-
-  private _sumTokenAmount(inputs: Box<bigint>[], tokenId: TokenId): bigint {
-    let acc = 0n;
-    if (isEmpty(inputs)) {
-      return acc;
-    }
-
-    for (const input of inputs) {
-      for (const token of input.assets) {
-        if (token.tokenId !== tokenId) {
-          continue;
-        }
-
-        acc += token.amount;
-      }
-    }
-
-    return acc;
   }
 }

@@ -1,5 +1,8 @@
 import { mockUnspentBoxes } from "../../mocks/mockBoxes";
 import { Box } from "../../types";
+import { first } from "../../utils/arrayUtils";
+import { sumBy } from "../../utils/bigIntUtils";
+import { sumByTokenId } from "../../utils/boxUtils";
 import { BoxSelector } from "./boxSelector";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 
@@ -31,9 +34,9 @@ describe("Selection strategies", () => {
   });
 
   it("Should fallback to a default selection strategy if nothing is specified", () => {
-    const selection = new BoxSelector(mockUnspentBoxes).select();
+    const selection = new BoxSelector(mockUnspentBoxes, { nanoErgs: 10000n }).select();
 
-    expect(selection?.length).toBeGreaterThanOrEqual(1);
+    expect(selection.length).toBe(1);
   });
 });
 
@@ -63,7 +66,37 @@ describe("Inputs sorting", () => {
   });
 });
 
-describe("Testing helpers", () => {
+describe("Ensure input inclusion", () => {
+  it("Should forcedly include inputs that attends to filter criteria", () => {
+    const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
+    const target = { nanoErgs: 10000n };
+    const selector = new BoxSelector(mockUnspentBoxes, target).ensureInclusion(
+      (input) => input.boxId === arbitraryBoxId
+    );
+    const boxes = selector.select();
+
+    expect(boxes.some((x) => x.boxId === arbitraryBoxId)).toBe(true);
+    expect(boxes).toHaveLength(1);
+    expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
+  });
+
+  it("Should forcedly include inputs that attends to filter criteria and collect additional inputs until target is reached", () => {
+    const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
+    const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
+    const target = { nanoErgs: 10000n, tokens: [{ tokenId, amount: 100n }] };
+    const selector = new BoxSelector(mockUnspentBoxes, target).ensureInclusion(
+      (input) => input.boxId === arbitraryBoxId
+    );
+    const boxes = selector.select();
+
+    expect(boxes.some((x) => x.boxId === arbitraryBoxId)).toBe(true);
+    expect(boxes).toHaveLength(2);
+    expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
+    expect(sumByTokenId(boxes, tokenId)).toBeGreaterThanOrEqual(first(target.tokens).amount);
+  });
+});
+
+describe("Test helpers", () => {
   it("Should return true with a ascending array", () => {
     expect(isAscending([1, 2, 2, 3, 4, 5])).toBe(true);
   });
