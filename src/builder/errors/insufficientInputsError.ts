@@ -11,6 +11,7 @@ export class InsufficientInputsError extends Error {
         })
         .join()}`
     );
+
     this.unreached = unreached;
   }
 }
