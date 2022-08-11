@@ -1,6 +1,6 @@
 import { BoxId } from "./boxes";
+import { Amount, ErgoTree } from "./common";
 import { ContextExtension } from "./contextExtension";
-import { ErgoTree, Amount } from "./common";
 import { ProverResult } from "./proverResult";
 import { NonMandatoryRegisters } from "./registers";
 import { TokenAmount } from "./token";

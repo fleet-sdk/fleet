@@ -20,6 +20,12 @@
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/naming-convention": [
       "error",
+      { "selector": "default", "format": ["camelCase"] },
+      { "selector": "typeProperty", "format": ["camelCase", "UPPER_CASE"] },
+      { "selector": "objectLiteralProperty", "format": ["camelCase", "UPPER_CASE"] },
+      { "selector": "variable", "format": ["camelCase", "UPPER_CASE"] },
+      { "selector": "parameter", "format": ["camelCase"], "leadingUnderscore": "allow" },
+      { "selector": "typeLike", "format": ["PascalCase"] },
       {
         "selector": [
           "classProperty",
@@ -35,32 +41,10 @@
         "modifiers": ["requiresQuotes"]
       },
       {
-        "selector": "default",
-        "format": ["camelCase"]
-      },
-      {
-        "selector": "objectLiteralProperty",
-        "format": ["camelCase", "UPPER_CASE"]
-      },
-      {
-        "selector": "variable",
-        "format": ["camelCase", "UPPER_CASE"]
-      },
-      {
-        "selector": "parameter",
-        "format": ["camelCase"],
-        "leadingUnderscore": "allow"
-      },
-
-      {
         "selector": "memberLike",
         "modifiers": ["private"],
         "format": ["camelCase"],
         "leadingUnderscore": "require"
-      },
-      {
-        "selector": "typeLike",
-        "format": ["PascalCase"]
       }
     ],
     "eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }],
