@@ -3,6 +3,7 @@ import { Box } from "../../types";
 import { first } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";
 import { sumByTokenId } from "../../utils/boxUtils";
+import { InsufficientInputsError } from "../errors/insufficientInputsError";
 import { BoxSelector } from "./boxSelector";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 
@@ -16,7 +17,7 @@ describe("Selection strategies", () => {
 
     const strategy = new CustomStrategy();
     const selectSpy = jest.spyOn(strategy, "select");
-    const selector = new BoxSelector(mockUnspentBoxes).defineStrategy(strategy);
+    const selector = new BoxSelector(mockUnspentBoxes, { nanoErgs: 0n }).defineStrategy(strategy);
 
     expect(selector.select()).toHaveLength(mockUnspentBoxes.length);
     expect(selectSpy).toBeCalled();
@@ -27,7 +28,9 @@ describe("Selection strategies", () => {
       return inputs;
     });
 
-    const selector = new BoxSelector(mockUnspentBoxes).defineStrategy(mockSelectorFunction);
+    const selector = new BoxSelector(mockUnspentBoxes, { nanoErgs: 0n }).defineStrategy(
+      mockSelectorFunction
+    );
 
     expect(selector.select()).toHaveLength(mockUnspentBoxes.length);
     expect(mockSelectorFunction).toBeCalled();
@@ -42,7 +45,10 @@ describe("Selection strategies", () => {
 
 describe("Inputs sorting", () => {
   it("Should order inputs ascending by boxId", () => {
-    const selection = new BoxSelector(mockUnspentBoxes).orderBy((x) => x.boxId).select();
+    const nanoErgs = sumBy(mockUnspentBoxes, (x) => x.value);
+    const selection = new BoxSelector(mockUnspentBoxes, { nanoErgs })
+      .orderBy((x) => x.boxId)
+      .select();
 
     expect(isAscending(selection.map((x) => x.boxId))).toBe(true);
     expect(isAscending(mockUnspentBoxes.map((x) => x.boxId))).not.toBe(true);
@@ -50,7 +56,10 @@ describe("Inputs sorting", () => {
   });
 
   it("Should order inputs descending by ergoTree", () => {
-    const selection = new BoxSelector(mockUnspentBoxes).orderBy((x) => x.ergoTree, "desc").select();
+    const nanoErgs = sumBy(mockUnspentBoxes, (x) => x.value);
+    const selection = new BoxSelector(mockUnspentBoxes, { nanoErgs })
+      .orderBy((x) => x.ergoTree, "desc")
+      .select();
 
     expect(isDescending(selection.map((x) => x.ergoTree))).toBe(true);
     expect(isDescending(mockUnspentBoxes.map((x) => x.ergoTree))).not.toBe(true);
@@ -58,7 +67,8 @@ describe("Inputs sorting", () => {
   });
 
   it("Should fallback order to ascending creationHeight if no orderBy is called", () => {
-    const selection = new BoxSelector(mockUnspentBoxes).select();
+    const nanoErgs = sumBy(mockUnspentBoxes, (x) => x.value);
+    const selection = new BoxSelector(mockUnspentBoxes, { nanoErgs }).select();
 
     expect(isAscending(selection.map((x) => x.creationHeight))).toBe(true);
     expect(isAscending(mockUnspentBoxes.map((x) => x.boxId))).not.toBe(true);
@@ -93,6 +103,42 @@ describe("Ensure input inclusion", () => {
     expect(boxes).toHaveLength(2);
     expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
     expect(sumByTokenId(boxes, tokenId)).toBeGreaterThanOrEqual(first(target.tokens).amount);
+  });
+});
+
+describe("Validations", () => {
+  it("Should fail if nanoErgs target is unreached", () => {
+    const selector = new BoxSelector(mockUnspentBoxes, {
+      nanoErgs: 9000000000000n
+    });
+
+    expect(() => {
+      selector.select();
+    }).toThrow(InsufficientInputsError);
+  });
+
+  it("Should fail if tokens target is unreached", () => {
+    const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
+    const selector = new BoxSelector(mockUnspentBoxes, {
+      nanoErgs: 10000n,
+      tokens: [{ tokenId, amount: 10000000n }]
+    });
+
+    expect(() => {
+      selector.select();
+    }).toThrow(InsufficientInputsError);
+  });
+
+  it("Should fail if any target is unreached", () => {
+    const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
+    const selector = new BoxSelector(mockUnspentBoxes, {
+      nanoErgs: 9000000000000n,
+      tokens: [{ tokenId, amount: 10000000n }]
+    });
+
+    expect(() => {
+      selector.select();
+    }).toThrow(InsufficientInputsError);
   });
 });
 

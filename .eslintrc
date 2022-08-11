@@ -16,9 +16,24 @@
   "rules": {
     "newline-before-return": "warn",
     "camelcase": "off",
+    "no-console": "error",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/naming-convention": [
       "error",
+      {
+        "selector": [
+          "classProperty",
+          "objectLiteralProperty",
+          "typeProperty",
+          "classMethod",
+          "objectLiteralMethod",
+          "typeMethod",
+          "accessor",
+          "enumMember"
+        ],
+        "format": null,
+        "modifiers": ["requiresQuotes"]
+      },
       {
         "selector": "default",
         "format": ["camelCase"]

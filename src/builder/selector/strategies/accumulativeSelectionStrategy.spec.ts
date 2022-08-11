@@ -4,9 +4,9 @@ import { sumByTokenId } from "../../../utils/boxUtils";
 import { AccumulativeSelectionStrategy } from "./accumulativeSelectionStrategy";
 
 describe("Accumulative selection strategy", () => {
-  it("Should return untouched inputs if no target is specified", () => {
+  it("Should return an empty array if empty target: { nanoErgs: 0 }", () => {
     const selector = new AccumulativeSelectionStrategy();
-    expect(selector.select(mockUnspentBoxes)).toEqual(mockUnspentBoxes);
+    expect(selector.select(mockUnspentBoxes, { nanoErgs: 0n })).toEqual([]);
   });
 
   it("Should select inputs for nanoErgs only", () => {

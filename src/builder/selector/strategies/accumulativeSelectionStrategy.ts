@@ -10,11 +10,7 @@ import { ISelectionStrategy } from "./ISelectionStrategy";
  * value is reached, skipping detrimental inputs.
  */
 export class AccumulativeSelectionStrategy implements ISelectionStrategy {
-  select(inputs: Box<bigint>[], target?: SelectionTarget): Box<bigint>[] {
-    if (!target) {
-      return inputs;
-    }
-
+  select(inputs: Box<bigint>[], target: SelectionTarget): Box<bigint>[] {
     let selection: Box<bigint>[] = [];
     if (!isEmpty(target.tokens)) {
       selection = this._selectTokens(inputs, target.tokens);

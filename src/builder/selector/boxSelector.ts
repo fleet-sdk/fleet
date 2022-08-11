@@ -1,23 +1,24 @@
 import { orderBy as lodashOrderBy } from "lodash";
 import { Box, FilterPredicate, SortingDirection, SortingSelector, TokenAmount } from "../../types";
+import { isEmpty, some } from "../../utils/arrayUtils";
+import { sumBy } from "../../utils/bigIntUtils";
+import { sumByTokenId } from "../../utils/boxUtils";
+import { InsufficientInputs, InsufficientInputsError } from "../errors/insufficientInputsError";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
 import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSelectionStrategy";
-import { sumBy } from "../../utils/bigIntUtils";
-import { isEmpty } from "../../utils/arrayUtils";
-import { sumByTokenId } from "../../utils/boxUtils";
 
 export type SelectionTarget = { nanoErgs: bigint; tokens?: TokenAmount<bigint>[] };
 
 export class BoxSelector {
   private readonly _inputs: Box<bigint>[];
-  private readonly _target?: SelectionTarget;
+  private readonly _target: SelectionTarget;
   private _strategy?: ISelectionStrategy;
+  private _ensureFilterPredicate?: FilterPredicate<Box<bigint>>;
   private _inputsSortSelector?: SortingSelector<Box<bigint>>;
   private _inputsSortDir?: SortingDirection;
-  private _ensureFilterPredicate?: FilterPredicate<Box<bigint>>;
 
-  constructor(inputs: Box<bigint>[], target?: SelectionTarget) {
+  constructor(inputs: Box<bigint>[], target: SelectionTarget) {
     this._inputs = inputs;
     this._target = target;
   }
@@ -37,7 +38,7 @@ export class BoxSelector {
       this._strategy = new AccumulativeSelectionStrategy();
     }
 
-    const target = this._target ? { ...this._target } : undefined;
+    const target = { ...this._target };
     let unselected = this._inputs;
     let selected = this._ensureFilterPredicate
       ? unselected.filter(this._ensureFilterPredicate)
@@ -56,11 +57,38 @@ export class BoxSelector {
         }
       }
     }
-    console.log(target);
+
     unselected = this._sort(unselected);
     selected = selected.concat(this._strategy.select(unselected, target));
 
+    const unreached = this._getUnreachedTargets(selected, this._target);
+    if (some(unreached)) {
+      throw new InsufficientInputsError(unreached);
+    }
+
     return selected;
+  }
+
+  private _getUnreachedTargets(inputs: Box<bigint>[], target: SelectionTarget): InsufficientInputs {
+    const unreached: InsufficientInputs = {};
+    const selectedNanoergs = sumBy(inputs, (input) => input.value);
+
+    if (target.nanoErgs > selectedNanoergs) {
+      unreached["nanoErgs"] = target.nanoErgs - selectedNanoergs;
+    }
+
+    if (isEmpty(target.tokens)) {
+      return unreached;
+    }
+
+    for (const tokenTarget of target.tokens) {
+      const totalSelected = sumByTokenId(inputs, tokenTarget.tokenId);
+      if (tokenTarget.amount > totalSelected) {
+        unreached[tokenTarget.tokenId] = tokenTarget.amount - totalSelected;
+      }
+    }
+
+    return unreached;
   }
 
   private _sort(inputs: Box<bigint>[]) {
