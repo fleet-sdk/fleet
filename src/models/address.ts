@@ -56,12 +56,12 @@ export class Address {
   }
 
   public static fromBytes(bytes: Buffer): Address {
-    const addr = new Address(bytes);
-    if (!addr.isValid()) {
+    const address = new Address(bytes);
+    if (!address.isValid()) {
       throw new Error(`Invalid Ergo address ${bytes}`);
     }
 
-    return addr;
+    return address;
   }
 
   public static fromErgoTree(ergoTree: string, network: Network = Network.Mainnet): Address {
@@ -114,7 +114,12 @@ export class Address {
     return this.fromPublicKey(Buffer.from(getSecpPublicKey(secretKey, true)), network);
   }
 
-  public static validate(bytes: Buffer): boolean {
+  public static validate(address: Buffer | string): boolean {
+    const bytes = Buffer.isBuffer(address) ? address : Buffer.from(bs58.decode(address));
+    if (bytes.length < CHECKSUM_BYTES_LENGTH) {
+      return false;
+    }
+
     const length = bytes.length;
     const script = bytes.subarray(0, length - CHECKSUM_BYTES_LENGTH);
     const checksum = bytes.subarray(length - CHECKSUM_BYTES_LENGTH, length);
