@@ -51,6 +51,10 @@ describe("fist() fetcher", () => {
     expect(first(undefined)).toBeUndefined();
   });
 
+  it("Should return number if the array is a Buffer", () => {
+    expect(first(Buffer.from([2, 4, 6]))).toBe(2);
+  });
+
   it("Should throw an error if the array is empty", () => {
     expect(() => {
       first([]);

@@ -22,6 +22,7 @@
       "error",
       { "selector": "default", "format": ["camelCase"] },
       { "selector": "typeProperty", "format": ["camelCase", "UPPER_CASE"] },
+      { "selector": "enumMember", "format": ["PascalCase", "UPPER_CASE"] },
       { "selector": "objectLiteralProperty", "format": ["camelCase", "UPPER_CASE"] },
       { "selector": "variable", "format": ["camelCase", "UPPER_CASE"] },
       { "selector": "parameter", "format": ["camelCase"], "leadingUnderscore": "allow" },
