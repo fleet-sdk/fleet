@@ -1,6 +1,7 @@
 import { getPublicKey as getSecpPublicKey } from "@noble/secp256k1";
 import { blake2b } from "blakejs";
 import * as bs58 from "bs58";
+import { InvalidAddressError } from "../builder/errors/invalidAddressError";
 import { AddressType, Network } from "../types";
 import { first } from "../utils/arrayUtils";
 
@@ -58,7 +59,7 @@ export class Address {
   public static fromBytes(bytes: Buffer): Address {
     const address = new Address(bytes);
     if (!address.isValid()) {
-      throw new Error(`Invalid Ergo address ${bytes}`);
+      throw new InvalidAddressError(address.address);
     }
 
     return address;
