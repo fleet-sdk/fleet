@@ -13,8 +13,8 @@ const P2PK_ERGOTREE_PREFIX_BYTES = Buffer.from([0x00, 0x08, 0xcd]);
 const P2PK_ERGOTREE_PREFIX_HEX = P2PK_ERGOTREE_PREFIX_BYTES.toString("hex");
 
 export class Address {
-  public readonly address: string;
   public readonly bytes: Buffer;
+  private readonly _address: string;
 
   private get _headByte() {
     return first(this.bytes);
@@ -44,11 +44,11 @@ export class Address {
   constructor(address: string);
   constructor(address: string | Buffer) {
     if (Buffer.isBuffer(address)) {
-      this.address = bs58.encode(address);
+      this._address = bs58.encode(address);
       this.bytes = address;
     } else {
-      this.address = address;
-      this.bytes = Buffer.from(bs58.decode(this.address));
+      this._address = address;
+      this.bytes = Buffer.from(bs58.decode(this._address));
     }
   }
 
@@ -59,7 +59,7 @@ export class Address {
   public static fromBytes(bytes: Buffer): Address {
     const address = new Address(bytes);
     if (!address.isValid()) {
-      throw new InvalidAddressError(address.address);
+      throw new InvalidAddressError(address._address);
     }
 
     return address;
@@ -132,5 +132,9 @@ export class Address {
 
   public isValid(): boolean {
     return Address.validate(this.bytes);
+  }
+
+  public toString(): string {
+    return this._address;
   }
 }

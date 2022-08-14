@@ -13,6 +13,8 @@ describe("Address validation", () => {
   it("Should validate VALID address from address string", () => {
     expect(Address.validate("9iPgSVU3yrRnTxtJC6hYA7bS5mMqZtjeJHrT3fNdLV7JZVpY5By")).toBeTruthy();
     expect(Address.validate("3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3")).toBeTruthy();
+    expect(Address.validate(FEE_TESTNET_ADDRESS)).toBeTruthy();
+    expect(Address.validate(FEE_MAINNET_ADDRESS)).toBeTruthy();
   });
 
   it("Should not validate INVALID address from address string", () => {
@@ -107,7 +109,7 @@ describe("Address model - ergo-ts test set", () => {
     testVectors.forEach((tv) => {
       if (tv.ergoTree) {
         const address = Address.fromErgoTree(tv.ergoTree, tv.network);
-        expect(address.address).toBe(tv.address);
+        expect(address.toString()).toBe(tv.address);
       }
     });
   });
@@ -129,7 +131,7 @@ describe("Address model - ergo-ts test set", () => {
   test("address from sk", () => {
     testVectors.forEach((o) => {
       if (o.sk) {
-        expect(Address.fromSecretKey(o.sk, o.network).address).toBe(o.address);
+        expect(Address.fromSecretKey(o.sk, o.network).toString()).toBe(o.address);
       }
     });
   });
