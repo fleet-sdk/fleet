@@ -1,7 +1,7 @@
 {
-  "name": "flet",
+  "name": "fleet",
   "version": "0.0.3",
-  "description": "Fluent Ergo Toolkit",
+  "description": "Feet Toolkit",
   "main": "build/lib/index.js",
   "typings": "build/lib/index.d.ts",
   "module": "build/lib/index.js",
