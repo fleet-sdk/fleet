@@ -31,7 +31,7 @@ jobs:
       - run: npm run test:prettier
       - run: npm run test:unit
 
-      - uses: codecov/codecov-action@v3
       - name: Codecov upload ${{ matrix.node-version }}
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage/coverage-final.json
