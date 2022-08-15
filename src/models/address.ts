@@ -2,7 +2,7 @@ import { getPublicKey as getSecpPublicKey } from "@noble/secp256k1";
 import { blake2b } from "blakejs";
 import * as bs58 from "bs58";
 import { InvalidAddressError } from "../errors/invalidAddressError";
-import { AddressType, Network } from "../types";
+import { AddressType, Base58String, HexString, Network } from "../types";
 import { first } from "../utils/arrayUtils";
 
 const KEY_BYTES_LENGTH = 32;
@@ -47,7 +47,7 @@ export class Address {
   /**
    * ErgoTree hex string
    */
-  public get ergoTree(): string {
+  public get ergoTree(): HexString {
     if (this.type === AddressType.P2PK) {
       return Buffer.concat([P2PK_ERGOTREE_PREFIX_BYTES, this.publicKey]).toString("hex");
     } else {
@@ -75,11 +75,11 @@ export class Address {
    */
   constructor(bytes: Buffer);
   /**
-   * New instance from base58 address string
+   * New instance from base58 encoded address string
    * @param address Address string
    */
-  constructor(address: string);
-  constructor(address: string | Buffer) {
+  constructor(address: Base58String);
+  constructor(address: Base58String | Buffer) {
     if (Buffer.isBuffer(address)) {
       this._address = bs58.encode(address);
       this.bytes = address;
@@ -93,7 +93,7 @@ export class Address {
    * Create a new checked instance from an address string
    * @param address Address encoded as base58
    */
-  public static fromBase58(address: string): Address {
+  public static fromBase58(address: Base58String): Address {
     return Address.fromBytes(Buffer.from(bs58.decode(address)));
   }
 
@@ -114,13 +114,13 @@ export class Address {
    * Create a new instance from an ErgoTree
    * @param ergoTree ErgoTree hex string
    */
-  public static fromErgoTree(ergoTree: string, network: Network = Network.Mainnet): Address {
+  public static fromErgoTree(ergoTree: HexString, network: Network = Network.Mainnet): Address {
     return ergoTree.startsWith(P2PK_ERGOTREE_PREFIX_HEX)
       ? Address._fromP2PKErgoTree(ergoTree, network)
       : Address._fromP2SErgoTree(ergoTree, network);
   }
 
-  private static _fromP2SErgoTree(ergoTree: string, network: Network) {
+  private static _fromP2SErgoTree(ergoTree: HexString, network: Network) {
     const prefixByte = Buffer.from([network + AddressType.P2S]);
     const contentBytes = Buffer.from(ergoTree, "hex");
     const hash = blake2b(Buffer.concat([prefixByte, contentBytes]), undefined, BLAKE_HASH_LENGTH);
@@ -130,7 +130,7 @@ export class Address {
     return new Address(addressBytes);
   }
 
-  private static _fromP2PKErgoTree(ergoTree: string, network: Network) {
+  private static _fromP2PKErgoTree(ergoTree: HexString, network: Network) {
     const prefixByte = Buffer.from([network + AddressType.P2PK]);
     const pk = ergoTree.slice(6, 72);
     const contentBytes = Buffer.from(pk, "hex");
@@ -147,7 +147,7 @@ export class Address {
    * @param publicKey Public key hex string
    */
   public static fromPublicKey(
-    publicKey: string | Buffer,
+    publicKey: HexString | Buffer,
     network: Network = Network.Mainnet
   ): Address {
     const prefixByte = Buffer.from([network + AddressType.P2PK]);
@@ -165,7 +165,7 @@ export class Address {
    * @param secretKey Secret key hex string
    * @returns Address instance
    */
-  public static fromSecretKey(secretKey: string, network: Network = Network.Mainnet): Address {
+  public static fromSecretKey(secretKey: HexString, network: Network = Network.Mainnet): Address {
     if (secretKey.length < KEY_HEX_LENGTH) {
       secretKey = secretKey.padStart(KEY_HEX_LENGTH, "0");
     }
