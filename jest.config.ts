@@ -3,7 +3,8 @@ export default {
   coveragePathIgnorePatterns: ["/node_modules/", "./src/types", "./src/mocks"],
   coverageDirectory: "./coverage",
   coverageProvider: "v8",
-  coverageReporters: ["text", "lcov"],
+  coverageReporters: ["text", "json"],
+  collectCoverage: true,
   coverageThreshold: {
     global: {
       statements: "100",
