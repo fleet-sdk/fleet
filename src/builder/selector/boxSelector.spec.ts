@@ -1,9 +1,9 @@
+import { InsufficientInputsError } from "../../errors/insufficientInputsError";
 import { mockUnspentBoxes } from "../../mocks/mockBoxes";
 import { Box } from "../../types";
 import { first } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";
 import { sumByTokenId } from "../../utils/boxUtils";
-import { InsufficientInputsError } from "../errors/insufficientInputsError";
 import { BoxSelector } from "./boxSelector";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 

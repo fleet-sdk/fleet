@@ -1,9 +1,9 @@
 import { orderBy as lodashOrderBy } from "lodash";
+import { InsufficientInputs, InsufficientInputsError } from "../../errors/insufficientInputsError";
 import { Box, FilterPredicate, SortingDirection, SortingSelector, TokenAmount } from "../../types";
 import { isEmpty, some } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";
 import { sumByTokenId } from "../../utils/boxUtils";
-import { InsufficientInputs, InsufficientInputsError } from "../errors/insufficientInputsError";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
 import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSelectionStrategy";

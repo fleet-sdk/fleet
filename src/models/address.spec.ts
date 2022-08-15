@@ -1,4 +1,4 @@
-import { InvalidAddressError } from "../builder/errors/invalidAddressError";
+import { InvalidAddressError } from "../errors/invalidAddressError";
 import { Network } from "../types";
 import { Address } from "./address";
 

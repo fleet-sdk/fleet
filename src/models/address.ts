@@ -1,7 +1,7 @@
 import { getPublicKey as getSecpPublicKey } from "@noble/secp256k1";
 import { blake2b } from "blakejs";
 import * as bs58 from "bs58";
-import { InvalidAddressError } from "../builder/errors/invalidAddressError";
+import { InvalidAddressError } from "../errors/invalidAddressError";
 import { AddressType, Network } from "../types";
 import { first } from "../utils/arrayUtils";
 
