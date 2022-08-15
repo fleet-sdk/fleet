@@ -21,7 +21,7 @@
     "watch:test": "jest --watch",
     "cov": "run-s build test:unit cov:html cov:lcov && open-cli coverage/index.html",
     "cov:html": "jest --coverage --coverageReporters=html ; open-cli coverage/index.html",
-    "cov:lcov": "jest --coverage --coverageReporters=lcov",
+    "cov:json": "jest --coverage --coverageReporters=json",
     "cov:check": "jest --coverage --coverageReporters=text",
     "cov:send": "run-s cov:lcov && codecov",
     "doc": "run-s doc:html && open-cli build/docs/index.html",
