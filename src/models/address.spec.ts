@@ -26,6 +26,18 @@ describe("Address validation", () => {
   });
 });
 
+describe("Public key", () => {
+  it("Should get public key from P2PK address", () => {
+    expect(
+      new Address("3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3").publicKey
+    ).not.toHaveLength(0);
+  });
+
+  it("Should return an empty buffer for P2S addresses", () => {
+    expect(new Address(FEE_MAINNET_ADDRESS).publicKey).toHaveLength(0);
+  });
+});
+
 describe("Address model - ergo-ts test set", () => {
   const testVectors = [
     {

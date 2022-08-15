@@ -38,10 +38,10 @@ export class Address {
   }
 
   /**
-   * Public key
+   * Public key for P2PK address
    */
   public get publicKey(): Buffer {
-    return this.bytes.subarray(1, 34);
+    return this.type === AddressType.P2PK ? this.bytes.subarray(1, 34) : Buffer.from([]);
   }
 
   /**
