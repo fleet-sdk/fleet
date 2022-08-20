@@ -1,9 +1,3 @@
-import { isEmpty } from "../utils/arrayUtils";
-
-const RADIX = 7;
-const MASK = 2 ** RADIX - 1;
-const MAX_VLQ_VALUE = 2147483647;
-
 /**
  * A **variable-length quantity (VLQ)** is a universal code that uses an arbitrary number
  * of binary octets (eight-bit bytes) to represent an arbitrarily large integer. A VLQ
@@ -12,38 +6,51 @@ const MAX_VLQ_VALUE = 2147483647;
  * endianness. See the example below.
  */
 export class VLQ {
-  public static maxIntegerValue = MAX_VLQ_VALUE;
-
   /**
    * Encode a unsigned integer to VLQ bytes
    * @param value unsigned integer
    * @returns VLQ bytes
    */
   public static encode(value: number): Buffer {
-    // source: https://rosettacode.org/wiki/Variable-length_quantity#JavaScript
+    // source: https://stackoverflow.com/a/3564685
 
     if (value === 0) {
       return Buffer.from([value]);
-    } else if (value > MAX_VLQ_VALUE) {
-      throw new RangeError(`Variable Length Quantity not supported for numbers > ${MAX_VLQ_VALUE}`);
     } else if (value < 0) {
       throw new RangeError("Variable Length Quantity not supported for negative numbers");
     }
 
-    const octets: number[] = [];
-    for (let i = value; i !== 0; i >>>= RADIX) {
-      octets.push((i & MASK) + (isEmpty(octets) ? 0 : MASK + 1));
-    }
+    const bytes = [];
+    do {
+      let lower7bits = value & 0x7f;
+      value >>= 7;
+      if (value > 0) {
+        lower7bits |= 0x80;
+      }
 
-    return Buffer.from(octets.reverse());
+      bytes.push(lower7bits);
+    } while (value > 0);
+
+    return Buffer.from(bytes);
   }
 
   /**
    * Decode VLQ bytes to an unsigned integer value
-   * @param octets VLQ bytes
+   * @param bytes VLQ bytes
    * @returns Unsigned integer value
    */
-  public static decode(octets: Buffer): number {
-    return octets.reduce((n, octet) => (n << RADIX) + (octet & MASK), 0);
+  public static decode(bytes: Buffer): number {
+    let value = 0;
+    let shift = 0;
+    let lower7bits = 0;
+    let i = 0;
+
+    do {
+      lower7bits = bytes[i++];
+      value |= (lower7bits & 0x7f) << shift;
+      shift += 7;
+    } while ((lower7bits & 0x80) != 0);
+
+    return value;
   }
 }

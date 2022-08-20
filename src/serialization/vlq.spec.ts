@@ -2,28 +2,24 @@ import { VLQ } from "./vlq";
 
 describe("VLQ serialization - Variable-length quantity", () => {
   const wikipediaExamples = [
-    { int: 0, bytes: "00" },
-    { int: 127, bytes: "7f" },
-    { int: 128, bytes: "8100" },
-    { int: 8192, bytes: "c000" },
-    { int: 16383, bytes: "ff7f" },
-    { int: 16384, bytes: "818000" },
-    { int: 2097151, bytes: "ffff7f" },
-    { int: 2097152, bytes: "81808000" },
-    { int: 134217728, bytes: "c0808000" },
-    { int: 268435455, bytes: "ffffff7f" }
+    { uint: 0, bytes: Buffer.from([0x00]) },
+    { uint: 126, bytes: Buffer.from([0x7e]) },
+    { uint: 127, bytes: Buffer.from([0x7f]) },
+    { uint: 128, bytes: Buffer.from([0x80, 0x01]) },
+    { uint: 129, bytes: Buffer.from([0x81, 0x01]) },
+    { uint: 16383, bytes: Buffer.from([0xff, 0x7f]) },
+    { uint: 16384, bytes: Buffer.from([0x80, 0x80, 0x01]) },
+    { uint: 16385, bytes: Buffer.from([0x81, 0x80, 0x01]) },
+    { uint: 2097151, bytes: Buffer.from([0xff, 0xff, 0x7f]) },
+    { uint: 2097152, bytes: Buffer.from([0x80, 0x80, 0x80, 0x01]) },
+    { uint: 268435455, bytes: Buffer.from([0xff, 0xff, 0xff, 0x7f]) },
+    { uint: 268435456, bytes: Buffer.from([0x80, 0x80, 0x80, 0x80, 0x01]) }
   ];
 
   it("Should encode", () => {
     wikipediaExamples.forEach((tv) => {
-      expect(VLQ.encode(tv.int).toString("hex")).toEqual(tv.bytes);
+      expect(VLQ.encode(tv.uint)).toEqual(tv.bytes);
     });
-  });
-
-  it("Should fail trying to encode values over the max value", () => {
-    expect(() => {
-      VLQ.encode(VLQ.maxIntegerValue + 1);
-    }).toThrow();
   });
 
   it("Should fail trying to encode negative values", () => {
@@ -34,7 +30,7 @@ describe("VLQ serialization - Variable-length quantity", () => {
 
   it("Should decode", () => {
     wikipediaExamples.forEach((tv) => {
-      expect(VLQ.decode(Buffer.from(tv.bytes, "hex"))).toEqual(tv.int);
+      expect(VLQ.decode(tv.bytes)).toEqual(tv.uint);
     });
   });
 
