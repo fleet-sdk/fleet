@@ -1,7 +1,7 @@
 import { VLQ } from "./vlq";
 
 describe("VLQ serialization - Variable-length quantity", () => {
-  const wikipediaExamples = [
+  const testVectors = [
     { uint: 0, bytes: Buffer.from([0x00]) },
     { uint: 126, bytes: Buffer.from([0x7e]) },
     { uint: 127, bytes: Buffer.from([0x7f]) },
@@ -17,7 +17,7 @@ describe("VLQ serialization - Variable-length quantity", () => {
   ];
 
   it("Should encode", () => {
-    wikipediaExamples.forEach((tv) => {
+    testVectors.forEach((tv) => {
       expect(VLQ.encode(tv.uint)).toEqual(tv.bytes);
     });
   });
@@ -29,7 +29,7 @@ describe("VLQ serialization - Variable-length quantity", () => {
   });
 
   it("Should decode", () => {
-    wikipediaExamples.forEach((tv) => {
+    testVectors.forEach((tv) => {
       expect(VLQ.decode(tv.bytes)).toEqual(tv.uint);
     });
   });
