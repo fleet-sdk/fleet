@@ -26,7 +26,7 @@ describe("ZigZag encoding", () => {
   });
 
   it("Should encode/decode radom numbers", () => {
-    Array.from(Array(1000))
+    Array.from(Array(100))
       .map(() => Math.ceil(Math.random() * 100000))
       .forEach((n) => {
         expect(ZigZag.decode(ZigZag.encode(n))).toBe(n);

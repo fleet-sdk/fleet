@@ -41,4 +41,12 @@ describe("VLQ serialization - Variable-length quantity", () => {
   it("Should decode empty Buffer to 0", () => {
     expect(VLQ.decode(Buffer.from([]))).toEqual(0);
   });
+
+  it("Should encode/decode radom numbers", () => {
+    Array.from(Array(100))
+      .map(() => Math.ceil(Math.random() * 100000))
+      .forEach((n) => {
+        expect(VLQ.decode(VLQ.encode(n))).toBe(n);
+      });
+  });
 });

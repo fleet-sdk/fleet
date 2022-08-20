@@ -17,7 +17,7 @@ export class VLQ {
   /**
    * Encode a unsigned integer to VLQ bytes
    * @param value unsigned integer
-   * @returns VQL bytes
+   * @returns VLQ bytes
    */
   public static encode(value: number): Buffer {
     // source: https://rosettacode.org/wiki/Variable-length_quantity#JavaScript
