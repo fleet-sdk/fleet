@@ -234,7 +234,11 @@ describe("Building", () => {
         amount: "100"
       }
     ]);
-    expect(boxCandidate.additionalRegisters).toEqual({});
+    expect(boxCandidate.additionalRegisters).toEqual({
+      R4: "0e0954657374546f6b656e",
+      R5: "0e104465736372697074696f6e2074657374",
+      R6: "0e0134"
+    });
   });
 
   it("Should build box with tokens and minting", () => {
@@ -243,9 +247,7 @@ describe("Building", () => {
       .addToken(tokenB, 1n)
       .mintToken({
         amount: 100n,
-        name: "TestToken",
-        decimals: 4,
-        description: "Description test"
+        name: "TestToken"
       })
       .build(mockUnspentBoxes);
 
@@ -261,7 +263,35 @@ describe("Building", () => {
       { tokenId: tokenA, amount: "15" },
       { tokenId: tokenB, amount: "1" }
     ]);
-    expect(boxCandidate.additionalRegisters).toEqual({});
+    expect(boxCandidate.additionalRegisters).toEqual({
+      R4: "0e0954657374546f6b656e",
+      R5: "0e00", // should be empty string
+      R6: "0e0130" // should be zero
+    });
+  });
+
+  it("Should should add default values if non mandatory minting field are filled", () => {
+    const boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+      .mintToken({
+        amount: 100n
+      })
+      .build(mockUnspentBoxes);
+
+    expect(boxCandidate.boxId).toBeUndefined();
+    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
+    expect(boxCandidate.ergoTree).toEqual(new Address(address).ergoTree);
+    expect(boxCandidate.creationHeight).toEqual(height);
+    expect(boxCandidate.assets).toEqual([
+      {
+        tokenId: mockUnspentBoxes[0].boxId, // should be the same as the first input
+        amount: "100"
+      }
+    ]);
+    expect(boxCandidate.additionalRegisters).toEqual({
+      R4: "0e00", // should be empty string
+      R5: "0e00", // should be empty string
+      R6: "0e0130" // should be zero
+    });
   });
 
   it("Should fail if inputs aren't included", () => {

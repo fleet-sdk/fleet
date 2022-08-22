@@ -1,6 +1,7 @@
 import { InsufficientTokenAmountError } from "../errors/insufficientTokenAmountError";
 import { InvalidRegistersPackingError } from "../errors/invalidRegistersPackingError";
 import { Address } from "../models";
+import { ByteColl } from "../serialization/sigma/byteColl";
 import {
   Amount,
   Base58String,
@@ -16,9 +17,16 @@ import {
 import { first, isEmpty } from "../utils/arrayUtils";
 import { toBigInt } from "../utils/bigIntUtils";
 import { areRegistersDenselyPacked } from "../utils/boxUtils";
+import { removeUndefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";
 
 export const SAFE_MIN_BOX_VALUE = 1000000n;
+/**
+ * (4096 - 85 bytes minimal size of the rest of the fields) / 33 token id
+ * 32 bytes + minimal token amount 1 byte = 121 tokens.
+ * Let's set it to 121 + 1 to be safe.
+ */
+export const MAX_DISTINCT_TOKENS = 122;
 
 export class OutputBuilder {
   private readonly _value: bigint;
@@ -123,7 +131,7 @@ export class OutputBuilder {
   }
 
   public setAdditionalRegisters(registers: NonMandatoryRegisters): OutputBuilder {
-    this._registers = registers;
+    this._registers = removeUndefined(registers);
 
     if (!areRegistersDenselyPacked(registers)) {
       throw new InvalidRegistersPackingError();
@@ -140,6 +148,16 @@ export class OutputBuilder {
         throw Error(
           "Minting context is undefined. Transaction's inputs must be included in order to determine minting token id."
         );
+      }
+
+      if (isEmpty(this.additionalRegisters)) {
+        this.setAdditionalRegisters({
+          R4: new ByteColl(Buffer.from(this.minting.name || "", "utf-8")).toString(),
+          R5: new ByteColl(Buffer.from(this.minting.description || "", "utf-8")).toString(),
+          R6: new ByteColl(
+            Buffer.from(this.minting.decimals?.toString() || "0", "utf-8")
+          ).toString()
+        });
       }
 
       tokens = [
