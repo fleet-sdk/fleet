@@ -294,6 +294,28 @@ describe("Building", () => {
     });
   });
 
+  it("Should should preserve explicitly defined registers", () => {
+    const boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+      .mintToken({
+        amount: 100n,
+        name: "TestToken"
+      })
+      .setAdditionalRegisters({ R4: "0e00" })
+      .build(mockUnspentBoxes);
+
+    expect(boxCandidate.boxId).toBeUndefined();
+    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
+    expect(boxCandidate.ergoTree).toEqual(new Address(address).ergoTree);
+    expect(boxCandidate.creationHeight).toEqual(height);
+    expect(boxCandidate.assets).toEqual([
+      {
+        tokenId: mockUnspentBoxes[0].boxId, // should be the same as the first input
+        amount: "100"
+      }
+    ]);
+    expect(boxCandidate.additionalRegisters).toEqual({ R4: "0e00" });
+  });
+
   it("Should fail if inputs aren't included", () => {
     const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).mintToken({
       amount: 100n,
