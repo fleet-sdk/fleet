@@ -1,7 +1,8 @@
 import { find } from "lodash";
+import { DistinctTokensOverflowError } from "../errors/distinctTokensOverflowError";
 import { InsufficientTokenAmountError } from "../errors/insufficientTokenAmountError";
 import { InvalidRegistersPackingError } from "../errors/invalidRegistersPackingError";
-import { regularBoxesMock } from "../mocks/mockBoxes";
+import { manyTokensBoxesMock, regularBoxesMock } from "../mocks/mockBoxes";
 import { Address } from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 
@@ -44,6 +45,22 @@ describe("Token handling", () => {
     expect(builder.tokens).toHaveLength(2);
     expect(find(builder.tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
     expect(find(builder.tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+  });
+
+  it("Should throw if too many tokens are batch added", () => {
+    const tokens = manyTokensBoxesMock.flatMap((x) => x.assets);
+
+    expect(() => {
+      builder.addToken(tokenA, 50n).addTokens(tokens);
+    }).toThrow(DistinctTokensOverflowError);
+  });
+
+  it("Should throw if too many tokens are individually added", () => {
+    const tokens = manyTokensBoxesMock.flatMap((x) => x.assets);
+
+    expect(() => {
+      tokens.forEach((token) => builder.addToken(token.tokenId, token.amount));
+    }).toThrow(DistinctTokensOverflowError);
   });
 
   it("Should sum if the same tokenId is added more than one time", () => {

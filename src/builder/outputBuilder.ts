@@ -1,3 +1,4 @@
+import { DistinctTokensOverflowError } from "../errors/distinctTokensOverflowError";
 import { InsufficientTokenAmountError } from "../errors/insufficientTokenAmountError";
 import { InvalidRegistersPackingError } from "../errors/invalidRegistersPackingError";
 import { Address } from "../models";
@@ -21,7 +22,7 @@ import { removeUndefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";
 
 export const SAFE_MIN_BOX_VALUE = 1000000n;
-export const MAX_DISTINCT_TOKENS = 121;
+export const MAX_DISTINCT_TOKENS_PER_BOX = 120;
 
 export class OutputBuilder {
   private readonly _value: bigint;
@@ -77,6 +78,10 @@ export class OutputBuilder {
 
         return this;
       }
+    }
+
+    if (this._tokens.length >= MAX_DISTINCT_TOKENS_PER_BOX) {
+      throw new DistinctTokensOverflowError();
     }
 
     this._tokens.push({ tokenId, amount: toBigInt(amount) });

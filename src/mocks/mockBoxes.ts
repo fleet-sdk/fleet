@@ -172,7 +172,7 @@ export const regularBoxesMock: Box<bigint>[] = [
   }
 ];
 
-const manyTokensBoxesMock: Box<Amount>[] = [
+export const manyTokensBoxesMock: Box<Amount>[] = [
   {
     boxId: "490148afdc36f5459bbfd84922a446abea9a1077e031822f377b0ff3a6e467e3",
     transactionId: "c82615aa845d8159b7a9e33401c0d4c56535a8f40c3b40b4d86fcbc15084bf0f",
