@@ -1,4 +1,4 @@
-import { mockUnspentBoxes } from "../../../mocks/mockBoxes";
+import { regularBoxesMock } from "../../../mocks/mockBoxes";
 import { Box } from "../../../types";
 import { CustomSelectionStrategy } from "./customSelectionStrategy";
 
@@ -9,7 +9,7 @@ describe("Custom selection strategy", () => {
     });
     const selection = new CustomSelectionStrategy(mockSelector);
 
-    expect(selection.select(mockUnspentBoxes)).toBe(mockUnspentBoxes);
+    expect(selection.select(regularBoxesMock)).toBe(regularBoxesMock);
     expect(mockSelector).toBeCalled();
   });
 });

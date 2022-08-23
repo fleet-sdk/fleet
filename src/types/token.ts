@@ -2,6 +2,7 @@ export type TokenId = string;
 
 type TokenBase<AmountType> = {
   amount: AmountType;
+  [x: string | number | symbol]: unknown;
 };
 
 export type TokenAmount<AmountType> = TokenBase<AmountType> & {

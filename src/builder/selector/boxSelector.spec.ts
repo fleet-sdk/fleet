@@ -1,5 +1,5 @@
 import { InsufficientInputsError } from "../../errors/insufficientInputsError";
-import { mockUnspentBoxes } from "../../mocks/mockBoxes";
+import { regularBoxesMock } from "../../mocks/mockBoxes";
 import { Box } from "../../types";
 import { first } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";
@@ -17,9 +17,9 @@ describe("Selection strategies", () => {
 
     const strategy = new CustomStrategy();
     const selectSpy = jest.spyOn(strategy, "select");
-    const selector = new BoxSelector(mockUnspentBoxes, { nanoErgs: 0n }).defineStrategy(strategy);
+    const selector = new BoxSelector(regularBoxesMock, { nanoErgs: 0n }).defineStrategy(strategy);
 
-    expect(selector.select()).toHaveLength(mockUnspentBoxes.length);
+    expect(selector.select()).toHaveLength(regularBoxesMock.length);
     expect(selectSpy).toBeCalled();
   });
 
@@ -28,16 +28,16 @@ describe("Selection strategies", () => {
       return inputs;
     });
 
-    const selector = new BoxSelector(mockUnspentBoxes, { nanoErgs: 0n }).defineStrategy(
+    const selector = new BoxSelector(regularBoxesMock, { nanoErgs: 0n }).defineStrategy(
       mockSelectorFunction
     );
 
-    expect(selector.select()).toHaveLength(mockUnspentBoxes.length);
+    expect(selector.select()).toHaveLength(regularBoxesMock.length);
     expect(mockSelectorFunction).toBeCalled();
   });
 
   it("Should fallback to a default selection strategy if nothing is specified", () => {
-    const selection = new BoxSelector(mockUnspentBoxes, { nanoErgs: 10000n }).select();
+    const selection = new BoxSelector(regularBoxesMock, { nanoErgs: 10000n }).select();
 
     expect(selection.length).toBe(1);
   });
@@ -45,34 +45,34 @@ describe("Selection strategies", () => {
 
 describe("Inputs sorting", () => {
   it("Should order inputs ascending by boxId", () => {
-    const nanoErgs = sumBy(mockUnspentBoxes, (x) => x.value);
-    const selection = new BoxSelector(mockUnspentBoxes, { nanoErgs })
+    const nanoErgs = sumBy(regularBoxesMock, (x) => x.value);
+    const selection = new BoxSelector(regularBoxesMock, { nanoErgs })
       .orderBy((x) => x.boxId)
       .select();
 
     expect(isAscending(selection.map((x) => x.boxId))).toBe(true);
-    expect(isAscending(mockUnspentBoxes.map((x) => x.boxId))).not.toBe(true);
-    expect(selection).toHaveLength(mockUnspentBoxes.length);
+    expect(isAscending(regularBoxesMock.map((x) => x.boxId))).not.toBe(true);
+    expect(selection).toHaveLength(regularBoxesMock.length);
   });
 
   it("Should order inputs descending by ergoTree", () => {
-    const nanoErgs = sumBy(mockUnspentBoxes, (x) => x.value);
-    const selection = new BoxSelector(mockUnspentBoxes, { nanoErgs })
+    const nanoErgs = sumBy(regularBoxesMock, (x) => x.value);
+    const selection = new BoxSelector(regularBoxesMock, { nanoErgs })
       .orderBy((x) => x.ergoTree, "desc")
       .select();
 
     expect(isDescending(selection.map((x) => x.ergoTree))).toBe(true);
-    expect(isDescending(mockUnspentBoxes.map((x) => x.ergoTree))).not.toBe(true);
-    expect(selection).toHaveLength(mockUnspentBoxes.length);
+    expect(isDescending(regularBoxesMock.map((x) => x.ergoTree))).not.toBe(true);
+    expect(selection).toHaveLength(regularBoxesMock.length);
   });
 
   it("Should fallback order to ascending creationHeight if no orderBy is called", () => {
-    const nanoErgs = sumBy(mockUnspentBoxes, (x) => x.value);
-    const selection = new BoxSelector(mockUnspentBoxes, { nanoErgs }).select();
+    const nanoErgs = sumBy(regularBoxesMock, (x) => x.value);
+    const selection = new BoxSelector(regularBoxesMock, { nanoErgs }).select();
 
     expect(isAscending(selection.map((x) => x.creationHeight))).toBe(true);
-    expect(isAscending(mockUnspentBoxes.map((x) => x.boxId))).not.toBe(true);
-    expect(selection).toHaveLength(mockUnspentBoxes.length);
+    expect(isAscending(regularBoxesMock.map((x) => x.boxId))).not.toBe(true);
+    expect(selection).toHaveLength(regularBoxesMock.length);
   });
 });
 
@@ -80,7 +80,7 @@ describe("Ensure input inclusion", () => {
   it("Should forcedly include inputs that attends to filter criteria", () => {
     const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
     const target = { nanoErgs: 10000n };
-    const selector = new BoxSelector(mockUnspentBoxes, target).ensureInclusion(
+    const selector = new BoxSelector(regularBoxesMock, target).ensureInclusion(
       (input) => input.boxId === arbitraryBoxId
     );
     const boxes = selector.select();
@@ -94,7 +94,7 @@ describe("Ensure input inclusion", () => {
     const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
     const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
     const target = { nanoErgs: 10000n, tokens: [{ tokenId, amount: 100n }] };
-    const selector = new BoxSelector(mockUnspentBoxes, target).ensureInclusion(
+    const selector = new BoxSelector(regularBoxesMock, target).ensureInclusion(
       (input) => input.boxId === arbitraryBoxId
     );
     const boxes = selector.select();
@@ -108,7 +108,7 @@ describe("Ensure input inclusion", () => {
 
 describe("Validations", () => {
   it("Should fail if nanoErgs target is unreached", () => {
-    const selector = new BoxSelector(mockUnspentBoxes, {
+    const selector = new BoxSelector(regularBoxesMock, {
       nanoErgs: 9000000000000n
     });
 
@@ -119,7 +119,7 @@ describe("Validations", () => {
 
   it("Should fail if tokens target is unreached", () => {
     const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
-    const selector = new BoxSelector(mockUnspentBoxes, {
+    const selector = new BoxSelector(regularBoxesMock, {
       nanoErgs: 10000n,
       tokens: [{ tokenId, amount: 10000000n }]
     });
@@ -131,7 +131,7 @@ describe("Validations", () => {
 
   it("Should fail if any target is unreached", () => {
     const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
-    const selector = new BoxSelector(mockUnspentBoxes, {
+    const selector = new BoxSelector(regularBoxesMock, {
       nanoErgs: 9000000000000n,
       tokens: [{ tokenId, amount: 10000000n }]
     });

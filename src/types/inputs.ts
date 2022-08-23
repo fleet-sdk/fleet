@@ -24,6 +24,7 @@ export type EIP12UnsignedInput = UnsignedInput & {
   value: Amount;
   assets: TokenAmount<string>[];
   additionalRegisters: NonMandatoryRegisters;
+  [x: string | number | symbol]: unknown;
 };
 
 export type DataInput = {

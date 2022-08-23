@@ -21,12 +21,7 @@ import { removeUndefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";
 
 export const SAFE_MIN_BOX_VALUE = 1000000n;
-/**
- * (4096 - 85 bytes minimal size of the rest of the fields) / 33 token id
- * 32 bytes + minimal token amount 1 byte = 121 tokens.
- * Let's set it to 121 + 1 to be safe.
- */
-export const MAX_DISTINCT_TOKENS = 122;
+export const MAX_DISTINCT_TOKENS = 121;
 
 export class OutputBuilder {
   private readonly _value: bigint;

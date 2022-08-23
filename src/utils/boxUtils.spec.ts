@@ -1,9 +1,9 @@
-import { mockUnspentBoxes } from "../mocks/mockBoxes";
+import { regularBoxesMock } from "../mocks/mockBoxes";
 import { areRegistersDenselyPacked, sumByTokenId } from "./boxUtils";
 
 describe("Box sumByTokenId", () => {
   it("Should sum correctly", () => {
-    const inputs = mockUnspentBoxes.filter((input) =>
+    const inputs = regularBoxesMock.filter((input) =>
       [
         "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d",
         "467b6867c6726cc5484be3cbddbf55c30c0a71594a20c1ac28d35b5049632444",
