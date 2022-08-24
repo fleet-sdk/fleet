@@ -1,9 +1,11 @@
+import { MAX_DISTINCT_TOKENS_PER_BOX } from "./outputBuilder";
+
 export class TransactionBuilderSettings {
   private _maxDistinctTokensPerChangeBox: number;
   private _allowTokenBurn: boolean;
 
   constructor() {
-    this._maxDistinctTokensPerChangeBox = 100;
+    this._maxDistinctTokensPerChangeBox = MAX_DISTINCT_TOKENS_PER_BOX;
     this._allowTokenBurn = false;
   }
 
