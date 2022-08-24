@@ -1,9 +1,9 @@
-export type InsufficientInputs = { [key: string]: bigint };
+export type InsufficientAssets = { [key: string]: bigint };
 
-export class InsufficientInputsError extends Error {
-  readonly unreached: InsufficientInputs;
+export class InsufficientInputs extends Error {
+  readonly unreached: InsufficientAssets;
 
-  constructor(unreached: InsufficientInputs) {
+  constructor(unreached: InsufficientAssets) {
     super(
       `Insufficient inputs:${Object.keys(unreached)
         .map((key) => {

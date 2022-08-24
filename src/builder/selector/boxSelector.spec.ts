@@ -1,4 +1,4 @@
-import { InsufficientInputsError } from "../../errors/insufficientInputsError";
+import { InsufficientInputs } from "../../errors/insufficientInputs";
 import { regularBoxesMock } from "../../mocks/mockBoxes";
 import { Box } from "../../types";
 import { first } from "../../utils/arrayUtils";
@@ -114,7 +114,7 @@ describe("Validations", () => {
 
     expect(() => {
       selector.select();
-    }).toThrow(InsufficientInputsError);
+    }).toThrow(InsufficientInputs);
   });
 
   it("Should fail if tokens target is unreached", () => {
@@ -126,7 +126,7 @@ describe("Validations", () => {
 
     expect(() => {
       selector.select();
-    }).toThrow(InsufficientInputsError);
+    }).toThrow(InsufficientInputs);
   });
 
   it("Should fail if any target is unreached", () => {
@@ -138,7 +138,7 @@ describe("Validations", () => {
 
     expect(() => {
       selector.select();
-    }).toThrow(InsufficientInputsError);
+    }).toThrow(InsufficientInputs);
   });
 });
 

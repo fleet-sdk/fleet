@@ -1,5 +1,5 @@
 import { orderBy as lodashOrderBy } from "lodash";
-import { InsufficientInputs, InsufficientInputsError } from "../../errors/insufficientInputsError";
+import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
 import { Box, FilterPredicate, SortingDirection, SortingSelector, TokenAmount } from "../../types";
 import { isEmpty, some } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";
@@ -63,14 +63,14 @@ export class BoxSelector {
 
     const unreached = this._getUnreachedTargets(selected, this._target);
     if (some(unreached)) {
-      throw new InsufficientInputsError(unreached);
+      throw new InsufficientInputs(unreached);
     }
 
     return selected;
   }
 
-  private _getUnreachedTargets(inputs: Box<bigint>[], target: SelectionTarget): InsufficientInputs {
-    const unreached: InsufficientInputs = {};
+  private _getUnreachedTargets(inputs: Box<bigint>[], target: SelectionTarget): InsufficientAssets {
+    const unreached: InsufficientAssets = {};
     const selectedNanoergs = sumBy(inputs, (input) => input.value);
 
     if (target.nanoErgs > selectedNanoergs) {

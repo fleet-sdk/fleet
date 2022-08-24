@@ -1,7 +1,7 @@
 import { find } from "lodash";
-import { DistinctTokensOverflowError } from "../errors/distinctTokensOverflowError";
-import { InsufficientTokenAmountError } from "../errors/insufficientTokenAmountError";
-import { InvalidRegistersPackingError } from "../errors/invalidRegistersPackingError";
+import { DistinctTokensOverflow } from "../errors/distinctTokensOverflow";
+import { InsufficientTokenAmount } from "../errors/insufficientTokenAmount";
+import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { manyTokensBoxesMock, regularBoxesMock } from "../mocks/mockBoxes";
 import { Address } from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
@@ -52,7 +52,7 @@ describe("Token handling", () => {
 
     expect(() => {
       builder.addToken(tokenA, 50n).addTokens(tokens);
-    }).toThrow(DistinctTokensOverflowError);
+    }).toThrow(DistinctTokensOverflow);
   });
 
   it("Should throw if too many tokens are individually added", () => {
@@ -60,7 +60,7 @@ describe("Token handling", () => {
 
     expect(() => {
       tokens.forEach((token) => builder.addToken(token.tokenId, token.amount));
-    }).toThrow(DistinctTokensOverflowError);
+    }).toThrow(DistinctTokensOverflow);
   });
 
   it("Should sum if the same tokenId is added more than one time", () => {
@@ -116,7 +116,7 @@ describe("Token handling", () => {
     builder.addToken(tokenA, 50n);
     expect(() => {
       builder.removeToken(tokenA, 100n);
-    }).toThrow(InsufficientTokenAmountError);
+    }).toThrow(InsufficientTokenAmount);
   });
 
   it("Should not to throw when trying to remove an not included token ", () => {
@@ -195,7 +195,7 @@ describe("Additional registers", () => {
       builder.setAdditionalRegisters({
         R6: "0580c0fc82aa02"
       });
-    }).toThrow(InvalidRegistersPackingError);
+    }).toThrow(InvalidRegistersPacking);
   });
 });
 

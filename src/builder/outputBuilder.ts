@@ -1,6 +1,6 @@
-import { DistinctTokensOverflowError } from "../errors/distinctTokensOverflowError";
-import { InsufficientTokenAmountError } from "../errors/insufficientTokenAmountError";
-import { InvalidRegistersPackingError } from "../errors/invalidRegistersPackingError";
+import { DistinctTokensOverflow } from "../errors/distinctTokensOverflow";
+import { InsufficientTokenAmount } from "../errors/insufficientTokenAmount";
+import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { Address } from "../models";
 import { ByteColl } from "../serialization/sigma/byteColl";
 import {
@@ -81,7 +81,7 @@ export class OutputBuilder {
     }
 
     if (this._tokens.length >= MAX_DISTINCT_TOKENS_PER_BOX) {
-      throw new DistinctTokensOverflowError();
+      throw new DistinctTokensOverflow();
     }
 
     this._tokens.push({ tokenId, amount: toBigInt(amount) });
@@ -105,7 +105,7 @@ export class OutputBuilder {
           const token = this._tokens[i];
 
           if (bigAmount > token.amount) {
-            throw new InsufficientTokenAmountError(
+            throw new InsufficientTokenAmount(
               `Insufficient token amount to perform this subtraction operation.`
             );
           } else if (bigAmount < token.amount) {
@@ -134,7 +134,7 @@ export class OutputBuilder {
     this._registers = removeUndefined(registers);
 
     if (!areRegistersDenselyPacked(registers)) {
-      throw new InvalidRegistersPackingError();
+      throw new InvalidRegistersPacking();
     }
 
     return this;

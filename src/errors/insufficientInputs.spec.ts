@@ -1,4 +1,4 @@
-import { InsufficientInputsError } from "./insufficientInputsError";
+import { InsufficientInputs } from "./insufficientInputs";
 
 describe("Insufficient inputs error", () => {
   it("Should hold details and return formatted error message", () => {
@@ -6,7 +6,7 @@ describe("Insufficient inputs error", () => {
       nanoErgs: 10n,
       "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283": 100n
     };
-    const error = new InsufficientInputsError(unreached);
+    const error = new InsufficientInputs(unreached);
 
     expect(error.unreached).toBe(unreached);
     expect(

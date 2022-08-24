@@ -1,4 +1,4 @@
-export class InsufficientTokenAmountError extends Error {
+export class InsufficientTokenAmount extends Error {
   constructor(message: string) {
     super(message);
   }

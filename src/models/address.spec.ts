@@ -1,4 +1,4 @@
-import { InvalidAddressError } from "../errors/invalidAddressError";
+import { InvalidAddress } from "../errors/invalidAddress";
 import { Network } from "../types";
 import { Address } from "./address";
 
@@ -163,7 +163,7 @@ describe("Address model - ergo-ts test set", () => {
       if (o.isValid) {
         expect(() => Address.fromBytes(o.instance.bytes)).not.toThrow();
       } else {
-        expect(() => Address.fromBytes(o.instance.bytes)).toThrow(InvalidAddressError);
+        expect(() => Address.fromBytes(o.instance.bytes)).toThrow(InvalidAddress);
       }
     });
   });
