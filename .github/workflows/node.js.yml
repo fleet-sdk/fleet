@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [12.x, 14.x, 16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -30,9 +30,3 @@ jobs:
       - run: npm run test:lint
       - run: npm run test:prettier
       - run: npm run test:unit
-
-      - name: Codecov upload ${{ matrix.node-version }}
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/coverage-final.json
-          root_dir: ./src

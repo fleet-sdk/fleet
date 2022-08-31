@@ -4,7 +4,7 @@ export default {
   coverageDirectory: "./coverage",
   coverageProvider: "v8",
   coverageReporters: ["text", "json"],
-  collectCoverage: true,
+  collectCoverage: false,
   coverageThreshold: {
     global: {
       statements: "100",
