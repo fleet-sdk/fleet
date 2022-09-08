@@ -1,6 +1,6 @@
 {
-  "name": "fleet",
-  "version": "0.0.3",
+  "name": "@nautilus-js/fleet",
+  "version": "0.0.4",
   "description": "Feet Toolkit",
   "main": "build/lib/index.js",
   "typings": "build/lib/index.d.ts",
