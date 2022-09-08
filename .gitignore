@@ -8,3 +8,4 @@ coverage
 *.log
 yarn.lock
 .DS_Store
+.npmrc
