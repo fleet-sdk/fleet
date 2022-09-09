@@ -2,10 +2,10 @@
   "compilerOptions": {
     "incremental": true,
     "target": "ESNext",
-    "outDir": "build/lib",
+    "outDir": "build/lib/main",
     "rootDir": "./src",
     "moduleResolution": "Node",
-    "module": "ESNext",
+    "module": "CommonJS",
     "declaration": true,
     "inlineSourceMap": true,
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,

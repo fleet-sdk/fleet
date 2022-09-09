@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig",
+  "compilerOptions": {
+    "target": "ESNext",
+    "outDir": "build/lib/module",
+    "module": "ESNext"
+  }
+}
