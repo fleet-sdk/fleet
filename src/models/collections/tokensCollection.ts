@@ -69,7 +69,6 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
   public remove(index: number, amount?: Amount): TokensCollection;
   public remove(tokenIdOrIndex: TokenId | number, amount?: Amount): TokensCollection {
     let index = -1;
-
     if (typeof tokenIdOrIndex === "number") {
       if (this._isIndexOutOfBounds(tokenIdOrIndex)) {
         throw new RangeError(`Index '${tokenIdOrIndex}' is out of range.`);

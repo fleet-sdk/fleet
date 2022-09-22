@@ -54,7 +54,6 @@ export class InputsCollection extends Collection<Box<bigint>> {
   public remove(index: number): InputsCollection;
   public remove(boxIdOrIndex: BoxId | number): InputsCollection {
     let index = -1;
-
     if (typeof boxIdOrIndex === "number") {
       if (this._isIndexOutOfBounds(boxIdOrIndex)) {
         throw new RangeError(`Index '${boxIdOrIndex}' is out of range.`);
