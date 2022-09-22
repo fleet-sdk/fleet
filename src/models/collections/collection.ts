@@ -26,7 +26,7 @@ export abstract class Collection<T> implements Iterable<T> {
     return this.length === 0;
   }
 
-  public toArray(): ReadonlyArray<T> {
-    return Object.freeze([...this._items]);
+  public toArray(): T[] {
+    return [...this._items];
   }
 }

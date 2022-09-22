@@ -1,7 +1,7 @@
 import { find } from "lodash";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { regularBoxesMock } from "../mocks/mockBoxes";
-import { ErgoAddress } from "../models";
+import { ErgoAddress, TokensCollection } from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 
 const address = "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c";
@@ -46,10 +46,24 @@ describe("Token handling", () => {
     expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
-  it("Should add tokens through context ejector", () => {
+  it("Should add tokens from context ejector", () => {
     builder.eject(({ tokens }) =>
       tokens.add({ tokenId: tokenA, amount: 50n }).add({ tokenId: tokenB, amount: 10n })
     );
+
+    expect(builder.tokens).toHaveLength(2);
+    const tokens = builder.tokens.toArray();
+    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+  });
+
+  it("Should add tokens from external TokensCollection", () => {
+    const collection = new TokensCollection([
+      { tokenId: tokenA, amount: 50n },
+      { tokenId: tokenB, amount: 10n }
+    ]);
+
+    builder.addTokens(collection);
 
     expect(builder.tokens).toHaveLength(2);
     const tokens = builder.tokens.toArray();

@@ -9,8 +9,19 @@ export const MAX_TOKENS_PER_BOX = 120;
 export type AddTokenOptions = { sum: boolean };
 
 export class TokensCollection extends Collection<TokenAmount<bigint>> {
-  constructor() {
+  constructor();
+  constructor(token: TokenAmount<Amount>);
+  constructor(tokens: TokenAmount<Amount>[], options: AddTokenOptions);
+  constructor(tokens: TokenAmount<Amount>[]);
+  constructor(
+    tokenOrTokens?: TokenAmount<Amount> | TokenAmount<Amount>[],
+    options?: AddTokenOptions
+  ) {
     super();
+
+    if (tokenOrTokens) {
+      this.add(tokenOrTokens, options);
+    }
   }
 
   private _add(tokenId: TokenId, amount: Amount, sum: boolean): void {
@@ -34,11 +45,11 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
   public add(tokens: TokenAmount<Amount>[], sum?: AddTokenOptions): TokensCollection;
   public add(token: TokenAmount<Amount>, sum?: AddTokenOptions): TokensCollection;
   public add(
-    tokenOrTokens: TokenAmount<Amount>[] | TokenAmount<Amount>,
+    tokenOrTokens: TokenAmount<Amount> | TokenAmount<Amount>[],
     options?: AddTokenOptions
   ): TokensCollection;
   public add(
-    tokenOrTokens: TokenAmount<Amount>[] | TokenAmount<Amount>,
+    tokenOrTokens: TokenAmount<Amount> | TokenAmount<Amount>[],
     options?: AddTokenOptions
   ): TokensCollection {
     const sum = options ? options.sum : true;

@@ -8,6 +8,34 @@ describe("Tokens collection", () => {
   const tokenA = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
   const tokenB = "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
 
+  it("Should create an empty collection", () => {
+    const collection = new TokensCollection();
+    expect(collection.isEmpty).toBeTruthy();
+  });
+
+  it("Should create a filled and summed collection", () => {
+    const collection = new TokensCollection([
+      { tokenId: tokenA, amount: 50n },
+      { tokenId: tokenB, amount: 10n },
+      { tokenId: tokenB, amount: 20n }
+    ]);
+
+    expect(collection).toHaveLength(2);
+  });
+
+  it("Should create a filled and accumulative collection", () => {
+    const collection = new TokensCollection(
+      [
+        { tokenId: tokenA, amount: 50n },
+        { tokenId: tokenB, amount: 10n },
+        { tokenId: tokenB, amount: 20n }
+      ],
+      { sum: false }
+    );
+
+    expect(collection).toHaveLength(3);
+  });
+
   it("Should add distinct tokens", () => {
     const collection = new TokensCollection();
     collection.add({ tokenId: tokenA, amount: 50n }).add({ tokenId: tokenB, amount: 10n });

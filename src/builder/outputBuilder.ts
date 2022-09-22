@@ -68,8 +68,15 @@ export class OutputBuilder {
     return this._minting;
   }
 
-  public addTokens(tokens: TokenAmount<Amount>[] | TokenAmount<Amount>, options?: AddTokenOptions) {
-    this._tokens.add(tokens, options);
+  public addTokens(
+    tokens: TokenAmount<Amount>[] | TokenAmount<Amount> | TokensCollection,
+    options?: AddTokenOptions
+  ) {
+    if (tokens instanceof TokensCollection) {
+      this._tokens.add(tokens.toArray(), options);
+    } else {
+      this._tokens.add(tokens, options);
+    }
 
     return this;
   }

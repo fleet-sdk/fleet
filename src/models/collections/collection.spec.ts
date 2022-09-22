@@ -29,6 +29,12 @@ describe("collection base", () => {
     expect(collection.toArray()).toHaveLength(numbers.length);
     expect(collection.toArray()).toEqual(numbers);
     expect(collection.toArray()).not.toBe(collection.toArray()); // should create a copy every time it's called
+
+    const array = collection.toArray();
+    expect(array).toHaveLength(numbers.length);
+
+    array.push(429);
+    expect(collection).toHaveLength(numbers.length); // push on previous line should not affect internal array.
   });
 
   it("Should iterate correctly for all items", () => {
