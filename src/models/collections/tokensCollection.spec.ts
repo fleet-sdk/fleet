@@ -1,5 +1,5 @@
 import { find } from "lodash";
-import { NotFound } from "../../errors";
+import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 import { manyTokensBoxesMock } from "../../mocks/mockBoxes";
@@ -189,7 +189,7 @@ describe("Tokens collection", () => {
 
     expect(() => {
       collection.remove(tokenB);
-    }).toThrow(NotFound);
+    }).toThrow(NotFoundError);
   });
 
   it("Should throw when trying to remove by an out of bounds index", () => {

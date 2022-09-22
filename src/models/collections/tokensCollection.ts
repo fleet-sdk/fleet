@@ -1,4 +1,4 @@
-import { NotFound } from "../../errors";
+import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 import { Amount, TokenAmount, TokenId } from "../../types";
@@ -80,7 +80,7 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
       index = this._items.findIndex((token) => token.tokenId === tokenIdOrIndex);
 
       if (this._isIndexOutOfBounds(index)) {
-        throw new NotFound(`TokenId '${tokenIdOrIndex}' not found in assets collection.`);
+        throw new NotFoundError(`TokenId '${tokenIdOrIndex}' not found in assets collection.`);
       }
     }
 

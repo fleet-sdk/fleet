@@ -1,4 +1,4 @@
-import { DuplicateInput, NotFound } from "../../errors";
+import { DuplicateInputError, NotFoundError } from "../../errors";
 import { regularBoxesMock } from "../../mocks/mockBoxes";
 import { first } from "../../utils/arrayUtils";
 import { InputsCollection } from "./inputsCollection";
@@ -55,7 +55,7 @@ describe("inputs collection", () => {
     const collection = new InputsCollection(regularBoxesMock);
     expect(() => {
       collection.add(first(regularBoxesMock));
-    }).toThrow(DuplicateInput);
+    }).toThrow(DuplicateInputError);
   });
 
   it("Should remove by boxId", () => {
@@ -82,7 +82,7 @@ describe("inputs collection", () => {
 
     expect(() => {
       collection.remove(boxId);
-    }).toThrow(NotFound);
+    }).toThrow(NotFoundError);
   });
 
   it("Should throw if not found", () => {

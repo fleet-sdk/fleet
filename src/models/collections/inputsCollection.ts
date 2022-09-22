@@ -1,4 +1,4 @@
-import { DuplicateInput, NotFound } from "../../errors";
+import { DuplicateInputError, NotFoundError } from "../../errors";
 import { Amount, Box, BoxId } from "../../types";
 import { toBigInt } from "../../utils/bigIntUtils";
 import { Collection } from "./collection";
@@ -34,7 +34,7 @@ export class InputsCollection extends Collection<Box<bigint>> {
 
   private _add(box: Box<Amount>): void {
     if (this._items.find((item) => item.boxId === box.boxId)) {
-      throw new DuplicateInput(box.boxId);
+      throw new DuplicateInputError(box.boxId);
     }
 
     this._items.push(this._map(box));
@@ -65,7 +65,7 @@ export class InputsCollection extends Collection<Box<bigint>> {
       index = this._items.findIndex((box) => box.boxId === boxIdOrIndex);
 
       if (this._isIndexOutOfBounds(index)) {
-        throw new NotFound(
+        throw new NotFoundError(
           "The input you are trying to remove is not present in the inputs collection."
         );
       }
