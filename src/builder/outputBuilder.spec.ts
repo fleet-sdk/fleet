@@ -263,8 +263,10 @@ describe("Building", () => {
 
   it("Should build box with tokens and minting", () => {
     const boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
-      .addTokens({ tokenId: tokenA, amount: "15" })
-      .addTokens({ tokenId: tokenB, amount: 1n })
+      .addTokens([
+        { tokenId: tokenA, amount: "15" },
+        { tokenId: tokenB, amount: 1n }
+      ])
       .mintToken({
         amount: 100n,
         name: "TestToken"
