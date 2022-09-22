@@ -1,5 +1,5 @@
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
-import { Address } from "../models";
+import { ErgoAddress } from "../models";
 import { AddTokenOptions, TokensCollection } from "../models/collections/tokensCollection";
 import { ByteColl } from "../serialization/sigma/byteColl";
 import {
@@ -23,7 +23,7 @@ export const SAFE_MIN_BOX_VALUE = 1000000n;
 
 export class OutputBuilder {
   private readonly _value: bigint;
-  private readonly _address: Address;
+  private readonly _address: ErgoAddress;
   private readonly _height: number;
   private readonly _tokens: TokensCollection;
   private _registers: NonMandatoryRegisters;
@@ -32,8 +32,8 @@ export class OutputBuilder {
   constructor(value: Amount, recipient: Base58String | ErgoTree, creationHeight: number) {
     this._value = toBigInt(value);
     this._address = isHex(recipient)
-      ? Address.fromErgoTree(recipient)
-      : Address.fromBase58(recipient);
+      ? ErgoAddress.fromErgoTree(recipient)
+      : ErgoAddress.fromBase58(recipient);
     this._height = creationHeight;
 
     this._tokens = new TokensCollection();

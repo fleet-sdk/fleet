@@ -29,7 +29,7 @@ const P2PK_ERGOTREE_PREFIX_HEX = P2PK_ERGOTREE_PREFIX_BYTES.toString("hex");
  * const address = Address.fromErgoTree(ergoTree).toString();
  * ```
  */
-export class Address {
+export class ErgoAddress {
   public readonly bytes: Buffer;
   private readonly _address: string;
 
@@ -93,16 +93,16 @@ export class Address {
    * Create a new checked instance from an address string
    * @param address Address encoded as base58
    */
-  public static fromBase58(address: Base58String): Address {
-    return Address.fromBytes(Buffer.from(bs58.decode(address)));
+  public static fromBase58(address: Base58String): ErgoAddress {
+    return ErgoAddress.fromBytes(Buffer.from(bs58.decode(address)));
   }
 
   /**
    * Create a new checked instance from bytes
    * @param bytes Address bytes
    */
-  public static fromBytes(bytes: Buffer): Address {
-    const address = new Address(bytes);
+  public static fromBytes(bytes: Buffer): ErgoAddress {
+    const address = new ErgoAddress(bytes);
     if (!address.isValid()) {
       throw new InvalidAddress(address._address);
     }
@@ -114,10 +114,10 @@ export class Address {
    * Create a new instance from an ErgoTree
    * @param ergoTree ErgoTree hex string
    */
-  public static fromErgoTree(ergoTree: HexString, network: Network = Network.Mainnet): Address {
+  public static fromErgoTree(ergoTree: HexString, network: Network = Network.Mainnet): ErgoAddress {
     return ergoTree.startsWith(P2PK_ERGOTREE_PREFIX_HEX)
-      ? Address._fromP2PKErgoTree(ergoTree, network)
-      : Address._fromP2SErgoTree(ergoTree, network);
+      ? ErgoAddress._fromP2PKErgoTree(ergoTree, network)
+      : ErgoAddress._fromP2SErgoTree(ergoTree, network);
   }
 
   private static _fromP2SErgoTree(ergoTree: HexString, network: Network) {
@@ -127,7 +127,7 @@ export class Address {
     const checksum = Buffer.from(hash).subarray(0, CHECKSUM_BYTES_LENGTH);
     const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]);
 
-    return new Address(addressBytes);
+    return new ErgoAddress(addressBytes);
   }
 
   private static _fromP2PKErgoTree(ergoTree: HexString, network: Network) {
@@ -139,7 +139,7 @@ export class Address {
     );
     const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]).subarray(0, 38);
 
-    return new Address(addressBytes);
+    return new ErgoAddress(addressBytes);
   }
 
   /**
@@ -149,7 +149,7 @@ export class Address {
   public static fromPublicKey(
     publicKey: HexString | Buffer,
     network: Network = Network.Mainnet
-  ): Address {
+  ): ErgoAddress {
     const prefixByte = Buffer.from([network + AddressType.P2PK]);
     const contentBytes = Buffer.from(publicKey);
     const checksum = Buffer.from(
@@ -157,7 +157,7 @@ export class Address {
     );
     const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]).subarray(0, 38);
 
-    return new Address(addressBytes);
+    return new ErgoAddress(addressBytes);
   }
 
   /**
@@ -165,7 +165,10 @@ export class Address {
    * @param secretKey Secret key hex string
    * @returns Address instance
    */
-  public static fromSecretKey(secretKey: HexString, network: Network = Network.Mainnet): Address {
+  public static fromSecretKey(
+    secretKey: HexString,
+    network: Network = Network.Mainnet
+  ): ErgoAddress {
     if (secretKey.length < KEY_HEX_LENGTH) {
       secretKey = secretKey.padStart(KEY_HEX_LENGTH, "0");
     }
@@ -196,7 +199,7 @@ export class Address {
    * Check address validity
    */
   public isValid(): boolean {
-    return Address.validate(this.bytes);
+    return ErgoAddress.validate(this.bytes);
   }
 
   /**

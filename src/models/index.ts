@@ -1,2 +1,2 @@
-export * from "./address";
+export * from "./ergoAddress";
 export * from "./collections";
