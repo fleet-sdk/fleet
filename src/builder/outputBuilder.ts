@@ -90,8 +90,8 @@ export class OutputBuilder {
     return this;
   }
 
-  public extract(extractor: (context: { tokens: TokensCollection }) => void) {
-    extractor({ tokens: this._tokens });
+  public eject(ejector: (context: { tokens: TokensCollection }) => void) {
+    ejector({ tokens: this._tokens });
   }
 
   public build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<string> {

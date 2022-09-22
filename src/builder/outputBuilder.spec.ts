@@ -46,8 +46,8 @@ describe("Token handling", () => {
     expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
-  it("Should add tokens through context extractor", () => {
-    builder.extract(({ tokens }) =>
+  it("Should add tokens through context ejector", () => {
+    builder.eject(({ tokens }) =>
       tokens.add({ tokenId: tokenA, amount: 50n }).add({ tokenId: tokenB, amount: 10n })
     );
 
@@ -105,11 +105,11 @@ describe("Token handling", () => {
     expect(find(tokens, (x) => x.tokenId === tokenA && x.amount === 110n)).not.toBeFalsy();
   });
 
-  it("Should remove tokens from the list using context extractor", () => {
+  it("Should remove tokens from the list using context ejector", () => {
     builder.addTokens({ tokenId: tokenA, amount: 50n }).addTokens({ tokenId: tokenB, amount: 10n });
     expect(builder.tokens).toHaveLength(2);
 
-    builder.extract(({ tokens }) => tokens.remove(tokenA));
+    builder.eject(({ tokens }) => tokens.remove(tokenA));
 
     expect(builder.tokens).toHaveLength(1);
     expect(find(builder.tokens.toArray(), (x) => x.tokenId === tokenA)).toBeFalsy();
