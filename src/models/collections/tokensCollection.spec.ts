@@ -1,4 +1,5 @@
 import { find } from "lodash";
+import { NotFound } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 import { manyTokensBoxesMock } from "../../mocks/mockBoxes";
@@ -110,7 +111,7 @@ describe("Tokens collection", () => {
     expect(find(tokensArray, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
-  it("Should remove tokens from the list", () => {
+  it("Should remove tokens from the list by tokenId", () => {
     const collection = new TokensCollection()
       .add({ tokenId: tokenA, amount: 50n })
       .add({ tokenId: tokenB, amount: 10n });
@@ -121,7 +122,18 @@ describe("Tokens collection", () => {
     expect(find(collection.toArray(), (x) => x.tokenId === tokenA)).toBeFalsy();
   });
 
-  it("Should subtract if amount is specified", () => {
+  it("Should remove tokens from the list by index", () => {
+    const collection = new TokensCollection()
+      .add({ tokenId: tokenA, amount: 50n })
+      .add({ tokenId: tokenB, amount: 10n });
+
+    collection.remove(0);
+
+    expect(collection).toHaveLength(1);
+    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)).toBeFalsy();
+  });
+
+  it("Should subtract if amount is specified by tokenId", () => {
     const collection = new TokensCollection()
       .add({ tokenId: tokenA, amount: 50n })
       .add({ tokenId: tokenB, amount: 10n });
@@ -132,7 +144,18 @@ describe("Tokens collection", () => {
     expect(find(collection.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(40n);
   });
 
-  it("Should remove token if amount is equal to already inserted amount", () => {
+  it("Should subtract if amount is specified by index", () => {
+    const collection = new TokensCollection()
+      .add({ tokenId: tokenA, amount: 50n })
+      .add({ tokenId: tokenB, amount: 10n });
+
+    collection.remove(0, 10n);
+
+    expect(collection).toHaveLength(2);
+    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(40n);
+  });
+
+  it("Should remove token if amount is equal to already inserted amount by tokenId", () => {
     const collection = new TokensCollection()
       .add({ tokenId: tokenA, amount: 50n })
       .add({ tokenId: tokenB, amount: 10n });
@@ -143,6 +166,17 @@ describe("Tokens collection", () => {
     expect(find(collection.toArray(), (x) => x.tokenId === tokenA)).toBeFalsy();
   });
 
+  it("Should remove token if amount is equal to already inserted amount by index", () => {
+    const collection = new TokensCollection()
+      .add({ tokenId: tokenA, amount: 50n })
+      .add({ tokenId: tokenB, amount: 10n });
+
+    collection.remove(1, 10n);
+
+    expect(collection).toHaveLength(1);
+    expect(find(collection.toArray(), (x) => x.tokenId === tokenB)).toBeFalsy();
+  });
+
   it("Should throw if amount is greater than already inserted amount", () => {
     const collection = new TokensCollection().add({ tokenId: tokenA, amount: 50n });
     expect(() => {
@@ -150,11 +184,30 @@ describe("Tokens collection", () => {
     }).toThrow(InsufficientTokenAmount);
   });
 
-  it("Should not to throw when trying to remove an not included token ", () => {
+  it("Should throw when trying to remove using a not included tokenId", () => {
     const collection = new TokensCollection().add({ tokenId: tokenA, amount: 50n });
 
     expect(() => {
       collection.remove(tokenB);
-    }).not.toThrow();
+    }).toThrow(NotFound);
+  });
+
+  it("Should throw when trying to remove by an out of bounds index", () => {
+    const collection = new TokensCollection().add([
+      { tokenId: tokenA, amount: 50n },
+      { tokenId: tokenB, amount: 10n }
+    ]);
+
+    expect(() => {
+      collection.remove(-1);
+    }).toThrow(RangeError);
+
+    expect(() => {
+      collection.remove(2);
+    }).toThrow(RangeError);
+
+    expect(() => {
+      collection.remove(10);
+    }).toThrow(RangeError);
   });
 });

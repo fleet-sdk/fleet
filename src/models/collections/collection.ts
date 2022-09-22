@@ -5,6 +5,10 @@ export abstract class Collection<T> implements Iterable<T> {
     this._items = [];
   }
 
+  protected _isIndexOutOfBounds(index: number): boolean {
+    return index < 0 || index >= this._items.length;
+  }
+
   [Symbol.iterator](): Iterator<T> {
     let counter = 0;
 

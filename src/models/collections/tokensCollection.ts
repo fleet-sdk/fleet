@@ -1,3 +1,4 @@
+import { NotFound } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 import { Amount, TokenAmount, TokenId } from "../../types";
@@ -70,29 +71,39 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
   public remove(tokenId: TokenId, amount?: Amount): TokensCollection;
   public remove(index: number, amount?: Amount): TokensCollection;
   public remove(tokenIdOrIndex: TokenId | number, amount?: Amount): TokensCollection {
-    for (let i = 0; i < this._items.length; i++) {
-      if (this._items[i].tokenId !== tokenIdOrIndex) {
-        continue;
+    let index = -1;
+
+    if (typeof tokenIdOrIndex === "number") {
+      if (this._isIndexOutOfBounds(tokenIdOrIndex)) {
+        throw new RangeError(`Index '${tokenIdOrIndex}' is out of range.`);
       }
 
-      if (amount) {
-        const bigAmount = toBigInt(amount);
-        const token = this._items[i];
+      index = tokenIdOrIndex;
+    } else {
+      index = this._items.findIndex((token) => token.tokenId === tokenIdOrIndex);
 
-        if (bigAmount > token.amount) {
-          throw new InsufficientTokenAmount(
-            `Insufficient token amount to perform a subtraction operation.`
-          );
-        } else if (bigAmount < token.amount) {
-          token.amount -= bigAmount;
-
-          return this;
-        }
+      if (this._isIndexOutOfBounds(index)) {
+        throw new NotFound(`TokenId '${tokenIdOrIndex}' not found in assets collection.`);
       }
+    }
 
-      this._items.splice(i, 1);
+    if (amount && index > -1) {
+      const bigAmount = toBigInt(amount);
+      const token = this._items[index];
 
-      return this;
+      if (bigAmount > token.amount) {
+        throw new InsufficientTokenAmount(
+          `Insufficient token amount to perform a subtraction operation.`
+        );
+      } else if (bigAmount < token.amount) {
+        token.amount -= bigAmount;
+
+        return this;
+      }
+    }
+
+    if (index > -1) {
+      this._items.splice(index, 1);
     }
 
     return this;
