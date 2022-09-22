@@ -12,16 +12,13 @@ export type AddTokenOptions = { sum: boolean };
 export class TokensCollection extends Collection<TokenAmount<bigint>> {
   constructor();
   constructor(token: TokenAmount<Amount>);
-  constructor(tokens: TokenAmount<Amount>[], options: AddTokenOptions);
   constructor(tokens: TokenAmount<Amount>[]);
-  constructor(
-    tokenOrTokens?: TokenAmount<Amount> | TokenAmount<Amount>[],
-    options?: AddTokenOptions
-  ) {
+  constructor(tokens: TokenAmount<Amount>[], options: AddTokenOptions);
+  constructor(tokens?: TokenAmount<Amount> | TokenAmount<Amount>[], options?: AddTokenOptions) {
     super();
 
-    if (tokenOrTokens) {
-      this.add(tokenOrTokens, options);
+    if (tokens) {
+      this.add(tokens, options);
     }
   }
 

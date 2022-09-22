@@ -1,0 +1,80 @@
+import { DuplicateInput, NotFound } from "../../errors";
+import { Amount, Box, BoxId } from "../../types";
+import { toBigInt } from "../../utils/bigIntUtils";
+import { Collection } from "./collection";
+
+export class InputsCollection extends Collection<Box<bigint>> {
+  constructor();
+  constructor(box: Box<Amount>);
+  constructor(boxes: Box<Amount>[]);
+  constructor(boxes?: Box<Amount> | Box<Amount>[]) {
+    super();
+
+    if (boxes) {
+      this.add(boxes);
+    }
+  }
+
+  public add(box: Box<Amount>): InputsCollection;
+  public add(boxes: Box<Amount>[]): InputsCollection;
+  public add(boxes: Box<Amount> | Box<Amount>[]): InputsCollection;
+  public add(boxOrBoxes: Box<Amount> | Box<Amount>[]): InputsCollection {
+    if (!Array.isArray(boxOrBoxes)) {
+      this._add(boxOrBoxes);
+
+      return this;
+    }
+
+    for (const box of boxOrBoxes) {
+      this._add(box);
+    }
+
+    return this;
+  }
+
+  private _add(box: Box<Amount>): void {
+    if (this._items.find((item) => item.boxId === box.boxId)) {
+      throw new DuplicateInput(box.boxId);
+    }
+
+    this._items.push(this._map(box));
+  }
+
+  private _map(input: Box<Amount>): Box<bigint> {
+    return {
+      ...input,
+      value: toBigInt(input.value),
+      assets: input.assets.map((asset) => {
+        return { tokenId: asset.tokenId, amount: toBigInt(asset.amount) };
+      })
+    };
+  }
+
+  public remove(boxId: BoxId): InputsCollection;
+  public remove(index: number): InputsCollection;
+  public remove(boxIdOrIndex: BoxId | number): InputsCollection {
+    let index = -1;
+
+    if (typeof boxIdOrIndex === "number") {
+      if (this._isIndexOutOfBounds(boxIdOrIndex)) {
+        throw new RangeError(`Index '${boxIdOrIndex}' is out of range.`);
+      }
+
+      index = boxIdOrIndex;
+    } else {
+      index = this._items.findIndex((box) => box.boxId === boxIdOrIndex);
+
+      if (this._isIndexOutOfBounds(index)) {
+        throw new NotFound(
+          "The input you are trying to remove is not present in the inputs collection."
+        );
+      }
+    }
+
+    if (index > -1) {
+      this._items.splice(index, 1);
+    }
+
+    return this;
+  }
+}
