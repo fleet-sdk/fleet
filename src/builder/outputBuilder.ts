@@ -44,8 +44,8 @@ export class OutputBuilder {
     return this._value;
   }
 
-  public get address(): Base58String {
-    return this._address.toString();
+  public get address(): ErgoAddress {
+    return this._address;
   }
 
   public get ergoTree(): ErgoTree {

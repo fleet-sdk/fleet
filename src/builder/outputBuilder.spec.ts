@@ -13,7 +13,7 @@ describe("Constructor", () => {
     const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height);
 
     expect(builder.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(builder.address).toEqual(address);
+    expect(builder.address.toString()).toEqual(address);
     expect(builder.ergoTree).toEqual(ergoTree);
     expect(builder.height).toEqual(height);
   });
@@ -22,7 +22,7 @@ describe("Constructor", () => {
     const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTree, height);
 
     expect(builder.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(builder.address).toEqual(address);
+    expect(builder.address.toString()).toEqual(address);
     expect(builder.ergoTree).toEqual(ergoTree);
     expect(builder.height).toEqual(height);
   });
