@@ -46,6 +46,12 @@
         "modifiers": ["private"],
         "format": ["camelCase"],
         "leadingUnderscore": "require"
+      },
+      {
+        "selector": "memberLike",
+        "modifiers": ["protected"],
+        "format": ["camelCase"],
+        "leadingUnderscore": "require"
       }
     ],
     "eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }],

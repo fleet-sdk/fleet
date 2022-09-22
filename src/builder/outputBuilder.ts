@@ -1,7 +1,6 @@
-import { DistinctTokensOverflow } from "../errors/distinctTokensOverflow";
-import { InsufficientTokenAmount } from "../errors/insufficientTokenAmount";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { Address } from "../models";
+import { AddTokenOptions, TokensCollection } from "../models/collections/tokensCollection";
 import { ByteColl } from "../serialization/sigma/byteColl";
 import {
   Amount,
@@ -12,7 +11,6 @@ import {
   NewToken,
   NonMandatoryRegisters,
   TokenAmount,
-  TokenId,
   UnsignedInput
 } from "../types";
 import { first, isEmpty } from "../utils/arrayUtils";
@@ -22,13 +20,12 @@ import { removeUndefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";
 
 export const SAFE_MIN_BOX_VALUE = 1000000n;
-export const MAX_DISTINCT_TOKENS_PER_BOX = 120;
 
 export class OutputBuilder {
   private readonly _value: bigint;
   private readonly _address: Address;
   private readonly _height: number;
-  private readonly _tokens: TokenAmount<bigint>[];
+  private readonly _tokens: TokensCollection;
   private _registers: NonMandatoryRegisters;
   private _minting?: NewToken<bigint>;
 
@@ -39,7 +36,7 @@ export class OutputBuilder {
       : Address.fromBase58(recipient);
     this._height = creationHeight;
 
-    this._tokens = [];
+    this._tokens = new TokensCollection();
     this._registers = {};
   }
 
@@ -59,8 +56,8 @@ export class OutputBuilder {
     return this._height;
   }
 
-  public get tokens(): ReadonlyArray<TokenAmount<bigint>> {
-    return Object.freeze([...this._tokens]);
+  public get tokens(): TokensCollection {
+    return this._tokens;
   }
 
   public get additionalRegisters(): NonMandatoryRegisters {
@@ -71,55 +68,8 @@ export class OutputBuilder {
     return this._minting;
   }
 
-  public addToken(tokenId: TokenId, amount: Amount): OutputBuilder {
-    for (const token of this._tokens) {
-      if (token.tokenId === tokenId) {
-        token.amount += toBigInt(amount);
-
-        return this;
-      }
-    }
-
-    if (this._tokens.length >= MAX_DISTINCT_TOKENS_PER_BOX) {
-      throw new DistinctTokensOverflow();
-    }
-
-    this._tokens.push({ tokenId, amount: toBigInt(amount) });
-
-    return this;
-  }
-
-  public addTokens(tokens: TokenAmount<Amount>[]) {
-    for (const token of tokens) {
-      this.addToken(token.tokenId, token.amount);
-    }
-
-    return this;
-  }
-
-  public removeToken(tokenId: TokenId, amount?: Amount) {
-    for (let i = 0; i < this._tokens.length; i++) {
-      if (this._tokens[i].tokenId === tokenId) {
-        if (amount) {
-          const bigAmount = toBigInt(amount);
-          const token = this._tokens[i];
-
-          if (bigAmount > token.amount) {
-            throw new InsufficientTokenAmount(
-              `Insufficient token amount to perform this subtraction operation.`
-            );
-          } else if (bigAmount < token.amount) {
-            token.amount -= bigAmount;
-
-            return this;
-          }
-        }
-
-        this._tokens.splice(i, 1);
-
-        return this;
-      }
-    }
+  public addTokens(tokens: TokenAmount<Amount>[] | TokenAmount<Amount>, options?: AddTokenOptions) {
+    this._tokens.add(tokens, options);
 
     return this;
   }
@@ -140,8 +90,12 @@ export class OutputBuilder {
     return this;
   }
 
+  public extract(extractor: (context: { tokens: TokensCollection }) => void) {
+    extractor({ tokens: this._tokens });
+  }
+
   public build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<string> {
-    let tokens = this._tokens;
+    let tokens = this.tokens.toArray();
 
     if (this.minting) {
       if (isEmpty(transactionInputs)) {

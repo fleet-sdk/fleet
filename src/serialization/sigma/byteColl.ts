@@ -13,7 +13,7 @@ export class ByteColl extends SigmaType {
   }
 
   public toBytes(): Buffer {
-    return Buffer.from([this.typeCode, ...VLQ.encode(this._bytes.length), ...this._bytes]);
+    return Buffer.from([this._typeCode, ...VLQ.encode(this._bytes.length), ...this._bytes]);
   }
 
   public toString(): string {

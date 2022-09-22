@@ -1,8 +1,6 @@
 import { find } from "lodash";
-import { DistinctTokensOverflow } from "../errors/distinctTokensOverflow";
-import { InsufficientTokenAmount } from "../errors/insufficientTokenAmount";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
-import { manyTokensBoxesMock, regularBoxesMock } from "../mocks/mockBoxes";
+import { regularBoxesMock } from "../mocks/mockBoxes";
 import { Address } from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 
@@ -40,43 +38,42 @@ describe("Token handling", () => {
   });
 
   it("Should add distinct tokens", () => {
-    builder.addToken(tokenA, 50n).addToken(tokenB, 10n);
+    builder.addTokens({ tokenId: tokenA, amount: 50n }).addTokens({ tokenId: tokenB, amount: 10n });
 
     expect(builder.tokens).toHaveLength(2);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    const tokens = builder.tokens.toArray();
+    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
-  it("Should throw if too many tokens are batch added", () => {
-    const tokens = manyTokensBoxesMock.flatMap((x) => x.assets);
+  it("Should add tokens through context extractor", () => {
+    builder.extract(({ tokens }) =>
+      tokens.add({ tokenId: tokenA, amount: 50n }).add({ tokenId: tokenB, amount: 10n })
+    );
 
-    expect(() => {
-      builder.addToken(tokenA, 50n).addTokens(tokens);
-    }).toThrow(DistinctTokensOverflow);
-  });
-
-  it("Should throw if too many tokens are individually added", () => {
-    const tokens = manyTokensBoxesMock.flatMap((x) => x.assets);
-
-    expect(() => {
-      tokens.forEach((token) => builder.addToken(token.tokenId, token.amount));
-    }).toThrow(DistinctTokensOverflow);
+    expect(builder.tokens).toHaveLength(2);
+    const tokens = builder.tokens.toArray();
+    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should sum if the same tokenId is added more than one time", () => {
-    builder.addToken(tokenA, "50").addToken(tokenB, 10n);
+    builder
+      .addTokens({ tokenId: tokenA, amount: "50" })
+      .addTokens({ tokenId: tokenB, amount: 10n });
     expect(builder.tokens).toHaveLength(2);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(find(builder.tokens.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
-    builder.addToken(tokenA, 100n);
+    builder.addTokens({ tokenId: tokenA, amount: 100n });
     expect(builder.tokens).toHaveLength(2);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(150n);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    const tokens = builder.tokens.toArray();
+    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(150n);
+    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should add multiple tokens and sum if the same tokenId is added more than one time", () => {
-    builder.addToken(tokenA, "50");
-    expect(find(builder.tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    builder.addTokens({ tokenId: tokenA, amount: "50" });
+    expect(find(builder.tokens.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
     expect(builder.tokens).toHaveLength(1);
 
     builder.addTokens([
@@ -84,46 +81,38 @@ describe("Token handling", () => {
       { tokenId: tokenB, amount: "10" }
     ]);
     expect(builder.tokens).toHaveLength(2);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(150n);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    const tokens = builder.tokens.toArray();
+    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(150n);
+    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
-  it("Should remove tokens from the list", () => {
-    builder.addToken(tokenA, 50n).addToken(tokenB, 10n);
-    builder.removeToken(tokenA);
-
+  it("Should not sum if the same tokenId is added more than one time", () => {
+    builder.addTokens({ tokenId: tokenA, amount: "50" });
+    expect(find(builder.tokens.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
     expect(builder.tokens).toHaveLength(1);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenA)).toBeFalsy();
+
+    builder.addTokens(
+      [
+        { tokenId: tokenA, amount: 110n },
+        { tokenId: tokenB, amount: "10" }
+      ],
+      { sum: false }
+    );
+    expect(builder.tokens).toHaveLength(3);
+    const tokens = builder.tokens.toArray();
+    expect(find(tokens, (x) => x.tokenId === tokenA && x.amount === 50n)).not.toBeFalsy();
+    expect(find(tokens, (x) => x.tokenId === tokenB && x.amount === 10n)).not.toBeFalsy();
+    expect(find(tokens, (x) => x.tokenId === tokenA && x.amount === 110n)).not.toBeFalsy();
   });
 
-  it("Should subtract if amount is specified", () => {
-    builder.addToken(tokenA, 50n).addToken(tokenB, 10n);
-    builder.removeToken(tokenA, 10n);
-
+  it("Should remove tokens from the list using context extractor", () => {
+    builder.addTokens({ tokenId: tokenA, amount: 50n }).addTokens({ tokenId: tokenB, amount: 10n });
     expect(builder.tokens).toHaveLength(2);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(40n);
-  });
 
-  it("Should remove token if amount is equal to already inserted amount", () => {
-    builder.addToken(tokenA, 50n).addToken(tokenB, 10n);
-    builder.removeToken(tokenA, 50n);
+    builder.extract(({ tokens }) => tokens.remove(tokenA));
 
     expect(builder.tokens).toHaveLength(1);
-    expect(find(builder.tokens, (x) => x.tokenId === tokenA)).toBeFalsy();
-  });
-
-  it("Should throw if amount is greater than already inserted amount", () => {
-    builder.addToken(tokenA, 50n);
-    expect(() => {
-      builder.removeToken(tokenA, 100n);
-    }).toThrow(InsufficientTokenAmount);
-  });
-
-  it("Should not to throw when trying to remove an not included token ", () => {
-    builder.addToken(tokenA, 50n);
-    expect(() => {
-      builder.removeToken(tokenB);
-    }).not.toThrow();
+    expect(find(builder.tokens.toArray(), (x) => x.tokenId === tokenA)).toBeFalsy();
   });
 });
 
@@ -216,8 +205,8 @@ describe("Building", () => {
 
   it("Should build box with tokens", () => {
     const boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
-      .addToken(tokenA, "15")
-      .addToken(tokenB, 1n)
+      .addTokens({ tokenId: tokenA, amount: "15" })
+      .addTokens({ tokenId: tokenB, amount: 1n })
       .build();
 
     expect(boxCandidate.boxId).toBeUndefined();
@@ -260,8 +249,8 @@ describe("Building", () => {
 
   it("Should build box with tokens and minting", () => {
     const boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
-      .addToken(tokenA, "15")
-      .addToken(tokenB, 1n)
+      .addTokens({ tokenId: tokenA, amount: "15" })
+      .addTokens({ tokenId: tokenB, amount: 1n })
       .mintToken({
         amount: 100n,
         name: "TestToken"
