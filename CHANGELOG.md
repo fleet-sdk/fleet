@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/capt-nemo429/flet/compare/v0.1.0...v0.1.1) (2022-09-23)
+
+
+### Bug Fixes
+
+* **ergo address model:** fix address encoding from public key hex string ([f036a21](https://github.com/capt-nemo429/flet/commit/f036a21e68764f9de74e20040dc20babad259f6d))
+
 ## [0.1.0](https://github.com/capt-nemo429/flet/compare/v0.0.5...v0.1.0) (2022-09-23)
 
 
