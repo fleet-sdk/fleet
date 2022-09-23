@@ -151,7 +151,7 @@ export class ErgoAddress {
     network: Network = Network.Mainnet
   ): ErgoAddress {
     const prefixByte = Buffer.from([network + AddressType.P2PK]);
-    const contentBytes = Buffer.from(publicKey);
+    const contentBytes = typeof publicKey === "string" ? Buffer.from(publicKey, "hex") : publicKey;
     const checksum = Buffer.from(
       blake2b(Buffer.concat([prefixByte, contentBytes]), undefined, BLAKE_HASH_LENGTH)
     );
