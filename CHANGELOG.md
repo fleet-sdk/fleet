@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/capt-nemo429/flet/compare/v0.0.5...v0.1.0) (2022-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* `OutputBuilder.extract()` renamed to `OutpuBuilder.eject()`
+* **models:** `Address` is renamed to `ErgoAddress`
+* Removed `addToken()` which can be replaced by `addTokens()` and `removeTokens()`
+which can be replaced by `builder.extract(({ tokens }) => tokens.remove(tokenId))`
+
+### Features
+
+* **models:** add inputs collection ([70ffba4](https://github.com/capt-nemo429/flet/commit/70ffba4f26b8706fb6e177e575de6867b4a74766))
+* **models:** add outputs collection ([91c0a39](https://github.com/capt-nemo429/flet/commit/91c0a39fec80e9ad84605376bc44b4bf597f81de))
+
+
+* add `Collection` and `TokensCollection` ([a4c2637](https://github.com/capt-nemo429/flet/commit/a4c263756d8dc7a998ccdd5adeeaa1b9b0f64b96))
+* **models:** rename `Address` to `ErgoAddress` ([c39c427](https://github.com/capt-nemo429/flet/commit/c39c427df36963373c9337d6fd41ddc6aa7862c7))
+* rename Context Extractor to Context Ejector ([32dd529](https://github.com/capt-nemo429/flet/commit/32dd529a99a77662d60484922ec3f9c028f33842))
+
 ### [0.0.5](https://github.com/capt-nemo429/flet/compare/v0.0.4...v0.0.5) (2022-09-09)
 
 ### 0.0.4 (2022-09-08)
