@@ -28,3 +28,28 @@ export function first<T>(array?: T[] | Buffer): T | number | undefined {
 
   return array[0];
 }
+
+/**
+ * Check for duplicate elements using the equality operator
+ */
+export function hasDuplicates<T>(array: T[]): boolean {
+  return array.some((item, index) => {
+    return array.indexOf(item) !== index;
+  });
+}
+
+/**
+ * Check for duplicate keys in complex elements
+ */
+export function hasDuplicatesBy<T>(array: T[], selector: (value: T) => unknown): boolean {
+  return array.some((item, index) => {
+    return array.findIndex((x) => selector(x) === selector(item)) !== index;
+  });
+  // for (const item of array) {
+  //   if (array.find((x) => selector(x) === selector(item))) {
+  //     return true;
+  //   }
+  // }
+
+  return false;
+}

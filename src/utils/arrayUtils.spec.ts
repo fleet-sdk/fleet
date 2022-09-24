@@ -1,4 +1,4 @@
-import { first, isEmpty, some } from "./arrayUtils";
+import { first, hasDuplicates, hasDuplicatesBy, isEmpty, some } from "./arrayUtils";
 
 describe("isEmpty() guard", () => {
   it("Should return true if array is undefined or empty", () => {
@@ -59,5 +59,61 @@ describe("fist() fetcher", () => {
     expect(() => {
       first([]);
     }).toThrow();
+  });
+});
+
+describe("hasDuplicates() checker", () => {
+  const uniqueNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+  const uniqueStrings = ["a", "b", "c", "d", "e", "f"];
+  const uniqueComplexObjects = [
+    { a: 1, b: 2 },
+    { a: 3, b: 4 },
+    { a: 5, b: 6 },
+    { a: 7, b: 8 },
+    { a: 9, b: 10 },
+    { a: 11, b: 12 },
+    { a: 13, b: 14 },
+    { a: 15, b: 16 },
+    { a: 17, b: 18 }
+  ];
+
+  const duplicateNumbers = uniqueNumbers.concat([1, 2]);
+  const duplicateStrings = uniqueStrings.concat(["f"]);
+  const duplicateComplexObjects = uniqueComplexObjects.concat(uniqueComplexObjects[1]);
+
+  it("Should return false with a duplicate free array", () => {
+    expect(hasDuplicates(uniqueNumbers)).toBeFalsy();
+    expect(hasDuplicates(uniqueStrings)).toBeFalsy();
+    expect(hasDuplicates(uniqueComplexObjects)).toBeFalsy();
+  });
+
+  it("Should return true with a duplicate array", () => {
+    expect(hasDuplicates(duplicateNumbers)).toBeTruthy();
+    expect(hasDuplicates(duplicateStrings)).toBeTruthy();
+    expect(hasDuplicates(duplicateComplexObjects)).toBeTruthy();
+  });
+});
+
+describe("hasDuplicatesBy() checker", () => {
+  const complexObjects = [
+    { unique: 1, duplicated: 2 },
+    { unique: 3, duplicated: 4 },
+    { unique: 5, duplicated: 6 },
+    { unique: 7, duplicated: 8 },
+    { unique: 9, duplicated: 10 },
+    { unique: 11, duplicated: 12 },
+    { unique: 13, duplicated: 14 },
+    { unique: 15, duplicated: 10 },
+    { unique: 17, duplicated: 18 }
+  ];
+
+  const duplicateComplexObjects = complexObjects.concat(complexObjects[1]);
+
+  it("Should return false with a duplicate free item key", () => {
+    expect(hasDuplicatesBy(complexObjects, (x) => x.unique)).toBeFalsy();
+  });
+
+  it("Should return true with a duplicate item key", () => {
+    expect(hasDuplicatesBy(duplicateComplexObjects, (x) => x.duplicated)).toBeTruthy();
   });
 });
