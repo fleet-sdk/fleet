@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/capt-nemo429/flet/compare/v0.1.2...v0.1.3) (2022-09-24)
+
+
+### Features
+
+* **box selector:** allow `undefined` amounts on selection targets ([4aeb94c](https://github.com/capt-nemo429/flet/commit/4aeb94c78265275951a43ce89e8e1e98d69d7bb2))
+
 ### [0.1.2](https://github.com/capt-nemo429/flet/compare/v0.1.1...v0.1.2) (2022-09-24)
 
 
