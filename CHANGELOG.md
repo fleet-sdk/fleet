@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.2](https://github.com/capt-nemo429/flet/compare/v0.1.1...v0.1.2) (2022-09-24)
+
+
+### Bug Fixes
+
+* **box selector:** check for duplicate inputs after selection and makes accumulative strategy unique ([86de3ef](https://github.com/capt-nemo429/flet/commit/86de3ef262d7f3aa557e8ae2520092a12f0ecca6))
+
 ### [0.1.1](https://github.com/capt-nemo429/flet/compare/v0.1.0...v0.1.1) (2022-09-23)
 
 
