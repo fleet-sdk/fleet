@@ -1,15 +1,22 @@
 import { orderBy as lodashOrderBy } from "lodash";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
-import { Box, FilterPredicate, SortingDirection, SortingSelector, TokenAmount } from "../../types";
+import {
+  Box,
+  FilterPredicate,
+  SortingDirection,
+  SortingSelector,
+  TokenTargetAmount
+} from "../../types";
 import { hasDuplicatesBy, isEmpty, some } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";
 import { sumByTokenId } from "../../utils/boxUtils";
+import { isUndefined } from "../../utils/objectUtils";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
 import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSelectionStrategy";
 
-export type SelectionTarget = { nanoErgs: bigint; tokens?: TokenAmount<bigint>[] };
+export type SelectionTarget = { nanoErgs?: bigint; tokens?: TokenTargetAmount<bigint>[] };
 
 export class BoxSelector {
   private readonly _inputs: Box<bigint>[];
@@ -49,13 +56,16 @@ export class BoxSelector {
       const predicate = this._ensureFilterPredicate;
       unselected = unselected.filter((input) => !predicate(input));
 
-      if (target) {
+      if (!isUndefined(target.nanoErgs)) {
         target.nanoErgs -= sumBy(selected, (input) => input.value);
-        if (target.tokens && selected.some((input) => !isEmpty(input.assets))) {
-          target.tokens.forEach((tokenTarget) => {
+      }
+
+      if (!isUndefined(target.tokens) && selected.some((input) => !isEmpty(input.assets))) {
+        target.tokens.forEach((tokenTarget) => {
+          if (tokenTarget.amount) {
             tokenTarget.amount -= sumByTokenId(selected, tokenTarget.tokenId);
-          });
-        }
+          }
+        });
       }
     }
 
@@ -78,7 +88,7 @@ export class BoxSelector {
     const unreached: InsufficientAssets = {};
     const selectedNanoergs = sumBy(inputs, (input) => input.value);
 
-    if (target.nanoErgs > selectedNanoergs) {
+    if (target.nanoErgs && target.nanoErgs > selectedNanoergs) {
       unreached["nanoErgs"] = target.nanoErgs - selectedNanoergs;
     }
 
@@ -88,7 +98,7 @@ export class BoxSelector {
 
     for (const tokenTarget of target.tokens) {
       const totalSelected = sumByTokenId(inputs, tokenTarget.tokenId);
-      if (tokenTarget.amount > totalSelected) {
+      if (!isUndefined(tokenTarget.amount) && tokenTarget.amount > totalSelected) {
         unreached[tokenTarget.tokenId] = tokenTarget.amount - totalSelected;
       }
     }

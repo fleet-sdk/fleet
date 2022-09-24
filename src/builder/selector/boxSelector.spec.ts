@@ -44,6 +44,29 @@ describe("Selection strategies", () => {
   });
 });
 
+describe("Overall selection", () => {
+  it("Should select all inputs with a given token if no target amount is specified - multiple tokenIds", () => {
+    const selector = new BoxSelector(regularBoxesMock, {
+      tokens: [
+        { tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283" },
+        { tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b" }
+      ]
+    });
+
+    const boxes = selector.select();
+
+    expect(boxes).toHaveLength(4);
+    expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(10000n);
+  });
+
+  it("Should select all inputs with nanoErgs if no target amount is specified", () => {
+    const selector = new BoxSelector(regularBoxesMock, { nanoErgs: undefined });
+    const boxes = selector.select();
+
+    expect(boxes).toHaveLength(regularBoxesMock.length);
+  });
+});
+
 describe("Inputs sorting", () => {
   it("Should order inputs ascending by boxId", () => {
     const nanoErgs = sumBy(regularBoxesMock, (x) => x.value);

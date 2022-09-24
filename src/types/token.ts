@@ -15,3 +15,8 @@ export type NewToken<AmountType> = TokenBase<AmountType> & {
   decimals?: number;
   description?: string;
 };
+
+export type TokenTargetAmount<AmountType> = {
+  tokenId: TokenId;
+  amount?: AmountType;
+};

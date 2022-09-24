@@ -1,7 +1,8 @@
-import { Box, TokenAmount, TokenId } from "../../../types";
+import { Box, TokenId, TokenTargetAmount } from "../../../types";
 import { isEmpty } from "../../../utils/arrayUtils";
 import { sumBy } from "../../../utils/bigIntUtils";
 import { sumByTokenId } from "../../../utils/boxUtils";
+import { isUndefined } from "../../../utils/objectUtils";
 import { SelectionTarget } from "../boxSelector";
 import { ISelectionStrategy } from "./ISelectionStrategy";
 
@@ -21,19 +22,29 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
     }
 
     const selectedNanoErgs = sumBy(selection, (input) => input.value);
-    if (selectedNanoErgs < target.nanoErgs) {
-      selection = selection.concat(this._select(target.nanoErgs - selectedNanoErgs));
+    if (
+      (isUndefined(target.nanoErgs) && isEmpty(target.tokens)) ||
+      (!isUndefined(target.nanoErgs) && selectedNanoErgs < target.nanoErgs)
+    ) {
+      const targetAmount = !isUndefined(target.nanoErgs)
+        ? target.nanoErgs - selectedNanoErgs
+        : undefined;
+
+      selection = selection.concat(this._select(targetAmount));
     }
 
     return selection;
   }
 
-  private _selectTokens(targets: TokenAmount<bigint>[]): Box<bigint>[] {
+  private _selectTokens(targets: TokenTargetAmount<bigint>[]): Box<bigint>[] {
     let selection: Box<bigint>[] = [];
 
     for (const target of targets) {
-      const targetAmount = target.amount - sumByTokenId(selection, target.tokenId);
-      if (targetAmount <= 0n) {
+      const targetAmount = !isUndefined(target.amount)
+        ? target.amount - sumByTokenId(selection, target.tokenId)
+        : undefined;
+
+      if (targetAmount && targetAmount <= 0n) {
         continue;
       }
 
@@ -43,23 +54,31 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
     return selection;
   }
 
-  private _select(target: bigint, tokenId?: TokenId): Box<bigint>[] {
+  private _select(target?: bigint, tokenId?: TokenId): Box<bigint>[] {
     let acc = 0n;
-    const selection: Box<bigint>[] = [];
+    let selection: Box<bigint>[] = [];
 
-    for (let i = 0; i < this._inputs.length && acc < target; i++) {
+    if (isUndefined(target)) {
       if (tokenId) {
-        for (const token of this._inputs[i].assets) {
-          if (token.tokenId !== tokenId) {
-            continue;
-          }
+        selection = this._inputs.filter((x) => x.assets.some((asset) => asset.tokenId === tokenId));
+      } else {
+        selection = this._inputs;
+      }
+    } else {
+      for (let i = 0; i < this._inputs.length && acc < target; i++) {
+        if (tokenId) {
+          for (const token of this._inputs[i].assets) {
+            if (token.tokenId !== tokenId) {
+              continue;
+            }
 
-          acc += token.amount;
+            acc += token.amount;
+            selection.push(this._inputs[i]);
+          }
+        } else {
+          acc += this._inputs[i].value;
           selection.push(this._inputs[i]);
         }
-      } else {
-        acc += this._inputs[i].value;
-        selection.push(this._inputs[i]);
       }
     }
 
