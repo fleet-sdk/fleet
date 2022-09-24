@@ -33,7 +33,7 @@ export class InputsCollection extends Collection<Box<bigint>> {
   }
 
   private _add(box: Box<Amount>): void {
-    if (this._items.find((item) => item.boxId === box.boxId)) {
+    if (this._items.some((item) => item.boxId === box.boxId)) {
       throw new DuplicateInputError(box.boxId);
     }
 

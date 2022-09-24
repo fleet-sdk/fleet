@@ -1,7 +1,8 @@
 import { orderBy as lodashOrderBy } from "lodash";
+import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
 import { Box, FilterPredicate, SortingDirection, SortingSelector, TokenAmount } from "../../types";
-import { isEmpty, some } from "../../utils/arrayUtils";
+import { hasDuplicatesBy, isEmpty, some } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";
 import { sumByTokenId } from "../../utils/boxUtils";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
@@ -39,7 +40,7 @@ export class BoxSelector {
     }
 
     const target = { ...this._target };
-    let unselected = this._inputs;
+    let unselected = [...this._inputs];
     let selected = this._ensureFilterPredicate
       ? unselected.filter(this._ensureFilterPredicate)
       : [];
@@ -60,6 +61,10 @@ export class BoxSelector {
 
     unselected = this._sort(unselected);
     selected = selected.concat(this._strategy.select(unselected, target));
+
+    if (hasDuplicatesBy(selected, (item) => item.boxId)) {
+      throw new DuplicateInputSelectionError();
+    }
 
     const unreached = this._getUnreachedTargets(selected, this._target);
     if (some(unreached)) {

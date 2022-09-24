@@ -45,11 +45,4 @@ export function hasDuplicatesBy<T>(array: T[], selector: (value: T) => unknown):
   return array.some((item, index) => {
     return array.findIndex((x) => selector(x) === selector(item)) !== index;
   });
-  // for (const item of array) {
-  //   if (array.find((x) => selector(x) === selector(item))) {
-  //     return true;
-  //   }
-  // }
-
-  return false;
 }

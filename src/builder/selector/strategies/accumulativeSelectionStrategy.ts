@@ -10,21 +10,25 @@ import { ISelectionStrategy } from "./ISelectionStrategy";
  * value is reached, skipping detrimental inputs.
  */
 export class AccumulativeSelectionStrategy implements ISelectionStrategy {
+  private _inputs!: Box<bigint>[];
+
   select(inputs: Box<bigint>[], target: SelectionTarget): Box<bigint>[] {
+    this._inputs = inputs;
+
     let selection: Box<bigint>[] = [];
     if (!isEmpty(target.tokens)) {
-      selection = this._selectTokens(inputs, target.tokens);
+      selection = this._selectTokens(target.tokens);
     }
 
     const selectedNanoErgs = sumBy(selection, (input) => input.value);
     if (selectedNanoErgs < target.nanoErgs) {
-      selection = selection.concat(this._select(inputs, target.nanoErgs - selectedNanoErgs));
+      selection = selection.concat(this._select(target.nanoErgs - selectedNanoErgs));
     }
 
     return selection;
   }
 
-  private _selectTokens(inputs: Box<bigint>[], targets: TokenAmount<bigint>[]): Box<bigint>[] {
+  private _selectTokens(targets: TokenAmount<bigint>[]): Box<bigint>[] {
     let selection: Box<bigint>[] = [];
 
     for (const target of targets) {
@@ -33,30 +37,34 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
         continue;
       }
 
-      selection = selection.concat(this._select(inputs, targetAmount, target.tokenId));
+      selection = selection.concat(this._select(targetAmount, target.tokenId));
     }
 
     return selection;
   }
 
-  private _select(inputs: Box<bigint>[], target: bigint, tokenId?: TokenId): Box<bigint>[] {
+  private _select(target: bigint, tokenId?: TokenId): Box<bigint>[] {
     let acc = 0n;
     const selection: Box<bigint>[] = [];
 
-    for (let i = 0; i < inputs.length && acc < target; i++) {
+    for (let i = 0; i < this._inputs.length && acc < target; i++) {
       if (tokenId) {
-        for (const token of inputs[i].assets) {
+        for (const token of this._inputs[i].assets) {
           if (token.tokenId !== tokenId) {
             continue;
           }
 
           acc += token.amount;
-          selection.push(inputs[i]);
+          selection.push(this._inputs[i]);
         }
       } else {
-        acc += inputs[i].value;
-        selection.push(inputs[i]);
+        acc += this._inputs[i].value;
+        selection.push(this._inputs[i]);
       }
+    }
+
+    if (!isEmpty(selection)) {
+      this._inputs = this._inputs.filter((input) => !selection.includes(input));
     }
 
     return selection;

@@ -1,3 +1,4 @@
+import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientInputs } from "../../errors/insufficientInputs";
 import { regularBoxesMock } from "../../mocks/mockBoxes";
 import { Box } from "../../types";
@@ -139,6 +140,18 @@ describe("Validations", () => {
     expect(() => {
       selector.select();
     }).toThrow(InsufficientInputs);
+  });
+
+  it("Should fail if selector duplicates any item", () => {
+    const selector = new BoxSelector(regularBoxesMock, { nanoErgs: 0n }).defineStrategy(
+      (inputs) => {
+        return inputs.concat(inputs[0]); // duplicates the fist input;
+      }
+    );
+
+    expect(() => {
+      selector.select();
+    }).toThrow(DuplicateInputSelectionError);
   });
 });
 
