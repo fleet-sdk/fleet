@@ -180,15 +180,14 @@ export class ErgoAddress {
    * Validate an address
    * @param address Address buffer or string
    */
-  public static validate(address: Buffer | string): boolean {
+  public static validate(address: Buffer | HexString): boolean {
     const bytes = Buffer.isBuffer(address) ? address : Buffer.from(bs58.decode(address));
     if (bytes.length < CHECKSUM_BYTES_LENGTH) {
       return false;
     }
 
-    const length = bytes.length;
-    const script = bytes.subarray(0, length - CHECKSUM_BYTES_LENGTH);
-    const checksum = bytes.subarray(length - CHECKSUM_BYTES_LENGTH, length);
+    const script = bytes.subarray(0, bytes.length - CHECKSUM_BYTES_LENGTH);
+    const checksum = bytes.subarray(bytes.length - CHECKSUM_BYTES_LENGTH, bytes.length);
     const blakeHash = Buffer.from(blake2b(script, undefined, BLAKE_HASH_LENGTH));
     const calculatedChecksum = blakeHash.subarray(0, CHECKSUM_BYTES_LENGTH);
 
