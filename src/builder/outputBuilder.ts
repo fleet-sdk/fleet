@@ -29,15 +29,23 @@ export class OutputBuilder {
   private _registers: NonMandatoryRegisters;
   private _minting?: NewToken<bigint>;
 
-  constructor(value: Amount, recipient: Base58String | ErgoTree, creationHeight: number) {
+  constructor(
+    value: Amount,
+    recipient: Base58String | ErgoTree | ErgoAddress,
+    creationHeight: number
+  ) {
     this._value = toBigInt(value);
-    this._address = isHex(recipient)
-      ? ErgoAddress.fromErgoTree(recipient)
-      : ErgoAddress.fromBase58(recipient);
     this._height = creationHeight;
-
     this._tokens = new TokensCollection();
     this._registers = {};
+
+    if (typeof recipient === "string") {
+      this._address = isHex(recipient)
+        ? ErgoAddress.fromErgoTree(recipient)
+        : ErgoAddress.fromBase58(recipient);
+    } else {
+      this._address = recipient;
+    }
   }
 
   public get value(): bigint {

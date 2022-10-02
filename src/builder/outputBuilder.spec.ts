@@ -9,22 +9,29 @@ const ergoTree = "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200
 const height = 816992;
 
 describe("Constructor", () => {
-  it("Should bind constructed params using 'recipient' param address as base58", () => {
+  it("Should construct using 'recipient' param address as base58", () => {
     const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height);
 
-    expect(builder.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(builder.address.toString()).toEqual(address);
-    expect(builder.ergoTree).toEqual(ergoTree);
-    expect(builder.height).toEqual(height);
+    expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
+    expect(builder.address.toString()).toBe(address);
+    expect(builder.ergoTree).toBe(ergoTree);
+    expect(builder.height).toBe(height);
   });
 
-  it("Should bind constructed params using 'recipient' param as ErgoTree", () => {
+  it("Should construct using 'recipient' param as ErgoTree", () => {
     const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTree, height);
 
-    expect(builder.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(builder.address.toString()).toEqual(address);
-    expect(builder.ergoTree).toEqual(ergoTree);
-    expect(builder.height).toEqual(height);
+    expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
+    expect(builder.address.toString()).toBe(address);
+    expect(builder.ergoTree).toBe(ergoTree);
+    expect(builder.height).toBe(height);
+  });
+
+  it("Should construct using 'recipient' param as ErgoAddress", () => {
+    const ergoAddress = ErgoAddress.fromBase58(address);
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoAddress, height);
+
+    expect(builder.address).toBe(ergoAddress);
   });
 });
 
@@ -42,8 +49,8 @@ describe("Token handling", () => {
 
     expect(builder.tokens).toHaveLength(2);
     const tokens = builder.tokens.toArray();
-    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
-    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toBe(50n);
+    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toBe(10n);
   });
 
   it("Should add tokens from context ejector", () => {
