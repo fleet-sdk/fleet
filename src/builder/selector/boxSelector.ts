@@ -1,11 +1,14 @@
-import { orderBy as lodashOrderBy } from "lodash";
+import { map, orderBy as lodashOrderBy } from "lodash";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
+import { InputsCollection } from "../../models";
 import {
   Box,
+  BoxCandidate,
   FilterPredicate,
   SortingDirection,
   SortingSelector,
+  TokenAmount,
   TokenTargetAmount
 } from "../../types";
 import { hasDuplicatesBy, isEmpty, some } from "../../utils/arrayUtils";
@@ -26,8 +29,13 @@ export class BoxSelector {
   private _inputsSortSelector?: SortingSelector<Box<bigint>>;
   private _inputsSortDir?: SortingDirection;
 
-  constructor(inputs: Box<bigint>[], target: SelectionTarget) {
-    this._inputs = inputs;
+  constructor(inputs: Box<bigint>[] | InputsCollection, target: SelectionTarget) {
+    if (inputs instanceof InputsCollection) {
+      this._inputs = inputs.toArray();
+    } else {
+      this._inputs = inputs;
+    }
+
     this._target = target;
   }
 
@@ -136,5 +144,22 @@ export class BoxSelector {
     }
 
     return false;
+  }
+
+  public static buildTargetFrom(boxes: Box<bigint>[] | BoxCandidate<bigint>[]): SelectionTarget {
+    const tokens: { [tokenId: string]: bigint } = {};
+    let nanoErgs = 0n;
+
+    for (const box of boxes) {
+      nanoErgs += box.value;
+      for (const token of box.assets) {
+        tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + token.amount;
+      }
+    }
+
+    return {
+      nanoErgs,
+      tokens: Object.keys(tokens).map((tokenId) => ({ tokenId, amount: tokens[tokenId] }))
+    };
   }
 }
