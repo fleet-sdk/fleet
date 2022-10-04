@@ -1,3 +1,4 @@
+import { isUndefined } from "lodash";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
@@ -97,8 +98,14 @@ export class OutputBuilder {
     return this;
   }
 
-  public setCreationHeight(height: number): OutputBuilder {
-    this._creationHeight = height;
+  public setCreationHeight(height: number, options?: { replace: boolean }): OutputBuilder {
+    if (
+      isUndefined(options) ||
+      options.replace === true ||
+      (options.replace === false && isUndefined(this._creationHeight))
+    ) {
+      this._creationHeight = height;
+    }
 
     return this;
   }
@@ -144,7 +151,7 @@ export class OutputBuilder {
       ];
     }
 
-    if (this.creationHeight === undefined || this.creationHeight === null) {
+    if (isUndefined(this.creationHeight)) {
       throw new UndefinedCreationHeight();
     }
 

@@ -1,5 +1,4 @@
 import { find } from "lodash";
-import { InsufficientInputs } from "../errors";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
@@ -55,6 +54,41 @@ describe("Constructor", () => {
     const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoAddress, height);
 
     expect(builder.address).toBe(ergoAddress);
+  });
+});
+
+describe("Creation height", () => {
+  it("Should construct with no creation height and set it using setCreationHeight()", () => {
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address);
+    expect(builder.creationHeight).toBeUndefined();
+
+    builder.setCreationHeight(10);
+    expect(builder.creationHeight).toBe(10);
+
+    builder.setCreationHeight(height);
+    expect(builder.creationHeight).toBe(height);
+  });
+
+  it("Should replace creation height", () => {
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height);
+    expect(builder.creationHeight).toBe(height); // should be the same as constructor
+
+    builder.setCreationHeight(10);
+    expect(builder.creationHeight).toBe(10); // should replace by default
+
+    builder.setCreationHeight(11, { replace: true });
+    expect(builder.creationHeight).toBe(11); // should replace explicitly
+  });
+
+  it("Should not replace creation height", () => {
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address);
+    expect(builder.creationHeight).toBeUndefined(); // should be the same as constructor (undefined on this case)
+
+    builder.setCreationHeight(height, { replace: false });
+    expect(builder.creationHeight).toBe(height); // should set height since creationsHeight is undefined
+
+    builder.setCreationHeight(11, { replace: false });
+    expect(builder.creationHeight).toBe(height); // should not replace
   });
 });
 
