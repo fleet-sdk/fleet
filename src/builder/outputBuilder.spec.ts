@@ -1,5 +1,8 @@
 import { find } from "lodash";
+import { InsufficientInputs } from "../errors";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
+import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
+import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import { regularBoxesMock } from "../mocks/mockBoxes";
 import { ErgoAddress, TokensCollection } from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
@@ -15,7 +18,16 @@ describe("Constructor", () => {
     expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
     expect(builder.address.toString()).toBe(address);
     expect(builder.ergoTree).toBe(ergoTree);
-    expect(builder.height).toBe(height);
+    expect(builder.creationHeight).toBe(height);
+  });
+
+  it("Should construct with no creation height", () => {
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address);
+
+    expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
+    expect(builder.address.toString()).toBe(address);
+    expect(builder.ergoTree).toBe(ergoTree);
+    expect(builder.creationHeight).toBeUndefined();
   });
 
   it("Should construct using 'recipient' param as ErgoTree", () => {
@@ -24,7 +36,18 @@ describe("Constructor", () => {
     expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
     expect(builder.address.toString()).toBe(address);
     expect(builder.ergoTree).toBe(ergoTree);
-    expect(builder.height).toBe(height);
+    expect(builder.creationHeight).toBe(height);
+  });
+
+  it("Should construct with no creation height and set it using setCreationHeight()", () => {
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address);
+    expect(builder.creationHeight).toBeUndefined();
+
+    builder.setCreationHeight(10);
+    expect(builder.creationHeight).toBe(10);
+
+    builder.setCreationHeight(height);
+    expect(builder.creationHeight).toBe(height);
   });
 
   it("Should construct using 'recipient' param as ErgoAddress", () => {
@@ -355,6 +378,14 @@ describe("Building", () => {
 
     expect(() => {
       builder.build();
-    }).toThrow();
+    }).toThrow(UndefinedMintingContext);
+  });
+
+  it("Should fail no creation height is added", () => {
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address);
+
+    expect(() => {
+      builder.build();
+    }).toThrow(UndefinedCreationHeight);
   });
 });

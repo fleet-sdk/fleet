@@ -1,4 +1,6 @@
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
+import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
+import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import { ErgoAddress } from "../models";
 import { AddTokenOptions, TokensCollection } from "../models/collections/tokensCollection";
 import { ByteColl } from "../serialization/sigma/byteColl";
@@ -24,18 +26,18 @@ export const SAFE_MIN_BOX_VALUE = 1000000n;
 export class OutputBuilder {
   private readonly _value: bigint;
   private readonly _address: ErgoAddress;
-  private readonly _height: number;
   private readonly _tokens: TokensCollection;
+  private _creationHeight?: number;
   private _registers: NonMandatoryRegisters;
   private _minting?: NewToken<bigint>;
 
   constructor(
     value: Amount,
     recipient: Base58String | ErgoTree | ErgoAddress,
-    creationHeight: number
+    creationHeight?: number
   ) {
     this._value = toBigInt(value);
-    this._height = creationHeight;
+    this._creationHeight = creationHeight;
     this._tokens = new TokensCollection();
     this._registers = {};
 
@@ -60,8 +62,8 @@ export class OutputBuilder {
     return this._address.ergoTree;
   }
 
-  public get height(): number {
-    return this._height;
+  public get creationHeight(): number | undefined {
+    return this._creationHeight;
   }
 
   public get tokens(): TokensCollection {
@@ -95,6 +97,12 @@ export class OutputBuilder {
     return this;
   }
 
+  public setCreationHeight(height: number): OutputBuilder {
+    this._creationHeight = height;
+
+    return this;
+  }
+
   public setAdditionalRegisters(registers: NonMandatoryRegisters): OutputBuilder {
     this._registers = removeUndefined(registers);
 
@@ -114,9 +122,7 @@ export class OutputBuilder {
 
     if (this.minting) {
       if (isEmpty(transactionInputs)) {
-        throw Error(
-          "Minting context is undefined. Transaction's inputs must be included in order to determine minting token id."
-        );
+        throw new UndefinedMintingContext();
       }
 
       if (isEmpty(this.additionalRegisters)) {
@@ -138,10 +144,14 @@ export class OutputBuilder {
       ];
     }
 
+    if (this.creationHeight === undefined || this.creationHeight === null) {
+      throw new UndefinedCreationHeight();
+    }
+
     return {
       value: this.value.toString(),
       ergoTree: this.ergoTree,
-      creationHeight: this.height,
+      creationHeight: this.creationHeight,
       assets: tokens.map((token) => {
         return {
           tokenId: token.tokenId,
