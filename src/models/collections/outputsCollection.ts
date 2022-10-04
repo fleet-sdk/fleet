@@ -1,5 +1,8 @@
 import { OutputBuilder } from "../../builder/outputBuilder";
+import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
+import { isEmpty } from "../../utils/arrayUtils";
+import { isUndefined } from "../../utils/objectUtils";
 import { Collection } from "./collection";
 
 export class OutputsCollection extends Collection<OutputBuilder> {
@@ -57,5 +60,38 @@ export class OutputsCollection extends Collection<OutputBuilder> {
     }
 
     return this;
+  }
+
+  public buildSelectionTarget(basis?: SelectionTarget): SelectionTarget {
+    const tokens: { [tokenId: string]: bigint } = {};
+    let nanoErgs = 0n;
+
+    if (basis) {
+      if (basis.nanoErgs) {
+        nanoErgs = basis.nanoErgs;
+      }
+
+      if (!isEmpty(basis.tokens)) {
+        for (const token of basis.tokens) {
+          if (isUndefined(token.amount)) {
+            continue;
+          }
+
+          tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + token.amount;
+        }
+      }
+    }
+
+    for (const box of this._items) {
+      nanoErgs += box.value;
+      for (const token of box.tokens) {
+        tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + token.amount;
+      }
+    }
+
+    return {
+      nanoErgs,
+      tokens: Object.keys(tokens).map((tokenId) => ({ tokenId, amount: tokens[tokenId] }))
+    };
   }
 }

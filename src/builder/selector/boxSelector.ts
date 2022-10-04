@@ -1,18 +1,18 @@
-import { map, orderBy as lodashOrderBy } from "lodash";
+import { orderBy as lodashOrderBy } from "lodash";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
 import { InputsCollection } from "../../models";
 import {
+  Amount,
   Box,
   BoxCandidate,
   FilterPredicate,
   SortingDirection,
   SortingSelector,
-  TokenAmount,
   TokenTargetAmount
 } from "../../types";
 import { hasDuplicatesBy, isEmpty, some } from "../../utils/arrayUtils";
-import { sumBy } from "../../utils/bigIntUtils";
+import { sumBy, toBigInt } from "../../utils/bigIntUtils";
 import { sumByTokenId } from "../../utils/boxUtils";
 import { isUndefined } from "../../utils/objectUtils";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
@@ -146,14 +146,14 @@ export class BoxSelector {
     return false;
   }
 
-  public static buildTargetFrom(boxes: Box<bigint>[] | BoxCandidate<bigint>[]): SelectionTarget {
+  public static buildTargetFrom(boxes: Box<Amount>[] | BoxCandidate<Amount>[]): SelectionTarget {
     const tokens: { [tokenId: string]: bigint } = {};
     let nanoErgs = 0n;
 
     for (const box of boxes) {
-      nanoErgs += box.value;
+      nanoErgs += toBigInt(box.value);
       for (const token of box.assets) {
-        tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + token.amount;
+        tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + toBigInt(token.amount);
       }
     }
 

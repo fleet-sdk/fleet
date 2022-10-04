@@ -1,12 +1,13 @@
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "../../builder/outputBuilder";
+import { RECOMMENDED_MIN_FEE_VALUE } from "../../builder/transactionBuilder";
 import { NotFoundError } from "../../errors";
 import { first } from "../../utils/arrayUtils";
 import { OutputsCollection } from "./outputsCollection";
 
-describe("outputs collection", () => {
-  const address = "9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ";
-  const height = 0;
+const address = "9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ";
+const height = 845575;
 
+describe("outputs collection", () => {
   it("Should create and empty collection", () => {
     const collection = new OutputsCollection();
     expect(collection.isEmpty).toBeTruthy();
@@ -96,5 +97,68 @@ describe("outputs collection", () => {
     expect(() => {
       collection.remove(100);
     }).toThrow(RangeError);
+  });
+});
+
+describe("Target building", () => {
+  const tokenA = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
+  const tokenB = "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
+  const tokenC = "4bdafc19f427fde7e335a38b1fac384143721249f037e0c2e2716631fdcc6741";
+  const tokenD = "5614535ba46927145c3d30fed8f14b08bd48a143b24136809f9e47afc40643c4";
+
+  it("Should sum amounts and build target", () => {
+    const collection = new OutputsCollection()
+      .add(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).addTokens({
+          tokenId: tokenA,
+          amount: 12348n
+        })
+      )
+      .add(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+          .addTokens({ tokenId: tokenA, amount: "11" })
+          .addTokens({ tokenId: tokenB, amount: 50n })
+      );
+
+    expect(collection.buildSelectionTarget()).toEqual({
+      nanoErgs: SAFE_MIN_BOX_VALUE * 2n,
+      tokens: [
+        { tokenId: tokenA, amount: 12359n },
+        { tokenId: tokenB, amount: 50n }
+      ]
+    });
+  });
+
+  it("Should sum amounts and build target starting from a basis object", () => {
+    const basis = {
+      nanoErgs: RECOMMENDED_MIN_FEE_VALUE,
+      tokens: [
+        { tokenId: tokenA, amount: 12359n },
+        { tokenId: tokenC, amount: 20n },
+        { tokenId: tokenD, amount: undefined }
+      ]
+    };
+
+    const collection = new OutputsCollection()
+      .add(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).addTokens({
+          tokenId: tokenA,
+          amount: 12348n
+        })
+      )
+      .add(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+          .addTokens({ tokenId: tokenA, amount: "11" })
+          .addTokens({ tokenId: tokenB, amount: 50n })
+      );
+
+    expect(collection.buildSelectionTarget(basis)).toEqual({
+      nanoErgs: SAFE_MIN_BOX_VALUE * 2n + basis.nanoErgs,
+      tokens: [
+        { tokenId: tokenA, amount: 12359n + (basis.tokens[0].amount || 0n) },
+        { tokenId: basis.tokens[1].tokenId, amount: basis.tokens[1].amount },
+        { tokenId: tokenB, amount: 50n }
+      ]
+    });
   });
 });

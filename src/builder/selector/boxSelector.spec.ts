@@ -207,7 +207,7 @@ describe("Target builder", () => {
         assets: [
           {
             tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
-            amount: 100n
+            amount: "100"
           },
           {
             tokenId: "5a34d53ca483924b9a6aa0c771f11888881b516a8d1a9cdc535d063fe26d065e",
@@ -225,7 +225,7 @@ describe("Target builder", () => {
       },
       {
         boxId: "a2c9821f5c2df9c320f17136f043b33f7716713ab74c84d687885f9dd39d2c8a",
-        value: 1000000n,
+        value: "1000000",
         index: 0,
         transactionId: "f82fa15166d787c275a6a5ab29983f6386571c63e50c73c1af7cba184f85ef23",
         creationHeight: 805063,
@@ -243,7 +243,7 @@ describe("Target builder", () => {
 
     const target = BoxSelector.buildTargetFrom(mockBoxes);
     expect(target).toEqual({
-      nanoErgs: sumBy(mockBoxes, (x) => x.value),
+      nanoErgs: 67501000000n,
       tokens: [
         {
           tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
