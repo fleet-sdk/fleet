@@ -129,6 +129,19 @@ describe("Target building", () => {
     });
   });
 
+  it("Should ignore minting tokens", () => {
+    const collection = new OutputsCollection().add(
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+        .addTokens({ tokenId: tokenA, amount: 12348n })
+        .mintToken({ name: "testToken", amount: 10n })
+    );
+
+    expect(collection.buildSelectionTarget()).toEqual({
+      nanoErgs: SAFE_MIN_BOX_VALUE,
+      tokens: [{ tokenId: tokenA, amount: 12348n }]
+    });
+  });
+
   it("Should sum amounts and build target starting from a basis object", () => {
     const basis = {
       nanoErgs: RECOMMENDED_MIN_FEE_VALUE,
