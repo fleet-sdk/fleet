@@ -6,6 +6,7 @@ import { Box } from "../../types";
 import { first } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";
 import { sumByTokenId } from "../../utils/boxUtils";
+import { SAFE_MIN_BOX_VALUE } from "../outputBuilder";
 import { BoxSelector } from "./boxSelector";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 
@@ -78,6 +79,28 @@ describe("Overall selection", () => {
     const boxes = selector.select();
 
     expect(boxes).toHaveLength(regularBoxesMock.length);
+  });
+
+  it("Should not change target object", () => {
+    const tokenA = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
+    const tokenB = "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
+    const target = {
+      nanoErgs: SAFE_MIN_BOX_VALUE,
+      tokens: [
+        { tokenId: tokenA, amount: 100n },
+        { tokenId: tokenB, amount: 1n }
+      ]
+    };
+
+    new BoxSelector(regularBoxesMock, target).select();
+
+    expect(target).toEqual({
+      nanoErgs: SAFE_MIN_BOX_VALUE,
+      tokens: [
+        { tokenId: tokenA, amount: 100n },
+        { tokenId: tokenB, amount: 1n }
+      ]
+    });
   });
 });
 
