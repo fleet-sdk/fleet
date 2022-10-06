@@ -13,3 +13,7 @@ export function removeUndefined(value: Record<string, unknown>) {
 export function isUndefined(value: unknown): value is undefined {
   return value === undefined || value === null || Number.isNaN(value);
 }
+
+export function isDefined<T>(value: T | undefined): value is T {
+  return !isUndefined(value);
+}

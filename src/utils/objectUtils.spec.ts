@@ -1,4 +1,4 @@
-import { isUndefined, removeUndefined } from "./objectUtils";
+import { isDefined, isUndefined, removeUndefined } from "./objectUtils";
 
 describe("Remove undefined fields", () => {
   it("Should remove", () => {
@@ -19,5 +19,19 @@ describe("isUndefined()", () => {
     expect(isUndefined(undefined)).toBeTruthy();
     expect(isUndefined(null)).toBeTruthy();
     expect(isUndefined(NaN)).toBeTruthy();
+  });
+});
+
+describe("isDefined()", () => {
+  it("Should return true for defined objects", () => {
+    expect(isDefined(0)).toBeTruthy();
+    expect(isDefined("")).toBeTruthy();
+    expect(isDefined({})).toBeTruthy();
+  });
+
+  it("Should return false for undefined or null objects", () => {
+    expect(isDefined(undefined)).toBeFalsy();
+    expect(isDefined(null)).toBeFalsy();
+    expect(isDefined(NaN)).toBeFalsy();
   });
 });
