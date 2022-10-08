@@ -1,5 +1,6 @@
-import { Box, NonMandatoryRegisters, TokenId } from "../types";
-import { isEmpty } from "./arrayUtils";
+import { Amount, Box, NonMandatoryRegisters, TokenId } from "../types";
+import { hasDuplicatesBy, isEmpty } from "./arrayUtils";
+import { sumBy, toBigInt } from "./bigIntUtils";
 
 export function sumByTokenId(inputs: Box<bigint>[], tokenId: TokenId): bigint {
   let acc = 0n;
@@ -41,4 +42,36 @@ export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boo
   }
 
   return true;
+}
+
+type TokenAmount<AmountType> = {
+  tokenId: TokenId;
+  amount: AmountType;
+};
+
+export type BoxAmounts = {
+  nanoErgs: bigint;
+  tokens: TokenAmount<bigint>[];
+};
+
+type MinimalAmountFields = {
+  value: Amount;
+  assets: TokenAmount<Amount>[];
+};
+
+export function sumBoxes(boxes: MinimalAmountFields[]): BoxAmounts {
+  const tokens: { [tokenId: string]: bigint } = {};
+  let nanoErgs = 0n;
+
+  for (const box of boxes) {
+    nanoErgs += toBigInt(box.value);
+    for (const token of box.assets) {
+      tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + toBigInt(token.amount);
+    }
+  }
+
+  return {
+    nanoErgs,
+    tokens: Object.keys(tokens).map((tokenId) => ({ tokenId, amount: tokens[tokenId] }))
+  };
 }

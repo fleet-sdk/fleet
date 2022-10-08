@@ -1,5 +1,6 @@
 import { regularBoxesMock } from "../mocks/mockBoxes";
-import { areRegistersDenselyPacked, sumByTokenId } from "./boxUtils";
+import { sumBy } from "./bigIntUtils";
+import { areRegistersDenselyPacked, sumBoxes, sumByTokenId } from "./boxUtils";
 
 describe("Box sumByTokenId", () => {
   it("Should sum correctly", () => {
@@ -20,6 +21,47 @@ describe("Box sumByTokenId", () => {
     expect(
       sumByTokenId([], "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
     ).toBe(0n);
+  });
+});
+
+describe("Sum boxes", () => {
+  it("Should sum all tokens and nanoErgs", () => {
+    const boxes = regularBoxesMock.filter((input) =>
+      [
+        "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
+        "a2c9821f5c2df9c320f17136f043b33f7716713ab74c84d687885f9dd39d2c8a",
+        "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
+        "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
+      ].includes(input.boxId)
+    );
+
+    expect(sumBoxes(boxes)).toEqual({
+      nanoErgs: sumBy(boxes, (x) => x.value),
+      tokens: [
+        {
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          amount: 226652336n
+        },
+        {
+          tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
+          amount: 10n
+        }
+      ]
+    });
+  });
+
+  it("Should sum if box doesn't contains tokens", () => {
+    const boxes = regularBoxesMock.filter((input) =>
+      [
+        "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
+        "30cb07d93f16f5b052e9f56c1b5dfb83db9ccaeb467dde064933afc23beb6f5f"
+      ].includes(input.boxId)
+    );
+
+    expect(sumBoxes(boxes)).toEqual({
+      nanoErgs: sumBy(boxes, (x) => x.value),
+      tokens: []
+    });
   });
 });
 
