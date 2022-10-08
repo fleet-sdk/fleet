@@ -1,7 +1,8 @@
 import { OutputBuilder } from "../../builder/outputBuilder";
 import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
-import { isEmpty } from "../../utils/arrayUtils";
+import { some } from "../../utils/arrayUtils";
+import { BoxAmounts } from "../../utils/boxUtils";
 import { isUndefined } from "../../utils/objectUtils";
 import { Collection } from "./collection";
 
@@ -62,7 +63,11 @@ export class OutputsCollection extends Collection<OutputBuilder> {
     return this;
   }
 
-  public buildSelectionTarget(basis?: SelectionTarget): SelectionTarget {
+  public clone(): OutputsCollection {
+    return new OutputsCollection(this._items);
+  }
+
+  public sum(basis?: SelectionTarget | BoxAmounts): BoxAmounts {
     const tokens: { [tokenId: string]: bigint } = {};
     let nanoErgs = 0n;
 
@@ -71,7 +76,7 @@ export class OutputsCollection extends Collection<OutputBuilder> {
         nanoErgs = basis.nanoErgs;
       }
 
-      if (!isEmpty(basis.tokens)) {
+      if (some(basis.tokens)) {
         for (const token of basis.tokens) {
           if (isUndefined(token.amount)) {
             continue;

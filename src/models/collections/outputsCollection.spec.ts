@@ -54,6 +54,22 @@ describe("outputs collection", () => {
     expect(collection.toArray().includes(outputA)).toBeFalsy();
   });
 
+  it("Should clone a collection", () => {
+    const outputA = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height);
+    const outputB = new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, address, height);
+    const collection = new OutputsCollection([outputA, outputB]);
+    expect(collection).toHaveLength(2);
+
+    const cloned = collection.clone();
+
+    cloned.remove(outputA);
+    expect(cloned).toHaveLength(1);
+    expect(cloned.toArray().includes(outputA)).toBeFalsy();
+
+    expect(collection).toHaveLength(2);
+    expect(collection.toArray().includes(outputA)).toBeTruthy();
+  });
+
   it("Should remove by index", () => {
     const outputA = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height);
     const outputB = new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, address, height);
@@ -106,7 +122,7 @@ describe("Target building", () => {
   const tokenC = "4bdafc19f427fde7e335a38b1fac384143721249f037e0c2e2716631fdcc6741";
   const tokenD = "5614535ba46927145c3d30fed8f14b08bd48a143b24136809f9e47afc40643c4";
 
-  it("Should sum amounts and build target", () => {
+  it("Should sum amounts", () => {
     const collection = new OutputsCollection()
       .add(
         new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).addTokens({
@@ -120,7 +136,7 @@ describe("Target building", () => {
           .addTokens({ tokenId: tokenB, amount: 50n })
       );
 
-    expect(collection.buildSelectionTarget()).toEqual({
+    expect(collection.sum()).toEqual({
       nanoErgs: SAFE_MIN_BOX_VALUE * 2n,
       tokens: [
         { tokenId: tokenA, amount: 12359n },
@@ -136,7 +152,7 @@ describe("Target building", () => {
         .mintToken({ name: "testToken", amount: 10n })
     );
 
-    expect(collection.buildSelectionTarget()).toEqual({
+    expect(collection.sum()).toEqual({
       nanoErgs: SAFE_MIN_BOX_VALUE,
       tokens: [{ tokenId: tokenA, amount: 12348n }]
     });
@@ -165,7 +181,7 @@ describe("Target building", () => {
           .addTokens({ tokenId: tokenB, amount: 50n })
       );
 
-    expect(collection.buildSelectionTarget(basis)).toEqual({
+    expect(collection.sum(basis)).toEqual({
       nanoErgs: SAFE_MIN_BOX_VALUE * 2n + basis.nanoErgs,
       tokens: [
         { tokenId: tokenA, amount: 12359n + (basis.tokens[0].amount || 0n) },
