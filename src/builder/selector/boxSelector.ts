@@ -14,7 +14,7 @@ import {
 import { hasDuplicatesBy, isEmpty, some } from "../../utils/arrayUtils";
 import { sumBy, toBigInt } from "../../utils/bigIntUtils";
 import { sumByTokenId } from "../../utils/boxUtils";
-import { isUndefined } from "../../utils/objectUtils";
+import { isDefined } from "../../utils/objectUtils";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
 import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSelectionStrategy";
@@ -23,20 +23,17 @@ export type SelectionTarget = { nanoErgs?: bigint; tokens?: TokenTargetAmount<bi
 
 export class BoxSelector {
   private readonly _inputs: Box<bigint>[];
-  private readonly _target: SelectionTarget;
   private _strategy?: ISelectionStrategy;
   private _ensureFilterPredicate?: FilterPredicate<Box<bigint>>;
   private _inputsSortSelector?: SortingSelector<Box<bigint>>;
   private _inputsSortDir?: SortingDirection;
 
-  constructor(inputs: Box<bigint>[] | InputsCollection, target: SelectionTarget) {
+  constructor(inputs: Box<bigint>[] | InputsCollection) {
     if (inputs instanceof InputsCollection) {
       this._inputs = inputs.toArray();
     } else {
       this._inputs = inputs;
     }
-
-    this._target = target;
   }
 
   public defineStrategy(strategy: ISelectionStrategy | SelectorFunction): BoxSelector {
@@ -49,42 +46,43 @@ export class BoxSelector {
     return this;
   }
 
-  public select(): Box<bigint>[] {
+  public select(target: SelectionTarget): Box<bigint>[] {
     if (!this._strategy) {
       this._strategy = new AccumulativeSelectionStrategy();
     }
 
-    const target = { ...this._target };
+    const remaining = { ...target };
     let unselected = [...this._inputs];
-    let selected = this._ensureFilterPredicate
-      ? unselected.filter(this._ensureFilterPredicate)
-      : [];
+    let selected!: Box<bigint>[];
 
-    if (this._ensureFilterPredicate) {
+    if (isDefined(this._ensureFilterPredicate)) {
       const predicate = this._ensureFilterPredicate;
+      selected = unselected.filter(predicate);
       unselected = unselected.filter((input) => !predicate(input));
 
-      if (!isUndefined(target.nanoErgs)) {
-        target.nanoErgs -= sumBy(selected, (input) => input.value);
+      if (isDefined(remaining.nanoErgs)) {
+        remaining.nanoErgs -= sumBy(selected, (input) => input.value);
       }
 
-      if (!isUndefined(target.tokens) && selected.some((input) => !isEmpty(input.assets))) {
-        target.tokens.forEach((tokenTarget) => {
+      if (isDefined(remaining.tokens) && selected.some((input) => !isEmpty(input.assets))) {
+        remaining.tokens.forEach((tokenTarget) => {
           if (tokenTarget.amount) {
             tokenTarget.amount -= sumByTokenId(selected, tokenTarget.tokenId);
           }
         });
       }
+    } else {
+      selected = [];
     }
 
     unselected = this._sort(unselected);
-    selected = selected.concat(this._strategy.select(unselected, target));
+    selected = selected.concat(this._strategy.select(unselected, remaining));
 
     if (hasDuplicatesBy(selected, (item) => item.boxId)) {
       throw new DuplicateInputSelectionError();
     }
 
-    const unreached = this._getUnreachedTargets(selected, this._target);
+    const unreached = this._getUnreachedTargets(selected, target);
     if (some(unreached)) {
       throw new InsufficientInputs(unreached);
     }
@@ -106,7 +104,7 @@ export class BoxSelector {
 
     for (const tokenTarget of target.tokens) {
       const totalSelected = sumByTokenId(inputs, tokenTarget.tokenId);
-      if (!isUndefined(tokenTarget.amount) && tokenTarget.amount > totalSelected) {
+      if (isDefined(tokenTarget.amount) && tokenTarget.amount > totalSelected) {
         unreached[tokenTarget.tokenId] = tokenTarget.amount - totalSelected;
       }
     }
