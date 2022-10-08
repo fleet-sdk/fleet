@@ -1,4 +1,4 @@
-import { first, hasDuplicates, hasDuplicatesBy, isEmpty, some } from "./arrayUtils";
+import { chunk, first, hasDuplicates, hasDuplicatesBy, isEmpty, some } from "./arrayUtils";
 
 describe("isEmpty() guard", () => {
   it("Should return true if array is undefined or empty", () => {
@@ -115,5 +115,26 @@ describe("hasDuplicatesBy() checker", () => {
 
   it("Should return true with a duplicate item key", () => {
     expect(hasDuplicatesBy(duplicateComplexObjects, (x) => x.duplicated)).toBeTruthy();
+  });
+});
+
+describe("Chunk arrays", () => {
+  it("Should return n chunked arrays without duplications", () => {
+    const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    expect(chunk(array, 2)).toEqual([
+      [1, 2],
+      [3, 4],
+      [5, 6],
+      [7, 8],
+      [9, 10]
+    ]);
+    expect(chunk(array, 3)).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]);
+    expect(chunk(array, 5)).toEqual([
+      [1, 2, 3, 4, 5],
+      [6, 7, 8, 9, 10]
+    ]);
+    expect(chunk(array, 10)).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]);
+    expect(chunk(array, 20)).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]);
   });
 });

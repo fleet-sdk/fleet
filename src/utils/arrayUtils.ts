@@ -8,7 +8,7 @@ export function isEmpty<T>(obj?: T[] | object): obj is undefined {
   return Array.isArray(obj) ? obj.length === 0 : Object.keys(obj).length === 0;
 }
 
-export function some<T extends object>(obj?: T): obj is undefined;
+export function some<T extends object>(obj?: T): obj is T;
 export function some<T>(array?: T[]): array is T[];
 export function some<T>(obj?: T[] | object): boolean {
   return !isEmpty(obj);
@@ -45,4 +45,17 @@ export function hasDuplicatesBy<T>(array: T[], selector: (value: T) => unknown):
   return array.some((item, index) => {
     return array.findIndex((x) => selector(x) === selector(item)) !== index;
   });
+}
+
+export function chunk<T>(array: T[], size: number): T[][] {
+  if (array.length <= size) {
+    return [array];
+  }
+
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+
+  return chunks;
 }
