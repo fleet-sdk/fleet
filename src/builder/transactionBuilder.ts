@@ -12,7 +12,7 @@ import {
   UnsignedInput,
   UnsignedTransaction
 } from "../types";
-import { chunk, hasDuplicatesBy, isEmpty, some } from "../utils/arrayUtils";
+import { chunk, hasDuplicatesBy, some } from "../utils/arrayUtils";
 import { toBigInt } from "../utils/bigIntUtils";
 import { BoxAmounts, sumBoxes } from "../utils/boxUtils";
 import { isDefined } from "../utils/objectUtils";
