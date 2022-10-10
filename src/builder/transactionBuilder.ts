@@ -1,3 +1,5 @@
+import { MalformedTransaction } from "../errors/malformedTransaction";
+import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import {
   Amount,
@@ -10,7 +12,7 @@ import {
   UnsignedInput,
   UnsignedTransaction
 } from "../types";
-import { chunk, some } from "../utils/arrayUtils";
+import { chunk, hasDuplicatesBy, isEmpty, some } from "../utils/arrayUtils";
 import { toBigInt } from "../utils/bigIntUtils";
 import { BoxAmounts, sumBoxes } from "../utils/boxUtils";
 import { isDefined } from "../utils/objectUtils";
@@ -163,6 +165,10 @@ export class TransactionBuilder {
   public build(
     buildOutputType: BuildOutputType = "default"
   ): UnsignedTransaction | EIP12UnsignedTransaction {
+    if (hasDuplicatesBy(this.outputs.toArray(), (output) => isDefined(output.minting))) {
+      throw new MalformedTransaction("only one token can be minted per transaction.");
+    }
+
     const outputs = this.outputs.clone();
 
     if (isDefined(this._feeAmount)) {
@@ -174,19 +180,22 @@ export class TransactionBuilder {
       this._selectorCallback(selector);
     }
 
-    const target = outputs.sum();
+    const target = some(this._burning)
+      ? outputs.sum({ tokens: this._burning.toArray() })
+      : outputs.sum();
     let inputs = selector.select(target);
 
     if (isDefined(this._changeAddress)) {
-      let change = this._calcChange(sumBoxes(inputs), target);
+      let change = this._calcDiff(sumBoxes(inputs), target);
 
       if (some(change.tokens)) {
         let requiredNanoErgs = this._calcRequiredNanoErgsForChange(change.tokens.length);
         while (requiredNanoErgs > change.nanoErgs) {
-          target.nanoErgs += requiredNanoErgs - change.nanoErgs;
-
-          inputs = selector.select(target);
-          change = this._calcChange(sumBoxes(inputs), target);
+          inputs = selector.select({
+            nanoErgs: target.nanoErgs + requiredNanoErgs,
+            tokens: target.tokens
+          });
+          change = this._calcDiff(sumBoxes(inputs), target);
           requiredNanoErgs = this._calcRequiredNanoErgsForChange(change.tokens.length);
         }
 
@@ -196,8 +205,8 @@ export class TransactionBuilder {
             change.nanoErgs > requiredNanoErgs
               ? change.nanoErgs - requiredNanoErgs + SAFE_MIN_BOX_VALUE
               : SAFE_MIN_BOX_VALUE;
-
           change.nanoErgs -= nanoErgs;
+
           outputs.add(new OutputBuilder(nanoErgs, this._changeAddress).addTokens(tokens));
         }
       }
@@ -207,7 +216,7 @@ export class TransactionBuilder {
       }
     }
 
-    return {
+    const unsignedTransaction = {
       inputs: inputs.map(this._mapInputs(buildOutputType)),
       dataInputs: this.dataInputs.toArray().map(this._mapInputs(buildOutputType)),
       outputs: outputs
@@ -216,6 +225,32 @@ export class TransactionBuilder {
           output.setCreationHeight(this._creationHeight, { replace: false }).build(inputs)
         )
     };
+
+    let burning = this._calcBurningBalance(unsignedTransaction, inputs);
+    if (burning.nanoErgs > 0n) {
+      throw new MalformedTransaction("it's not possible to burn ERG.");
+    }
+
+    if (some(burning.tokens) && some(this._burning)) {
+      burning = this._calcDiff(burning, { nanoErgs: 0n, tokens: this._burning.toArray() });
+    }
+
+    if (!this._settings.canBurnTokens && some(burning.tokens)) {
+      throw new NotAllowedTokenBurning();
+    }
+
+    return unsignedTransaction;
+  }
+
+  private _calcBurningBalance(
+    unsignedTransaction: UnsignedTransaction,
+    inputs: Box<bigint>[]
+  ): BoxAmounts {
+    const usedInputs = inputs.filter((input) =>
+      isDefined(unsignedTransaction.inputs.find((txInput) => txInput.boxId === input.boxId))
+    );
+
+    return this._calcDiff(sumBoxes(usedInputs), sumBoxes(unsignedTransaction.outputs));
   }
 
   private _calcChangeLength(tokensLength: number): number {
@@ -248,7 +283,7 @@ export class TransactionBuilder {
     });
   }
 
-  private _calcChange(inputs: BoxAmounts, outputs: BoxAmounts): BoxAmounts {
+  private _calcDiff(inputs: BoxAmounts, outputs: BoxAmounts): BoxAmounts {
     const tokens: TokenAmount<bigint>[] = [];
     const nanoErgs = inputs.nanoErgs - outputs.nanoErgs;
 

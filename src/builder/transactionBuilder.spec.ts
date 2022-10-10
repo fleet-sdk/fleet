@@ -1,8 +1,11 @@
+import { MalformedTransaction } from "../errors/malformedTransaction";
+import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
 import { manyTokensBoxesMock, regularBoxesMock } from "../mocks/mockBoxes";
 import { ErgoAddress, MAX_TOKENS_PER_BOX } from "../models";
 import { Network } from "../types";
 import { first, some } from "../utils/arrayUtils";
 import { sumBy, toBigInt } from "../utils/bigIntUtils";
+import { sumByTokenId } from "../utils/boxUtils";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";
 
@@ -406,6 +409,9 @@ describe("Building", () => {
       .sendChangeTo(a1.address)
       .build();
 
+    expect(sumBy(manyTokensBoxesMock, (x) => toBigInt(x.value))).toBe(
+      sumBy(transaction.outputs, (x) => toBigInt(x.value))
+    );
     expect(transaction.inputs).toHaveLength(3);
     expect(transaction.dataInputs).toHaveLength(0);
     expect(transaction.outputs).toHaveLength(5);
@@ -432,7 +438,7 @@ describe("Building", () => {
 
     expect(change1.ergoTree).toBe(a1.ergoTree);
     expect(change1.creationHeight).toBe(height);
-    expect(change1.value).toBe("1122108");
+    expect(change1.value).toBe("3465648");
     expect(change1.assets).toHaveLength(MAX_TOKENS_PER_BOX);
     expect(change1.additionalRegisters).toEqual({});
 
@@ -471,6 +477,56 @@ describe("Building", () => {
     }
   });
 
+  it("Should build in EIP-12 format", () => {
+    const transaction = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .withDataFrom(regularBoxesMock[1])
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+      .payMinFee()
+      .sendChangeTo(a1.address)
+      .build("EIP-12");
+
+    expect(transaction.inputs).toEqual([
+      {
+        additionalRegisters: {},
+        assets: [],
+        boxId: "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
+        creationHeight: 284761,
+        ergoTree:
+          "100204a00b08cd021dde34603426402615658f1d970cfa7c7bd92ac81a8b16eeebff264d59ce4604ea02d192a39a8cc7a70173007301",
+        extension: {},
+        index: 1,
+        transactionId: "9148408c04c2e38a6402a7950d6157730fa7d49e9ab3b9cadec481d7769918e9",
+        value: "67500000000"
+      }
+    ]);
+
+    expect(transaction.dataInputs).toEqual([
+      {
+        additionalRegisters: {
+          R4: "110780f0b252a4048088bdfa9e60808c8d9e0200c80180f8efcc9f60",
+          R5: "0e20aae3684e4e7c78c8d8e62f866345bd5c70543ac73f4a06142292f0693c9bdd60"
+        },
+        assets: [
+          {
+            amount: "226642336",
+            tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
+          }
+        ],
+        boxId: "a2c9821f5c2df9c320f17136f043b33f7716713ab74c84d687885f9dd39d2c8a",
+        creationHeight: 805063,
+        ergoTree:
+          "1012040204000404040004020406040c0408040a050004000402040204000400040404000400d812d601b2a4730000d602e4c6a7050ed603b2db6308a7730100d6048c720302d605db6903db6503fed606e4c6a70411d6079d997205b27206730200b27206730300d608b27206730400d609b27206730500d60a9972097204d60b95917205b272067306009d9c7209b27206730700b272067308007309d60c959272077208997209720a999a9d9c7207997209720b7208720b720ad60d937204720cd60e95720db2a5730a00b2a5730b00d60fdb6308720ed610b2720f730c00d6118c720301d612b2a5730d00d1eded96830201aedb63087201d901134d0e938c721301720293c5b2a4730e00c5a79683050193c2720ec2720193b1720f730f938cb2720f731000017202938c7210017211938c721002720cec720dd801d613b2db630872127311009683060193c17212c1a793c27212c2a7938c7213017211938c721302997204720c93e4c67212050e720293e4c6721204117206",
+        extension: {},
+        index: 0,
+        transactionId: "f82fa15166d787c275a6a5ab29983f6386571c63e50c73c1af7cba184f85ef23",
+        value: "1000000"
+      }
+    ]);
+  });
+});
+
+describe("Token minting", () => {
   it("Should use first input boxId as minted tokenId", () => {
     const transaction = new TransactionBuilder(height)
       .from(regularBoxesMock)
@@ -525,51 +581,125 @@ describe("Building", () => {
     ]);
   });
 
-  it("Should build in EIP-12 format", () => {
-    const transaction = new TransactionBuilder(height)
+  it("Should fail if trying to mint more than one token", () => {
+    const builder = new TransactionBuilder(height)
       .from(regularBoxesMock)
-      .withDataFrom(regularBoxesMock[1])
-      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
-      .payMinFee()
+      .to([
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({ name: "token1", amount: 1n }),
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).mintToken({ name: "token2", amount: 1n })
+      ]);
+
+    expect(() => {
+      builder.build();
+    }).toThrow(MalformedTransaction);
+  });
+});
+
+describe("Token burning", () => {
+  it("Should explicitly burn tokens", () => {
+    const nftTokenId = "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2";
+    const regularTokenId = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
+
+    expect(
+      sumByTokenId(
+        regularBoxesMock,
+        "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
+      )
+    ).toBe(226679716n);
+
+    const transactions = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .burnTokens([
+        { tokenId: nftTokenId, amount: 1n },
+        { tokenId: regularTokenId, amount: 126679716n }
+      ])
       .sendChangeTo(a1.address)
-      .build("EIP-12");
+      .build();
 
-    expect(transaction.inputs).toEqual([
+    const allOutputTokens = transactions.outputs.flatMap((x) => x.assets);
+    expect(allOutputTokens.find((x) => x.tokenId === nftTokenId)).toBeFalsy();
+    expect(
+      sumBy(
+        allOutputTokens.filter((x) => x.tokenId === regularTokenId),
+        (x) => toBigInt(x.amount)
+      )
+    ).toBe(100000000n);
+  });
+
+  it("Should burn tokens by omitting change address and explicitly allowing token burning", () => {
+    const inputs = regularBoxesMock.filter(
+      (input) => input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
+    );
+
+    // tokens can alternatively be burned by omitting the change address
+    const transaction = new TransactionBuilder(height)
+      .from(inputs)
+      .to(
+        new OutputBuilder(1000000000n - RECOMMENDED_MIN_FEE_VALUE, a1.address).addTokens({
+          tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
+          amount: 5n
+        })
+      )
+      .payFee(RECOMMENDED_MIN_FEE_VALUE)
+      .configure((settings) => settings.allowTokenBurn(true)) // explicitly allow token burning
+      .build();
+
+    expect(transaction.outputs).toHaveLength(2);
+    const output = transaction.outputs[0];
+
+    expect(output.assets).toEqual([
       {
-        additionalRegisters: {},
-        assets: [],
-        boxId: "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
-        creationHeight: 284761,
-        ergoTree:
-          "100204a00b08cd021dde34603426402615658f1d970cfa7c7bd92ac81a8b16eeebff264d59ce4604ea02d192a39a8cc7a70173007301",
-        extension: {},
-        index: 1,
-        transactionId: "9148408c04c2e38a6402a7950d6157730fa7d49e9ab3b9cadec481d7769918e9",
-        value: "67500000000"
+        tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
+        amount: "5"
       }
     ]);
+  });
 
-    expect(transaction.dataInputs).toEqual([
-      {
-        additionalRegisters: {
-          R4: "110780f0b252a4048088bdfa9e60808c8d9e0200c80180f8efcc9f60",
-          R5: "0e20aae3684e4e7c78c8d8e62f866345bd5c70543ac73f4a06142292f0693c9bdd60"
-        },
-        assets: [
-          {
-            amount: "226642336",
-            tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
-          }
-        ],
-        boxId: "a2c9821f5c2df9c320f17136f043b33f7716713ab74c84d687885f9dd39d2c8a",
-        creationHeight: 805063,
-        ergoTree:
-          "1012040204000404040004020406040c0408040a050004000402040204000400040404000400d812d601b2a4730000d602e4c6a7050ed603b2db6308a7730100d6048c720302d605db6903db6503fed606e4c6a70411d6079d997205b27206730200b27206730300d608b27206730400d609b27206730500d60a9972097204d60b95917205b272067306009d9c7209b27206730700b272067308007309d60c959272077208997209720a999a9d9c7207997209720b7208720b720ad60d937204720cd60e95720db2a5730a00b2a5730b00d60fdb6308720ed610b2720f730c00d6118c720301d612b2a5730d00d1eded96830201aedb63087201d901134d0e938c721301720293c5b2a4730e00c5a79683050193c2720ec2720193b1720f730f938cb2720f731000017202938c7210017211938c721002720cec720dd801d613b2db630872127311009683060193c17212c1a793c27212c2a7938c7213017211938c721302997204720c93e4c67212050e720293e4c6721204117206",
-        extension: {},
-        index: 0,
-        transactionId: "f82fa15166d787c275a6a5ab29983f6386571c63e50c73c1af7cba184f85ef23",
-        value: "1000000"
-      }
-    ]);
+  it("Should fail if burning is not explicit allowed", () => {
+    const outputValue = sumBy(regularBoxesMock, (x) => x.value) - RECOMMENDED_MIN_FEE_VALUE;
+
+    // tokens can alternatively be burned by omitting the change address
+    const builder = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .to(new OutputBuilder(outputValue, a1.address)) // force add boxes to be included by adding all nanoergs
+      .payFee(RECOMMENDED_MIN_FEE_VALUE);
+
+    expect(() => {
+      builder.build();
+    }).toThrow(NotAllowedTokenBurning);
+  });
+
+  it("Should fail if trying to burn ERG", () => {
+    const outputValue = 1000000000n - RECOMMENDED_MIN_FEE_VALUE;
+    const builder = new TransactionBuilder(height)
+      .from(
+        regularBoxesMock.filter(
+          (input) =>
+            input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
+        )
+      )
+      .to(new OutputBuilder(outputValue - 1000000n, a1.address)) // will try to burn 1000000n
+      .payFee(RECOMMENDED_MIN_FEE_VALUE);
+
+    expect(() => {
+      builder.build();
+    }).toThrow(MalformedTransaction);
+  });
+
+  it("Should fail if trying to burn ERG even if burning is explicitly allowed", () => {
+    const outputValue = 1000000000n - RECOMMENDED_MIN_FEE_VALUE;
+    const inputs = regularBoxesMock.filter(
+      (input) => input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
+    );
+
+    const builder = new TransactionBuilder(height)
+      .from(inputs)
+      .to(new OutputBuilder(outputValue - 1000000n, a1.address)) // will try to burn 1000000n
+      .payFee(RECOMMENDED_MIN_FEE_VALUE)
+      .configure((settings) => settings.allowTokenBurn(true));
+
+    expect(() => {
+      builder.build();
+    }).toThrow(MalformedTransaction);
   });
 });
