@@ -1,6 +1,6 @@
 import { Amount, Box, NonMandatoryRegisters, TokenId } from "../types";
-import { hasDuplicatesBy, isEmpty } from "./arrayUtils";
-import { sumBy, toBigInt } from "./bigIntUtils";
+import { isEmpty } from "./arrayUtils";
+import { toBigInt } from "./bigIntUtils";
 
 export function sumByTokenId(inputs: Box<bigint>[], tokenId: TokenId): bigint {
   let acc = 0n;
