@@ -9,7 +9,7 @@ export class TransactionBuilderSettings {
     this._allowTokenBurn = false;
   }
 
-  public get maxDistinctTokensPerChangeBox(): number {
+  public get maxTokensPerChangeBox(): number {
     return this._maxDistinctTokensPerChangeBox;
   }
 
@@ -17,7 +17,7 @@ export class TransactionBuilderSettings {
     return this._allowTokenBurn;
   }
 
-  public setMaxDistinctTokensPerChangeBox(max: number): TransactionBuilderSettings {
+  public setMaxTokensPerChangeBox(max: number): TransactionBuilderSettings {
     this._maxDistinctTokensPerChangeBox = max;
 
     return this;
