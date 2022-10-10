@@ -471,6 +471,60 @@ describe("Building", () => {
     }
   });
 
+  it("Should use first input boxId as minted tokenId", () => {
+    const transaction = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({
+          amount: 100n,
+          name: "TestToken",
+          decimals: 4,
+          description: "Description test"
+        })
+      )
+
+      .sendChangeTo(a1.address)
+      .payMinFee()
+      .build();
+
+    const mintingBox = transaction.outputs[0];
+    expect(mintingBox.assets).toEqual([{ tokenId: transaction.inputs[0].boxId, amount: "100" }]);
+    expect(mintingBox.additionalRegisters).toEqual({
+      R4: "0e0954657374546f6b656e",
+      R5: "0e104465736372697074696f6e2074657374",
+      R6: "0e0134"
+    });
+  });
+
+  it("Should mint and transfer other tokens in the same box", () => {
+    const transaction = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address)
+          .mintToken({
+            amount: 100n,
+            name: "Test"
+          })
+          .addTokens({
+            tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+            amount: 1n
+          })
+      )
+
+      .sendChangeTo(a1.address)
+      .payMinFee()
+      .build();
+
+    const mintingBox = transaction.outputs[0];
+    expect(mintingBox.assets).toEqual([
+      { tokenId: transaction.inputs[0].boxId, amount: "100" },
+      {
+        tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+        amount: "1"
+      }
+    ]);
+  });
+
   it("Should build in EIP-12 format", () => {
     const transaction = new TransactionBuilder(height)
       .from(regularBoxesMock)
