@@ -190,7 +190,7 @@ export class TransactionBuilder {
           requiredNanoErgs = this._calcRequiredNanoErgsForChange(change.tokens.length);
         }
 
-        const chunkedTokens = chunk(change.tokens, this._settings.maxDistinctTokensPerChangeBox);
+        const chunkedTokens = chunk(change.tokens, this._settings.maxTokensPerChangeBox);
         for (const tokens of chunkedTokens) {
           const nanoErgs =
             change.nanoErgs > requiredNanoErgs
@@ -219,7 +219,7 @@ export class TransactionBuilder {
   }
 
   private _calcChangeLength(tokensLength: number): number {
-    return Math.ceil(tokensLength / this._settings.maxDistinctTokensPerChangeBox);
+    return Math.ceil(tokensLength / this._settings.maxTokensPerChangeBox);
   }
 
   private _calcRequiredNanoErgsForChange(

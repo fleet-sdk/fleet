@@ -1,7 +1,7 @@
 import { manyTokensBoxesMock, regularBoxesMock } from "../mocks/mockBoxes";
 import { ErgoAddress, MAX_TOKENS_PER_BOX } from "../models";
 import { Network } from "../types";
-import { first } from "../utils/arrayUtils";
+import { first, some } from "../utils/arrayUtils";
 import { sumBy, toBigInt } from "../utils/bigIntUtils";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";
@@ -100,14 +100,14 @@ describe("basic construction", () => {
   it("Should set transaction building settings", () => {
     const builder = new TransactionBuilder(height).from(regularBoxesMock);
     expect(builder.settings.canBurnTokens).toBeFalsy();
-    expect(builder.settings.maxDistinctTokensPerChangeBox).toBe(MAX_TOKENS_PER_BOX);
+    expect(builder.settings.maxTokensPerChangeBox).toBe(MAX_TOKENS_PER_BOX);
 
     builder.configure((settings) => {
-      settings.allowTokenBurn(true).setMaxDistinctTokensPerChangeBox(10);
+      settings.allowTokenBurn(true).setMaxTokensPerChangeBox(10);
     });
 
     expect(builder.settings.canBurnTokens).toBeTruthy();
-    expect(builder.settings.maxDistinctTokensPerChangeBox).toBe(10);
+    expect(builder.settings.maxTokensPerChangeBox).toBe(10);
   });
 
   it("Should eject context", () => {
@@ -388,7 +388,7 @@ describe("Building", () => {
     expect(changeOutput.additionalRegisters).toEqual({});
   });
 
-  it("Should produce multiple change boxes and run multiple inputs selections if necessary", () => {
+  it("Should produce multiple change boxes and run multiple input selections if necessary", () => {
     const transaction = new TransactionBuilder(height)
       .from(manyTokensBoxesMock)
       .to(
@@ -447,6 +447,28 @@ describe("Building", () => {
     expect(change3.value).toBe(SAFE_MIN_BOX_VALUE.toString());
     expect(change3.assets).toHaveLength(32);
     expect(change3.additionalRegisters).toEqual({});
+  });
+
+  it("Should produce multiple change boxes based on maxTokensPerChangeBox param", () => {
+    const tokensPerBox = 2;
+
+    const transaction = new TransactionBuilder(height)
+      .from(regularBoxesMock, (selector) => selector.ensureInclusion((i) => some(i.assets)))
+      .sendChangeTo(a1.address)
+      .configure((settings) => settings.setMaxTokensPerChangeBox(tokensPerBox))
+      .build();
+
+    expect(transaction.inputs).toHaveLength(4);
+    expect(transaction.dataInputs).toHaveLength(0);
+    expect(transaction.outputs).toHaveLength(11);
+
+    for (let i = 0; i < transaction.outputs.length; i++) {
+      if (i < transaction.outputs.length - 1) {
+        expect(transaction.outputs[i].assets).toHaveLength(tokensPerBox);
+      } else {
+        expect(transaction.outputs[i].assets.length <= tokensPerBox).toBeTruthy();
+      }
+    }
   });
 
   it("Should build in EIP-12 format", () => {
