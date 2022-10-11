@@ -1,6 +1,6 @@
 {
-  "name": "@nautilus-js/fleet",
-  "version": "0.1.6",
+  "name": "@fleet-sdk/core",
+  "version": "0.1.1-alpha.0",
   "description": "Feet Toolkit",
   "main": "build/lib/main/index.js",
   "typings": "build/lib/module/index.d.ts",
