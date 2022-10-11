@@ -110,7 +110,7 @@ const unsignedTransaction = new TransactionBuilder(creationHeight)
 ```
 
 ## Ensuring input inclusion
-You can ensure that one or more input will be included in the transaction. Useful when working with contracts.
+You can ensure that one or more inputs will be included in the transaction. Useful when working with contracts.
 
 ```ts
 import { OutputBuilder, TransactionBuilder } from "@fleet-sdk/core";
