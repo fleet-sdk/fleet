@@ -1,11 +1,14 @@
 {
   "name": "@fleet-sdk/core",
-  "version": "0.1.1-alpha.0",
-  "description": "Feet Toolkit",
+  "version": "0.0.0",
+  "description": "Fleet SDK - Core library",
   "main": "build/lib/main/index.js",
   "typings": "build/lib/module/index.d.ts",
   "module": "build/lib/module/index.js",
-  "repository": "https://github.com/capt-nemo429/fleet",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fleet-sdk/core.git"
+  },
   "license": "MIT",
   "publishConfig": {
     "access": "public"
