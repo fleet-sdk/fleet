@@ -1,7 +1,7 @@
-[![checks](https://badgen.net/github/checks/capt-nemo429/fleet/master)](https://github.com/capt-nemo429/fleet/actions)
-[![coverage](https://codecov.io/gh/capt-nemo429/fleet/branch/master/graph/badge.svg)](https://app.codecov.io/gh/capt-nemo429/fleet)
-[![License](https://badgen.net/github/license/capt-nemo429/fleet/)](https://github.com/capt-nemo429/fleet/blob/master/LICENSE)
+[![Checks](https://badgen.net/github/checks/fleet-sdk/core/master)](https://github.com/fleet-sdk/core/actions)
+[![Coverage](https://app.codecov.io/gh/fleet-sdk/core/branch/master/graph/badge.svg)](https://app.codecov.io/gh/fleet-sdk/core)
+[![License](https://badgen.net/github/license/fleet-sdk/core/)](https://github.com/fleet-sdk/core/blob/master/LICENSE) [![npm](https://badgen.net/npm/v/@fleet-sdk/core)](https://www.npmjs.com/package/@fleet-sdk/core)
 
-# fleet
+# @fleet-sdk/core
 
-Fluent Ergo Toolkit
+Fleet SDK Core library
