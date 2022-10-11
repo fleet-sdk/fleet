@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.4](https://github.com/capt-nemo429/flet/compare/v0.1.3...v0.1.4) (2022-10-11)
+
+
+### Features
+
+* **array utils:** add `chunk()` ([0f99f6b](https://github.com/capt-nemo429/flet/commit/0f99f6b5b0f9469809193c448f431d42d64b93e5))
+* **bigint utils:** add conditional `sumBy()` ([c72afd9](https://github.com/capt-nemo429/flet/commit/c72afd9c88fcd99e21dd6e0b597d704b2e685022))
+* **box selector:** add `buildSelectionTarget()` method ([f8ff38c](https://github.com/capt-nemo429/flet/commit/f8ff38c12f153788be08e6981b7eb2938ca75acf))
+* **box selector:** add target builder ([076ac44](https://github.com/capt-nemo429/flet/commit/076ac440f6f44c1c5dd18e7227e84cc3f461647e))
+* **box selector:** allow multiple selection exec ([a696676](https://github.com/capt-nemo429/flet/commit/a6966767eb2faf8cc1b8661445bdc391fda0f907))
+* **box utils:** add `boxSum()` ([49bc46f](https://github.com/capt-nemo429/flet/commit/49bc46fb813c4a4a1a676f3c297b9e9865b84c3f))
+* **builder:** add transaction builder ([d06f647](https://github.com/capt-nemo429/flet/commit/d06f64733185d489c0e1e123b1ec26bd3e663da2))
+* **object utils:** add `isDefined()` ([b1d52d6](https://github.com/capt-nemo429/flet/commit/b1d52d6bac8ffb499c379f987ec8f70db379dd94))
+* **outputs collection:** add `clone()` method ([2e56ee2](https://github.com/capt-nemo429/flet/commit/2e56ee2110bbe3598d70309cf15e7d3f68df172c))
+* **tx builder:** add token burning validations ([7d4af2b](https://github.com/capt-nemo429/flet/commit/7d4af2becdd7e51d543f72747ab1d7eabe04bd2a))
+
+
+### Bug Fixes
+
+* **output builder:** accept `ErgoAddress` object as recipiend address ([7e1f8a5](https://github.com/capt-nemo429/flet/commit/7e1f8a5e861dc6e78be203e5df215bfd08693257))
+
 ### [0.1.3](https://github.com/capt-nemo429/flet/compare/v0.1.2...v0.1.3) (2022-09-24)
 
 
