@@ -37,7 +37,7 @@ const unsignedTransaction = new TransactionBuilder(creationHeight)
 
 ## Building a transaction with multiple outputs
 
-To build a a transaction with multiple outputs you can simply pass an array of `OutputBuilder` as argument of the `to()` method.
+To build a a transaction with multiple outputs you can simply pass an array of `OutputBuilder` as argument of `to()` method.
 
 ```ts
 import { OutputBuilder, TransactionBuilder } from "@fleet-sdk/core";
