@@ -3,9 +3,9 @@
   "version": "0.1.5",
   "description": "Feet Toolkit",
   "main": "build/lib/main/index.js",
-  "typings": "build/lib/main/index.d.ts",
+  "typings": "build/lib/module/index.d.ts",
   "module": "build/lib/module/index.js",
-  "repository": "https://github.com/capt-nemo429/flet",
+  "repository": "https://github.com/capt-nemo429/fleet",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
