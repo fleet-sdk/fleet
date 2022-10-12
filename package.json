@@ -1,7 +1,7 @@
 {
   "name": "@fleet-sdk/core",
   "version": "0.1.0-alpha.0",
-  "description": "Fleet SDK - Core library",
+  "description": "Fleet SDK core library",
   "main": "build/lib/main/index.js",
   "typings": "build/lib/module/index.d.ts",
   "module": "build/lib/module/index.js",
@@ -41,8 +41,8 @@
     "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
   },
   "dependencies": {
-    "blakejs": "^1.2.1",
-    "bs58": "^5.0.0"
+    "@noble/hashes": "^1.1.3",
+    "@scure/base": "^1.1.1"
   },
   "devDependencies": {
     "@types/jest": "^28.1.6",

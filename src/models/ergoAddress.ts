@@ -1,5 +1,5 @@
-import { blake2b } from "blakejs";
-import * as bs58 from "bs58";
+import { blake2b } from "@noble/hashes/blake2b";
+import { base58 } from "@scure/base";
 import { InvalidAddress } from "../errors/invalidAddress";
 import { AddressType, Base58String, HexString, Network } from "../types";
 import { first } from "../utils/arrayUtils";
@@ -78,11 +78,11 @@ export class ErgoAddress {
   constructor(address: Base58String);
   constructor(address: Base58String | Buffer) {
     if (Buffer.isBuffer(address)) {
-      this._address = bs58.encode(address);
+      this._address = base58.encode(address);
       this.bytes = address;
     } else {
       this._address = address;
-      this.bytes = Buffer.from(bs58.decode(this._address));
+      this.bytes = Buffer.from(base58.decode(this._address));
     }
   }
 
@@ -91,7 +91,7 @@ export class ErgoAddress {
    * @param address Address encoded as base58
    */
   public static fromBase58(address: Base58String): ErgoAddress {
-    return ErgoAddress.fromBytes(Buffer.from(bs58.decode(address)));
+    return ErgoAddress.fromBytes(Buffer.from(base58.decode(address)));
   }
 
   /**
@@ -120,7 +120,7 @@ export class ErgoAddress {
   private static _fromP2SErgoTree(ergoTree: HexString, network: Network) {
     const prefixByte = Buffer.from([network + AddressType.P2S]);
     const contentBytes = Buffer.from(ergoTree, "hex");
-    const hash = blake2b(Buffer.concat([prefixByte, contentBytes]), undefined, BLAKE_HASH_LENGTH);
+    const hash = blake2b(Buffer.concat([prefixByte, contentBytes]), { dkLen: BLAKE_HASH_LENGTH });
     const checksum = Buffer.from(hash).subarray(0, CHECKSUM_BYTES_LENGTH);
     const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]);
 
@@ -132,7 +132,7 @@ export class ErgoAddress {
     const pk = ergoTree.slice(6, 72);
     const contentBytes = Buffer.from(pk, "hex");
     const checksum = Buffer.from(
-      blake2b(Buffer.concat([prefixByte, contentBytes]), undefined, BLAKE_HASH_LENGTH)
+      blake2b(Buffer.concat([prefixByte, contentBytes]), { dkLen: BLAKE_HASH_LENGTH })
     );
     const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]).subarray(0, 38);
 
@@ -150,7 +150,7 @@ export class ErgoAddress {
     const prefixByte = Buffer.from([network + AddressType.P2PK]);
     const contentBytes = typeof publicKey === "string" ? Buffer.from(publicKey, "hex") : publicKey;
     const checksum = Buffer.from(
-      blake2b(Buffer.concat([prefixByte, contentBytes]), undefined, BLAKE_HASH_LENGTH)
+      blake2b(Buffer.concat([prefixByte, contentBytes]), { dkLen: BLAKE_HASH_LENGTH })
     );
     const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]).subarray(0, 38);
 
@@ -162,14 +162,14 @@ export class ErgoAddress {
    * @param address Address buffer or string
    */
   public static validate(address: Buffer | HexString): boolean {
-    const bytes = Buffer.isBuffer(address) ? address : Buffer.from(bs58.decode(address));
+    const bytes = Buffer.isBuffer(address) ? address : Buffer.from(base58.decode(address));
     if (bytes.length < CHECKSUM_BYTES_LENGTH) {
       return false;
     }
 
     const script = bytes.subarray(0, bytes.length - CHECKSUM_BYTES_LENGTH);
     const checksum = bytes.subarray(bytes.length - CHECKSUM_BYTES_LENGTH, bytes.length);
-    const blakeHash = Buffer.from(blake2b(script, undefined, BLAKE_HASH_LENGTH));
+    const blakeHash = Buffer.from(blake2b(script, { dkLen: BLAKE_HASH_LENGTH }));
     const calculatedChecksum = blakeHash.subarray(0, CHECKSUM_BYTES_LENGTH);
 
     return calculatedChecksum.toString("hex") === checksum.toString("hex");
