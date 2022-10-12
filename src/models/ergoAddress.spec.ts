@@ -577,19 +577,16 @@ describe("Address model - ergo-ts test set", () => {
       isValid: true
     },
     {
-      sk: "8e6993a4999f009c03d9457ffcf8ff3d840ae78332c959c8e806a53fbafbbee1",
       address: "9gsLq5a12nJe33nKtjMe7NPY7o8CQAtjS9amDgALbebv1wmRXrv",
       network: Network.Mainnet,
       isValid: true
     },
     {
-      sk: "ff00",
       address: "9gU3czAt9q4fQPRWBriBbpfLbRP7JrXRmB7kowtwdyw66PMRmaY",
       network: Network.Mainnet,
       isValid: true
     },
     {
-      sk: "8e6993a4999f009c03d9457ffcf8ff3d840ae78332c959c8e806a53fbafbbee1",
       address: "3WxxVQqxoVSWEKG5B73eNttBX51ZZ6WXLW7fiVDgCFhzRK8R4gmk",
       network: Network.Testnet,
       isValid: true
@@ -667,14 +664,6 @@ describe("Address model - ergo-ts test set", () => {
   test("simple address validity test", () => {
     testVectors.forEach((tv) => {
       expect(tv.instance.isValid()).toBe(tv.isValid);
-    });
-  });
-
-  test("address from sk", () => {
-    testVectors.forEach((o) => {
-      if (o.sk) {
-        expect(ErgoAddress.fromSecretKey(o.sk, o.network).toString()).toBe(o.address);
-      }
     });
   });
 

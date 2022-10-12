@@ -41,7 +41,6 @@
     "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
   },
   "dependencies": {
-    "@noble/secp256k1": "^1.6.3",
     "blakejs": "^1.2.1",
     "bs58": "^5.0.0"
   },

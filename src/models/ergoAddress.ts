@@ -1,12 +1,9 @@
-import { getPublicKey as getSecpPublicKey } from "@noble/secp256k1";
 import { blake2b } from "blakejs";
 import * as bs58 from "bs58";
 import { InvalidAddress } from "../errors/invalidAddress";
 import { AddressType, Base58String, HexString, Network } from "../types";
 import { first } from "../utils/arrayUtils";
 
-const KEY_BYTES_LENGTH = 32;
-const KEY_HEX_LENGTH = KEY_BYTES_LENGTH * 2;
 const CHECKSUM_BYTES_LENGTH = 4;
 const BLAKE_HASH_LENGTH = 32;
 const P2PK_ERGOTREE_PREFIX_BYTES = Buffer.from([0x00, 0x08, 0xcd]);
@@ -158,22 +155,6 @@ export class ErgoAddress {
     const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]).subarray(0, 38);
 
     return new ErgoAddress(addressBytes);
-  }
-
-  /**
-   * Create a new instance from a secret key
-   * @param secretKey Secret key hex string
-   * @returns Address instance
-   */
-  public static fromSecretKey(
-    secretKey: HexString,
-    network: Network = Network.Mainnet
-  ): ErgoAddress {
-    if (secretKey.length < KEY_HEX_LENGTH) {
-      secretKey = secretKey.padStart(KEY_HEX_LENGTH, "0");
-    }
-
-    return this.fromPublicKey(Buffer.from(getSecpPublicKey(secretKey, true)), network);
   }
 
   /**
