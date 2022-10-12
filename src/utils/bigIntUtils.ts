@@ -1,5 +1,5 @@
-import { isUndefined } from "lodash";
 import { isEmpty } from "./arrayUtils";
+import { isUndefined } from "./objectUtils";
 
 export function toBigInt(number: string | number | bigint | boolean): bigint {
   return typeof number === "bigint" ? number : BigInt(number);

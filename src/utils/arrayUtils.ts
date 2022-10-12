@@ -1,3 +1,5 @@
+import { SortingDirection, SortingSelector } from "../types";
+
 export function isEmpty<T extends object>(obj?: T): obj is undefined;
 export function isEmpty<T>(array?: T[]): array is undefined;
 export function isEmpty<T>(obj?: T[] | object): obj is undefined {
@@ -58,4 +60,20 @@ export function chunk<T>(array: T[], size: number): T[][] {
   }
 
   return chunks;
+}
+
+export function orderBy<T>(
+  array: T[],
+  iteratee: SortingSelector<T>,
+  order: SortingDirection = "asc"
+): T[] {
+  return array.sort((a: T, b: T) => {
+    if (iteratee(a) > iteratee(b)) {
+      return order === "asc" ? 1 : -1;
+    } else if (iteratee(a) < iteratee(b)) {
+      return order === "asc" ? -1 : 1;
+    } else {
+      return 0;
+    }
+  });
 }

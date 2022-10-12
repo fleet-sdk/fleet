@@ -3,7 +3,7 @@ export type ErgoTree = string;
 export type Base58String = string;
 export type Amount = string | bigint;
 
-export type SortingSelector<T> = (item: T) => unknown;
+export type SortingSelector<T> = (item: T) => string | number | bigint;
 export type SortingDirection = "asc" | "desc";
 
 export type FilterPredicate<T> = (item: T) => boolean;

@@ -1,4 +1,3 @@
-import { find } from "lodash";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
@@ -106,8 +105,8 @@ describe("Token handling", () => {
 
     expect(builder.tokens).toHaveLength(2);
     const tokens = builder.tokens.toArray();
-    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toBe(50n);
-    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toBe(10n);
+    expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toBe(50n);
+    expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toBe(10n);
   });
 
   it("Should add tokens from context ejector", () => {
@@ -117,8 +116,8 @@ describe("Token handling", () => {
 
     expect(builder.tokens).toHaveLength(2);
     const tokens = builder.tokens.toArray();
-    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
-    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should add tokens from external TokensCollection", () => {
@@ -131,8 +130,8 @@ describe("Token handling", () => {
 
     expect(builder.tokens).toHaveLength(2);
     const tokens = builder.tokens.toArray();
-    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
-    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should sum if the same tokenId is added more than one time", () => {
@@ -140,18 +139,18 @@ describe("Token handling", () => {
       .addTokens({ tokenId: tokenA, amount: "50" })
       .addTokens({ tokenId: tokenB, amount: 10n });
     expect(builder.tokens).toHaveLength(2);
-    expect(find(builder.tokens.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(builder.tokens.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     builder.addTokens({ tokenId: tokenA, amount: 100n });
     expect(builder.tokens).toHaveLength(2);
     const tokens = builder.tokens.toArray();
-    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(150n);
-    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toEqual(150n);
+    expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should add multiple tokens and sum if the same tokenId is added more than one time", () => {
     builder.addTokens({ tokenId: tokenA, amount: "50" });
-    expect(find(builder.tokens.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(builder.tokens.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
     expect(builder.tokens).toHaveLength(1);
 
     builder.addTokens([
@@ -160,13 +159,13 @@ describe("Token handling", () => {
     ]);
     expect(builder.tokens).toHaveLength(2);
     const tokens = builder.tokens.toArray();
-    expect(find(tokens, (x) => x.tokenId === tokenA)?.amount).toEqual(150n);
-    expect(find(tokens, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toEqual(150n);
+    expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should not sum if the same tokenId is added more than one time", () => {
     builder.addTokens({ tokenId: tokenA, amount: "50" });
-    expect(find(builder.tokens.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(builder.tokens.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
     expect(builder.tokens).toHaveLength(1);
 
     builder.addTokens(
@@ -178,9 +177,9 @@ describe("Token handling", () => {
     );
     expect(builder.tokens).toHaveLength(3);
     const tokens = builder.tokens.toArray();
-    expect(find(tokens, (x) => x.tokenId === tokenA && x.amount === 50n)).not.toBeFalsy();
-    expect(find(tokens, (x) => x.tokenId === tokenB && x.amount === 10n)).not.toBeFalsy();
-    expect(find(tokens, (x) => x.tokenId === tokenA && x.amount === 110n)).not.toBeFalsy();
+    expect(tokens.find((x) => x.tokenId === tokenA && x.amount === 50n)).not.toBeFalsy();
+    expect(tokens.find((x) => x.tokenId === tokenB && x.amount === 10n)).not.toBeFalsy();
+    expect(tokens.find((x) => x.tokenId === tokenA && x.amount === 110n)).not.toBeFalsy();
   });
 
   it("Should remove tokens from the list using context ejector", () => {
@@ -190,7 +189,7 @@ describe("Token handling", () => {
     builder.eject(({ tokens }) => tokens.remove(tokenA));
 
     expect(builder.tokens).toHaveLength(1);
-    expect(find(builder.tokens.toArray(), (x) => x.tokenId === tokenA)).toBeFalsy();
+    expect(builder.tokens.toArray().find((x) => x.tokenId === tokenA)).toBeFalsy();
   });
 });
 

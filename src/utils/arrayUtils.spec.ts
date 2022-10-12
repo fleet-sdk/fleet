@@ -1,4 +1,4 @@
-import { chunk, first, hasDuplicates, hasDuplicatesBy, isEmpty, some } from "./arrayUtils";
+import { chunk, first, hasDuplicates, hasDuplicatesBy, isEmpty, orderBy, some } from "./arrayUtils";
 
 describe("isEmpty() guard", () => {
   it("Should return true if array is undefined or empty", () => {
@@ -136,5 +136,46 @@ describe("Chunk arrays", () => {
     ]);
     expect(chunk(array, 10)).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]);
     expect(chunk(array, 20)).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]);
+  });
+});
+
+describe("Array ordering", () => {
+  const objects = [
+    { a: "x", b: 3 },
+    { a: "y", b: 4 },
+    { a: "x", b: 1 },
+    { a: "y", b: 2 }
+  ];
+
+  it("Should order descending", () => {
+    expect(orderBy(objects, (x) => x.a, "desc")).toStrictEqual([
+      { a: "y", b: 4 },
+      { a: "y", b: 2 },
+      { a: "x", b: 3 },
+      { a: "x", b: 1 }
+    ]);
+
+    expect(orderBy(objects, (x) => x.b, "desc")).toStrictEqual([
+      { a: "y", b: 4 },
+      { a: "x", b: 3 },
+      { a: "y", b: 2 },
+      { a: "x", b: 1 }
+    ]);
+  });
+
+  it("Should order ascending", () => {
+    expect(orderBy(objects, (x) => x.a, "asc")).toStrictEqual([
+      { a: "x", b: 3 },
+      { a: "x", b: 1 },
+      { a: "y", b: 4 },
+      { a: "y", b: 2 }
+    ]);
+
+    expect(orderBy(objects, (x) => x.b, "asc")).toStrictEqual([
+      { a: "x", b: 1 },
+      { a: "y", b: 2 },
+      { a: "x", b: 3 },
+      { a: "y", b: 4 }
+    ]);
   });
 });

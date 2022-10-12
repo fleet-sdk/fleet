@@ -1,4 +1,3 @@
-import { find } from "lodash";
 import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
@@ -44,8 +43,8 @@ describe("Tokens collection", () => {
 
     expect(collection).toHaveLength(2);
     expect(tokensArray).toHaveLength(2);
-    expect(find(tokensArray, (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
-    expect(find(tokensArray, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    expect(tokensArray.find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(tokensArray.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should throw if too many tokens are batch added", () => {
@@ -71,13 +70,13 @@ describe("Tokens collection", () => {
       .add({ tokenId: tokenB, amount: 10n });
 
     expect(collection).toHaveLength(2);
-    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     collection.add({ tokenId: tokenA, amount: 100n }, { sum: true });
     expect(collection).toHaveLength(2);
     const tokensArray = collection.toArray();
-    expect(find(tokensArray, (x) => x.tokenId === tokenA)?.amount).toEqual(150n);
-    expect(find(tokensArray, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    expect(tokensArray.find((x) => x.tokenId === tokenA)?.amount).toEqual(150n);
+    expect(tokensArray.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should add if sum = false if tokenId is already included", () => {
@@ -86,20 +85,20 @@ describe("Tokens collection", () => {
       .add({ tokenId: tokenB, amount: 10n });
 
     expect(collection).toHaveLength(2);
-    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     collection.add({ tokenId: tokenA, amount: 100n }, { sum: false });
     expect(collection).toHaveLength(3);
     const tokensArray = collection.toArray();
-    expect(find(tokensArray, (x) => x.tokenId === tokenA && x.amount === 50n)).not.toBeFalsy();
-    expect(find(tokensArray, (x) => x.tokenId === tokenB && x.amount === 10n)).not.toBeFalsy();
-    expect(find(tokensArray, (x) => x.tokenId === tokenA && x.amount === 100n)).not.toBeFalsy();
+    expect(tokensArray.find((x) => x.tokenId === tokenA && x.amount === 50n)).not.toBeFalsy();
+    expect(tokensArray.find((x) => x.tokenId === tokenB && x.amount === 10n)).not.toBeFalsy();
+    expect(tokensArray.find((x) => x.tokenId === tokenA && x.amount === 100n)).not.toBeFalsy();
   });
 
   it("Should add multiple tokens and sum if the same tokenId is already included", () => {
     const collection = new TokensCollection().add({ tokenId: tokenA, amount: "50" });
     expect(collection).toHaveLength(1);
-    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     collection.add([
       { tokenId: tokenA, amount: 100n },
@@ -107,8 +106,8 @@ describe("Tokens collection", () => {
     ]);
     expect(collection).toHaveLength(2);
     const tokensArray = collection.toArray();
-    expect(find(tokensArray, (x) => x.tokenId === tokenA)?.amount).toEqual(150n);
-    expect(find(tokensArray, (x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+    expect(tokensArray.find((x) => x.tokenId === tokenA)?.amount).toEqual(150n);
+    expect(tokensArray.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should remove tokens from the list by tokenId", () => {
@@ -119,7 +118,7 @@ describe("Tokens collection", () => {
     collection.remove(tokenA);
 
     expect(collection).toHaveLength(1);
-    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)).toBeFalsy();
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)).toBeFalsy();
   });
 
   it("Should remove tokens from the list by index", () => {
@@ -130,7 +129,7 @@ describe("Tokens collection", () => {
     collection.remove(0);
 
     expect(collection).toHaveLength(1);
-    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)).toBeFalsy();
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)).toBeFalsy();
   });
 
   it("Should subtract if amount is specified by tokenId", () => {
@@ -141,7 +140,7 @@ describe("Tokens collection", () => {
     collection.remove(tokenA, 10n);
 
     expect(collection).toHaveLength(2);
-    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(40n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(40n);
   });
 
   it("Should subtract if amount is specified by index", () => {
@@ -152,7 +151,7 @@ describe("Tokens collection", () => {
     collection.remove(0, 10n);
 
     expect(collection).toHaveLength(2);
-    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)?.amount).toEqual(40n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(40n);
   });
 
   it("Should remove token if amount is equal to already inserted amount by tokenId", () => {
@@ -163,7 +162,7 @@ describe("Tokens collection", () => {
     collection.remove(tokenA, 50n);
 
     expect(collection).toHaveLength(1);
-    expect(find(collection.toArray(), (x) => x.tokenId === tokenA)).toBeFalsy();
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)).toBeFalsy();
   });
 
   it("Should remove token if amount is equal to already inserted amount by index", () => {
@@ -174,7 +173,7 @@ describe("Tokens collection", () => {
     collection.remove(1, 10n);
 
     expect(collection).toHaveLength(1);
-    expect(find(collection.toArray(), (x) => x.tokenId === tokenB)).toBeFalsy();
+    expect(collection.toArray().find((x) => x.tokenId === tokenB)).toBeFalsy();
   });
 
   it("Should throw if amount is greater than already inserted amount", () => {

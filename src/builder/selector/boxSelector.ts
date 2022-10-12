@@ -1,4 +1,3 @@
-import { orderBy as lodashOrderBy } from "lodash";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
 import { InputsCollection } from "../../models";
@@ -11,7 +10,7 @@ import {
   SortingSelector,
   TokenTargetAmount
 } from "../../types";
-import { hasDuplicatesBy, isEmpty, some } from "../../utils/arrayUtils";
+import { hasDuplicatesBy, isEmpty, orderBy, some } from "../../utils/arrayUtils";
 import { sumBy, toBigInt } from "../../utils/bigIntUtils";
 import { sumByTokenId } from "../../utils/boxUtils";
 import { isDefined } from "../../utils/objectUtils";
@@ -114,10 +113,10 @@ export class BoxSelector {
 
   private _sort(inputs: Box<bigint>[]) {
     if (!this._inputsSortSelector) {
-      return lodashOrderBy(inputs, (input) => input.creationHeight, "asc");
+      return orderBy(inputs, (input) => input.creationHeight, "asc");
     }
 
-    return lodashOrderBy(inputs, this._inputsSortSelector, this._inputsSortDir || "asc");
+    return orderBy(inputs, this._inputsSortSelector, this._inputsSortDir || "asc");
   }
 
   public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector {

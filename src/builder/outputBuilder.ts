@@ -1,4 +1,3 @@
-import { isUndefined } from "lodash";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
@@ -19,7 +18,7 @@ import {
 import { first, isEmpty } from "../utils/arrayUtils";
 import { toBigInt } from "../utils/bigIntUtils";
 import { areRegistersDenselyPacked } from "../utils/boxUtils";
-import { removeUndefined } from "../utils/objectUtils";
+import { isUndefined, removeUndefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";
 
 export const SAFE_MIN_BOX_VALUE = 1000000n;
