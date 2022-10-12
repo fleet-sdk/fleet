@@ -47,7 +47,7 @@ const unsignedTransaction = new TransactionBuilder(creationHeight)
   .to([
     new OutputBuilder(1000000n, "9gNvAv97W71Wm33GoXgSQBFJxinFubKvE6wh2dEhFTSgYEe783j"),
     new OutputBuilder(2000000n, "9fhJkRaSoPfzE9rA3e4ptK51xvyNsLKonYN1xje5LWaLukx7iX2")
-  ]),
+  ])
   .sendChangeTo("9i2bQmRpCPLmDdVgBNyeAy7dDXqBQfjvcxVVt5YMzbDud6AvJS8")
   .payMinFee()
   .build();
