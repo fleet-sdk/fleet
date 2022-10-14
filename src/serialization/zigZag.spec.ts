@@ -2,32 +2,32 @@ import { ZigZag } from "./zigZag";
 
 describe("ZigZag encoding", () => {
   it("Should encode", () => {
-    expect(ZigZag.encode(0)).toBe(0);
-    expect(ZigZag.encode(-1)).toBe(1);
-    expect(ZigZag.encode(1)).toBe(2);
-    expect(ZigZag.encode(-2)).toBe(3);
-    expect(ZigZag.encode(2)).toBe(4);
-    expect(ZigZag.encode(-3)).toBe(5);
+    expect(ZigZag.encode(0n)).toBe(0n);
+    expect(ZigZag.encode(-1n)).toBe(1n);
+    expect(ZigZag.encode(1n)).toBe(2n);
+    expect(ZigZag.encode(-2n)).toBe(3n);
+    expect(ZigZag.encode(2n)).toBe(4n);
+    expect(ZigZag.encode(-3n)).toBe(5n);
 
-    expect(ZigZag.encode(0x3fffffff)).toBe(0x7ffffffe);
-    expect(ZigZag.encode(0x000000003fffffff)).toBe(0x000000007ffffffe);
+    expect(ZigZag.encode(0x3fffffffn)).toBe(0x7ffffffen);
+    expect(ZigZag.encode(0x000000003fffffffn)).toBe(0x000000007ffffffen);
   });
 
   it("Should decode", () => {
-    expect(ZigZag.decode(0)).toBe(0);
-    expect(ZigZag.decode(1)).toBe(-1);
-    expect(ZigZag.decode(2)).toBe(1);
-    expect(ZigZag.decode(3)).toBe(-2);
-    expect(ZigZag.decode(4)).toBe(2);
-    expect(ZigZag.decode(5)).toBe(-3);
+    expect(ZigZag.decode(0n)).toBe(0n);
+    expect(ZigZag.decode(1n)).toBe(-1n);
+    expect(ZigZag.decode(2n)).toBe(1n);
+    expect(ZigZag.decode(3n)).toBe(-2n);
+    expect(ZigZag.decode(4n)).toBe(2n);
+    expect(ZigZag.decode(5n)).toBe(-3n);
 
-    expect(ZigZag.decode(0x7ffffffe)).toBe(0x3fffffff);
-    expect(ZigZag.decode(0x000000007ffffffe)).toBe(0x000000003fffffff);
+    expect(ZigZag.decode(0x7ffffffen)).toBe(0x3fffffffn);
+    expect(ZigZag.decode(0x000000007ffffffen)).toBe(0x000000003fffffffn);
   });
 
   it("Should encode/decode radom numbers", () => {
     Array.from(Array(100))
-      .map(() => Math.ceil(Math.random() * 100000))
+      .map(() => BigInt(Math.ceil(Math.random() * 100000)))
       .forEach((n) => {
         expect(ZigZag.decode(ZigZag.encode(n))).toBe(n);
       });

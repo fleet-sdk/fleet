@@ -12,8 +12,8 @@ export class ZigZag {
    * @param input Signed integer
    * @returns ZigZag-encoded value
    */
-  public static encode(input: number): number {
-    return (input << 1) ^ (input >> 63);
+  public static encode(input: bigint): bigint {
+    return (input << 1n) ^ (input >> 63n);
   }
 
   /**
@@ -21,7 +21,7 @@ export class ZigZag {
    * @param input ZigZag-encoded value
    * @returns Signed integer
    */
-  public static decode(input: number): number {
-    return (input >>> 1) ^ -(input & 1);
+  public static decode(input: bigint): bigint {
+    return (input >> 1n) ^ -(input & 1n);
   }
 }
