@@ -1,0 +1,56 @@
+import { blake2b } from "@noble/hashes/blake2b";
+import { serializeErgoBox } from "../serialization/sigma/chainObjects";
+import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "../types";
+import { toBigInt } from "../utils/bigIntUtils";
+
+export class ErgoBox {
+  boxId!: string;
+  value!: bigint;
+  ergoTree!: string;
+  creationHeight!: number;
+  assets!: TokenAmount<bigint>[];
+  additionalRegisters!: NonMandatoryRegisters;
+  transactionId!: string;
+  index!: number;
+
+  constructor(box: Box<Amount>) {
+    this.boxId = box.boxId;
+    this.ergoTree = box.ergoTree;
+    this.creationHeight = box.creationHeight;
+    this.value = toBigInt(box.value);
+    this.assets = box.assets.map((asset) => ({
+      tokenId: asset.tokenId,
+      amount: toBigInt(asset.amount)
+    }));
+    this.additionalRegisters = box.additionalRegisters;
+    this.transactionId = box.transactionId;
+    this.index = box.index;
+  }
+
+  toVanillaObject(): Box<string> {
+    return {
+      boxId: this.boxId,
+      value: this.value.toString(),
+      ergoTree: this.ergoTree,
+      creationHeight: this.creationHeight,
+      assets: this.assets.map((asset) => ({
+        tokenId: asset.tokenId,
+        amount: asset.amount.toString()
+      })),
+      additionalRegisters: this.additionalRegisters,
+      transactionId: this.transactionId,
+      index: this.index
+    };
+  }
+
+  public isValid(): boolean {
+    return ErgoBox.validate(this);
+  }
+
+  static validate(box: Box<Amount> | ErgoBox): boolean {
+    const bytes = serializeErgoBox(box);
+    const hash = Buffer.from(blake2b(bytes, { dkLen: 32 })).toString("hex");
+
+    return box.boxId === hash;
+  }
+}

@@ -1,10 +1,11 @@
+import { ErgoBox } from "../../models/ergoBox";
 import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "../../types";
 import { isEmpty } from "../../utils/arrayUtils";
 import { toBigInt } from "../../utils/bigIntUtils";
 import { isDefined } from "../../utils/objectUtils";
 import { VLQ } from "../vlq";
 
-export function serializeErgoBox(box: Box<Amount>): Buffer {
+export function serializeErgoBox(box: Box<Amount> | ErgoBox): Buffer {
   return Buffer.concat([
     VLQ.encode(toBigInt(box.value)),
     Buffer.from(box.ergoTree, "hex"),
