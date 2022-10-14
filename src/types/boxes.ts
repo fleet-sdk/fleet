@@ -22,5 +22,4 @@ export type Box<AmountType> = BoxBaseType<AmountType> & {
   boxId: BoxId;
   transactionId: TransactionId;
   index: number;
-  confirmed?: boolean;
 };
