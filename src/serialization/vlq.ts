@@ -11,19 +11,24 @@ export class VLQ {
    * @param value unsigned integer
    * @returns VLQ bytes
    */
-  public static encode(value: number): Buffer {
+  public static encode(value: bigint | number): Buffer {
     // source: https://stackoverflow.com/a/3564685
 
-    if (value === 0) {
-      return Buffer.from([value]);
+    if (typeof value === "number") {
+      value = BigInt(value);
+    }
+
+    if (value === 0n) {
+      return Buffer.from([0]);
     } else if (value < 0) {
       throw new RangeError("Variable Length Quantity not supported for negative numbers");
     }
 
     const bytes = [];
     do {
-      let lower7bits = value & 0x7f;
-      value >>= 7;
+      let lower7bits = Number(value & 0x7fn);
+      value >>= 7n;
+
       if (value > 0) {
         lower7bits |= 0x80;
       }
@@ -39,15 +44,15 @@ export class VLQ {
    * @param bytes VLQ bytes
    * @returns Unsigned integer value
    */
-  public static decode(bytes: Buffer): number {
-    let value = 0;
+  public static decode(bytes: Buffer): bigint {
+    let value = 0n;
     let shift = 0;
     let lower7bits = 0;
     let i = 0;
 
     do {
       lower7bits = bytes[i++];
-      value |= (lower7bits & 0x7f) << shift;
+      value |= BigInt((lower7bits & 0x7f) << shift);
       shift += 7;
     } while ((lower7bits & 0x80) != 0);
 
