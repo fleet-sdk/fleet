@@ -37,9 +37,9 @@
     "cov:json": "jest --coverage --coverageReporters=json",
     "cov:check": "jest --coverage --coverageReporters=text",
     "cov:send": "run-s cov:lcov && codecov",
-    "version": "standard-version",
-    "reset-hard": "git clean -dfx && git reset --hard && npm i",
-    "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
+    "ver:stable": "standard-version",
+    "ver:alpha": "standard-version --prerelease alpha",
+    "reset-hard": "git clean -dfx && git reset --hard && npm i"
   },
   "dependencies": {
     "@noble/hashes": "^1.1.3",
