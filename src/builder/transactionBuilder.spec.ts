@@ -23,10 +23,38 @@ const a2 = {
 describe("basic construction", () => {
   const token1 = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
 
-  it("Should create a empty transaction builder", () => {
+  it("Should create an empty transaction builder", () => {
+    const builder = new TransactionBuilder(height);
+
+    expect(builder.inputs).toHaveLength(0);
+    expect(builder.dataInputs).toHaveLength(0);
+    expect(builder.outputs).toHaveLength(0);
+    expect(builder.changeAddress).toBeFalsy();
+    expect(builder.fee).toBeFalsy();
+    expect(builder.burning).toBeFalsy();
+    expect(builder.settings).toBeTruthy();
+    expect(builder.creationHeight).toBe(height);
+  });
+
+  it("Should create a transaction builder with inputs", () => {
     const builder = new TransactionBuilder(height).from(regularBoxesMock);
 
     expect(builder.inputs).toHaveLength(regularBoxesMock.length);
+    expect(builder.dataInputs).toHaveLength(0);
+    expect(builder.outputs).toHaveLength(0);
+    expect(builder.changeAddress).toBeFalsy();
+    expect(builder.fee).toBeFalsy();
+    expect(builder.burning).toBeFalsy();
+    expect(builder.settings).toBeTruthy();
+    expect(builder.creationHeight).toBe(height);
+  });
+
+  it("Should create transaction builder with inputs from multiple sources", () => {
+    const builder = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .and.from(manyTokensBoxesMock);
+
+    expect(builder.inputs).toHaveLength(regularBoxesMock.length + manyTokensBoxesMock.length);
     expect(builder.dataInputs).toHaveLength(0);
     expect(builder.outputs).toHaveLength(0);
     expect(builder.changeAddress).toBeFalsy();
