@@ -1,6 +1,7 @@
 import { DuplicateInputError, NotFoundError } from "../../errors";
 import { Amount, Box, BoxId } from "../../types";
 import { toBigInt } from "../../utils/bigIntUtils";
+import { isDefined } from "../../utils/objectUtils";
 import { Collection } from "./collection";
 
 export class InputsCollection extends Collection<Box<bigint>> {
@@ -10,7 +11,7 @@ export class InputsCollection extends Collection<Box<bigint>> {
   constructor(boxes?: Box<Amount> | Box<Amount>[]) {
     super();
 
-    if (boxes) {
+    if (isDefined(boxes)) {
       this.add(boxes);
     }
   }

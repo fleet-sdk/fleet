@@ -25,7 +25,8 @@ export const RECOMMENDED_MIN_FEE_VALUE = 1100000n;
 export const FEE_CONTRACT =
   "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304";
 
-export type SelectorCallback = (selector: BoxSelector) => void;
+type SelectorSettings = Omit<BoxSelector, "select">;
+export type SelectorCallback = (selector: SelectorSettings) => void;
 
 type EjectorContext = {
   inputs: InputsCollection;
@@ -33,6 +34,7 @@ type EjectorContext = {
   outputs: OutputsCollection;
   burning: TokensCollection | undefined;
   settings: TransactionBuilderSettings;
+  selection: (selectorCallBack?: SelectorCallback) => void;
 };
 
 type BuildOutputType = "default" | "EIP-12";
@@ -89,9 +91,22 @@ export class TransactionBuilder {
     return this._creationHeight;
   }
 
-  public from(inputs: Box<Amount>[], selectorCallback?: SelectorCallback): TransactionBuilder {
+  /**
+   * Syntax sugar to be used in composition with another methods
+   *
+   * @example
+   * ```
+   * new TransactionBuilder(height)
+   *   .from(inputs)
+   *   .and.from(otherInputs);
+   * ```
+   */
+  public get and(): TransactionBuilder {
+    return this;
+  }
+
+  public from(inputs: Box<Amount>[]): TransactionBuilder {
     this._inputs.add(inputs);
-    this._selectorCallback = selectorCallback;
 
     return this;
   }
@@ -147,13 +162,24 @@ export class TransactionBuilder {
     return this;
   }
 
+  public configureSelector(selectorCallback?: SelectorCallback): TransactionBuilder {
+    this._selectorCallback = selectorCallback;
+
+    return this;
+  }
+
   public eject(ejector: (context: EjectorContext) => void): TransactionBuilder {
+    const selection = (selectorCallback?: SelectorCallback) => {
+      this._selectorCallback = selectorCallback;
+    };
+
     ejector({
       inputs: this.inputs,
       dataInputs: this.dataInputs,
       outputs: this.outputs,
       burning: this.burning,
-      settings: this.settings
+      settings: this.settings,
+      selection: selection
     });
 
     return this;

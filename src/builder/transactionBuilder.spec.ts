@@ -329,19 +329,17 @@ describe("Building", () => {
         "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
       ].includes(input.boxId)
     );
-
+    const boxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
     const transaction = new TransactionBuilder(height)
-      .from(boxes, (selector) =>
-        selector.ensureInclusion(
-          (input) =>
-            input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
-        )
-      )
+      .from(boxes)
       .to(
         new OutputBuilder(500000000n, a2.address).addTokens({
           tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 180n
         })
+      )
+      .eject(({ selection }) =>
+        selection((selector) => selector.ensureInclusion((input) => input.boxId === boxId))
       )
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .sendChangeTo(a1.address)
@@ -459,8 +457,9 @@ describe("Building", () => {
     const tokensPerBox = 2;
 
     const transaction = new TransactionBuilder(height)
-      .from(regularBoxesMock, (selector) => selector.ensureInclusion((i) => some(i.assets)))
+      .from(regularBoxesMock)
       .sendChangeTo(a1.address)
+      .configureSelector((selector) => selector.ensureInclusion((i) => some(i.assets)))
       .configure((settings) => settings.setMaxTokensPerChangeBox(tokensPerBox))
       .build();
 
