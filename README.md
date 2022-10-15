@@ -110,19 +110,17 @@ const unsignedTransaction = new TransactionBuilder(creationHeight)
 ```
 
 ## Ensuring input inclusion
-You can ensure that one or more inputs will be included in the transaction. Useful when working with contracts.
+You can `configureSelector` method to ensure one or more inputs to be included in the transaction. Useful when working with contracts.
 
 ```ts
 import { OutputBuilder, TransactionBuilder } from "@fleet-sdk/core";
 
+const boxId = "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e";
 const unsignedTransaction = new TransactionBuilder(creationHeight)
-  .from(inputs, (selector) => 
-    selector.ensureInclusion( 
-      (input) => input.boxId === "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e"
-    )
-  )
+  .from(inputs)
   .to(new OutputBuilder(1000000n, "9gNvAv97W71Wm33GoXgSQBFJxinFubKvE6wh2dEhFTSgYEe783j"))
   .sendChangeTo("9i2bQmRpCPLmDdVgBNyeAy7dDXqBQfjvcxVVt5YMzbDud6AvJS8")
+  .configureSelector((selector) => selector.ensureInclusion((input) => input.boxId === boxId))
   .payMinFee()
   .build();
 ```
