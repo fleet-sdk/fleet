@@ -1,3 +1,3 @@
 import { HexString } from "./common";
 
-export type ContextExtension = { values?: { [key: string]: HexString } };
+export type ContextExtension = { [key: number]: HexString };

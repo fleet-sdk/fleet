@@ -8,6 +8,8 @@ export type SortingDirection = "asc" | "desc";
 
 export type FilterPredicate<T> = (item: T) => boolean;
 
+export type BuildOutputType = "default" | "EIP-12";
+
 export enum Network {
   Mainnet = 0 << 4,
   Testnet = 1 << 4

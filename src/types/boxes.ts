@@ -11,7 +11,6 @@ type BoxBaseType<AmountType> = {
   value: AmountType;
   assets: TokenAmount<AmountType>[];
   additionalRegisters: NonMandatoryRegisters;
-  [x: string | number | symbol]: unknown;
 };
 
 export type BoxCandidate<AmountType> = BoxBaseType<AmountType> & {
