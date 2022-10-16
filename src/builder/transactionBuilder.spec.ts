@@ -314,6 +314,7 @@ describe("Building", () => {
 
     const transaction = new TransactionBuilder(height)
       .from(boxes)
+      .withDataFrom(manyTokensBoxesMock[0])
       .to(
         new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).addTokens({
           tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
@@ -325,8 +326,10 @@ describe("Building", () => {
       .build();
 
     expect(transaction.inputs).toHaveLength(2);
-    expect(transaction.dataInputs).toHaveLength(0);
+    expect(transaction.dataInputs).toHaveLength(1);
+    expect(transaction.dataInputs[0].boxId).toBe(manyTokensBoxesMock[0].boxId);
     expect(transaction.outputs).toHaveLength(3);
+
     const customOutput = transaction.outputs[0];
     const feeOutput = transaction.outputs[1];
     const changeOutput = transaction.outputs[2];
