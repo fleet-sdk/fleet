@@ -10,7 +10,7 @@ import {
   TokenAmount,
   UnsignedTransaction
 } from "../types";
-import { chunk, hasDuplicatesBy, some } from "../utils/arrayUtils";
+import { chunk, some } from "../utils/arrayUtils";
 import { toBigInt } from "../utils/bigIntUtils";
 import { BoxAmounts, sumBoxes } from "../utils/boxUtils";
 import { isDefined } from "../utils/objectUtils";
