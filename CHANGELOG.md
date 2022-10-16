@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.2](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.1...v0.1.0-alpha.2) (2022-10-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove selector config from `from()` method.
+
+### Features
+
+* introduce `configureSelector()` method ([f957294](https://github.com/fleet-sdk/core/commit/f9572942e4f89a57c09a01fb7e0d2858efd05460))
+* **models:** add context vars support ([175a02b](https://github.com/fleet-sdk/core/commit/175a02bb01fa2e995bfe3278f99da754dcce3401))
+* **models:** add ergo box model ([dfcade2](https://github.com/fleet-sdk/core/commit/dfcade207ce746351481040c6344300f7efac297))
+* **serialization:** add ergo box serialization ([ad84c6f](https://github.com/fleet-sdk/core/commit/ad84c6f4e1e8d6b5e68414a54e81e8d472ae0ed5))
+
+
+### Bug Fixes
+
+* fix context extension type ([c0afa4c](https://github.com/fleet-sdk/core/commit/c0afa4cb953ff2cdcedea24dc917631e91bbf761))
+* **transaction builder:** multiple minting check ([3726302](https://github.com/fleet-sdk/core/commit/3726302a475aac77ceea88180075f1be68b60511))
+
 ## [0.1.0-alpha.1](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.0...v0.1.0-alpha.1) (2022-10-12)
 
 ## 0.1.0-alpha.0 (2022-10-11)
