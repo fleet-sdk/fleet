@@ -186,7 +186,7 @@ export class TransactionBuilder {
   public build(): UnsignedTransaction;
   public build<T extends BuildOutputType>(buildOutputType: T): TransactionType<T>;
   public build<T extends BuildOutputType>(buildOutputType?: T): TransactionType<T> {
-    if (hasDuplicatesBy(this.outputs.toArray(), (output) => isDefined(output.minting))) {
+    if (!this._validateTokenMinting()) {
       throw new MalformedTransaction("only one token can be minted per transaction.");
     }
 
@@ -269,6 +269,22 @@ export class TransactionBuilder {
     }
 
     return unsignedTransaction;
+  }
+
+  private _validateTokenMinting(): boolean {
+    let mintingCount = 0;
+
+    for (const output of this._outputs) {
+      if (isDefined(output.minting)) {
+        mintingCount++;
+
+        if (mintingCount > 1) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   private _calcBurningBalance(

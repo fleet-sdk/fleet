@@ -257,7 +257,7 @@ describe("Building", () => {
       .from(inputs)
       .to([
         new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address, height + 1),
-        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address)
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.ergoTree)
       ])
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .sendChangeTo(a1.address)
@@ -270,11 +270,11 @@ describe("Building", () => {
 
     expect(transaction.dataInputs).toHaveLength(0);
 
-    expect(transaction.outputs).toHaveLength(3);
+    expect(transaction.outputs).toHaveLength(4);
     const customOutputOne = transaction.outputs[0];
-    const customOutputTwo = transaction.outputs[0];
-    const feeOutput = transaction.outputs[1];
-    const changeOutput = transaction.outputs[2];
+    const customOutputTwo = transaction.outputs[1];
+    const feeOutput = transaction.outputs[2];
+    const changeOutput = transaction.outputs[3];
 
     expect(customOutputOne.ergoTree).toBe(a2.ergoTree);
     expect(customOutputOne.creationHeight).toBe(height + 1); // should preserve height
@@ -282,7 +282,7 @@ describe("Building", () => {
     expect(customOutputOne.assets).toHaveLength(0);
     expect(customOutputOne.additionalRegisters).toEqual({});
 
-    expect(customOutputTwo.ergoTree).toBe(a2.ergoTree);
+    expect(customOutputTwo.ergoTree).toBe(a1.ergoTree);
     expect(customOutputTwo.creationHeight).toBe(height);
     expect(toBigInt(customOutputTwo.value)).toBe(SAFE_MIN_BOX_VALUE);
     expect(customOutputTwo.assets).toHaveLength(0);
