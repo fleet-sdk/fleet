@@ -1,15 +1,13 @@
-import { MalformedTransaction } from "../errors/malformedTransaction";
-import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
+import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import {
   Amount,
   Base58String,
   Box,
-  EIP12UnsignedInput,
+  BuildOutputType,
   EIP12UnsignedTransaction,
   HexString,
   TokenAmount,
-  UnsignedInput,
   UnsignedTransaction
 } from "../types";
 import { chunk, hasDuplicatesBy, some } from "../utils/arrayUtils";
@@ -21,11 +19,13 @@ import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
+type TransactionType<T> = T extends "default" ? UnsignedTransaction : EIP12UnsignedTransaction;
+
 export const RECOMMENDED_MIN_FEE_VALUE = 1100000n;
 export const FEE_CONTRACT =
   "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304";
 
-type SelectorSettings = Omit<BoxSelector, "select">;
+type SelectorSettings = Omit<BoxSelector<Box<bigint>>, "select">;
 export type SelectorCallback = (selector: SelectorSettings) => void;
 
 type EjectorContext = {
@@ -36,8 +36,6 @@ type EjectorContext = {
   settings: TransactionBuilderSettings;
   selection: (selectorCallBack?: SelectorCallback) => void;
 };
-
-type BuildOutputType = "default" | "EIP-12";
 
 export class TransactionBuilder {
   private readonly _inputs!: InputsCollection;
@@ -105,7 +103,7 @@ export class TransactionBuilder {
     return this;
   }
 
-  public from(inputs: Box<Amount>[]): TransactionBuilder {
+  public from(inputs: Box<Amount> | Box<Amount>[]): TransactionBuilder {
     this._inputs.add(inputs);
 
     return this;
@@ -185,12 +183,9 @@ export class TransactionBuilder {
     return this;
   }
 
-  public build(buildOutputType: "default"): UnsignedTransaction;
-  public build(buildOutputType: "EIP-12"): EIP12UnsignedTransaction;
   public build(): UnsignedTransaction;
-  public build(
-    buildOutputType: BuildOutputType = "default"
-  ): UnsignedTransaction | EIP12UnsignedTransaction {
+  public build<T extends BuildOutputType>(buildOutputType: T): TransactionType<T>;
+  public build<T extends BuildOutputType>(buildOutputType?: T): TransactionType<T> {
     if (hasDuplicatesBy(this.outputs.toArray(), (output) => isDefined(output.minting))) {
       throw new MalformedTransaction("only one token can be minted per transaction.");
     }
@@ -201,7 +196,7 @@ export class TransactionBuilder {
       outputs.add(new OutputBuilder(this._feeAmount, FEE_CONTRACT));
     }
 
-    const selector = new BoxSelector(this.inputs);
+    const selector = new BoxSelector(this.inputs.toArray());
     if (isDefined(this._selectorCallback)) {
       this._selectorCallback(selector);
     }
@@ -242,15 +237,23 @@ export class TransactionBuilder {
       }
     }
 
+    for (const input of inputs) {
+      if (!input.isValid()) {
+        throw new InvalidInput(input.boxId);
+      }
+    }
+
     const unsignedTransaction = {
-      inputs: inputs.map(this._mapInputs(buildOutputType)),
-      dataInputs: this.dataInputs.toArray().map(this._mapInputs(buildOutputType)),
+      inputs: inputs.map((input) => input.toUnsignedInputObject(buildOutputType || "default")),
+      dataInputs: this.dataInputs
+        .toArray()
+        .map((input) => input.toDataInputObject(buildOutputType || "default")),
       outputs: outputs
         .toArray()
         .map((output) =>
           output.setCreationHeight(this._creationHeight, { replace: false }).build(inputs)
         )
-    };
+    } as TransactionType<T>;
 
     let burning = this._calcBurningBalance(unsignedTransaction, inputs);
     if (burning.nanoErgs > 0n) {
@@ -288,25 +291,6 @@ export class TransactionBuilder {
     minNanoErgsPerBox = SAFE_MIN_BOX_VALUE
   ): bigint {
     return minNanoErgsPerBox * BigInt(this._calcChangeLength(tokensLength));
-  }
-
-  private _mapInputs(type: BuildOutputType) {
-    if (type === "EIP-12") {
-      return (input: Box<bigint>): EIP12UnsignedInput => ({
-        ...input,
-        value: input.value.toString(),
-        assets: input.assets.map((asset) => ({
-          tokenId: asset.tokenId,
-          amount: asset.amount.toString()
-        })),
-        extension: {}
-      });
-    }
-
-    return (input: Box<bigint>): UnsignedInput => ({
-      boxId: input.boxId,
-      extension: {}
-    });
   }
 
   private _calcDiff(inputs: BoxAmounts, outputs: BoxAmounts): BoxAmounts {

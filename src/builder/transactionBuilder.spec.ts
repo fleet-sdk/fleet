@@ -1,7 +1,8 @@
+import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
-import { manyTokensBoxesMock, regularBoxesMock } from "../mocks/mockBoxes";
-import { ErgoAddress, MAX_TOKENS_PER_BOX } from "../models";
+import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../mocks/mockBoxes";
+import { ErgoAddress, ErgoUnsignedInput, MAX_TOKENS_PER_BOX } from "../models";
 import { Network } from "../types";
 import { first, some } from "../utils/arrayUtils";
 import { sumBy, toBigInt } from "../utils/bigIntUtils";
@@ -250,11 +251,14 @@ describe("Building", () => {
   it("Should build with one input only ERG change", () => {
     const inputs = [first(regularBoxesMock)];
     const inputsSum = sumBy(inputs, (x) => x.value);
-    const change = inputsSum - RECOMMENDED_MIN_FEE_VALUE - SAFE_MIN_BOX_VALUE;
+    const change = inputsSum - RECOMMENDED_MIN_FEE_VALUE - SAFE_MIN_BOX_VALUE * 2n;
 
     const transaction = new TransactionBuilder(height)
       .from(inputs)
-      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address, height + 1))
+      .to([
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address, height + 1),
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address)
+      ])
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .sendChangeTo(a1.address)
       .build();
@@ -267,15 +271,22 @@ describe("Building", () => {
     expect(transaction.dataInputs).toHaveLength(0);
 
     expect(transaction.outputs).toHaveLength(3);
-    const customOutput = transaction.outputs[0];
+    const customOutputOne = transaction.outputs[0];
+    const customOutputTwo = transaction.outputs[0];
     const feeOutput = transaction.outputs[1];
     const changeOutput = transaction.outputs[2];
 
-    expect(customOutput.ergoTree).toBe(a2.ergoTree);
-    expect(customOutput.creationHeight).toBe(height + 1); // should preserve height
-    expect(toBigInt(customOutput.value)).toBe(SAFE_MIN_BOX_VALUE);
-    expect(customOutput.assets).toHaveLength(0);
-    expect(customOutput.additionalRegisters).toEqual({});
+    expect(customOutputOne.ergoTree).toBe(a2.ergoTree);
+    expect(customOutputOne.creationHeight).toBe(height + 1); // should preserve height
+    expect(toBigInt(customOutputOne.value)).toBe(SAFE_MIN_BOX_VALUE);
+    expect(customOutputOne.assets).toHaveLength(0);
+    expect(customOutputOne.additionalRegisters).toEqual({});
+
+    expect(customOutputTwo.ergoTree).toBe(a2.ergoTree);
+    expect(customOutputTwo.creationHeight).toBe(height);
+    expect(toBigInt(customOutputTwo.value)).toBe(SAFE_MIN_BOX_VALUE);
+    expect(customOutputTwo.assets).toHaveLength(0);
+    expect(customOutputTwo.additionalRegisters).toEqual({});
 
     expect(feeOutput.ergoTree).toBe(FEE_CONTRACT);
     expect(feeOutput.creationHeight).toBe(height);
@@ -544,12 +555,39 @@ describe("Building", () => {
         creationHeight: 805063,
         ergoTree:
           "1012040204000404040004020406040c0408040a050004000402040204000400040404000400d812d601b2a4730000d602e4c6a7050ed603b2db6308a7730100d6048c720302d605db6903db6503fed606e4c6a70411d6079d997205b27206730200b27206730300d608b27206730400d609b27206730500d60a9972097204d60b95917205b272067306009d9c7209b27206730700b272067308007309d60c959272077208997209720a999a9d9c7207997209720b7208720b720ad60d937204720cd60e95720db2a5730a00b2a5730b00d60fdb6308720ed610b2720f730c00d6118c720301d612b2a5730d00d1eded96830201aedb63087201d901134d0e938c721301720293c5b2a4730e00c5a79683050193c2720ec2720193b1720f730f938cb2720f731000017202938c7210017211938c721002720cec720dd801d613b2db630872127311009683060193c17212c1a793c27212c2a7938c7213017211938c721302997204720c93e4c67212050e720293e4c6721204117206",
-        extension: {},
         index: 0,
         transactionId: "f82fa15166d787c275a6a5ab29983f6386571c63e50c73c1af7cba184f85ef23",
         value: "1000000"
       }
     ]);
+  });
+
+  it("Should fail if invalid inputs are used", () => {
+    const tx = new TransactionBuilder(height)
+      .from(invalidBoxesMock)
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address))
+      .payFee(RECOMMENDED_MIN_FEE_VALUE)
+      .sendChangeTo(a2.ergoTree);
+
+    expect(() => {
+      tx.build();
+    }).toThrow(InvalidInput);
+  });
+
+  it("Should preserve inputs extension", () => {
+    const input = new ErgoUnsignedInput(regularBoxesMock[0]);
+    input.setContextVars({ 0: "0580c0fc82aa02" });
+
+    const unsignedTransaction = new TransactionBuilder(height)
+      .from(regularBoxesMock[1])
+      .and.from(input)
+      .configureSelector((selector) => selector.ensureInclusion((input) => input.value > 0n))
+      .payFee(RECOMMENDED_MIN_FEE_VALUE)
+      .sendChangeTo(a2.ergoTree);
+
+    expect(unsignedTransaction.inputs).toHaveLength(2);
+    expect(unsignedTransaction.inputs.toArray()[1]).toBe(input);
+    expect(unsignedTransaction.inputs.toArray()[1].extension).toEqual({ 0: "0580c0fc82aa02" });
   });
 });
 
