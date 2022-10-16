@@ -1,5 +1,3 @@
-export type InsufficientAssets = { [key: string]: bigint };
-
 export class NotAllowedTokenBurning extends Error {
   constructor() {
     super(

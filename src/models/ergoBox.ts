@@ -27,22 +27,6 @@ export class ErgoBox {
     this.index = box.index;
   }
 
-  toVanillaObject(): Box<string> {
-    return {
-      boxId: this.boxId,
-      value: this.value.toString(),
-      ergoTree: this.ergoTree,
-      creationHeight: this.creationHeight,
-      assets: this.assets.map((asset) => ({
-        tokenId: asset.tokenId,
-        amount: asset.amount.toString()
-      })),
-      additionalRegisters: this.additionalRegisters,
-      transactionId: this.transactionId,
-      index: this.index
-    };
-  }
-
   public isValid(): boolean {
     return ErgoBox.validate(this);
   }
