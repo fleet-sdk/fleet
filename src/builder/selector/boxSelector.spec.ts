@@ -15,12 +15,6 @@ describe("Construction", () => {
     const selector = new BoxSelector(regularBoxesMock);
     expect(selector.select({ nanoErgs: undefined })).toHaveLength(regularBoxesMock.length);
   });
-
-  it("Should construct with an InputsCollection", () => {
-    const collection = new InputsCollection(regularBoxesMock);
-    const selector = new BoxSelector(collection);
-    expect(selector.select({ nanoErgs: undefined })).toHaveLength(collection.length);
-  });
 });
 
 describe("Selection strategies", () => {

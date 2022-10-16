@@ -1,10 +1,10 @@
 import { DuplicateInputError, NotFoundError } from "../../errors";
 import { Amount, Box, BoxId } from "../../types";
-import { toBigInt } from "../../utils/bigIntUtils";
 import { isDefined } from "../../utils/objectUtils";
+import { ErgoUnsignedInput } from "../ergoUnsignedInput";
 import { Collection } from "./collection";
 
-export class InputsCollection extends Collection<Box<bigint>> {
+export class InputsCollection extends Collection<ErgoUnsignedInput> {
   constructor();
   constructor(box: Box<Amount>);
   constructor(boxes: Box<Amount>[]);
@@ -38,17 +38,7 @@ export class InputsCollection extends Collection<Box<bigint>> {
       throw new DuplicateInputError(box.boxId);
     }
 
-    this._items.push(this._map(box));
-  }
-
-  private _map(input: Box<Amount>): Box<bigint> {
-    return {
-      ...input,
-      value: toBigInt(input.value),
-      assets: input.assets.map((asset) => {
-        return { tokenId: asset.tokenId, amount: toBigInt(asset.amount) };
-      })
-    };
+    this._items.push(box instanceof ErgoUnsignedInput ? box : new ErgoUnsignedInput(box));
   }
 
   public remove(boxId: BoxId): InputsCollection;

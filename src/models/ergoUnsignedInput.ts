@@ -1,0 +1,57 @@
+import {
+  Amount,
+  Box,
+  BuildOutputType,
+  ContextExtension,
+  DataInput,
+  EIP12UnsignedDataInput,
+  EIP12UnsignedInput,
+  UnsignedInput
+} from "../types";
+import { ErgoBox } from "./ergoBox";
+
+type InputType<T> = T extends "default" ? UnsignedInput : EIP12UnsignedInput;
+type DataInputType<T> = T extends "default" ? DataInput : EIP12UnsignedDataInput;
+
+export class ErgoUnsignedInput extends ErgoBox {
+  extension?: ContextExtension;
+
+  constructor(box: Box<Amount>) {
+    super(box);
+  }
+
+  public setContextVars(extension: ContextExtension): ErgoUnsignedInput {
+    this.extension = extension;
+
+    return this;
+  }
+
+  public toUnsignedInputObject<T extends BuildOutputType>(type: T): InputType<T> {
+    return {
+      ...this.toDataInputObject(type),
+      extension: this.extension || {}
+    } as InputType<T>;
+  }
+
+  public toDataInputObject<T extends BuildOutputType>(type: T): DataInputType<T> {
+    if (type === "EIP-12") {
+      return {
+        boxId: this.boxId,
+        value: this.value.toString(),
+        ergoTree: this.ergoTree,
+        creationHeight: this.creationHeight,
+        assets: this.assets.map((asset) => ({
+          tokenId: asset.tokenId,
+          amount: asset.amount.toString()
+        })),
+        additionalRegisters: this.additionalRegisters,
+        transactionId: this.transactionId,
+        index: this.index
+      } as DataInputType<T>;
+    } else {
+      return {
+        boxId: this.boxId
+      } as DataInputType<T>;
+    }
+  }
+}

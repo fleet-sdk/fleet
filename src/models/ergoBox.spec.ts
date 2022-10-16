@@ -9,16 +9,16 @@ import { ErgoBox } from "./ergoBox";
 describe("Construction", () => {
   it("Should construct from a vanilla object", () => {
     for (const box of regularBoxesMock) {
-      expect(new ErgoBox(box).toVanillaObject()).toEqual({
-        boxId: box.boxId,
-        value: box.value.toString(),
-        ergoTree: box.ergoTree,
-        assets: box.assets.map((x) => ({ tokenId: x.tokenId, amount: x.amount.toString() })),
-        creationHeight: box.creationHeight,
-        additionalRegisters: box.additionalRegisters,
-        transactionId: box.transactionId,
-        index: box.index
-      });
+      const ergoBox = new ErgoBox(box);
+
+      expect(ergoBox.boxId).toBe(box.boxId);
+      expect(ergoBox.value).toBe(box.value);
+      expect(ergoBox.ergoTree).toBe(box.ergoTree);
+      expect(ergoBox.assets).toEqual(box.assets);
+      expect(ergoBox.creationHeight).toBe(box.creationHeight);
+      expect(ergoBox.additionalRegisters).toBe(box.additionalRegisters);
+      expect(ergoBox.transactionId).toBe(box.transactionId);
+      expect(ergoBox.index).toBe(box.index);
     }
   });
 });

@@ -1,6 +1,5 @@
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
-import { InputsCollection } from "../../models";
 import {
   Amount,
   Box,
@@ -20,22 +19,18 @@ import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSe
 
 export type SelectionTarget = { nanoErgs?: bigint; tokens?: TokenTargetAmount<bigint>[] };
 
-export class BoxSelector {
+export class BoxSelector<T extends Box<bigint>> {
   private readonly _inputs: Box<bigint>[];
   private _strategy?: ISelectionStrategy;
   private _ensureFilterPredicate?: FilterPredicate<Box<bigint>>;
   private _inputsSortSelector?: SortingSelector<Box<bigint>>;
   private _inputsSortDir?: SortingDirection;
 
-  constructor(inputs: Box<bigint>[] | InputsCollection) {
-    if (inputs instanceof InputsCollection) {
-      this._inputs = inputs.toArray();
-    } else {
-      this._inputs = inputs;
-    }
+  constructor(inputs: T[]) {
+    this._inputs = inputs;
   }
 
-  public defineStrategy(strategy: ISelectionStrategy | SelectorFunction): BoxSelector {
+  public defineStrategy(strategy: ISelectionStrategy | SelectorFunction): BoxSelector<T> {
     if (this._isISelectionStrategyImplementation(strategy)) {
       this._strategy = strategy;
     } else {
@@ -45,7 +40,7 @@ export class BoxSelector {
     return this;
   }
 
-  public select(target: SelectionTarget): Box<bigint>[] {
+  public select(target: SelectionTarget): T[] {
     if (!this._strategy) {
       this._strategy = new AccumulativeSelectionStrategy();
     }
@@ -86,7 +81,7 @@ export class BoxSelector {
       throw new InsufficientInputs(unreached);
     }
 
-    return selected;
+    return selected as T[];
   }
 
   private _getUnreachedTargets(inputs: Box<bigint>[], target: SelectionTarget): InsufficientAssets {
@@ -119,7 +114,7 @@ export class BoxSelector {
     return orderBy(inputs, this._inputsSortSelector, this._inputsSortDir || "asc");
   }
 
-  public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector {
+  public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector<T> {
     this._ensureFilterPredicate = predicate;
 
     return this;
@@ -128,7 +123,7 @@ export class BoxSelector {
   public orderBy(
     selector: SortingSelector<Box<bigint>>,
     direction?: SortingDirection
-  ): BoxSelector {
+  ): BoxSelector<T> {
     this._inputsSortSelector = selector;
     this._inputsSortDir = direction;
 
