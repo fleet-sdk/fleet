@@ -247,7 +247,7 @@ export class TransactionBuilder {
       inputs: inputs.map((input) => input.toUnsignedInputObject(buildOutputType || "default")),
       dataInputs: this.dataInputs
         .toArray()
-        .map((input) => input.toDataInputObject(buildOutputType || "default")),
+        .map((input) => input.toObject(buildOutputType || "default")),
       outputs: outputs
         .toArray()
         .map((output) =>

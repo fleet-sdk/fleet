@@ -28,12 +28,12 @@ export class ErgoUnsignedInput extends ErgoBox {
 
   public toUnsignedInputObject<T extends BuildOutputType>(type: T): InputType<T> {
     return {
-      ...this.toDataInputObject(type),
+      ...this.toObject(type),
       extension: this.extension || {}
     } as InputType<T>;
   }
 
-  public toDataInputObject<T extends BuildOutputType>(type: T): DataInputType<T> {
+  public toObject<T extends BuildOutputType>(type: T): DataInputType<T> {
     if (type === "EIP-12") {
       return {
         boxId: this.boxId,
