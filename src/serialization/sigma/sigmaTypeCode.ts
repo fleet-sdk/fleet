@@ -1,5 +1,12 @@
-export enum SigmaConstructorTypeCode {
-  EmbeddableType = 0x01,
+export enum SigmaTypeCode {
+  Boolean = 0x01,
+  Byte = 0x02,
+  Short = 0x03,
+  Int = 0x04,
+  Long = 0x05,
+  BigInt = 0x06,
+  GroupElement = 0x07,
+  SigmaProp = 0x08,
   Coll = 0x0c,
   NestedColl = 0x18,
   Option = 0x24,

@@ -18,8 +18,8 @@ export function some<T>(obj?: T[] | object): boolean {
 
 export function first(array: undefined): undefined;
 export function first(array: Buffer): number;
-export function first<T>(array: T[]): T;
-export function first<T>(array?: T[] | Buffer): T | number | undefined {
+export function first<T>(array: ArrayLike<T>): T;
+export function first<T>(array?: ArrayLike<T> | Buffer): T | number | undefined {
   if (!array) {
     return;
   }

@@ -3,7 +3,8 @@ import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import { ErgoAddress } from "../models";
 import { AddTokenOptions, TokensCollection } from "../models/collections/tokensCollection";
-import { ByteColl } from "../serialization/sigma/byteColl";
+import { SConstant } from "../serialization/sigma/constantSerializer";
+import { SByte, SColl } from "../serialization/sigma/sigmaTypes";
 import {
   Amount,
   Base58String,
@@ -133,11 +134,15 @@ export class OutputBuilder {
 
       if (isEmpty(this.additionalRegisters)) {
         this.setAdditionalRegisters({
-          R4: new ByteColl(Buffer.from(this.minting.name || "", "utf-8")).toString(),
-          R5: new ByteColl(Buffer.from(this.minting.description || "", "utf-8")).toString(),
-          R6: new ByteColl(
-            Buffer.from(this.minting.decimals?.toString() || "0", "utf-8")
-          ).toString()
+          R4: SConstant(SColl(SByte, Buffer.from(this.minting.name || "", "utf-8"))).toString(
+            "hex"
+          ),
+          R5: SConstant(
+            SColl(SByte, Buffer.from(this.minting.description || "", "utf-8"))
+          ).toString("hex"),
+          R6: SConstant(
+            SColl(SByte, Buffer.from(this.minting.decimals?.toString() || "0", "utf-8"))
+          ).toString("hex")
         });
       }
 
