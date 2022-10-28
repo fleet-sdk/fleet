@@ -41,7 +41,7 @@ describe("Primary types serialization", () => {
     }
   });
 
-  it("Should throw if try to serialize uninplemented type", () => {
+  it("Should throw if try to serialize not implemented type", () => {
     expect(() => {
       SConstant({ type: SigmaTypeCode.AvlTree });
     }).toThrow();
