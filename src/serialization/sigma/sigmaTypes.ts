@@ -44,8 +44,14 @@ export function SLong(value?: number): IPrimitiveSigmaType<number> | SigmaTypeCo
   return SPrimitiveType(SigmaTypeCode.Long, value);
 }
 
+export function SUnit(): IPrimitiveSigmaType<null>;
+export function SUnit(): SigmaTypeCode;
+export function SUnit(): IPrimitiveSigmaType<null> | SigmaTypeCode {
+  return SPrimitiveType(SigmaTypeCode.Unit, null);
+}
+
 function SPrimitiveType<T>(type: SigmaTypeCode, value?: T): IPrimitiveSigmaType<T> | SigmaTypeCode {
-  if (isDefined(value)) {
+  if (value !== undefined) {
     return { type, value };
   } else {
     return type;

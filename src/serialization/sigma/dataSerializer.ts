@@ -23,7 +23,8 @@ export class DataSerializer {
         // case SigmaTypeCode.GroupElement:
         // case SigmaTypeCode.SigmaProp:
         // case SigmaTypeCode.Any:
-        // case SigmaTypeCode.Unit:
+        case SigmaTypeCode.Unit:
+          break;
         // case SigmaTypeCode.Box:
         // case SigmaTypeCode.AvlTree:
         // case SigmaTypeCode.Context:
