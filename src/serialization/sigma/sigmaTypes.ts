@@ -1,4 +1,3 @@
-import { isDefined } from "../../utils/objectUtils";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 
 export interface ISigmaType {
