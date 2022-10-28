@@ -46,6 +46,8 @@ export class DataSerializer {
             );
           }
       }
+    } else {
+      throw Error("Not implemented");
     }
   }
 }

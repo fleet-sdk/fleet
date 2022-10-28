@@ -1,2 +1,1 @@
-export * from "./sigma/sigmaTypes";
-export * from "./sigma/constantSerializer";
+export * from "./sigma";

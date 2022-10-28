@@ -49,6 +49,10 @@ describe("Primary types serialization", () => {
     expect(() => {
       SConstant({ type: SigmaTypeCode.AvlTree });
     }).toThrow();
+
+    expect(() => {
+      SConstant({ type: SigmaTypeCode.Tuple2 });
+    }).toThrow();
   });
 });
 

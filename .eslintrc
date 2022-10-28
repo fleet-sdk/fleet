@@ -21,13 +21,17 @@
     "@typescript-eslint/naming-convention": [
       "error",
       { "selector": "default", "format": ["camelCase"] },
-      { "selector": "function", "format": ["camelCase", "PascalCase"] },
       { "selector": "typeProperty", "format": ["camelCase", "UPPER_CASE"] },
       { "selector": "enumMember", "format": ["PascalCase", "UPPER_CASE"] },
       { "selector": "objectLiteralProperty", "format": ["camelCase", "UPPER_CASE"] },
       { "selector": "variable", "format": ["camelCase", "UPPER_CASE"] },
       { "selector": "parameter", "format": ["camelCase"], "leadingUnderscore": "allow" },
       { "selector": "typeLike", "format": ["PascalCase"] },
+      {
+        "selector": "function",
+        "format": ["camelCase", "PascalCase"],
+        "leadingUnderscore": "allow"
+      },
       {
         "selector": [
           "classProperty",
