@@ -22,15 +22,9 @@ export class DataSerializer {
         // case SigmaTypeCode.BigInt:
         // case SigmaTypeCode.GroupElement:
         // case SigmaTypeCode.SigmaProp:
-        // case SigmaTypeCode.Any:
-        case SigmaTypeCode.Unit:
+        case SigmaTypeCode.Unit: // same as void, don't need to save anything
           break;
         // case SigmaTypeCode.Box:
-        // case SigmaTypeCode.AvlTree:
-        // case SigmaTypeCode.Context:
-        // case SigmaTypeCode.Header:
-        // case SigmaTypeCode.PreHeader:
-        // case SigmaTypeCode.Global:
         default:
           throw Error("Not implemented");
       }
