@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.5](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.4...v0.1.0-alpha.5) (2022-10-28)
+
+
+### Features
+
+* add generic serialization structure ([912b3a4](https://github.com/fleet-sdk/core/commit/912b3a42b34215b55043152a81374397f476566c))
+* add SUnit serialization ([105ffd4](https://github.com/fleet-sdk/core/commit/105ffd4e8ac5e32154d0d4c37b576de144244ff7))
+
 ## [0.1.0-alpha.4](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.3...v0.1.0-alpha.4) (2022-10-18)
 
 
