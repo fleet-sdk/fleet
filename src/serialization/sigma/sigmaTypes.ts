@@ -5,7 +5,7 @@ export interface ISigmaType {
   readonly type: SigmaTypeCode;
 }
 
-export interface IPrimarySigmaType<T> extends ISigmaType {
+export interface IPrimitiveSigmaType<T> extends ISigmaType {
   value: T;
 }
 
@@ -14,37 +14,37 @@ export interface ISigmaCollection<T> extends ISigmaType {
   elementsType: SigmaTypeCode;
 }
 
-export function SByte(value: number): IPrimarySigmaType<number>;
+export function SByte(value: number): IPrimitiveSigmaType<number>;
 export function SByte(): SigmaTypeCode;
-export function SByte(value?: number): IPrimarySigmaType<number> | SigmaTypeCode {
-  return SPrimaryType(SigmaTypeCode.Byte, value);
+export function SByte(value?: number): IPrimitiveSigmaType<number> | SigmaTypeCode {
+  return SPrimitiveType(SigmaTypeCode.Byte, value);
 }
 
-export function SBool(value: boolean): IPrimarySigmaType<boolean>;
+export function SBool(value: boolean): IPrimitiveSigmaType<boolean>;
 export function SBool(): SigmaTypeCode;
-export function SBool(value?: boolean): IPrimarySigmaType<boolean> | SigmaTypeCode {
-  return SPrimaryType(SigmaTypeCode.Boolean, value);
+export function SBool(value?: boolean): IPrimitiveSigmaType<boolean> | SigmaTypeCode {
+  return SPrimitiveType(SigmaTypeCode.Boolean, value);
 }
 
-export function SShort(value: number): IPrimarySigmaType<number>;
+export function SShort(value: number): IPrimitiveSigmaType<number>;
 export function SShort(): SigmaTypeCode;
-export function SShort(value?: number): IPrimarySigmaType<number> | SigmaTypeCode {
-  return SPrimaryType(SigmaTypeCode.Short, value);
+export function SShort(value?: number): IPrimitiveSigmaType<number> | SigmaTypeCode {
+  return SPrimitiveType(SigmaTypeCode.Short, value);
 }
 
-export function SInt(value: number): IPrimarySigmaType<number>;
+export function SInt(value: number): IPrimitiveSigmaType<number>;
 export function SInt(): SigmaTypeCode;
-export function SInt(value?: number): IPrimarySigmaType<number> | SigmaTypeCode {
-  return SPrimaryType(SigmaTypeCode.Int, value);
+export function SInt(value?: number): IPrimitiveSigmaType<number> | SigmaTypeCode {
+  return SPrimitiveType(SigmaTypeCode.Int, value);
 }
 
-export function SLong(value: number): IPrimarySigmaType<number>;
+export function SLong(value: number): IPrimitiveSigmaType<number>;
 export function SLong(): SigmaTypeCode;
-export function SLong(value?: number): IPrimarySigmaType<number> | SigmaTypeCode {
-  return SPrimaryType(SigmaTypeCode.Long, value);
+export function SLong(value?: number): IPrimitiveSigmaType<number> | SigmaTypeCode {
+  return SPrimitiveType(SigmaTypeCode.Long, value);
 }
 
-function SPrimaryType<T>(type: SigmaTypeCode, value?: T): IPrimarySigmaType<T> | SigmaTypeCode {
+function SPrimitiveType<T>(type: SigmaTypeCode, value?: T): IPrimitiveSigmaType<T> | SigmaTypeCode {
   if (isDefined(value)) {
     return { type, value };
   } else {

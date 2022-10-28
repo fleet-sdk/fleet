@@ -1,23 +1,23 @@
 import { VLQ } from "../vlq";
 import { SigmaBuffer } from "./sigmaBuffer";
 import { SigmaTypeCode } from "./sigmaTypeCode";
-import { IPrimarySigmaType, ISigmaType } from "./sigmaTypes";
-import { isColl, isPrimaryType } from "./utils";
+import { IPrimitiveSigmaType, ISigmaType } from "./sigmaTypes";
+import { isColl, isPrimitiveType } from "./utils";
 
 export class DataSerializer {
   public static serialize(data: ISigmaType, buffer: SigmaBuffer) {
-    if (isPrimaryType(data)) {
+    if (isPrimitiveType(data)) {
       switch (data.type) {
         case SigmaTypeCode.Boolean:
-          buffer.putBoolean((data as IPrimarySigmaType<boolean>).value);
+          buffer.putBoolean((data as IPrimitiveSigmaType<boolean>).value);
           break;
         case SigmaTypeCode.Byte:
-          buffer.put((data as IPrimarySigmaType<number>).value);
+          buffer.put((data as IPrimitiveSigmaType<number>).value);
           break;
         case SigmaTypeCode.Short:
         case SigmaTypeCode.Int:
         case SigmaTypeCode.Long:
-          buffer.putInt((data as IPrimarySigmaType<number>).value);
+          buffer.putInt((data as IPrimitiveSigmaType<number>).value);
           break;
         // case SigmaTypeCode.BigInt:
         // case SigmaTypeCode.GroupElement:

@@ -1,10 +1,10 @@
-import { IPrimarySigmaType, ISigmaCollection, ISigmaType } from "./sigmaTypes";
+import { IPrimitiveSigmaType, ISigmaCollection, ISigmaType } from "./sigmaTypes";
 
 export function isEmbeddable(typeCode: number): boolean {
   return typeCode >= 0x01 && typeCode <= 0x0b;
 }
 
-export function isPrimaryType<T>(data: ISigmaType): data is IPrimarySigmaType<T> {
+export function isPrimitiveType<T>(data: ISigmaType): data is IPrimitiveSigmaType<T> {
   return !isConstructorType(data);
 }
 
