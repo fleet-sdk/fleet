@@ -2,7 +2,7 @@ import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 import { Amount, TokenAmount, TokenId } from "../../types";
-import { toBigInt } from "../../utils/bigIntUtils";
+import { ensureBigInt } from "../../utils/bigIntUtils";
 import { Collection } from "./collection";
 
 export const MAX_TOKENS_PER_BOX = 120;
@@ -26,7 +26,7 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
     if (sum) {
       for (const token of this._items) {
         if (token.tokenId === tokenId) {
-          token.amount += toBigInt(amount);
+          token.amount += ensureBigInt(amount);
 
           return;
         }
@@ -37,7 +37,7 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
       throw new MaxTokensOverflow();
     }
 
-    this._items.push({ tokenId, amount: toBigInt(amount) });
+    this._items.push({ tokenId, amount: ensureBigInt(amount) });
   }
 
   public add(tokens: TokenAmount<Amount>[], sum?: AddTokenOptions): TokensCollection;
@@ -84,7 +84,7 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
     }
 
     if (amount && index > -1) {
-      const bigAmount = toBigInt(amount);
+      const bigAmount = ensureBigInt(amount);
       const token = this._items[index];
 
       if (bigAmount > token.amount) {

@@ -5,7 +5,7 @@ import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../mock
 import { ErgoAddress, ErgoUnsignedInput, MAX_TOKENS_PER_BOX } from "../models";
 import { Network } from "../types";
 import { first, some } from "../utils/arrayUtils";
-import { sumBy, toBigInt } from "../utils/bigIntUtils";
+import { ensureBigInt, sumBy } from "../utils/bigIntUtils";
 import { sumByTokenId } from "../utils/boxUtils";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";
@@ -172,7 +172,7 @@ describe("Building", () => {
     expect(transaction.dataInputs).toHaveLength(0);
 
     expect(transaction.outputs).toHaveLength(1);
-    expect(sumBy(transaction.outputs, (x) => toBigInt(x.value))).toBe(inputsSum);
+    expect(sumBy(transaction.outputs, (x) => ensureBigInt(x.value))).toBe(inputsSum);
     expect(transaction.outputs.flatMap((x) => x.assets)).toHaveLength(0);
   });
 
@@ -198,17 +198,17 @@ describe("Building", () => {
 
     expect(customOutput.ergoTree).toBe(a1.ergoTree);
     expect(customOutput.creationHeight).toBe(height);
-    expect(toBigInt(customOutput.value)).toBe(inputsSum - RECOMMENDED_MIN_FEE_VALUE);
+    expect(ensureBigInt(customOutput.value)).toBe(inputsSum - RECOMMENDED_MIN_FEE_VALUE);
     expect(customOutput.assets).toHaveLength(0);
     expect(customOutput.additionalRegisters).toEqual({});
 
     expect(feeOutput.ergoTree).toBe(FEE_CONTRACT);
     expect(feeOutput.creationHeight).toBe(height);
-    expect(toBigInt(feeOutput.value)).toBe(RECOMMENDED_MIN_FEE_VALUE);
+    expect(ensureBigInt(feeOutput.value)).toBe(RECOMMENDED_MIN_FEE_VALUE);
     expect(feeOutput.assets).toHaveLength(0);
     expect(feeOutput.additionalRegisters).toEqual({});
 
-    expect(sumBy(transaction.outputs, (x) => toBigInt(x.value))).toBe(inputsSum);
+    expect(sumBy(transaction.outputs, (x) => ensureBigInt(x.value))).toBe(inputsSum);
   });
 
   it("Should build with only ERG change", () => {
@@ -235,17 +235,17 @@ describe("Building", () => {
 
     expect(feeOutput.ergoTree).toBe(FEE_CONTRACT);
     expect(feeOutput.creationHeight).toBe(height);
-    expect(toBigInt(feeOutput.value)).toBe(RECOMMENDED_MIN_FEE_VALUE);
+    expect(ensureBigInt(feeOutput.value)).toBe(RECOMMENDED_MIN_FEE_VALUE);
     expect(feeOutput.assets).toHaveLength(0);
     expect(feeOutput.additionalRegisters).toEqual({});
 
     expect(changeOutput.ergoTree).toBe(a1.ergoTree);
     expect(changeOutput.creationHeight).toBe(height);
-    expect(toBigInt(changeOutput.value)).toBe(change);
+    expect(ensureBigInt(changeOutput.value)).toBe(change);
     expect(changeOutput.assets).toHaveLength(0);
     expect(changeOutput.additionalRegisters).toEqual({});
 
-    expect(sumBy(transaction.outputs, (x) => toBigInt(x.value))).toBe(inputsSum);
+    expect(sumBy(transaction.outputs, (x) => ensureBigInt(x.value))).toBe(inputsSum);
   });
 
   it("Should build with one input only ERG change", () => {
@@ -278,29 +278,29 @@ describe("Building", () => {
 
     expect(customOutputOne.ergoTree).toBe(a2.ergoTree);
     expect(customOutputOne.creationHeight).toBe(height + 1); // should preserve height
-    expect(toBigInt(customOutputOne.value)).toBe(SAFE_MIN_BOX_VALUE);
+    expect(ensureBigInt(customOutputOne.value)).toBe(SAFE_MIN_BOX_VALUE);
     expect(customOutputOne.assets).toHaveLength(0);
     expect(customOutputOne.additionalRegisters).toEqual({});
 
     expect(customOutputTwo.ergoTree).toBe(a1.ergoTree);
     expect(customOutputTwo.creationHeight).toBe(height);
-    expect(toBigInt(customOutputTwo.value)).toBe(SAFE_MIN_BOX_VALUE);
+    expect(ensureBigInt(customOutputTwo.value)).toBe(SAFE_MIN_BOX_VALUE);
     expect(customOutputTwo.assets).toHaveLength(0);
     expect(customOutputTwo.additionalRegisters).toEqual({});
 
     expect(feeOutput.ergoTree).toBe(FEE_CONTRACT);
     expect(feeOutput.creationHeight).toBe(height);
-    expect(toBigInt(feeOutput.value)).toBe(RECOMMENDED_MIN_FEE_VALUE);
+    expect(ensureBigInt(feeOutput.value)).toBe(RECOMMENDED_MIN_FEE_VALUE);
     expect(feeOutput.assets).toHaveLength(0);
     expect(feeOutput.additionalRegisters).toEqual({});
 
     expect(changeOutput.ergoTree).toBe(a1.ergoTree);
     expect(changeOutput.creationHeight).toBe(height);
-    expect(toBigInt(changeOutput.value)).toBe(change);
+    expect(ensureBigInt(changeOutput.value)).toBe(change);
     expect(changeOutput.assets).toHaveLength(0);
     expect(changeOutput.additionalRegisters).toEqual({});
 
-    expect(sumBy(transaction.outputs, (x) => toBigInt(x.value))).toBe(inputsSum);
+    expect(sumBy(transaction.outputs, (x) => ensureBigInt(x.value))).toBe(inputsSum);
   });
 
   it("Should build with multiple inputs and tokens with change", () => {
@@ -449,8 +449,8 @@ describe("Building", () => {
       .sendChangeTo(a1.address)
       .build();
 
-    expect(sumBy(manyTokensBoxesMock, (x) => toBigInt(x.value))).toBe(
-      sumBy(transaction.outputs, (x) => toBigInt(x.value))
+    expect(sumBy(manyTokensBoxesMock, (x) => ensureBigInt(x.value))).toBe(
+      sumBy(transaction.outputs, (x) => ensureBigInt(x.value))
     );
     expect(transaction.inputs).toHaveLength(3);
     expect(transaction.dataInputs).toHaveLength(0);
@@ -689,7 +689,7 @@ describe("Token burning", () => {
     expect(
       sumBy(
         allOutputTokens.filter((x) => x.tokenId === regularTokenId),
-        (x) => toBigInt(x.amount)
+        (x) => ensureBigInt(x.amount)
       )
     ).toBe(100000000n);
   });

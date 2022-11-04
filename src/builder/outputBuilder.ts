@@ -17,7 +17,7 @@ import {
   UnsignedInput
 } from "../types";
 import { first, isEmpty } from "../utils/arrayUtils";
-import { toBigInt } from "../utils/bigIntUtils";
+import { ensureBigInt } from "../utils/bigIntUtils";
 import { areRegistersDenselyPacked } from "../utils/boxUtils";
 import { isUndefined, removeUndefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";
@@ -37,7 +37,7 @@ export class OutputBuilder {
     recipient: Base58String | ErgoTree | ErgoAddress,
     creationHeight?: number
   ) {
-    this._value = toBigInt(value);
+    this._value = ensureBigInt(value);
     this._creationHeight = creationHeight;
     this._tokens = new TokensCollection();
     this._registers = {};
@@ -93,7 +93,7 @@ export class OutputBuilder {
   }
 
   public mintToken(token: NewToken<Amount>): OutputBuilder {
-    this._minting = { ...token, amount: toBigInt(token.amount) };
+    this._minting = { ...token, amount: ensureBigInt(token.amount) };
 
     return this;
   }

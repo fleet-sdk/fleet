@@ -1,7 +1,7 @@
 import { blake2b } from "@noble/hashes/blake2b";
 import { serializeErgoBox } from "../serialization/sigma/chainObjects";
 import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "../types";
-import { toBigInt } from "../utils/bigIntUtils";
+import { ensureBigInt } from "../utils/bigIntUtils";
 
 export class ErgoBox {
   boxId!: string;
@@ -17,10 +17,10 @@ export class ErgoBox {
     this.boxId = box.boxId;
     this.ergoTree = box.ergoTree;
     this.creationHeight = box.creationHeight;
-    this.value = toBigInt(box.value);
+    this.value = ensureBigInt(box.value);
     this.assets = box.assets.map((asset) => ({
       tokenId: asset.tokenId,
-      amount: toBigInt(asset.amount)
+      amount: ensureBigInt(asset.amount)
     }));
     this.additionalRegisters = box.additionalRegisters;
     this.transactionId = box.transactionId;

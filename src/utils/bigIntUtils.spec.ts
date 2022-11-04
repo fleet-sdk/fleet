@@ -1,14 +1,14 @@
-import { sumBy, toBigInt } from "./bigIntUtils";
+import { ensureBigInt, sumBy } from "./bigIntUtils";
 
 describe("BigInt toBigInt() conversion", () => {
   it("Should convert arbitrary types to bigint", () => {
-    expect(toBigInt("1298379183")).toBe(1298379183n);
-    expect(toBigInt(10)).toBe(10n);
-    expect(toBigInt(true)).toBe(1n);
+    expect(ensureBigInt("1298379183")).toBe(1298379183n);
+    expect(ensureBigInt(10)).toBe(10n);
+    expect(ensureBigInt(true)).toBe(1n);
   });
 
   it("Should bypass conversion when using an bigint as argument", () => {
-    expect(toBigInt(1298379183n)).toBe(1298379183n);
+    expect(ensureBigInt(1298379183n)).toBe(1298379183n);
   });
 });
 

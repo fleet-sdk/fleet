@@ -9,7 +9,7 @@ import {
 } from "../../tests/testVectors/constants.tv";
 import { SConstant } from "./constantSerializer";
 import { SigmaTypeCode } from "./sigmaTypeCode";
-import { SBool, SByte, SColl, SInt, SLong, SShort, SUnit } from "./sigmaTypes";
+import { SBool, SByte, SColl, SInt, SLong, SShort, SSigmaProp, SUnit } from "./sigmaTypes";
 
 describe("Primary types serialization", () => {
   it("Should serialize SBoolean", () => {
@@ -43,6 +43,16 @@ describe("Primary types serialization", () => {
 
   it("Should serialize SUnit", () => {
     expect(SConstant(SUnit()).toString("hex")).toBe("62");
+  });
+
+  it("Should serialize SSigmaProp", () => {
+    expect(
+      SConstant(
+        SSigmaProp(
+          Buffer.from("03b196b978d77488fba3138876a40a40b9a046c2fbb5ecfa13d4ecf8f1eec52aec", "hex")
+        )
+      ).toString("hex")
+    ).toBe("08cd03b196b978d77488fba3138876a40a40b9a046c2fbb5ecfa13d4ecf8f1eec52aec");
   });
 
   it("Should throw if try to serialize not implemented type", () => {

@@ -11,7 +11,7 @@ import {
   UnsignedTransaction
 } from "../types";
 import { chunk, some } from "../utils/arrayUtils";
-import { toBigInt } from "../utils/bigIntUtils";
+import { ensureBigInt } from "../utils/bigIntUtils";
 import { _0n } from "../utils/bitIntLiterals";
 import { BoxAmounts, sumBoxes } from "../utils/boxUtils";
 import { isDefined } from "../utils/objectUtils";
@@ -135,7 +135,7 @@ export class TransactionBuilder {
   }
 
   public payFee(amount: Amount): TransactionBuilder {
-    this._feeAmount = toBigInt(amount);
+    this._feeAmount = ensureBigInt(amount);
 
     return this;
   }

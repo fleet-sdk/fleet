@@ -1,7 +1,8 @@
 import { isEmpty } from "./arrayUtils";
+import { _0n } from "./bitIntLiterals";
 import { isUndefined } from "./objectUtils";
 
-export function toBigInt(number: string | number | bigint | boolean): bigint {
+export function ensureBigInt(number: string | number | bigint | boolean): bigint {
   return typeof number === "bigint" ? number : BigInt(number);
 }
 
@@ -10,7 +11,7 @@ export function sumBy<T>(
   iteratee: (value: T) => bigint,
   condition?: (value: T) => boolean
 ): bigint {
-  let acc = 0n;
+  let acc = _0n;
   if (isEmpty(collection)) {
     return acc;
   }

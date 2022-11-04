@@ -10,7 +10,7 @@ import {
   TokenTargetAmount
 } from "../../types";
 import { hasDuplicatesBy, isEmpty, orderBy, some } from "../../utils/arrayUtils";
-import { sumBy, toBigInt } from "../../utils/bigIntUtils";
+import { ensureBigInt, sumBy } from "../../utils/bigIntUtils";
 import { _0n } from "../../utils/bitIntLiterals";
 import { sumByTokenId } from "../../utils/boxUtils";
 import { isDefined } from "../../utils/objectUtils";
@@ -144,9 +144,9 @@ export class BoxSelector<T extends Box<bigint>> {
     let nanoErgs = _0n;
 
     for (const box of boxes) {
-      nanoErgs += toBigInt(box.value);
+      nanoErgs += ensureBigInt(box.value);
       for (const token of box.assets) {
-        tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + toBigInt(token.amount);
+        tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + ensureBigInt(token.amount);
       }
     }
 

@@ -1,13 +1,13 @@
 import { ErgoBox } from "../../models/ergoBox";
 import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "../../types";
 import { isEmpty } from "../../utils/arrayUtils";
-import { toBigInt } from "../../utils/bigIntUtils";
+import { ensureBigInt } from "../../utils/bigIntUtils";
 import { isDefined } from "../../utils/objectUtils";
 import { VLQ } from "../vlq";
 
 export function serializeErgoBox(box: Box<Amount> | ErgoBox): Buffer {
   return Buffer.concat([
-    VLQ.encode(toBigInt(box.value)),
+    VLQ.encode(ensureBigInt(box.value)),
     Buffer.from(box.ergoTree, "hex"),
     VLQ.encode(box.creationHeight),
     serializeTokens(box.assets),
@@ -25,7 +25,7 @@ function serializeTokens(tokens: TokenAmount<Amount>[]): Buffer {
   return Buffer.concat([
     VLQ.encode(tokens.length),
     ...tokens.map((asset) =>
-      Buffer.concat([Buffer.from(asset.tokenId, "hex"), VLQ.encode(toBigInt(asset.amount))])
+      Buffer.concat([Buffer.from(asset.tokenId, "hex"), VLQ.encode(ensureBigInt(asset.amount))])
     )
   ]);
 }
