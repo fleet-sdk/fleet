@@ -1,6 +1,7 @@
 import { Box, TokenId, TokenTargetAmount } from "../../../types";
 import { isEmpty } from "../../../utils/arrayUtils";
 import { sumBy } from "../../../utils/bigIntUtils";
+import { _0n } from "../../../utils/bitIntLiterals";
 import { sumByTokenId } from "../../../utils/boxUtils";
 import { isUndefined } from "../../../utils/objectUtils";
 import { SelectionTarget } from "../boxSelector";
@@ -44,7 +45,7 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
         ? target.amount - sumByTokenId(selection, target.tokenId)
         : undefined;
 
-      if (targetAmount && targetAmount <= 0n) {
+      if (targetAmount && targetAmount <= _0n) {
         continue;
       }
 
@@ -55,7 +56,7 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
   }
 
   private _select(target?: bigint, tokenId?: TokenId): Box<bigint>[] {
-    let acc = 0n;
+    let acc = _0n;
     let selection: Box<bigint>[] = [];
 
     if (isUndefined(target)) {

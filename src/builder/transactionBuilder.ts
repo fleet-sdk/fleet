@@ -12,6 +12,7 @@ import {
 } from "../types";
 import { chunk, some } from "../utils/arrayUtils";
 import { toBigInt } from "../utils/bigIntUtils";
+import { _0n } from "../utils/bitIntLiterals";
 import { BoxAmounts, sumBoxes } from "../utils/boxUtils";
 import { isDefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";
@@ -21,7 +22,7 @@ import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
 type TransactionType<T> = T extends "default" ? UnsignedTransaction : EIP12UnsignedTransaction;
 
-export const RECOMMENDED_MIN_FEE_VALUE = 1100000n;
+export const RECOMMENDED_MIN_FEE_VALUE = BigInt(1100000);
 export const FEE_CONTRACT =
   "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304";
 
@@ -232,7 +233,7 @@ export class TransactionBuilder {
         }
       }
 
-      if (change.nanoErgs > 0n) {
+      if (change.nanoErgs > _0n) {
         outputs.add(new OutputBuilder(change.nanoErgs, this._changeAddress));
       }
     }
@@ -256,12 +257,12 @@ export class TransactionBuilder {
     } as TransactionType<T>;
 
     let burning = this._calcBurningBalance(unsignedTransaction, inputs);
-    if (burning.nanoErgs > 0n) {
+    if (burning.nanoErgs > _0n) {
       throw new MalformedTransaction("it's not possible to burn ERG.");
     }
 
     if (some(burning.tokens) && some(this._burning)) {
-      burning = this._calcDiff(burning, { nanoErgs: 0n, tokens: this._burning.toArray() });
+      burning = this._calcDiff(burning, { nanoErgs: _0n, tokens: this._burning.toArray() });
     }
 
     if (!this._settings.canBurnTokens && some(burning.tokens)) {
@@ -315,9 +316,9 @@ export class TransactionBuilder {
 
     for (const token of inputs.tokens) {
       const balance =
-        token.amount - (outputs.tokens.find((t) => t.tokenId === token.tokenId)?.amount || 0n);
+        token.amount - (outputs.tokens.find((t) => t.tokenId === token.tokenId)?.amount || _0n);
 
-      if (balance > 0n) {
+      if (balance > _0n) {
         tokens.push({ tokenId: token.tokenId, amount: balance });
       }
     }

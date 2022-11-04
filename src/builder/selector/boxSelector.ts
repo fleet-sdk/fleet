@@ -11,6 +11,7 @@ import {
 } from "../../types";
 import { hasDuplicatesBy, isEmpty, orderBy, some } from "../../utils/arrayUtils";
 import { sumBy, toBigInt } from "../../utils/bigIntUtils";
+import { _0n } from "../../utils/bitIntLiterals";
 import { sumByTokenId } from "../../utils/boxUtils";
 import { isDefined } from "../../utils/objectUtils";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
@@ -140,12 +141,12 @@ export class BoxSelector<T extends Box<bigint>> {
 
   public static buildTargetFrom(boxes: Box<Amount>[] | BoxCandidate<Amount>[]): SelectionTarget {
     const tokens: { [tokenId: string]: bigint } = {};
-    let nanoErgs = 0n;
+    let nanoErgs = _0n;
 
     for (const box of boxes) {
       nanoErgs += toBigInt(box.value);
       for (const token of box.assets) {
-        tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + toBigInt(token.amount);
+        tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + toBigInt(token.amount);
       }
     }
 

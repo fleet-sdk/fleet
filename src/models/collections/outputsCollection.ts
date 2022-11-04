@@ -2,6 +2,7 @@ import { OutputBuilder } from "../../builder/outputBuilder";
 import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
 import { some } from "../../utils/arrayUtils";
+import { _0n } from "../../utils/bitIntLiterals";
 import { BoxAmounts } from "../../utils/boxUtils";
 import { isUndefined } from "../../utils/objectUtils";
 import { Collection } from "./collection";
@@ -69,7 +70,7 @@ export class OutputsCollection extends Collection<OutputBuilder> {
 
   public sum(basis?: SelectionTarget | BoxAmounts): BoxAmounts {
     const tokens: { [tokenId: string]: bigint } = {};
-    let nanoErgs = 0n;
+    let nanoErgs = _0n;
 
     if (basis) {
       if (basis.nanoErgs) {
@@ -82,7 +83,7 @@ export class OutputsCollection extends Collection<OutputBuilder> {
             continue;
           }
 
-          tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + token.amount;
+          tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + token.amount;
         }
       }
     }
@@ -90,7 +91,7 @@ export class OutputsCollection extends Collection<OutputBuilder> {
     for (const box of this._items) {
       nanoErgs += box.value;
       for (const token of box.tokens) {
-        tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + token.amount;
+        tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + token.amount;
       }
     }
 

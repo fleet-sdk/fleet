@@ -22,7 +22,7 @@ import { areRegistersDenselyPacked } from "../utils/boxUtils";
 import { isUndefined, removeUndefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";
 
-export const SAFE_MIN_BOX_VALUE = 1000000n;
+export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 
 export class OutputBuilder {
   private readonly _value: bigint;

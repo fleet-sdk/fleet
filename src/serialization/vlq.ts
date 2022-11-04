@@ -1,3 +1,5 @@
+import { _0n, _127n, _7n } from "../utils/bitIntLiterals";
+
 /**
  * A **variable-length quantity (VLQ)** is a universal code that uses an arbitrary number
  * of binary octets (eight-bit bytes) to represent an arbitrarily large integer. A VLQ
@@ -18,7 +20,7 @@ export class VLQ {
       value = BigInt(value);
     }
 
-    if (value === 0n) {
+    if (value === _0n) {
       return Buffer.from([0]);
     } else if (value < 0) {
       throw new RangeError("Variable Length Quantity not supported for negative numbers");
@@ -26,8 +28,8 @@ export class VLQ {
 
     const bytes = [];
     do {
-      let lower7bits = Number(value & 0x7fn);
-      value >>= 7n;
+      let lower7bits = Number(value & _127n);
+      value >>= _7n;
 
       if (value > 0) {
         lower7bits |= 0x80;
@@ -45,7 +47,7 @@ export class VLQ {
    * @returns Unsigned integer value
    */
   public static decode(bytes: Buffer): bigint {
-    let value = 0n;
+    let value = _0n;
     let shift = 0;
     let lower7bits = 0;
     let i = 0;

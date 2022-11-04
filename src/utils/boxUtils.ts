@@ -1,9 +1,10 @@
 import { Amount, Box, NonMandatoryRegisters, TokenId } from "../types";
 import { isEmpty } from "./arrayUtils";
 import { toBigInt } from "./bigIntUtils";
+import { _0n } from "./bitIntLiterals";
 
 export function sumByTokenId(inputs: Box<bigint>[], tokenId: TokenId): bigint {
-  let acc = 0n;
+  let acc = _0n;
   if (isEmpty(inputs)) {
     return acc;
   }
@@ -61,12 +62,12 @@ type MinimalAmountFields = {
 
 export function sumBoxes(boxes: MinimalAmountFields[]): BoxAmounts {
   const tokens: { [tokenId: string]: bigint } = {};
-  let nanoErgs = 0n;
+  let nanoErgs = _0n;
 
   for (const box of boxes) {
     nanoErgs += toBigInt(box.value);
     for (const token of box.assets) {
-      tokens[token.tokenId] = (tokens[token.tokenId] || 0n) + toBigInt(token.amount);
+      tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + toBigInt(token.amount);
     }
   }
 

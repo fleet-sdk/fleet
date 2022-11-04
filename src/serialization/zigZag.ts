@@ -1,3 +1,5 @@
+import { _1n, _63n } from "../utils/bitIntLiterals";
+
 /**
  * ZigZag encoding maps signed integers to unsigned integers so that numbers
  * with a small absolute value (for instance, -1) have a small variant encoded
@@ -13,7 +15,7 @@ export class ZigZag {
    * @returns ZigZag-encoded value
    */
   public static encode(input: bigint): bigint {
-    return (input << 1n) ^ (input >> 63n);
+    return (input << _1n) ^ (input >> _63n);
   }
 
   /**
@@ -22,6 +24,6 @@ export class ZigZag {
    * @returns Signed integer
    */
   public static decode(input: bigint): bigint {
-    return (input >> 1n) ^ -(input & 1n);
+    return (input >> _1n) ^ -(input & _1n);
   }
 }
