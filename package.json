@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/core",
-  "version": "0.1.0-alpha.6",
+  "version": "0.1.0-alpha.7",
   "description": "Fleet SDK core library",
   "main": "build/lib/main/index.js",
   "typings": "build/lib/module/index.d.ts",

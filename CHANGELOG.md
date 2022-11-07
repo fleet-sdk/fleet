@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.7](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.6...v0.1.0-alpha.7) (2022-11-07)
+
+
+### Features
+
+* **serializer:** add `SigmaProp` and `GroupElement` ([4093468](https://github.com/fleet-sdk/core/commit/40934689933ab0cc1cc63c7d80d6b8801b608eb1))
+
+
+### Bug Fixes
+
+* **selector:** fix undesired target change ([8341597](https://github.com/fleet-sdk/core/commit/8341597661e0b937f17c8d55eeeec5d58f500db7))
+
 ## [0.1.0-alpha.6](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.5...v0.1.0-alpha.6) (2022-10-28)
 
 ## [0.1.0-alpha.5](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.4...v0.1.0-alpha.5) (2022-10-28)
