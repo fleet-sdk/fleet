@@ -46,7 +46,7 @@ export class BoxSelector<T extends Box<bigint>> {
       this._strategy = new AccumulativeSelectionStrategy();
     }
 
-    const remaining = { ...target };
+    const remaining = this._deepCloneTarget(target);
     let unselected = [...this._inputs];
     let selected!: Box<bigint>[];
 
@@ -83,6 +83,15 @@ export class BoxSelector<T extends Box<bigint>> {
     }
 
     return selected as T[];
+  }
+
+  private _deepCloneTarget(target: SelectionTarget): SelectionTarget {
+    return {
+      nanoErgs: target.nanoErgs,
+      tokens: isDefined(target.tokens)
+        ? target.tokens.map((t) => ({ tokenId: t.tokenId, amount: t.amount }))
+        : undefined
+    };
   }
 
   private _getUnreachedTargets(inputs: Box<bigint>[], target: SelectionTarget): InsufficientAssets {

@@ -211,6 +211,168 @@ describe("Building", () => {
     expect(sumBy(transaction.outputs, (x) => ensureBigInt(x.value))).toBe(inputsSum);
   });
 
+  it("Should 'manually' build babel transaction", () => {
+    const babelBox = {
+      boxId: "85add0fac1bff1be3b5ce325dc6ce47b4eb50456101f371c305cd600a2077129",
+      value: "997800000",
+      ergoTree:
+        "100604000e20aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed0400040005000500d803d601e30004d602e4c6a70408d603e4c6a7050595e67201d804d604b2a5e4720100d605b2db63087204730000d606db6308a7d60799c1a7c17204d1968302019683050193c27204c2a7938c720501730193e4c672040408720293e4c672040505720393e4c67204060ec5a796830201929c998c7205029591b1720673028cb272067303000273047203720792720773057202",
+      creationHeight: 96698,
+      assets: [
+        {
+          tokenId: "aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed",
+          amount: "2"
+        }
+      ],
+      additionalRegisters: {
+        R4: "08cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+        R5: "05c0a38601"
+      },
+      transactionId: "7b60adae36df1faf0547c90b5a2ca27cf29eacd8018ab34a6529657330c8d935",
+      index: 1,
+      extension: {
+        "0": "0402"
+      }
+    };
+
+    const inputs = [
+      {
+        boxId: "d55741e4dfea148e0f930c332c1bc9526030d5cd9df744d94eafac6652ccf89d",
+        value: "1000000",
+        ergoTree: "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
+        creationHeight: 97228,
+        assets: [
+          {
+            tokenId: "f9845114906081e295e456bea7aee383ca630f442d6ed284e36ee32d2b8f82f1",
+            amount: "5"
+          }
+        ],
+        additionalRegisters: {},
+        transactionId: "9282376d75d2f4246c326a29f297312dfb0b40f86fcaa97896b9b58bbdae03b4",
+        index: 0,
+        extension: {}
+      },
+      {
+        boxId: "887ba2dcbed4a6003909d2b10b75cdaa10be1186e43f3ba023a4d4802d6312dc",
+        value: "1000000",
+        ergoTree: "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
+        creationHeight: 97230,
+        assets: [
+          {
+            tokenId: "aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed",
+            amount: "100"
+          }
+        ],
+        additionalRegisters: {},
+        transactionId: "17e351c617ea678a5bb0b86a37ecb00f46d4a1c9daf591f931d084693b4a3699",
+        index: 0,
+        extension: {}
+      }
+    ];
+
+    const expectedSendingBox = {
+      value: "1000000",
+      ergoTree: "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
+      creationHeight: 97238,
+      assets: [
+        {
+          tokenId: "f9845114906081e295e456bea7aee383ca630f442d6ed284e36ee32d2b8f82f1",
+          amount: "1"
+        }
+      ],
+      additionalRegisters: {}
+    };
+
+    const expectedBabelRecreatedBox = {
+      value: "995600000",
+      ergoTree:
+        "100604000e20aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed0400040005000500d803d601e30004d602e4c6a70408d603e4c6a7050595e67201d804d604b2a5e4720100d605b2db63087204730000d606db6308a7d60799c1a7c17204d1968302019683050193c27204c2a7938c720501730193e4c672040408720293e4c672040505720393e4c67204060ec5a796830201929c998c7205029591b1720673028cb272067303000273047203720792720773057202",
+      creationHeight: 97238,
+      assets: [
+        {
+          tokenId: "aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed",
+          amount: "4"
+        }
+      ],
+      additionalRegisters: {
+        R4: "08cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+        R5: "05c0a38601",
+        R6: "0e2085add0fac1bff1be3b5ce325dc6ce47b4eb50456101f371c305cd600a2077129"
+      }
+    };
+
+    const expectedFeeBox = {
+      value: "1200000",
+      ergoTree:
+        "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304",
+      creationHeight: 97238,
+      assets: [],
+      additionalRegisters: {}
+    };
+
+    const expectedChangeBox = {
+      value: "2000000",
+      ergoTree: "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
+      creationHeight: 97238,
+      assets: [
+        {
+          tokenId: "aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed",
+          amount: "98"
+        },
+        {
+          tokenId: "f9845114906081e295e456bea7aee383ca630f442d6ed284e36ee32d2b8f82f1",
+          amount: "4"
+        }
+      ],
+      additionalRegisters: {}
+    };
+
+    const tx = new TransactionBuilder(97238)
+      .from(inputs)
+      .to(
+        new OutputBuilder(
+          "1000000",
+          "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca"
+        ).addTokens({
+          tokenId: "f9845114906081e295e456bea7aee383ca630f442d6ed284e36ee32d2b8f82f1",
+          amount: "1"
+        })
+      )
+      .and.from(babelBox)
+      .payFee("1200000")
+      .sendChangeTo("0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca")
+      .to(
+        new OutputBuilder(
+          "995600000",
+          "100604000e20aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed0400040005000500d803d601e30004d602e4c6a70408d603e4c6a7050595e67201d804d604b2a5e4720100d605b2db63087204730000d606db6308a7d60799c1a7c17204d1968302019683050193c27204c2a7938c720501730193e4c672040408720293e4c672040505720393e4c67204060ec5a796830201929c998c7205029591b1720673028cb272067303000273047203720792720773057202"
+        )
+          .addTokens({
+            tokenId: "aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed",
+            amount: "4"
+          })
+          // .addTokens({
+          //   tokenId: "aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed",
+          //   amount: "2"
+          // })
+          .setAdditionalRegisters({
+            R4: "08cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+            R5: "05c0a38601",
+            R6: "0e2085add0fac1bff1be3b5ce325dc6ce47b4eb50456101f371c305cd600a2077129"
+          })
+      )
+      .configureSelector((selector) =>
+        selector.ensureInclusion((input) => input.boxId === babelBox.boxId)
+      )
+      .build("EIP-12");
+
+    expect(tx.outputs).toEqual([
+      expectedSendingBox,
+      expectedBabelRecreatedBox,
+      expectedFeeBox,
+      expectedChangeBox
+    ]);
+  });
+
   it("Should build with only ERG change", () => {
     const inputs = [first(regularBoxesMock)];
     const inputsSum = sumBy(inputs, (x) => x.value);
