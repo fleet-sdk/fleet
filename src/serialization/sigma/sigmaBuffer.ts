@@ -1,4 +1,5 @@
-import { toBigInt } from "../../utils/bigIntUtils";
+import { ensureBigInt } from "../../utils/bigIntUtils";
+import { _0n } from "../../utils/bitIntLiterals";
 import { VLQ } from "../vlq";
 import { ZigZag } from "../zigZag";
 
@@ -30,7 +31,7 @@ export class SigmaBuffer {
   }
 
   public putInt(value: number): SigmaBuffer {
-    this.putBytes(VLQ.encode(ZigZag.encode(toBigInt(value))));
+    this.putBytes(VLQ.encode(ZigZag.encode(ensureBigInt(value))));
 
     return this;
   }
@@ -44,6 +45,37 @@ export class SigmaBuffer {
   public putBytes(bytes: Uint8Array): SigmaBuffer {
     this._bytes.set(bytes, this._cursor);
     this._cursor += bytes.length;
+
+    return this;
+  }
+
+  public putHex(hex: string): SigmaBuffer {
+    if (hex.length % 2) {
+      throw new Error("Invalid hex padding");
+    }
+
+    for (let i = 0; i < hex.length / 2; i++) {
+      const j = i * 2;
+      const byte = Number.parseInt(hex.slice(j, j + 2), 16);
+
+      if (Number.isNaN(byte) || byte < 0) {
+        throw new Error("Invalid byte sequence");
+      }
+
+      this.put(byte);
+    }
+
+    // const len = hex.length / 2;
+    // // const u8 = new Uint8Array(len);
+
+    // let i = 0;
+    // let j = 0;
+    // while (i < len) {
+    //   this.put(parseInt(hex.slice(j, j + 2), 16));
+
+    //   i += 1;
+    //   j += 2;
+    // }
 
     return this;
   }
@@ -67,6 +99,25 @@ export class SigmaBuffer {
     if (bitOffset > 0) {
       this._cursor++;
     }
+
+    return this;
+  }
+
+  public putBigInt(number: bigint): SigmaBuffer {
+    if (number < _0n) {
+      throw new Error("Negative BigInt values are not supported Fleet serializer.");
+    }
+
+    let hex = number.toString(16);
+    if (hex.length % 2) {
+      hex = "0" + hex;
+    } else if (Number.parseInt(hex.substring(0, 1), 16) >= 8) {
+      // maximum positive need to prepend 0 otherwise results in negative number
+      hex = "00" + hex;
+    }
+
+    this.putBytes(VLQ.encode(hex.length / 2));
+    this.putHex(hex);
 
     return this;
   }

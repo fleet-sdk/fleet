@@ -1,3 +1,5 @@
+import { ensureBigInt } from "../../utils/bigIntUtils";
+import { isDefined } from "../../utils/objectUtils";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 
 export interface ISigmaType {
@@ -37,16 +39,44 @@ export function SInt(value?: number): IPrimitiveSigmaType<number> | SigmaTypeCod
   return _createPrimitiveType(SigmaTypeCode.Int, value);
 }
 
-export function SLong(value: number): IPrimitiveSigmaType<number>;
+export function SLong(value: number | string | bigint): IPrimitiveSigmaType<bigint>;
 export function SLong(): SigmaTypeCode;
-export function SLong(value?: number): IPrimitiveSigmaType<number> | SigmaTypeCode {
-  return _createPrimitiveType(SigmaTypeCode.Long, value);
+export function SLong(
+  value?: number | string | bigint
+): IPrimitiveSigmaType<bigint> | SigmaTypeCode {
+  return _createPrimitiveType(
+    SigmaTypeCode.Long,
+    isDefined(value) ? ensureBigInt(value) : undefined
+  );
+}
+
+export function SBigInt(value: string | bigint): IPrimitiveSigmaType<bigint>;
+export function SBigInt(): SigmaTypeCode;
+export function SBigInt(value?: string | bigint): IPrimitiveSigmaType<bigint> | SigmaTypeCode {
+  return _createPrimitiveType(
+    SigmaTypeCode.BigInt,
+    isDefined(value) ? ensureBigInt(value) : undefined
+  );
 }
 
 export function SUnit(): IPrimitiveSigmaType<null>;
 export function SUnit(): SigmaTypeCode;
 export function SUnit(): IPrimitiveSigmaType<null> | SigmaTypeCode {
   return _createPrimitiveType(SigmaTypeCode.Unit, null);
+}
+
+export function SGroupElement(value: Uint8Array): IPrimitiveSigmaType<Uint8Array>;
+export function SGroupElement(): SigmaTypeCode;
+export function SGroupElement(value?: Uint8Array): IPrimitiveSigmaType<Uint8Array> | SigmaTypeCode {
+  return _createPrimitiveType(SigmaTypeCode.GroupElement, value);
+}
+
+export function SSigmaProp(value: IPrimitiveSigmaType<Uint8Array>): IPrimitiveSigmaType<ISigmaType>;
+export function SSigmaProp(): SigmaTypeCode;
+export function SSigmaProp(
+  value?: IPrimitiveSigmaType<Uint8Array>
+): IPrimitiveSigmaType<ISigmaType> | SigmaTypeCode {
+  return _createPrimitiveType(SigmaTypeCode.SigmaProp, value);
 }
 
 function _createPrimitiveType<T>(

@@ -19,6 +19,32 @@ describe("Sigma Buffer", () => {
     expect(sigmaBuffer.toBuffer()).toEqual(Buffer.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]));
   });
 
+  it("Should put multiple hex string", () => {
+    const sigmaBuffer = new SigmaBuffer(MAX_CONSTANT_LENGTH);
+
+    sigmaBuffer.putHex("000021ff");
+    sigmaBuffer.putHex("150c");
+
+    expect(sigmaBuffer).toHaveLength(6);
+    expect(sigmaBuffer.toBuffer()).toEqual(Buffer.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]));
+  });
+
+  it("Should fail for invalid hex string", () => {
+    const sigmaBuffer = new SigmaBuffer(MAX_CONSTANT_LENGTH);
+
+    expect(() => {
+      sigmaBuffer.putHex("000021f");
+    }).toThrow(Error("Invalid hex padding"));
+
+    expect(() => {
+      sigmaBuffer.putHex("-1");
+    }).toThrow(Error("Invalid byte sequence"));
+
+    expect(() => {
+      sigmaBuffer.putHex("ka");
+    }).toThrow(Error("Invalid byte sequence"));
+  });
+
   it("Should put a boolean", () => {
     const sigmaBuffer = new SigmaBuffer(MAX_CONSTANT_LENGTH);
     sigmaBuffer.putBoolean(true);

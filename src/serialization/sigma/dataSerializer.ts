@@ -19,9 +19,23 @@ export class DataSerializer {
         case SigmaTypeCode.Long:
           buffer.putInt((data as IPrimitiveSigmaType<number>).value);
           break;
-        // case SigmaTypeCode.BigInt:
-        // case SigmaTypeCode.GroupElement:
-        // case SigmaTypeCode.SigmaProp:
+        case SigmaTypeCode.BigInt: {
+          buffer.putBigInt((data as IPrimitiveSigmaType<bigint>).value);
+          break;
+        }
+        case SigmaTypeCode.GroupElement:
+          buffer.putBytes((data as IPrimitiveSigmaType<Uint8Array>).value);
+          break;
+        case SigmaTypeCode.SigmaProp: {
+          const node = (data as IPrimitiveSigmaType<ISigmaType>).value;
+          if (node.type === SigmaTypeCode.GroupElement) {
+            buffer.put(0xcd); // CreateProveDlog operation
+            DataSerializer.serialize(node, buffer);
+          } else {
+            throw Error("Not implemented");
+          }
+          break;
+        }
         case SigmaTypeCode.Unit: // same as void, don't need to save anything
           break;
         // case SigmaTypeCode.Box:

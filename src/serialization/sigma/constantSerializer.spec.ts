@@ -4,12 +4,27 @@ import {
   collIntTestVectors,
   collLongTestVectors,
   collShortTestVectors,
+  sGroupElementTestVectors,
   sIntTestVectors,
-  sLongTestVectors
+  sLongTestVectors,
+  sNegativeBigIntTestVectors,
+  sPositiveBigIntTestVectors,
+  sSigmaPropTestVectors
 } from "../../tests/testVectors/constants.tv";
 import { SConstant } from "./constantSerializer";
 import { SigmaTypeCode } from "./sigmaTypeCode";
-import { SBool, SByte, SColl, SInt, SLong, SShort, SSigmaProp, SUnit } from "./sigmaTypes";
+import {
+  SBigInt,
+  SBool,
+  SByte,
+  SColl,
+  SGroupElement,
+  SInt,
+  SLong,
+  SShort,
+  SSigmaProp,
+  SUnit
+} from "./sigmaTypes";
 
 describe("Primary types serialization", () => {
   it("Should serialize SBoolean", () => {
@@ -41,21 +56,47 @@ describe("Primary types serialization", () => {
     }
   });
 
+  it("Should serialize positive SBigInt", () => {
+    for (const tv of sPositiveBigIntTestVectors) {
+      expect(SConstant(SBigInt(tv.value)).toString("hex")).toBe(tv.hex);
+    }
+  });
+
+  it("Should fail for negative SBigInt", () => {
+    for (const tv of sNegativeBigIntTestVectors) {
+      expect(() => {
+        SConstant(SBigInt(tv.value));
+      }).toThrow();
+    }
+  });
+
   it("Should serialize SUnit", () => {
     expect(SConstant(SUnit()).toString("hex")).toBe("62");
   });
 
-  it("Should serialize SSigmaProp", () => {
-    expect(
-      SConstant(
-        SSigmaProp(
-          Buffer.from("03b196b978d77488fba3138876a40a40b9a046c2fbb5ecfa13d4ecf8f1eec52aec", "hex")
-        )
-      ).toString("hex")
-    ).toBe("08cd03b196b978d77488fba3138876a40a40b9a046c2fbb5ecfa13d4ecf8f1eec52aec");
+  it("Should serialize SGroupElement", () => {
+    for (const tv of sGroupElementTestVectors) {
+      expect(SConstant(SGroupElement(Buffer.from(tv.value, "hex"))).toString("hex")).toBe(tv.hex);
+    }
   });
 
-  it("Should throw if try to serialize not implemented type", () => {
+  it("Should serialize SSigmaProp", () => {
+    for (const tv of sSigmaPropTestVectors) {
+      expect(
+        SConstant(SSigmaProp(SGroupElement(Buffer.from(tv.value, "hex")))).toString("hex")
+      ).toBe(tv.hex);
+    }
+  });
+
+  it("Should for not implemented SSigmaProp expression", () => {
+    expect(() => {
+      SConstant(SSigmaProp({ type: SigmaTypeCode.AvlTree, value: Uint8Array.from([]) })).toString(
+        "hex"
+      );
+    }).toThrow();
+  });
+
+  it("Should throw for not implemented type", () => {
     expect(() => {
       SConstant({ type: SigmaTypeCode.AvlTree });
     }).toThrow();
