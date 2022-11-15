@@ -67,6 +67,7 @@
     "node": ">=10"
   },
   "files": [
+    "src",
     "build/lib",
     "!**/*.spec.*",
     "!**/*.json",
