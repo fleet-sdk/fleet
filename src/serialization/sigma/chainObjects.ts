@@ -1,3 +1,4 @@
+import { concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { ErgoBox } from "../../models/ergoBox";
 import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "../../types";
 import { isEmpty } from "../../utils/arrayUtils";
@@ -5,47 +6,44 @@ import { ensureBigInt } from "../../utils/bigIntUtils";
 import { isDefined } from "../../utils/objectUtils";
 import { VLQ } from "../vlq";
 
-export function serializeErgoBox(box: Box<Amount> | ErgoBox): Buffer {
-  return Buffer.concat([
+export function serializeErgoBox(box: Box<Amount> | ErgoBox): Uint8Array {
+  return concatBytes(
     VLQ.encode(ensureBigInt(box.value)),
-    Buffer.from(box.ergoTree, "hex"),
+    hexToBytes(box.ergoTree),
     VLQ.encode(box.creationHeight),
     serializeTokens(box.assets),
     serializeRegisters(box.additionalRegisters),
-    Buffer.from(box.transactionId, "hex"),
+    hexToBytes(box.transactionId),
     VLQ.encode(box.index)
-  ]);
+  );
 }
 
-function serializeTokens(tokens: TokenAmount<Amount>[]): Buffer {
+function serializeTokens(tokens: TokenAmount<Amount>[]): Uint8Array {
   if (isEmpty(tokens)) {
-    return Buffer.from([0]);
+    return Uint8Array.from([0]);
   }
 
-  return Buffer.concat([
+  return concatBytes(
     VLQ.encode(tokens.length),
     ...tokens.map((asset) =>
-      Buffer.concat([Buffer.from(asset.tokenId, "hex"), VLQ.encode(ensureBigInt(asset.amount))])
+      concatBytes(hexToBytes(asset.tokenId), VLQ.encode(ensureBigInt(asset.amount)))
     )
-  ]);
+  );
 }
 
-function serializeRegisters(registers: NonMandatoryRegisters): Buffer {
+function serializeRegisters(registers: NonMandatoryRegisters): Uint8Array {
   const keys = Object.keys(registers);
   if (isEmpty(keys)) {
-    return Buffer.from([0]);
+    return Uint8Array.from([0]);
   }
 
-  const serializedRegisters: Buffer[] = [];
+  const serializedRegisters: Uint8Array[] = [];
   for (const key of keys) {
     const val = registers[key as keyof NonMandatoryRegisters];
     if (isDefined(val)) {
-      serializedRegisters.push(Buffer.from(val, "hex"));
+      serializedRegisters.push(hexToBytes(val));
     }
   }
 
-  return Buffer.concat([
-    VLQ.encode(serializedRegisters.length),
-    Buffer.concat(serializedRegisters)
-  ]);
+  return concatBytes(VLQ.encode(serializedRegisters.length), concatBytes(...serializedRegisters));
 }

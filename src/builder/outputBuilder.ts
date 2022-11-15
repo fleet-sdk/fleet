@@ -1,3 +1,4 @@
+import { stringToBytes } from "@scure/base";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
@@ -134,15 +135,11 @@ export class OutputBuilder {
 
       if (isEmpty(this.additionalRegisters)) {
         this.setAdditionalRegisters({
-          R4: SConstant(SColl(SByte, Buffer.from(this.minting.name || "", "utf-8"))).toString(
-            "hex"
-          ),
-          R5: SConstant(
-            SColl(SByte, Buffer.from(this.minting.description || "", "utf-8"))
-          ).toString("hex"),
+          R4: SConstant(SColl(SByte, stringToBytes("utf8", this.minting.name || ""))),
+          R5: SConstant(SColl(SByte, stringToBytes("utf8", this.minting.description || ""))),
           R6: SConstant(
-            SColl(SByte, Buffer.from(this.minting.decimals?.toString() || "0", "utf-8"))
-          ).toString("hex")
+            SColl(SByte, stringToBytes("utf8", this.minting.decimals?.toString() || "0"))
+          )
         });
       }
 

@@ -1,13 +1,14 @@
 import { blake2b } from "@noble/hashes/blake2b";
+import { bytesToHex, concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { base58 } from "@scure/base";
 import { InvalidAddress } from "../errors/invalidAddress";
 import { AddressType, Base58String, HexString, Network } from "../types";
-import { first } from "../utils/arrayUtils";
+import { areEqual, first } from "../utils/arrayUtils";
 
 const CHECKSUM_BYTES_LENGTH = 4;
 const BLAKE_HASH_LENGTH = 32;
-const P2PK_ERGOTREE_PREFIX_BYTES = Buffer.from([0x00, 0x08, 0xcd]);
-const P2PK_ERGOTREE_PREFIX_HEX = P2PK_ERGOTREE_PREFIX_BYTES.toString("hex");
+const P2PK_ERGOTREE_PREFIX_BYTES = Uint8Array.from([0x00, 0x08, 0xcd]);
+const P2PK_ERGOTREE_PREFIX_HEX = bytesToHex(P2PK_ERGOTREE_PREFIX_BYTES);
 
 /**
  * Ergo address model
@@ -27,7 +28,7 @@ const P2PK_ERGOTREE_PREFIX_HEX = P2PK_ERGOTREE_PREFIX_BYTES.toString("hex");
  * ```
  */
 export class ErgoAddress {
-  public readonly bytes: Buffer;
+  public readonly bytes: Uint8Array;
   private readonly _address: string;
 
   private get _headByte() {
@@ -37,8 +38,8 @@ export class ErgoAddress {
   /**
    * Public key for P2PK address
    */
-  public get publicKey(): Buffer {
-    return this.type === AddressType.P2PK ? this.bytes.subarray(1, 34) : Buffer.from([]);
+  public get publicKey(): Uint8Array {
+    return this.type === AddressType.P2PK ? this.bytes.subarray(1, 34) : Uint8Array.from([]);
   }
 
   /**
@@ -46,9 +47,9 @@ export class ErgoAddress {
    */
   public get ergoTree(): HexString {
     if (this.type === AddressType.P2PK) {
-      return Buffer.concat([P2PK_ERGOTREE_PREFIX_BYTES, this.publicKey]).toString("hex");
+      return bytesToHex(concatBytes(P2PK_ERGOTREE_PREFIX_BYTES, this.publicKey));
     } else {
-      return this.bytes.subarray(1, this.bytes.length - CHECKSUM_BYTES_LENGTH).toString("hex");
+      return bytesToHex(this.bytes.subarray(1, this.bytes.length - CHECKSUM_BYTES_LENGTH));
     }
   }
 
@@ -70,19 +71,19 @@ export class ErgoAddress {
    * New instance from bytes
    * @param bytes Address bytes
    */
-  constructor(bytes: Buffer);
+  constructor(bytes: Uint8Array);
   /**
    * New instance from base58 encoded address string
    * @param address Address string
    */
   constructor(address: Base58String);
-  constructor(address: Base58String | Buffer) {
-    if (Buffer.isBuffer(address)) {
+  constructor(address: Base58String | Uint8Array) {
+    if (typeof address === "string") {
+      this._address = address;
+      this.bytes = base58.decode(this._address);
+    } else {
       this._address = base58.encode(address);
       this.bytes = address;
-    } else {
-      this._address = address;
-      this.bytes = Buffer.from(base58.decode(this._address));
     }
   }
 
@@ -91,14 +92,14 @@ export class ErgoAddress {
    * @param address Address encoded as base58
    */
   public static fromBase58(address: Base58String): ErgoAddress {
-    return ErgoAddress.fromBytes(Buffer.from(base58.decode(address)));
+    return ErgoAddress.fromBytes(base58.decode(address));
   }
 
   /**
    * Create a new checked instance from bytes
    * @param bytes Address bytes
    */
-  public static fromBytes(bytes: Buffer): ErgoAddress {
+  public static fromBytes(bytes: Uint8Array): ErgoAddress {
     const address = new ErgoAddress(bytes);
     if (!address.isValid()) {
       throw new InvalidAddress(address._address);
@@ -118,23 +119,21 @@ export class ErgoAddress {
   }
 
   private static _fromP2SErgoTree(ergoTree: HexString, network: Network) {
-    const prefixByte = Buffer.from([network + AddressType.P2S]);
-    const contentBytes = Buffer.from(ergoTree, "hex");
-    const hash = blake2b(Buffer.concat([prefixByte, contentBytes]), { dkLen: BLAKE_HASH_LENGTH });
-    const checksum = Buffer.from(hash).subarray(0, CHECKSUM_BYTES_LENGTH);
-    const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]);
+    const prefixByte = Uint8Array.from([network + AddressType.P2S]);
+    const contentBytes = hexToBytes(ergoTree);
+    const hash = blake2b(concatBytes(prefixByte, contentBytes), { dkLen: BLAKE_HASH_LENGTH });
+    const checksum = hash.subarray(0, CHECKSUM_BYTES_LENGTH);
+    const addressBytes = concatBytes(prefixByte, contentBytes, checksum);
 
     return new ErgoAddress(addressBytes);
   }
 
   private static _fromP2PKErgoTree(ergoTree: HexString, network: Network) {
-    const prefixByte = Buffer.from([network + AddressType.P2PK]);
+    const prefixByte = Uint8Array.from([network + AddressType.P2PK]);
     const pk = ergoTree.slice(6, 72);
-    const contentBytes = Buffer.from(pk, "hex");
-    const checksum = Buffer.from(
-      blake2b(Buffer.concat([prefixByte, contentBytes]), { dkLen: BLAKE_HASH_LENGTH })
-    );
-    const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]).subarray(0, 38);
+    const contentBytes = hexToBytes(pk);
+    const checksum = blake2b(concatBytes(prefixByte, contentBytes), { dkLen: BLAKE_HASH_LENGTH });
+    const addressBytes = concatBytes(prefixByte, contentBytes, checksum).subarray(0, 38);
 
     return new ErgoAddress(addressBytes);
   }
@@ -144,15 +143,15 @@ export class ErgoAddress {
    * @param publicKey Public key hex string
    */
   public static fromPublicKey(
-    publicKey: HexString | Buffer,
+    publicKey: HexString | Uint8Array,
     network: Network = Network.Mainnet
   ): ErgoAddress {
-    const prefixByte = Buffer.from([network + AddressType.P2PK]);
-    const contentBytes = typeof publicKey === "string" ? Buffer.from(publicKey, "hex") : publicKey;
-    const checksum = Buffer.from(
-      blake2b(Buffer.concat([prefixByte, contentBytes]), { dkLen: BLAKE_HASH_LENGTH })
-    );
-    const addressBytes = Buffer.concat([prefixByte, contentBytes, checksum]).subarray(0, 38);
+    const prefixByte = Uint8Array.from([network + AddressType.P2PK]);
+    const contentBytes = typeof publicKey === "string" ? hexToBytes(publicKey) : publicKey;
+    const checksum = blake2b(concatBytes(prefixByte, contentBytes), {
+      dkLen: BLAKE_HASH_LENGTH
+    });
+    const addressBytes = concatBytes(prefixByte, contentBytes, checksum).subarray(0, 38);
 
     return new ErgoAddress(addressBytes);
   }
@@ -161,18 +160,18 @@ export class ErgoAddress {
    * Validate an address
    * @param address Address buffer or string
    */
-  public static validate(address: Buffer | HexString): boolean {
-    const bytes = Buffer.isBuffer(address) ? address : Buffer.from(base58.decode(address));
+  public static validate(address: Uint8Array | HexString): boolean {
+    const bytes = typeof address === "string" ? base58.decode(address) : address;
     if (bytes.length < CHECKSUM_BYTES_LENGTH) {
       return false;
     }
 
     const script = bytes.subarray(0, bytes.length - CHECKSUM_BYTES_LENGTH);
     const checksum = bytes.subarray(bytes.length - CHECKSUM_BYTES_LENGTH, bytes.length);
-    const blakeHash = Buffer.from(blake2b(script, { dkLen: BLAKE_HASH_LENGTH }));
+    const blakeHash = blake2b(script, { dkLen: BLAKE_HASH_LENGTH });
     const calculatedChecksum = blakeHash.subarray(0, CHECKSUM_BYTES_LENGTH);
 
-    return calculatedChecksum.toString("hex") === checksum.toString("hex");
+    return areEqual(calculatedChecksum, checksum);
   }
 
   /**

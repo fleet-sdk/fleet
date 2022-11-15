@@ -1,4 +1,5 @@
 import { blake2b } from "@noble/hashes/blake2b";
+import { bytesToHex } from "@noble/hashes/utils";
 import { serializeErgoBox } from "../serialization/sigma/chainObjects";
 import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "../types";
 import { ensureBigInt } from "../utils/bigIntUtils";
@@ -33,7 +34,7 @@ export class ErgoBox {
 
   static validate(box: Box<Amount> | ErgoBox): boolean {
     const bytes = serializeErgoBox(box);
-    const hash = Buffer.from(blake2b(bytes, { dkLen: 32 })).toString("hex");
+    const hash = bytesToHex(blake2b(bytes, { dkLen: 32 }));
 
     return box.boxId === hash;
   }

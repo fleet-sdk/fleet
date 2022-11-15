@@ -1,5 +1,5 @@
 import { isEmpty } from "./arrayUtils";
-import { _0n } from "./bitIntLiterals";
+import { _0n } from "./bigIntLiterals";
 import { isUndefined } from "./objectUtils";
 
 export function ensureBigInt(number: string | number | bigint | boolean): bigint {

@@ -1,5 +1,6 @@
+import { bytesToHex } from "@noble/hashes/utils";
+import { _0n } from "../../utils/bigIntLiterals";
 import { ensureBigInt } from "../../utils/bigIntUtils";
-import { _0n } from "../../utils/bitIntLiterals";
 import { VLQ } from "../vlq";
 import { ZigZag } from "../zigZag";
 
@@ -65,18 +66,6 @@ export class SigmaBuffer {
       this.put(byte);
     }
 
-    // const len = hex.length / 2;
-    // // const u8 = new Uint8Array(len);
-
-    // let i = 0;
-    // let j = 0;
-    // while (i < len) {
-    //   this.put(parseInt(hex.slice(j, j + 2), 16));
-
-    //   i += 1;
-    //   j += 2;
-    // }
-
     return this;
   }
 
@@ -122,7 +111,11 @@ export class SigmaBuffer {
     return this;
   }
 
-  public toBuffer(): Buffer {
-    return Buffer.from(this._bytes.subarray(0, this._cursor));
+  public toHex(): string {
+    return bytesToHex(this._bytes.subarray(0, this._cursor));
+  }
+
+  public toBytes(): Uint8Array {
+    return this._bytes.subarray(0, this._cursor);
   }
 }

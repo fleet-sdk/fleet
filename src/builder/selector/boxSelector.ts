@@ -10,8 +10,8 @@ import {
   TokenTargetAmount
 } from "../../types";
 import { hasDuplicatesBy, isEmpty, orderBy, some } from "../../utils/arrayUtils";
+import { _0n } from "../../utils/bigIntLiterals";
 import { ensureBigInt, sumBy } from "../../utils/bigIntUtils";
-import { _0n } from "../../utils/bitIntLiterals";
 import { sumByTokenId } from "../../utils/boxUtils";
 import { isDefined } from "../../utils/objectUtils";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";

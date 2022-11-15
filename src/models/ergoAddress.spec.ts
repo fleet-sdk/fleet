@@ -1,3 +1,4 @@
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { InvalidAddress } from "../errors/invalidAddress";
 import { Network } from "../types";
 import { ErgoAddress } from "./ergoAddress";
@@ -532,7 +533,7 @@ describe("Public key", () => {
 
   it("Should parse from public key buffer", () => {
     for (const testVector of publicKeyTestVectors) {
-      expect(ErgoAddress.fromPublicKey(Buffer.from(testVector.publicKey, "hex")).toString()).toBe(
+      expect(ErgoAddress.fromPublicKey(hexToBytes(testVector.publicKey)).toString()).toBe(
         testVector.base58
       );
     }
@@ -540,9 +541,7 @@ describe("Public key", () => {
 
   it("Should generate the right public key from base58 encoded string", () => {
     for (const testVector of publicKeyTestVectors) {
-      expect(new ErgoAddress(testVector.base58).publicKey.toString("hex")).toBe(
-        testVector.publicKey
-      );
+      expect(bytesToHex(new ErgoAddress(testVector.base58).publicKey)).toBe(testVector.publicKey);
     }
   });
 });

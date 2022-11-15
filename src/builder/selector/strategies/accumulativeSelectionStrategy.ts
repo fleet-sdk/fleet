@@ -1,7 +1,7 @@
 import { Box, TokenId, TokenTargetAmount } from "../../../types";
 import { isEmpty } from "../../../utils/arrayUtils";
+import { _0n } from "../../../utils/bigIntLiterals";
 import { sumBy } from "../../../utils/bigIntUtils";
-import { _0n } from "../../../utils/bitIntLiterals";
 import { sumByTokenId } from "../../../utils/boxUtils";
 import { isUndefined } from "../../../utils/objectUtils";
 import { SelectionTarget } from "../boxSelector";

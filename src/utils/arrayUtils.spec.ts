@@ -1,4 +1,13 @@
-import { chunk, first, hasDuplicates, hasDuplicatesBy, isEmpty, orderBy, some } from "./arrayUtils";
+import {
+  areEqual,
+  chunk,
+  first,
+  hasDuplicates,
+  hasDuplicatesBy,
+  isEmpty,
+  orderBy,
+  some
+} from "./arrayUtils";
 
 describe("isEmpty() guard", () => {
   it("Should return true if array is undefined or empty", () => {
@@ -52,7 +61,7 @@ describe("fist() fetcher", () => {
   });
 
   it("Should return number if the array is a Buffer", () => {
-    expect(first(Buffer.from([2, 4, 6]))).toBe(2);
+    expect(first(Uint8Array.from([2, 4, 6]))).toBe(2);
   });
 
   it("Should throw an error if the array is empty", () => {
@@ -177,5 +186,24 @@ describe("Array ordering", () => {
       { a: "x", b: 3 },
       { a: "y", b: 4 }
     ]);
+  });
+});
+
+describe("areEqual()", () => {
+  it("Should return true for equal arrays", () => {
+    const array1 = [1, 2, 4];
+
+    expect(areEqual([], [])).toBeTruthy();
+    expect(areEqual(array1, [1, 2, 4])).toBeTruthy();
+    expect(areEqual(array1, Uint8Array.from([1, 2, 4]))).toBeTruthy();
+    expect(areEqual(array1, array1)).toBeTruthy();
+  });
+
+  it("Should return false for not equal arrays", () => {
+    const array1 = [1, 2, 4, 5, 0];
+
+    expect(areEqual(array1, [1, 2])).toBeFalsy();
+    expect(areEqual(array1, [])).toBeFalsy();
+    expect(areEqual(array1, [1, 2, 10, 5, 0])).toBeFalsy();
   });
 });

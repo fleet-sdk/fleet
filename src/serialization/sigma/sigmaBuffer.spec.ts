@@ -7,16 +7,16 @@ describe("Sigma Buffer", () => {
     sigmaBuffer.put(0x10).put(0x0f).put(0x00);
 
     expect(sigmaBuffer).toHaveLength(3);
-    expect(sigmaBuffer.toBuffer()).toEqual(Buffer.from([0x10, 0x0f, 0x00]));
+    expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x10, 0x0f, 0x00]));
   });
 
   it("Should put multiple bytes at once", () => {
     const sigmaBuffer = new SigmaBuffer(MAX_CONSTANT_LENGTH);
     sigmaBuffer.putBytes(Uint8Array.from([0x00, 0x00, 0x21, 0xff]));
-    sigmaBuffer.putBytes(Buffer.from([0x15, 0x0c]));
+    sigmaBuffer.putBytes(Uint8Array.from([0x15, 0x0c]));
 
     expect(sigmaBuffer).toHaveLength(6);
-    expect(sigmaBuffer.toBuffer()).toEqual(Buffer.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]));
+    expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]));
   });
 
   it("Should put multiple hex string", () => {
@@ -26,7 +26,7 @@ describe("Sigma Buffer", () => {
     sigmaBuffer.putHex("150c");
 
     expect(sigmaBuffer).toHaveLength(6);
-    expect(sigmaBuffer.toBuffer()).toEqual(Buffer.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]));
+    expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]));
   });
 
   it("Should fail for invalid hex string", () => {
@@ -51,7 +51,7 @@ describe("Sigma Buffer", () => {
     sigmaBuffer.putBoolean(false);
 
     expect(sigmaBuffer).toHaveLength(2);
-    expect(sigmaBuffer.toBuffer()).toEqual(Buffer.from([0x01, 0x00]));
+    expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x01, 0x00]));
   });
 
   it("Should put multiple booleans", () => {
@@ -59,7 +59,7 @@ describe("Sigma Buffer", () => {
     sigmaBuffer.putBooleans([true, false]);
 
     expect(sigmaBuffer).toHaveLength(2);
-    expect(sigmaBuffer.toBuffer()).toEqual(Buffer.from([0x01, 0x00]));
+    expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x01, 0x00]));
   });
 
   it("Should put Int", () => {
@@ -89,9 +89,9 @@ describe("Sigma Buffer", () => {
     const all = new SigmaBuffer(MAX_CONSTANT_LENGTH);
     for (const tv of testVectors) {
       all.putInt(tv.int);
-      expect(new SigmaBuffer(tv.hex.length).putInt(tv.int).toBuffer().toString("hex")).toBe(tv.hex);
+      expect(new SigmaBuffer(tv.hex.length).putInt(tv.int).toHex()).toBe(tv.hex);
     }
 
-    expect(all.toBuffer().toString("hex")).toEqual(testVectors.map((x) => x.hex).join(""));
+    expect(all.toHex()).toEqual(testVectors.map((x) => x.hex).join(""));
   });
 });

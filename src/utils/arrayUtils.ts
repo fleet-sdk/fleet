@@ -17,9 +17,9 @@ export function some<T>(obj?: T[] | object): boolean {
 }
 
 export function first(array: undefined): undefined;
-export function first(array: Buffer): number;
+export function first(array: Uint8Array): number;
 export function first<T>(array: ArrayLike<T>): T;
-export function first<T>(array?: ArrayLike<T> | Buffer): T | number | undefined {
+export function first<T>(array?: ArrayLike<T> | Uint8Array): T | number | undefined {
   if (!array) {
     return;
   }
@@ -76,4 +76,22 @@ export function orderBy<T>(
       return 0;
     }
   });
+}
+
+export function areEqual<T>(bytes1: ArrayLike<T>, bytes2: ArrayLike<T>): boolean {
+  if (bytes1 === bytes2) {
+    return true;
+  }
+
+  if (bytes1.length != bytes2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < bytes1.length; i++) {
+    if (bytes1[i] !== bytes2[i]) {
+      return false;
+    }
+  }
+
+  return true;
 }

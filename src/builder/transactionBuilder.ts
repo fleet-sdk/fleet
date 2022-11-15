@@ -11,8 +11,8 @@ import {
   UnsignedTransaction
 } from "../types";
 import { chunk, some } from "../utils/arrayUtils";
+import { _0n } from "../utils/bigIntLiterals";
 import { ensureBigInt } from "../utils/bigIntUtils";
-import { _0n } from "../utils/bitIntLiterals";
 import { BoxAmounts, sumBoxes } from "../utils/boxUtils";
 import { isDefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";

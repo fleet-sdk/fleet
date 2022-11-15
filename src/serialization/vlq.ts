@@ -1,4 +1,4 @@
-import { _0n, _127n, _7n } from "../utils/bitIntLiterals";
+import { _0n, _127n, _7n } from "../utils/bigIntLiterals";
 
 /**
  * A **variable-length quantity (VLQ)** is a universal code that uses an arbitrary number
@@ -13,7 +13,7 @@ export class VLQ {
    * @param value unsigned integer
    * @returns VLQ bytes
    */
-  public static encode(value: bigint | number): Buffer {
+  public static encode(value: bigint | number): Uint8Array {
     // source: https://stackoverflow.com/a/3564685
 
     if (typeof value === "number") {
@@ -21,7 +21,7 @@ export class VLQ {
     }
 
     if (value === _0n) {
-      return Buffer.from([0]);
+      return Uint8Array.from([0]);
     } else if (value < 0) {
       throw new RangeError("Variable Length Quantity not supported for negative numbers");
     }
@@ -38,7 +38,7 @@ export class VLQ {
       bytes.push(lower7bits);
     } while (value > 0);
 
-    return Buffer.from(bytes);
+    return Uint8Array.from(bytes);
   }
 
   /**
@@ -46,7 +46,7 @@ export class VLQ {
    * @param bytes VLQ bytes
    * @returns Unsigned integer value
    */
-  public static decode(bytes: Buffer): bigint {
+  public static decode(bytes: Uint8Array): bigint {
     let value = _0n;
     let shift = 0;
     let lower7bits = 0;
