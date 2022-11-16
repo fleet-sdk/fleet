@@ -78,17 +78,17 @@ export function orderBy<T>(
   });
 }
 
-export function areEqual<T>(bytes1: ArrayLike<T>, bytes2: ArrayLike<T>): boolean {
-  if (bytes1 === bytes2) {
+export function areEqual<T>(array1: ArrayLike<T>, array2: ArrayLike<T>): boolean {
+  if (array1 === array2) {
     return true;
   }
 
-  if (bytes1.length != bytes2.length) {
+  if (array1.length != array2.length) {
     return false;
   }
 
-  for (let i = 0; i < bytes1.length; i++) {
-    if (bytes1[i] !== bytes2[i]) {
+  for (let i = 0; i < array1.length; i++) {
+    if (array1[i] !== array2[i]) {
       return false;
     }
   }
