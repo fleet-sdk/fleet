@@ -1,14 +1,20 @@
 # @fleet-sdk/core [![Checks](https://badgen.net/github/checks/fleet-sdk/core/master)](https://github.com/fleet-sdk/core/actions) [![Coverage](https://codecov.io/gh/fleet-sdk/core/branch/master/graph/badge.svg)](https://app.codecov.io/gh/fleet-sdk/core) [![License](https://badgen.net/github/license/fleet-sdk/core/)](https://github.com/fleet-sdk/core/blob/master/LICENSE) [![npm](https://badgen.net/npm/v/@fleet-sdk/core)](https://www.npmjs.com/package/@fleet-sdk/core)
 
-Easily create Ergo transactions with a pure JS library.
+FLEET is a pure Javascript Software Development Kit for the Ergo blockchain. FLEET provides a thin wrapper around the core components of the [ErgoScript compiler](https://github.com/ScorexFoundation/sigmastate-interpreter), ErgoTree interpreter and [Ergo protocol](https://github.com/ergoplatform/ergo) implementations, which are written in Scala. FLEET stands for:
+
+- 🦾 Fluent: creates complex transactions with a 100% code coverage and tree-shakable API
+
+- 🪶 Lightweight: [~12kB minified + gziped](https://bundlephobia.com/package/@fleet-sdk/core)
 
 - 🪄 Easy to use
-- 🪶 Lightweight: [~12kB minified + gziped](https://bundlephobia.com/package/@fleet-sdk/core)
-- 🦾 Powerful: easily create complex transactions with a fluent API
-- 🧪 100% code coverage
-- 🌲 Tree-shakeable
 
-# Basic usage
+- ⛓️ Ergo blockchain
+
+- 🔨 Toolkit
+
+FLEET implements a consistent programming model and API overlay to ErgoScript using idiomatic Javascript.
+
+# Basic Usage
 
 ## Installation
 
@@ -20,6 +26,12 @@ or
 
 ```bash
 yarn install @fleet-sdk/core
+```
+
+## Getting utxo inputs
+
+```ts
+ergo.get_utxos()
 ```
 
 ## Building a simple transaction
@@ -124,3 +136,8 @@ const unsignedTransaction = new TransactionBuilder(creationHeight)
   .payMinFee()
   .build();
 ```
+
+## Example FLEET Usage from Ergo Projects
+
+- [Nautilus Babel Fees](https://github.com/capt-nemo429/nautilus-wallet/blob/babel-fees/src/api/ergo/transaction/txBuilder.ts#L95)
+- [Ergonames](https://github.com/ergonames/sdk/blob/master/tx-lib/index.js)
