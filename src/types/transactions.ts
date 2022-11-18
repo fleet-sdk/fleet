@@ -21,7 +21,7 @@ export type EIP12UnsignedTransaction = {
   id?: TransactionId;
   inputs: EIP12UnsignedInput[];
   dataInputs: EIP12UnsignedDataInput[];
-  outputs: BoxCandidate<Amount>[];
+  outputs: BoxCandidate<string>[];
 };
 
 export type SignedTransaction = {
