@@ -1,5 +1,5 @@
 import { BoxId } from "./boxes";
-import { Amount, ErgoTree } from "./common";
+import { ErgoTree } from "./common";
 import { ContextExtension } from "./contextExtension";
 import { ProverResult } from "./proverResult";
 import { NonMandatoryRegisters } from "./registers";
@@ -21,7 +21,7 @@ export type EIP12UnsignedInput = UnsignedInput & {
   index: number;
   ergoTree: ErgoTree;
   creationHeight: number;
-  value: Amount;
+  value: string;
   assets: TokenAmount<string>[];
   additionalRegisters: NonMandatoryRegisters;
 };
@@ -32,7 +32,7 @@ export type EIP12UnsignedDataInput = {
   index: number;
   ergoTree: ErgoTree;
   creationHeight: number;
-  value: Amount;
+  value: string;
   assets: TokenAmount<string>[];
   additionalRegisters: NonMandatoryRegisters;
 };
