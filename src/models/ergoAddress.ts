@@ -7,7 +7,7 @@ import { areEqual, endsWith, first, startsWith } from "../utils/arrayUtils";
 import { isDefined } from "../utils/objectUtils";
 
 const CHECKSUM_LENGTH = 4;
-const BLAKE_HASH_LENGTH = 32;
+const BLAKE_256_HASH_LENGTH = 32;
 
 const P2PK_ERGOTREE_PREFIX = hexToBytes("0008cd");
 const P2PK_ERGOTREE_LENGTH = 36;
@@ -34,7 +34,7 @@ function _ensureBytes(content: HexString | Uint8Array): Uint8Array {
 }
 
 function blake2b256(input: Uint8Array): Uint8Array {
-  return blake2b(input, { dkLen: BLAKE_HASH_LENGTH });
+  return blake2b(input, { dkLen: BLAKE_256_HASH_LENGTH });
 }
 
 function _getErgoTreeType(ergoTree: Uint8Array): AddressType {
@@ -119,9 +119,9 @@ export class ErgoAddress {
   public static fromHash(hash: HexString | Uint8Array, network?: Network): ErgoAddress {
     hash = _ensureBytes(hash);
 
-    if (hash.length > P2SH_HASH_LENGTH) {
+    if (hash.length === BLAKE_256_HASH_LENGTH) {
       hash = hash.subarray(0, P2SH_HASH_LENGTH);
-    } else if (hash.length < P2SH_HASH_LENGTH) {
+    } else if (hash.length != P2SH_HASH_LENGTH) {
       throw Error(`Invalid hash length: ${hash.length}`);
     }
 

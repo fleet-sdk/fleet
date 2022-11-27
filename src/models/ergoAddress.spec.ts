@@ -87,11 +87,20 @@ describe("Construction", () => {
     expect(address.encode()).toBe("8dC5Kgb4DRXYeRxiNDizFSne24UX5BTD27LCkJB");
   });
 
-  it("Should fail to construct from too small hash bytes", () => {
-    const hash = blake2b(FEE_CONTRACT, { dkLen: 32 }).subarray(0, 10);
+  it("Should fail to construct from invalid hash bytes", () => {
+    expect(() => {
+      const hash = new Uint8Array(33);
+      hash.set(blake2b(FEE_CONTRACT, { dkLen: 32 }));
+
+      ErgoAddress.fromHash(hash);
+    }).toThrow();
 
     expect(() => {
-      ErgoAddress.fromHash(hash);
+      ErgoAddress.fromHash(blake2b(FEE_CONTRACT, { dkLen: 32 }).subarray(0, 25));
+    }).toThrow();
+
+    expect(() => {
+      ErgoAddress.fromHash(blake2b(FEE_CONTRACT, { dkLen: 32 }).subarray(0, 10));
     }).toThrow();
   });
 
