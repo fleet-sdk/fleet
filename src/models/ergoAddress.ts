@@ -33,7 +33,7 @@ function _ensureBytes(content: HexString | Uint8Array): Uint8Array {
   return content;
 }
 
-function _blake2b(input: Uint8Array): Uint8Array {
+function blake2b256(input: Uint8Array): Uint8Array {
   return blake2b(input, { dkLen: BLAKE_HASH_LENGTH });
 }
 
@@ -165,7 +165,7 @@ export class ErgoAddress {
 
     const script = bytes.subarray(0, bytes.length - CHECKSUM_LENGTH);
     const checksum = bytes.subarray(bytes.length - CHECKSUM_LENGTH, bytes.length);
-    const blakeHash = _blake2b(script);
+    const blakeHash = blake2b256(script);
     const calculatedChecksum = blakeHash.subarray(0, CHECKSUM_LENGTH);
 
     return areEqual(calculatedChecksum, checksum);
@@ -192,7 +192,7 @@ export class ErgoAddress {
       return this.encode();
     }
 
-    const hash = _blake2b(this._ergoTree).subarray(0, P2SH_HASH_LENGTH);
+    const hash = blake2b256(this._ergoTree).subarray(0, P2SH_HASH_LENGTH);
 
     return this._encode(hash, AddressType.P2SH, network);
   }
@@ -227,7 +227,7 @@ export class ErgoAddress {
 
     const head = Uint8Array.from([network + type]);
     body = concatBytes(head, body);
-    const checksum = _blake2b(body).subarray(0, CHECKSUM_LENGTH);
+    const checksum = blake2b256(body).subarray(0, CHECKSUM_LENGTH);
 
     return base58.encode(concatBytes(body, checksum));
   }
