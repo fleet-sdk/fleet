@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.12](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.11...v0.1.0-alpha.12) (2022-11-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **address model:** `ErgoAddress` constructor is now private and accepts an ErgoTree as input
+
+### Features
+
+* add arrays startsWith and endsWith ([d6a4649](https://github.com/fleet-sdk/core/commit/d6a46493dd641b30aba46c5b0a368b1216a68c0d))
+* **address model:** add P2SH support ([75466a3](https://github.com/fleet-sdk/core/commit/75466a39a35c3c05895df0fc93927be8fcb1d184))
+
 ## [0.1.0-alpha.11](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.10...v0.1.0-alpha.11) (2022-11-18)
 
 ## [0.1.0-alpha.10](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.9...v0.1.0-alpha.10) (2022-11-18)
