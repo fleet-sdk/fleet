@@ -213,14 +213,24 @@ describe("P2SH", () => {
   });
 
   it("Should encode arbitrary ErgoTree to P2SH", () => {
-    const address = ErgoAddress.fromErgoTree(FEE_CONTRACT);
+    const testVectors = [
+      { ergoTree: FEE_CONTRACT, p2sh: "8dC5Kgb4DRXYeRxiNDizFSne24UX5BTD27LCkJB" },
+      {
+        ergoTree:
+          "100604000e2003faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf040400040005000500d803d601e30004d602e4c6a70408d603e4c6a7050595e67201d804d604b2a5e4720100d605b2db63087204730000d606db6308a7d60799c1a7c17204d1968302019683050193c27204c2a7938c720501730193e4c672040408720293e4c672040505720393e4c67204060ec5a796830201929c998c7205029591b1720673028cb272067303000273047203720792720773057202",
+        p2sh: "7RDgCgZs1w9XEgBxtyPPKyG32zhkNv3HKzBy9RE"
+      }
+    ];
 
-    expect(address.toP2SH()).toBe("8dC5Kgb4DRXYeRxiNDizFSne24UX5BTD27LCkJB");
+    for (const tv of testVectors) {
+      const address = ErgoAddress.fromErgoTree(tv.ergoTree);
 
-    expect(ErgoAddress.getAddressType(address.toP2SH())).toBe(AddressType.P2SH);
-    expect(ErgoAddress.getNetworkType(address.toP2SH())).toBe(Network.Mainnet);
-    expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Mainnet))).toBe(Network.Mainnet);
-    expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Testnet))).toBe(Network.Testnet);
+      expect(address.toP2SH()).toBe(tv.p2sh);
+      expect(ErgoAddress.getAddressType(address.toP2SH())).toBe(AddressType.P2SH);
+      expect(ErgoAddress.getNetworkType(address.toP2SH())).toBe(Network.Mainnet);
+      expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Mainnet))).toBe(Network.Mainnet);
+      expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Testnet))).toBe(Network.Testnet);
+    }
   });
 
   it("Should not double hash P2SH ErgoTree", () => {
