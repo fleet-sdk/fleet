@@ -13,7 +13,7 @@ import {
   sPositiveBigIntTestVectors,
   sSigmaPropTestVectors
 } from "../../tests/testVectors/constants.tv";
-import { SConstant } from "./constantSerializer";
+import { SConstant, SigmaConstant } from "./constantSerializer";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 import {
   SBigInt,
@@ -27,6 +27,15 @@ import {
   SSigmaProp,
   SUnit
 } from "./sigmaTypes";
+
+it("test", () => {
+  // "480e0102020a0c0102"
+  // 0c4805050503000406080a0c0e1012
+  const t = SigmaConstant.fromHex<[Uint8Array, boolean, number]>(
+    "3c0e400e035052500411596f7572206c6f616e204a616e75617279"
+  );
+  console.log(t.data, t.type);
+});
 
 describe("Primary types serialization", () => {
   it("Should serialize SBoolean", () => {

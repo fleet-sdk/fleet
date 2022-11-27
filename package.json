@@ -43,7 +43,8 @@
   },
   "dependencies": {
     "@noble/hashes": "^1.1.3",
-    "@scure/base": "^1.1.1"
+    "@scure/base": "^1.1.1",
+    "sigmastate-js": "^0.0.9"
   },
   "devDependencies": {
     "@types/jest": "^29.1.2",
