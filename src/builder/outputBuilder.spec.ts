@@ -274,7 +274,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
-    expect(boxCandidate.ergoTree).toEqual(new ErgoAddress(address).ergoTree);
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([]);
     expect(boxCandidate.additionalRegisters).toEqual({});
@@ -288,7 +288,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
-    expect(boxCandidate.ergoTree).toEqual(new ErgoAddress(address).ergoTree);
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       { tokenId: tokenA, amount: "15" },
@@ -309,7 +309,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
-    expect(boxCandidate.ergoTree).toEqual(new ErgoAddress(address).ergoTree);
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
@@ -338,7 +338,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
-    expect(boxCandidate.ergoTree).toEqual(new ErgoAddress(address).ergoTree);
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
@@ -364,7 +364,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
-    expect(boxCandidate.ergoTree).toEqual(new ErgoAddress(address).ergoTree);
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
@@ -390,7 +390,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
-    expect(boxCandidate.ergoTree).toEqual(new ErgoAddress(address).ergoTree);
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {

@@ -7,6 +7,7 @@ import {
   BuildOutputType,
   EIP12UnsignedTransaction,
   HexString,
+  Network,
   TokenAmount,
   UnsignedTransaction
 } from "../types";
@@ -125,7 +126,7 @@ export class TransactionBuilder {
   public sendChangeTo(address: ErgoAddress | Base58String | HexString): TransactionBuilder {
     if (typeof address === "string") {
       this._changeAddress = isHex(address)
-        ? ErgoAddress.fromErgoTree(address)
+        ? ErgoAddress.fromErgoTree(address, Network.Mainnet)
         : ErgoAddress.fromBase58(address);
     } else {
       this._changeAddress = address;
