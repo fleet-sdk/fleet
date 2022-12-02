@@ -6,7 +6,7 @@ import { ErgoAddress, ErgoUnsignedInput, MAX_TOKENS_PER_BOX } from "../models";
 import { Network } from "../types";
 import { first, some } from "../utils/arrayUtils";
 import { ensureBigInt, sumBy } from "../utils/bigIntUtils";
-import { utxoSumByTokenId } from "../utils/boxUtils";
+import { utxoSum } from "../utils/boxUtils";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";
 
@@ -831,10 +831,7 @@ describe("Token burning", () => {
     const regularTokenId = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
 
     expect(
-      utxoSumByTokenId(
-        regularBoxesMock,
-        "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
-      )
+      utxoSum(regularBoxesMock, "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283")
     ).toBe(226679716n);
 
     const transactions = new TransactionBuilder(height)

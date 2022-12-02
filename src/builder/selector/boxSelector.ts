@@ -12,7 +12,7 @@ import {
 import { hasDuplicatesBy, isEmpty, orderBy, some } from "../../utils/arrayUtils";
 import { _0n } from "../../utils/bigIntLiterals";
 import { ensureBigInt, sumBy } from "../../utils/bigIntUtils";
-import { utxoSumByTokenId } from "../../utils/boxUtils";
+import { utxoSum } from "../../utils/boxUtils";
 import { isDefined } from "../../utils/objectUtils";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
@@ -62,7 +62,7 @@ export class BoxSelector<T extends Box<bigint>> {
       if (isDefined(remaining.tokens) && selected.some((input) => !isEmpty(input.assets))) {
         remaining.tokens.forEach((tokenTarget) => {
           if (tokenTarget.amount) {
-            tokenTarget.amount -= utxoSumByTokenId(selected, tokenTarget.tokenId);
+            tokenTarget.amount -= utxoSum(selected, tokenTarget.tokenId);
           }
         });
       }
@@ -107,7 +107,7 @@ export class BoxSelector<T extends Box<bigint>> {
     }
 
     for (const tokenTarget of target.tokens) {
-      const totalSelected = utxoSumByTokenId(inputs, tokenTarget.tokenId);
+      const totalSelected = utxoSum(inputs, tokenTarget.tokenId);
       if (isDefined(tokenTarget.amount) && tokenTarget.amount > totalSelected) {
         unreached[tokenTarget.tokenId] = tokenTarget.amount - totalSelected;
       }

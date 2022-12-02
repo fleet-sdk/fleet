@@ -1,9 +1,9 @@
 import { regularBoxesMock } from "../mocks/mockBoxes";
 import { sumBy } from "./bigIntUtils";
-import { areRegistersDenselyPacked, utxoSum, utxoSumByTokenId } from "./boxUtils";
+import { areRegistersDenselyPacked, utxoSum } from "./boxUtils";
 
-describe("Box sumByTokenId", () => {
-  it("Should sum correctly", () => {
+describe("UTxo sum", () => {
+  it("Should sum correctly by token id", () => {
     const inputs = regularBoxesMock.filter((input) =>
       [
         "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d",
@@ -13,18 +13,16 @@ describe("Box sumByTokenId", () => {
     );
 
     expect(
-      utxoSumByTokenId(inputs, "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
+      utxoSum(inputs, "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
     ).toBe(3819n);
   });
 
   it("Should return zero for empty arrays", () => {
-    expect(
-      utxoSumByTokenId([], "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
-    ).toBe(0n);
+    expect(utxoSum([], "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")).toBe(
+      0n
+    );
   });
-});
 
-describe("Sum boxes", () => {
   it("Should sum all tokens and nanoErgs", () => {
     const boxes = regularBoxesMock.filter((input) =>
       [
@@ -48,6 +46,19 @@ describe("Sum boxes", () => {
         }
       ]
     });
+  });
+
+  it("Should sum only nanoErgs", () => {
+    const boxes = regularBoxesMock.filter((input) =>
+      [
+        "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
+        "a2c9821f5c2df9c320f17136f043b33f7716713ab74c84d687885f9dd39d2c8a",
+        "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
+        "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
+      ].includes(input.boxId)
+    );
+
+    expect(utxoSum(boxes, "nanoErgs")).toEqual(sumBy(boxes, (x) => x.value));
   });
 
   it("Should sum if box doesn't contains tokens", () => {

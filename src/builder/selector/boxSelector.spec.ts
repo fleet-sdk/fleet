@@ -4,7 +4,7 @@ import { regularBoxesMock } from "../../mocks/mockBoxes";
 import { Box } from "../../types";
 import { first } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";
-import { utxoSumByTokenId } from "../../utils/boxUtils";
+import { utxoSum } from "../../utils/boxUtils";
 import { SAFE_MIN_BOX_VALUE } from "../outputBuilder";
 import { BoxSelector } from "./boxSelector";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
@@ -154,7 +154,7 @@ describe("Ensure input inclusion", () => {
     expect(boxes.some((x) => x.boxId === arbitraryBoxId)).toBe(true);
     expect(boxes).toHaveLength(2);
     expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
-    expect(utxoSumByTokenId(boxes, tokenId)).toBeGreaterThanOrEqual(first(target.tokens).amount);
+    expect(utxoSum(boxes, tokenId)).toBeGreaterThanOrEqual(first(target.tokens).amount);
   });
 });
 

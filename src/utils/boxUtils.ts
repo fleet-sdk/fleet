@@ -1,41 +1,40 @@
-import { Amount, Box, NonMandatoryRegisters, TokenId } from "../types";
-import { isEmpty } from "./arrayUtils";
+import { Amount, NonMandatoryRegisters, TokenId } from "../types";
 import { _0n } from "./bigIntLiterals";
 import { ensureBigInt } from "./bigIntUtils";
+import { isDefined, isUndefined } from "./objectUtils";
 
-export function utxoSumByTokenId(inputs: Box<bigint>[], tokenId: TokenId): bigint {
-  let acc = _0n;
-  if (isEmpty(inputs)) {
-    return acc;
-  }
+const NANOERGS_TOKEN_ID = "nanoErgs";
 
-  for (const input of inputs) {
-    for (const token of input.assets) {
-      if (token.tokenId !== tokenId) {
-        continue;
-      }
-
-      acc += token.amount;
-    }
-  }
-
-  return acc;
-}
-
-export function utxoSum(boxes: MinimalAmountFields[]): BoxAmounts {
-  const tokens: { [tokenId: string]: bigint } = {};
-  let nanoErgs = _0n;
+export function utxoSum(boxes: MinimalBoxAmountFields[]): BoxAmounts;
+export function utxoSum(boxes: MinimalBoxAmountFields[], tokenId: TokenId): bigint;
+export function utxoSum(boxes: MinimalBoxAmountFields[], tokenId?: TokenId): BoxAmounts | bigint {
+  const balances: { [tokenId: string]: bigint } = {};
 
   for (const box of boxes) {
-    nanoErgs += ensureBigInt(box.value);
-    for (const token of box.assets) {
-      tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + ensureBigInt(token.amount);
+    if (isUndefined(tokenId) || tokenId === NANOERGS_TOKEN_ID) {
+      balances[NANOERGS_TOKEN_ID] = (balances[NANOERGS_TOKEN_ID] || _0n) + ensureBigInt(box.value);
     }
+
+    if (tokenId !== NANOERGS_TOKEN_ID) {
+      for (const token of box.assets) {
+        if (isDefined(tokenId) && tokenId !== token.tokenId) {
+          continue;
+        }
+
+        balances[token.tokenId] = (balances[token.tokenId] || _0n) + ensureBigInt(token.amount);
+      }
+    }
+  }
+
+  if (isDefined(tokenId)) {
+    return balances[tokenId] || _0n;
   }
 
   return {
-    nanoErgs,
-    tokens: Object.keys(tokens).map((tokenId) => ({ tokenId, amount: tokens[tokenId] }))
+    nanoErgs: balances[NANOERGS_TOKEN_ID] || _0n,
+    tokens: Object.keys(balances)
+      .filter((x) => x !== NANOERGS_TOKEN_ID)
+      .map((tokenId) => ({ tokenId, amount: balances[tokenId] }))
   };
 }
 
@@ -72,7 +71,7 @@ export type BoxAmounts = {
   tokens: TokenAmount<bigint>[];
 };
 
-type MinimalAmountFields = {
+type MinimalBoxAmountFields = {
   value: Amount;
   assets: TokenAmount<Amount>[];
 };
