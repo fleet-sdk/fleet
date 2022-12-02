@@ -1,6 +1,6 @@
 import { regularBoxesMock } from "../mocks/mockBoxes";
 import { sumBy } from "./bigIntUtils";
-import { areRegistersDenselyPacked, sumBoxes, sumByTokenId } from "./boxUtils";
+import { areRegistersDenselyPacked, utxoSum, utxoSumByTokenId } from "./boxUtils";
 
 describe("Box sumByTokenId", () => {
   it("Should sum correctly", () => {
@@ -13,13 +13,13 @@ describe("Box sumByTokenId", () => {
     );
 
     expect(
-      sumByTokenId(inputs, "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
+      utxoSumByTokenId(inputs, "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
     ).toBe(3819n);
   });
 
   it("Should return zero for empty arrays", () => {
     expect(
-      sumByTokenId([], "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
+      utxoSumByTokenId([], "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
     ).toBe(0n);
   });
 });
@@ -35,7 +35,7 @@ describe("Sum boxes", () => {
       ].includes(input.boxId)
     );
 
-    expect(sumBoxes(boxes)).toEqual({
+    expect(utxoSum(boxes)).toEqual({
       nanoErgs: sumBy(boxes, (x) => x.value),
       tokens: [
         {
@@ -58,7 +58,7 @@ describe("Sum boxes", () => {
       ].includes(input.boxId)
     );
 
-    expect(sumBoxes(boxes)).toEqual({
+    expect(utxoSum(boxes)).toEqual({
       nanoErgs: sumBy(boxes, (x) => x.value),
       tokens: []
     });

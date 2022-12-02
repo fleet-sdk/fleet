@@ -14,7 +14,7 @@ import {
 import { chunk, some } from "../utils/arrayUtils";
 import { _0n } from "../utils/bigIntLiterals";
 import { ensureBigInt } from "../utils/bigIntUtils";
-import { BoxAmounts, sumBoxes } from "../utils/boxUtils";
+import { BoxAmounts, utxoSum } from "../utils/boxUtils";
 import { isDefined } from "../utils/objectUtils";
 import { isHex } from "../utils/stringUtils";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
@@ -209,7 +209,7 @@ export class TransactionBuilder {
     let inputs = selector.select(target);
 
     if (isDefined(this._changeAddress)) {
-      let change = this._calcDiff(sumBoxes(inputs), target);
+      let change = this._calcDiff(utxoSum(inputs), target);
 
       if (some(change.tokens)) {
         let requiredNanoErgs = this._calcRequiredNanoErgsForChange(change.tokens.length);
@@ -218,7 +218,7 @@ export class TransactionBuilder {
             nanoErgs: target.nanoErgs + requiredNanoErgs,
             tokens: target.tokens
           });
-          change = this._calcDiff(sumBoxes(inputs), target);
+          change = this._calcDiff(utxoSum(inputs), target);
           requiredNanoErgs = this._calcRequiredNanoErgsForChange(change.tokens.length);
         }
 
@@ -297,7 +297,7 @@ export class TransactionBuilder {
       isDefined(unsignedTransaction.inputs.find((txInput) => txInput.boxId === input.boxId))
     );
 
-    return this._calcDiff(sumBoxes(usedInputs), sumBoxes(unsignedTransaction.outputs));
+    return this._calcDiff(utxoSum(usedInputs), utxoSum(unsignedTransaction.outputs));
   }
 
   private _calcChangeLength(tokensLength: number): number {

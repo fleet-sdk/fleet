@@ -2,7 +2,7 @@ import { Box, TokenId, TokenTargetAmount } from "../../../types";
 import { isEmpty } from "../../../utils/arrayUtils";
 import { _0n } from "../../../utils/bigIntLiterals";
 import { sumBy } from "../../../utils/bigIntUtils";
-import { sumByTokenId } from "../../../utils/boxUtils";
+import { utxoSumByTokenId } from "../../../utils/boxUtils";
 import { isUndefined } from "../../../utils/objectUtils";
 import { SelectionTarget } from "../boxSelector";
 import { ISelectionStrategy } from "./ISelectionStrategy";
@@ -42,7 +42,7 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
 
     for (const target of targets) {
       const targetAmount = !isUndefined(target.amount)
-        ? target.amount - sumByTokenId(selection, target.tokenId)
+        ? target.amount - utxoSumByTokenId(selection, target.tokenId)
         : undefined;
 
       if (targetAmount && targetAmount <= _0n) {
