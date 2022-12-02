@@ -31,7 +31,7 @@ export function utxoSum(boxes: MinimalBoxAmountFields[], tokenId?: TokenId): Box
   }
 
   return {
-    nanoErgs: balances[NANOERGS_TOKEN_ID] || _0n,
+    nanoErgs: balances[NANOERGS_TOKEN_ID],
     tokens: Object.keys(balances)
       .filter((x) => x !== NANOERGS_TOKEN_ID)
       .map((tokenId) => ({ tokenId, amount: balances[tokenId] }))
