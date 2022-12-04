@@ -2,7 +2,7 @@
   "extends": "./tsconfig",
   "compilerOptions": {
     "target": "ESNext",
-    "outDir": "build/lib/module",
+    "outDir": "dist/esm",
     "module": "ESNext"
   }
 }

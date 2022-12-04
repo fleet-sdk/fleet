@@ -2,9 +2,9 @@
   "name": "@fleet-sdk/core",
   "version": "0.1.0-alpha.12",
   "description": "Fleet SDK core library",
-  "main": "build/lib/main/index.js",
-  "typings": "build/lib/module/index.d.ts",
-  "module": "build/lib/module/index.js",
+  "main": "dist/cjs/index.js",
+  "typings": "dist/esm/index.d.ts",
+  "module": "dist/esm/index.js",
   "packageManager": "pnpm@7.18.0",
   "repository": {
     "type": "git",
@@ -70,7 +70,7 @@
   },
   "files": [
     "src",
-    "build/lib",
+    "dist",
     "!**/*.spec.*",
     "!**/*.json",
     "CHANGELOG.md",

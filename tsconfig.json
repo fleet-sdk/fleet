@@ -2,7 +2,7 @@
   "compilerOptions": {
     "incremental": true,
     "target": "ESNext",
-    "outDir": "build/lib/main",
+    "outDir": "dist/cjs",
     "rootDir": "./src",
     "moduleResolution": "Node",
     "module": "CommonJS",
