@@ -5,6 +5,7 @@
   "main": "build/lib/main/index.js",
   "typings": "build/lib/module/index.d.ts",
   "module": "build/lib/module/index.js",
+  "packageManager": "pnpm@7.18.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/fleet-sdk/core.git"
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.1.2",
+    "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.40.0",
     "@typescript-eslint/parser": "^5.40.0",
     "eslint": "^8.25.0",

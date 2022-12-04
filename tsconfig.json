@@ -30,12 +30,7 @@
     "types": ["jest"],
     "typeRoots": ["node_modules/@types", "src/types"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/builder/transactionBuilder.tsb",
-    "src/builder/outputBuilder.tsb",
-    "src/models/address.spec.js"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }
