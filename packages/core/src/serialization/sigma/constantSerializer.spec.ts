@@ -12,7 +12,7 @@ import {
   sNegativeBigIntTestVectors,
   sPositiveBigIntTestVectors,
   sSigmaPropTestVectors
-} from "../../tests/testVectors/constants.tv";
+} from "../../tests/testVectors/constantsTestVectors";
 import { SConstant } from "./constantSerializer";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 import {

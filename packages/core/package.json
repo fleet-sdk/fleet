@@ -51,6 +51,7 @@
     "dist",
     "!**/*.spec.*",
     "!**/*.json",
+    "!tests",
     "CHANGELOG.md",
     "LICENSE",
     "README.md"

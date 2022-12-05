@@ -6,8 +6,8 @@ import {
   FEE_MAINNET_ADDRESS_TV,
   FEE_TESTNET_ADDRESS_TV,
   p2shTestVectors
-} from "../tests/testVectors/ergoAddresses.tv";
-import { publicKeyTestVectors } from "../tests/testVectors/ergoAddresses.tv";
+} from "../tests/testVectors/ergoAddressesTestVectors";
+import { publicKeyTestVectors } from "../tests/testVectors/ergoAddressesTestVectors";
 import { AddressType, Network } from "../types";
 import { ErgoAddress } from "./ergoAddress";
 
