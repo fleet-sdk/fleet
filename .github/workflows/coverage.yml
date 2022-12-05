@@ -22,7 +22,7 @@ jobs:
           node-version: 16.x
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run -r cov:json
+      - run: pnpm -r cov:json
 
       - name: Submit report
         uses: codecov/codecov-action@v3
