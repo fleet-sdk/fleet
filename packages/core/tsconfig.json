@@ -4,6 +4,5 @@
     "rootDir": "./src",
     "outDir": "dist/cjs"
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules/**", "**/*.spec.ts", "src/tests/**", "src/mocks/**"]
+  "include": ["src/**/*.ts"]
 }
