@@ -1,6 +1,6 @@
 # @fleet-sdk/core [![Checks](https://badgen.net/github/checks/fleet-sdk/fleet/master)](https://github.com/fleet-sdk/fleet/actions) [![Coverage](https://codecov.io/gh/fleet-sdk/fleet/branch/master/graph/badge.svg)](https://app.codecov.io/gh/fleet-sdk/fleet) [![License](https://badgen.net/github/license/fleet-sdk/fleet/)](https://github.com/fleet-sdk/fleet/blob/master/LICENSE) [![npm](https://badgen.net/npm/v/@fleet-sdk/core)](https://www.npmjs.com/package/@fleet-sdk/core)
 
-Easily create Ergo transactions with a pure JS library.
+Easily write Ergo off-chain code with a lightweight pure JS library.
 
 - 🪄 Easy to use
 - 🪶 Lightweight: [~13kB minified + gziped](https://bundlephobia.com/package/@fleet-sdk/core)
@@ -8,18 +8,12 @@ Easily create Ergo transactions with a pure JS library.
 - 🧪 100% code coverage
 - 🌲 Tree-shakeable
 
-# Basic usage
+# Basic Usage
 
 ## Installation
 
 ```bash
 npm install @fleet-sdk/core
-```
-
-or
-
-```bash
-yarn install @fleet-sdk/core
 ```
 
 ## Building a simple transaction
@@ -109,7 +103,7 @@ const unsignedTransaction = new TransactionBuilder(creationHeight)
 
 ## Ensuring input inclusion
 
-You can `configureSelector` method to ensure one or more inputs to be included in the transaction. Useful when working with contracts.
+You can use `configureSelector` method to ensure one or more inputs to be included in the transaction. Useful when working with contracts.
 
 ```ts
 import { OutputBuilder, TransactionBuilder } from "@fleet-sdk/core";
@@ -123,3 +117,8 @@ const unsignedTransaction = new TransactionBuilder(creationHeight)
   .payMinFee()
   .build();
 ```
+
+## Examples of FLEET Usage from Ergo Projects
+
+- [Nautilus' internal transaction builder](https://github.com/capt-nemo429/nautilus-wallet/blob/master/src/api/ergo/transaction/txBuilder.ts#L95)
+- [Ergonames SDK](https://github.com/ergonames/sdk/blob/master/tx-lib/index.js)
