@@ -20,12 +20,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
       - name: Build and Test ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
-      - run: pnpm i
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run -r build
       - run: pnpm run -r test:lint
       - run: pnpm run -r test:prettier
