@@ -2,8 +2,6 @@
   "compilerOptions": {
     "incremental": true,
     "target": "ESNext",
-    "outDir": "dist/cjs",
-    "rootDir": "./src",
     "moduleResolution": "Node",
     "module": "CommonJS",
     "declaration": true,
@@ -28,9 +26,8 @@
 
     "lib": ["ESNext", "DOM"],
     "types": ["jest"],
-    "typeRoots": ["node_modules/@types", "src/types"]
+    "rootDir": ".",
+    "typeRoots": ["node_modules/@types"]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules/**"],
   "compileOnSave": false
 }
