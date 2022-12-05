@@ -5,10 +5,12 @@
   "main": "dist/cjs/index.js",
   "typings": "dist/esm/index.d.ts",
   "module": "dist/esm/index.js",
+  "sideEffects": false,
   "packageManager": "pnpm@7.18.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fleet-sdk/core.git"
+    "url": "https://github.com/fleet-sdk/core.git",
+    "directory": "packages/core"
   },
   "license": "MIT",
   "publishConfig": {
