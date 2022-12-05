@@ -26,7 +26,6 @@
 
     "lib": ["ESNext", "DOM"],
     "types": ["jest"],
-    "rootDir": ".",
     "typeRoots": ["node_modules/@types"]
   },
   "compileOnSave": false

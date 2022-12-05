@@ -6,10 +6,6 @@ export default {
   coverageReporters: ["text", "json"],
   collectCoverage: false,
   testEnvironment: "node",
-  // transform: {
-  //   "^.+\\.(m?j|t)s$": "@swc/jest"
-  // },
-  // transformIgnorePatterns: [],
   coverageThreshold: {
     global: {
       statements: "100",

@@ -5,5 +5,5 @@
     "outDir": "dist/cjs"
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules/**"]
+  "exclude": ["node_modules/**", "**/*.spec.ts", "src/tests/**", "src/mocks/**"]
 }

@@ -5,7 +5,6 @@
       "type": "node",
       "request": "launch",
       "name": "Debug Active Spec",
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/jest",
       "runtimeArgs": ["debug", "--break", "--serial", "${file}"],
       "outputCapture": "std",
       "skipFiles": ["<node_internals>/**/*.js"],
