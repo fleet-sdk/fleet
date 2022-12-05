@@ -10,7 +10,7 @@ on:
     branches: ["master"]
 
 jobs:
-  build:
+  coverage:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,9 +24,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r cov:json
 
-      - name: Submit report
+      - name: Submit core report
         uses: codecov/codecov-action@v3
         with:
-          files: ./core/coverage/coverage-final.json
+          files: ./packages/core/coverage/coverage-final.json
           flags: core
-          root_dir: ./packages
