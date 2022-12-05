@@ -5,6 +5,7 @@ export default {
   coverageProvider: "v8",
   coverageReporters: ["text", "json"],
   collectCoverage: false,
+  testEnvironment: "node",
   coverageThreshold: {
     global: {
       statements: "100",
