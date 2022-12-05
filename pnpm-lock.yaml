@@ -19,6 +19,7 @@ importers:
       npm-run-all: ^4.1.5
       open-cli: ^7.1.0
       prettier: ^2.7.1
+      sigmastate-js: ^0.0.9
       standard-version: ^9.5.0
       ts-jest: ^29.0.3
       ts-node: ^10.9.1
@@ -39,6 +40,7 @@ importers:
       npm-run-all: 4.1.5
       open-cli: 7.1.0
       prettier: 2.8.0
+      sigmastate-js: 0.0.9
       standard-version: 9.5.0
       ts-jest: 29.0.3_4f6uxrzmuwipl5rr3bcogf6k74
       ts-node: 10.9.1_eoe7put6ewfbqpy6gs36tihw6y
@@ -1210,6 +1212,10 @@ packages:
 
   /balanced-match/1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
+    dev: true
+
+  /bouncycastle-js/0.1.8:
+    resolution: {integrity: sha512-X95lYJCxuSFppzzAeW+L5RatSlBpquadU8nEdB3qLnF7w+4AJDWR0X8iRKgusaNBiabYTHNS8rLLJLkJpHHlWA==}
     dev: true
 
   /brace-expansion/1.1.11:
@@ -4044,6 +4050,18 @@ packages:
       call-bind: 1.0.2
       get-intrinsic: 1.1.3
       object-inspect: 1.12.2
+    dev: true
+
+  /sigmajs-crypto-facade/0.0.3:
+    resolution: {integrity: sha512-z8tfaVScGu1yX/aGJxlbDBGih36ixmsxs19UWxy7L5FCqGQ0RRj/lU7gubulh+Ml8HuwZkjisqAE5+VhDYY4Vw==}
+    engines: {node: '>=10'}
+    dev: true
+
+  /sigmastate-js/0.0.9:
+    resolution: {integrity: sha512-zN0hEPSc5o14uPyE5RCU0e2S1daXCx7PonwvhItdh8yJ+f0XEuz5fEFr3CobntV3TfVYxOp+A4SlkJ67GwfZVg==}
+    dependencies:
+      bouncycastle-js: 0.1.8
+      sigmajs-crypto-facade: 0.0.3
     dev: true
 
   /signal-exit/3.0.7:
