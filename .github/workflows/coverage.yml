@@ -27,5 +27,6 @@ jobs:
       - name: Submit report
         uses: codecov/codecov-action@v3
         with:
-          files: .core/coverage/coverage-final.json
+          files: ./core/coverage/coverage-final.json
+          flags: core
           root_dir: ./packages
