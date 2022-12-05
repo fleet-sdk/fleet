@@ -1,4 +1,4 @@
-# @fleet-sdk/core [![Checks](https://badgen.net/github/checks/fleet-sdk/core/master)](https://github.com/fleet-sdk/core/actions) [![Coverage](https://codecov.io/gh/fleet-sdk/core/branch/master/graph/badge.svg)](https://app.codecov.io/gh/fleet-sdk/core) [![License](https://badgen.net/github/license/fleet-sdk/core/)](https://github.com/fleet-sdk/core/blob/master/LICENSE) [![npm](https://badgen.net/npm/v/@fleet-sdk/core)](https://www.npmjs.com/package/@fleet-sdk/core)
+# @fleet-sdk/core [![Checks](https://badgen.net/github/checks/fleet-sdk/fleet/master)](https://github.com/fleet-sdk/fleet/actions) [![Coverage](https://codecov.io/gh/fleet-sdk/fleet/branch/master/graph/badge.svg)](https://app.codecov.io/gh/fleet-sdk/fleet) [![License](https://badgen.net/github/license/fleet-sdk/fleet/)](https://github.com/fleet-sdk/fleet/blob/master/LICENSE) [![npm](https://badgen.net/npm/v/@fleet-sdk/core)](https://www.npmjs.com/package/@fleet-sdk/core)
 
 Easily create Ergo transactions with a pure JS library.
 
@@ -61,11 +61,10 @@ import { OutputBuilder, TransactionBuilder } from "@fleet-sdk/core";
 const unsignedTransaction = new TransactionBuilder(creationHeight)
   .from(inputs)
   .to(
-    new OutputBuilder(1000000n, "9gNvAv97W71Wm33GoXgSQBFJxinFubKvE6wh2dEhFTSgYEe783j")
-      .addTokens([
-        { tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b", amount: 100n },
-        { tokenId: "36aba4b4a97b65be491cf9f5ca57b5408b0da8d0194f30ec8330d1e8946161c1", amount: 429n }
-      ])
+    new OutputBuilder(1000000n, "9gNvAv97W71Wm33GoXgSQBFJxinFubKvE6wh2dEhFTSgYEe783j").addTokens([
+      { tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b", amount: 100n },
+      { tokenId: "36aba4b4a97b65be491cf9f5ca57b5408b0da8d0194f30ec8330d1e8946161c1", amount: 429n }
+    ])
   )
   .sendChangeTo("9i2bQmRpCPLmDdVgBNyeAy7dDXqBQfjvcxVVt5YMzbDud6AvJS8")
   .payMinFee()
@@ -80,13 +79,12 @@ import { OutputBuilder, TransactionBuilder } from "@fleet-sdk/core";
 const unsignedTransaction = new TransactionBuilder(creationHeight)
   .from(inputs)
   .to(
-    new OutputBuilder(1000000n, "9gNvAv97W71Wm33GoXgSQBFJxinFubKvE6wh2dEhFTSgYEe783j")
-      .mintToken({
-        name: "TestToken",
-        amount: 21000000n,
-        decimals: 4,
-        description: "Just a test token"
-      })
+    new OutputBuilder(1000000n, "9gNvAv97W71Wm33GoXgSQBFJxinFubKvE6wh2dEhFTSgYEe783j").mintToken({
+      name: "TestToken",
+      amount: 21000000n,
+      decimals: 4,
+      description: "Just a test token"
+    })
   )
   .sendChangeTo("9i2bQmRpCPLmDdVgBNyeAy7dDXqBQfjvcxVVt5YMzbDud6AvJS8")
   .payMinFee()
@@ -110,6 +108,7 @@ const unsignedTransaction = new TransactionBuilder(creationHeight)
 ```
 
 ## Ensuring input inclusion
+
 You can `configureSelector` method to ensure one or more inputs to be included in the transaction. Useful when working with contracts.
 
 ```ts
