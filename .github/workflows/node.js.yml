@@ -20,13 +20,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
       - name: Build and Test ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
-      - run: npm ci
-      - run: npm run build
-      - run: npm run test:lint
-      - run: npm run test:prettier
-      - run: npm run test:unit
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
+      - run: pnpm -r test:lint
+      - run: pnpm -r test:prettier
+      - run: pnpm -r test:unit

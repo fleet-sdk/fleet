@@ -1,12 +1,14 @@
 import {
   areEqual,
   chunk,
+  endsWith,
   first,
   hasDuplicates,
   hasDuplicatesBy,
   isEmpty,
   orderBy,
-  some
+  some,
+  startsWith
 } from "./arrayUtils";
 
 describe("isEmpty() guard", () => {
@@ -205,5 +207,46 @@ describe("areEqual()", () => {
     expect(areEqual(array1, [1, 2])).toBeFalsy();
     expect(areEqual(array1, [])).toBeFalsy();
     expect(areEqual(array1, [1, 2, 10, 5, 0])).toBeFalsy();
+  });
+});
+
+describe("startsWith()", () => {
+  it("Should return true if starts with target", () => {
+    const array = [1, 2, 4];
+
+    expect(startsWith([], [])).toBeTruthy();
+    expect(startsWith(array, [1, 2, 4])).toBeTruthy();
+    expect(startsWith(array, [1, 2])).toBeTruthy();
+    expect(startsWith(array, Uint8Array.from([1]))).toBeTruthy();
+    expect(startsWith(array, array)).toBeTruthy();
+  });
+
+  it("Should return false for not starts with target", () => {
+    const array = [1, 2, 4, 5, 0];
+
+    expect(startsWith(array, [0, 1, 2])).toBeFalsy();
+    expect(startsWith(array, [8])).toBeFalsy();
+    expect(startsWith(array, [1, 2, 10, 5, 0, 1])).toBeFalsy();
+  });
+});
+
+describe("endsWith()", () => {
+  it("Should return true if ends with target", () => {
+    const array = [1, 2, 4];
+
+    expect(endsWith([], [])).toBeTruthy();
+    expect(endsWith(array, [1, 2, 4])).toBeTruthy();
+    expect(endsWith(array, [2, 4])).toBeTruthy();
+    expect(endsWith(array, Uint8Array.from([4]))).toBeTruthy();
+    expect(endsWith(array, array)).toBeTruthy();
+  });
+
+  it("Should return false for not ends with target", () => {
+    const array = [1, 2, 4, 5, 0];
+
+    expect(endsWith(array, [0, 1, 2])).toBeFalsy();
+    expect(endsWith(array, [10, 2, 4, 5, 0])).toBeFalsy();
+    expect(endsWith(array, [8])).toBeFalsy();
+    expect(endsWith(array, [1, 2, 10, 5, 0, 1])).toBeFalsy();
   });
 });

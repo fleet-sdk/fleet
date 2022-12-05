@@ -2,5 +2,6 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
     "*.ts": "${capture}.spec.ts, ${capture}.js"
-  }
+  },
+  "jest.jestCommandLine": "pnpm -r test:unit"
 }
