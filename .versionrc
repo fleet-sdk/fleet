@@ -1,0 +1,6 @@
+{
+  "bumpFiles": [
+    "./package.json",
+    "./packages/core/package.json"
+  ]
+}
