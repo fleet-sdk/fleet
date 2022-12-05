@@ -1,7 +1,7 @@
 import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
-import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../mocks/mockBoxes";
+import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { ErgoAddress, ErgoUnsignedInput, MAX_TOKENS_PER_BOX } from "../models";
 import { Network } from "../types";
 import { first, some } from "../utils/arrayUtils";

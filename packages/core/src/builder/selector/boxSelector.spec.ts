@@ -1,6 +1,6 @@
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientInputs } from "../../errors/insufficientInputs";
-import { regularBoxesMock } from "../../mocks/mockBoxes";
+import { regularBoxesMock } from "../../tests/mocks/mockBoxes";
 import { Box } from "../../types";
 import { first } from "../../utils/arrayUtils";
 import { sumBy } from "../../utils/bigIntUtils";

@@ -1,4 +1,4 @@
-import { regularBoxesMock } from "../../../mocks/mockBoxes";
+import { regularBoxesMock } from "../../../tests/mocks/mockBoxes";
 import { sumBy } from "../../../utils/bigIntUtils";
 import { utxoSum } from "../../../utils/boxUtils";
 import { AccumulativeSelectionStrategy } from "./accumulativeSelectionStrategy";

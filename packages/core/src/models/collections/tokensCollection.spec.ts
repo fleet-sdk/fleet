@@ -1,7 +1,7 @@
 import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
-import { manyTokensBoxesMock } from "../../mocks/mockBoxes";
+import { manyTokensBoxesMock } from "../../tests/mocks/mockBoxes";
 import { TokensCollection } from "./tokensCollection";
 
 describe("Tokens collection", () => {

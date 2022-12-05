@@ -1,4 +1,4 @@
-import { regularBoxesMock } from "../mocks/mockBoxes";
+import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { sumBy } from "./bigIntUtils";
 import { areRegistersDenselyPacked, utxoSum } from "./boxUtils";
 

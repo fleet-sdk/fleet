@@ -1,4 +1,4 @@
-import { regularBoxesMock } from "../mocks/mockBoxes";
+import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 
 describe("Construction", () => {

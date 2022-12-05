@@ -1,7 +1,7 @@
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
-import { regularBoxesMock } from "../mocks/mockBoxes";
+import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { ErgoAddress, TokensCollection } from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 

@@ -1,4 +1,4 @@
-import { regularBoxesMock } from "../../../mocks/mockBoxes";
+import { regularBoxesMock } from "../../../tests/mocks/mockBoxes";
 import { Box } from "../../../types";
 import { CustomSelectionStrategy } from "./customSelectionStrategy";
 

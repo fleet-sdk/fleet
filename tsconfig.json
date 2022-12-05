@@ -20,5 +20,5 @@
     "typeRoots": ["node_modules/@types"]
   },
   "compileOnSave": false,
-  "exclude": ["**/node_modules", "**/tests", "**/mocks"]
+  "exclude": ["**/node_modules"]
 }

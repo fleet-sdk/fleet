@@ -1,5 +1,5 @@
 import { DuplicateInputError, NotFoundError } from "../../errors";
-import { regularBoxesMock } from "../../mocks/mockBoxes";
+import { regularBoxesMock } from "../../tests/mocks/mockBoxes";
 import { first } from "../../utils/arrayUtils";
 import { InputsCollection } from "./inputsCollection";
 

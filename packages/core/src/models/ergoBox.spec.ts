@@ -3,7 +3,7 @@ import {
   manyTokensBoxesMock,
   regularBoxesMock,
   validBoxesMock
-} from "../mocks/mockBoxes";
+} from "../tests/mocks/mockBoxes";
 import { ErgoBox } from "./ergoBox";
 
 describe("Construction", () => {

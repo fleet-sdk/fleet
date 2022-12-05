@@ -1,4 +1,4 @@
-import { Amount, Box } from "../types";
+import { Amount, Box } from "../../types";
 
 export const regularBoxesMock: Box<bigint>[] = [
   {
