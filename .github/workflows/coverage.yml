@@ -15,16 +15,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
       - name: Collect coverage
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          cache: "npm"
-      - run: npm ci
-      - run: npm run cov:json
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run -r cov:json
 
       - name: Submit report
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage/coverage-final.json
-          root_dir: ./src
+          files: .core/coverage/coverage-final.json
+          root_dir: ./packages
