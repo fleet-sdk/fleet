@@ -1,12 +1,10 @@
+import { Network } from "@fleet-sdk/common";
+import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
 import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
 import { ErgoAddress, ErgoUnsignedInput, MAX_TOKENS_PER_BOX } from "../models";
 import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../tests/mocks/mockBoxes";
-import { Network } from "../types";
-import { first, some } from "../utils/arrayUtils";
-import { ensureBigInt, sumBy } from "../utils/bigIntUtils";
-import { utxoSum } from "../utils/boxUtils";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";
 

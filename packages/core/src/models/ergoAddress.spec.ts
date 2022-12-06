@@ -1,3 +1,4 @@
+import { AddressType, Network } from "@fleet-sdk/common";
 import { blake2b } from "@noble/hashes/blake2b";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { FEE_CONTRACT } from "../builder";
@@ -8,7 +9,6 @@ import {
   p2shTestVectors
 } from "../tests/testVectors/ergoAddressesTestVectors";
 import { publicKeyTestVectors } from "../tests/testVectors/ergoAddressesTestVectors";
-import { AddressType, Network } from "../types";
 import { ErgoAddress } from "./ergoAddress";
 
 describe("Construction", () => {

@@ -1,16 +1,15 @@
 {
-  "name": "@fleet-sdk/core",
+  "name": "@fleet-sdk/common",
   "version": "0.1.0-alpha.12",
-  "description": "Fleet SDK core library",
+  "description": "Internal utility functions, constants and types shared across @fleet-sdk packages.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "typings": "dist/esm/index.d.ts",
   "sideEffects": false,
-  "packageManager": "pnpm@7.18.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/fleet-sdk/fleet.git",
-    "directory": "packages/core"
+    "directory": "packages/common"
   },
   "license": "MIT",
   "publishConfig": {
@@ -18,9 +17,7 @@
   },
   "keywords": [
     "ergo",
-    "blockchain",
-    "transactions",
-    "serialization"
+    "blockchain"
   ],
   "scripts": {
     "build": "run-p build:*",
@@ -38,11 +35,6 @@
     "cov:html": "jest --coverage --coverageReporters=html ; open-cli coverage/index.html",
     "cov:json": "jest --coverage --coverageReporters=json",
     "cov:check": "jest --coverage --coverageReporters=text"
-  },
-  "dependencies": {
-    "@fleet-sdk/common": "workspace:*",
-    "@noble/hashes": "^1.1.3",
-    "@scure/base": "^1.1.1"
   },
   "engines": {
     "node": ">=10"

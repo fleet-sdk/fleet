@@ -7,7 +7,7 @@ import {
   EIP12UnsignedDataInput,
   EIP12UnsignedInput,
   UnsignedInput
-} from "../types";
+} from "@fleet-sdk/common";
 import { ErgoBox } from "./ergoBox";
 
 type InputType<T> = T extends "default" ? UnsignedInput : EIP12UnsignedInput;

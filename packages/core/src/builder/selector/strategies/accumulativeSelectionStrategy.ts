@@ -1,9 +1,5 @@
-import { Box, TokenId, TokenTargetAmount } from "../../../types";
-import { isEmpty } from "../../../utils/arrayUtils";
-import { _0n } from "../../../utils/bigIntLiterals";
-import { sumBy } from "../../../utils/bigIntUtils";
-import { utxoSum } from "../../../utils/boxUtils";
-import { isUndefined } from "../../../utils/objectUtils";
+import { Box, TokenId, TokenTargetAmount } from "@fleet-sdk/common";
+import { _0n, isEmpty, isUndefined, sumBy, utxoSum } from "@fleet-sdk/common";
 import { SelectionTarget } from "../boxSelector";
 import { ISelectionStrategy } from "./ISelectionStrategy";
 

@@ -3,5 +3,5 @@
   "explorer.fileNesting.patterns": {
     "*.ts": "${capture}.spec.ts, ${capture}.js"
   },
-  "jest.jestCommandLine": "pnpm -r test:unit"
+  "jest.jestCommandLine": "pnpm --filter core run test:unit"
 }

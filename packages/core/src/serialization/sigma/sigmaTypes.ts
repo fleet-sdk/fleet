@@ -1,5 +1,4 @@
-import { ensureBigInt } from "../../utils/bigIntUtils";
-import { isDefined } from "../../utils/objectUtils";
+import { ensureBigInt, isDefined } from "@fleet-sdk/common";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 
 export interface ISigmaType {

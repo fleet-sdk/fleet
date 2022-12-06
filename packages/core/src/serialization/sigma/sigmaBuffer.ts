@@ -1,6 +1,5 @@
+import { _0n, ensureBigInt } from "@fleet-sdk/common";
 import { bytesToHex } from "@noble/hashes/utils";
-import { _0n } from "../../utils/bigIntLiterals";
-import { ensureBigInt } from "../../utils/bigIntUtils";
 import { VLQ } from "../vlq";
 import { ZigZag } from "../zigZag";
 

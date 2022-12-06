@@ -1,7 +1,7 @@
+import { first } from "@fleet-sdk/common";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "../../builder/outputBuilder";
 import { RECOMMENDED_MIN_FEE_VALUE } from "../../builder/transactionBuilder";
 import { NotFoundError } from "../../errors";
-import { first } from "../../utils/arrayUtils";
 import { OutputsCollection } from "./outputsCollection";
 
 const address = "9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ";

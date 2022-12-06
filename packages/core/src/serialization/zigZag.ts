@@ -1,4 +1,4 @@
-import { _1n, _63n } from "../utils/bigIntLiterals";
+import { _1n, _63n } from "@fleet-sdk/common";
 
 /**
  * ZigZag encoding maps signed integers to unsigned integers so that numbers

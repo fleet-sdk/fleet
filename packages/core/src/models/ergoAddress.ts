@@ -1,10 +1,9 @@
+import { AddressType, Base58String, HexString, Network } from "@fleet-sdk/common";
+import { areEqual, endsWith, first, isDefined, startsWith } from "@fleet-sdk/common";
 import { blake2b } from "@noble/hashes/blake2b";
 import { bytesToHex, concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { base58 } from "@scure/base";
 import { InvalidAddress } from "../errors/invalidAddress";
-import { AddressType, Base58String, HexString, Network } from "../types";
-import { areEqual, endsWith, first, startsWith } from "../utils/arrayUtils";
-import { isDefined } from "../utils/objectUtils";
 
 const CHECKSUM_LENGTH = 4;
 const BLAKE_256_HASH_LENGTH = 32;

@@ -1,5 +1,3 @@
-import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
-import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import {
   Amount,
   Base58String,
@@ -10,13 +8,19 @@ import {
   Network,
   TokenAmount,
   UnsignedTransaction
-} from "../types";
-import { chunk, some } from "../utils/arrayUtils";
-import { _0n } from "../utils/bigIntLiterals";
-import { ensureBigInt } from "../utils/bigIntUtils";
-import { BoxAmounts, utxoSum } from "../utils/boxUtils";
-import { isDefined } from "../utils/objectUtils";
-import { isHex } from "../utils/stringUtils";
+} from "@fleet-sdk/common";
+import {
+  _0n,
+  BoxAmounts,
+  chunk,
+  ensureBigInt,
+  isDefined,
+  isHex,
+  some,
+  utxoSum
+} from "@fleet-sdk/common";
+import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
+import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";

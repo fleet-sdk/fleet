@@ -1,8 +1,8 @@
+import { Amount, TokenAmount, TokenId } from "@fleet-sdk/common";
+import { ensureBigInt } from "@fleet-sdk/common";
 import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
-import { Amount, TokenAmount, TokenId } from "../../types";
-import { ensureBigInt } from "../../utils/bigIntUtils";
 import { Collection } from "./collection";
 
 export const MAX_TOKENS_PER_BOX = 120;

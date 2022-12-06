@@ -1,4 +1,4 @@
-import { HexString } from "../../types";
+import { HexString } from "@fleet-sdk/common";
 import { DataSerializer } from "./dataSerializer";
 import { SigmaBuffer } from "./sigmaBuffer";
 import { ISigmaType } from "./sigmaTypes";

@@ -1,6 +1,6 @@
+import { Amount, Box, BoxId } from "@fleet-sdk/common";
+import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "../../errors";
-import { Amount, Box, BoxId } from "../../types";
-import { isDefined } from "../../utils/objectUtils";
 import { ErgoUnsignedInput } from "../ergoUnsignedInput";
 import { Collection } from "./collection";
 

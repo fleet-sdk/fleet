@@ -1,6 +1,6 @@
+import { first } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "../../errors";
 import { regularBoxesMock } from "../../tests/mocks/mockBoxes";
-import { first } from "../../utils/arrayUtils";
 import { InputsCollection } from "./inputsCollection";
 
 describe("inputs collection", () => {

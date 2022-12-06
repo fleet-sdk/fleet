@@ -1,5 +1,3 @@
-import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
-import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
 import {
   Amount,
   Box,
@@ -8,12 +6,20 @@ import {
   SortingDirection,
   SortingSelector,
   TokenTargetAmount
-} from "../../types";
-import { hasDuplicatesBy, isEmpty, orderBy, some } from "../../utils/arrayUtils";
-import { _0n } from "../../utils/bigIntLiterals";
-import { ensureBigInt, sumBy } from "../../utils/bigIntUtils";
-import { utxoSum } from "../../utils/boxUtils";
-import { isDefined } from "../../utils/objectUtils";
+} from "@fleet-sdk/common";
+import {
+  _0n,
+  ensureBigInt,
+  hasDuplicatesBy,
+  isDefined,
+  isEmpty,
+  orderBy,
+  some,
+  sumBy,
+  utxoSum
+} from "@fleet-sdk/common";
+import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
+import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
 import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSelectionStrategy";

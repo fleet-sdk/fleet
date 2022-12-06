@@ -1,10 +1,7 @@
+import { _0n, BoxAmounts, isUndefined, some } from "@fleet-sdk/common";
 import { OutputBuilder } from "../../builder/outputBuilder";
 import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
-import { some } from "../../utils/arrayUtils";
-import { _0n } from "../../utils/bigIntLiterals";
-import { BoxAmounts } from "../../utils/boxUtils";
-import { isUndefined } from "../../utils/objectUtils";
 import { Collection } from "./collection";
 
 export class OutputsCollection extends Collection<OutputBuilder> {

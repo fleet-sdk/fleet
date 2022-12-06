@@ -1,8 +1,8 @@
+import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
+import { ensureBigInt } from "@fleet-sdk/common";
 import { blake2b } from "@noble/hashes/blake2b";
 import { bytesToHex } from "@noble/hashes/utils";
 import { serializeErgoBox } from "../serialization/sigma/chainObjects";
-import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "../types";
-import { ensureBigInt } from "../utils/bigIntUtils";
 
 export class ErgoBox {
   boxId!: string;

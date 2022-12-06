@@ -1,9 +1,7 @@
+import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
+import { ensureBigInt, isDefined, isEmpty } from "@fleet-sdk/common";
 import { concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { ErgoBox } from "../../models/ergoBox";
-import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "../../types";
-import { isEmpty } from "../../utils/arrayUtils";
-import { ensureBigInt } from "../../utils/bigIntUtils";
-import { isDefined } from "../../utils/objectUtils";
 import { VLQ } from "../vlq";
 
 export function serializeErgoBox(box: Box<Amount> | ErgoBox): Uint8Array {

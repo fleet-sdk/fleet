@@ -1,4 +1,4 @@
-import { Amount, Box } from "../../types";
+import { Amount, Box } from "@fleet-sdk/common";
 
 export const regularBoxesMock: Box<bigint>[] = [
   {

@@ -1,4 +1,4 @@
-import { _0n, _127n, _7n } from "../utils/bigIntLiterals";
+import { _0n, _127n, _7n } from "@fleet-sdk/common";
 
 /**
  * A **variable-length quantity (VLQ)** is a universal code that uses an arbitrary number

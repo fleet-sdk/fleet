@@ -1,10 +1,8 @@
+import { Box } from "@fleet-sdk/common";
+import { first, sumBy, utxoSum } from "@fleet-sdk/common";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientInputs } from "../../errors/insufficientInputs";
 import { regularBoxesMock } from "../../tests/mocks/mockBoxes";
-import { Box } from "../../types";
-import { first } from "../../utils/arrayUtils";
-import { sumBy } from "../../utils/bigIntUtils";
-import { utxoSum } from "../../utils/boxUtils";
 import { SAFE_MIN_BOX_VALUE } from "../outputBuilder";
 import { BoxSelector } from "./boxSelector";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";

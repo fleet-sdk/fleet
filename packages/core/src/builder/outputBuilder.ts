@@ -1,11 +1,3 @@
-import { stringToBytes } from "@scure/base";
-import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
-import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
-import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
-import { ErgoAddress } from "../models";
-import { AddTokenOptions, TokensCollection } from "../models/collections/tokensCollection";
-import { SConstant } from "../serialization/sigma/constantSerializer";
-import { SByte, SColl } from "../serialization/sigma/sigmaTypes";
 import {
   Amount,
   Base58String,
@@ -16,12 +8,24 @@ import {
   NonMandatoryRegisters,
   TokenAmount,
   UnsignedInput
-} from "../types";
-import { first, isEmpty } from "../utils/arrayUtils";
-import { ensureBigInt } from "../utils/bigIntUtils";
-import { areRegistersDenselyPacked } from "../utils/boxUtils";
-import { isUndefined, removeUndefined } from "../utils/objectUtils";
-import { isHex } from "../utils/stringUtils";
+} from "@fleet-sdk/common";
+import {
+  areRegistersDenselyPacked,
+  ensureBigInt,
+  first,
+  isEmpty,
+  isHex,
+  isUndefined,
+  removeUndefined
+} from "@fleet-sdk/common";
+import { stringToBytes } from "@scure/base";
+import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
+import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
+import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
+import { ErgoAddress } from "../models";
+import { AddTokenOptions, TokensCollection } from "../models/collections/tokensCollection";
+import { SConstant } from "../serialization/sigma/constantSerializer";
+import { SByte, SColl } from "../serialization/sigma/sigmaTypes";
 
 export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 

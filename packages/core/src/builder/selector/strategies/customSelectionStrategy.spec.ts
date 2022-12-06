@@ -1,5 +1,5 @@
+import { Box } from "@fleet-sdk/common";
 import { regularBoxesMock } from "../../../tests/mocks/mockBoxes";
-import { Box } from "../../../types";
 import { CustomSelectionStrategy } from "./customSelectionStrategy";
 
 describe("Custom selection strategy", () => {
