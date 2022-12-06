@@ -30,3 +30,10 @@ jobs:
           files: ./packages/core/coverage/coverage-final.json
           flags: core
           root_dir: ./packages
+
+      - name: Submit common report
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./packages/common/coverage/coverage-final.json
+          flags: common
+          root_dir: ./packages
