@@ -9,7 +9,8 @@
   "license": "MIT",
   "scripts": {
     "ver:stable": "standard-version",
-    "ver:alpha": "standard-version --dry-run --prerelease alpha"
+    "ver:alpha": "standard-version --dry-run --prerelease alpha",
+    "clear": "pnpm -r exec rm -rf dist"
   },
   "devDependencies": {
     "@noble/hashes": "^1.1.3",
