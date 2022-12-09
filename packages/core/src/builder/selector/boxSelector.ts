@@ -3,6 +3,8 @@ import {
   Box,
   BoxCandidate,
   FilterPredicate,
+  first,
+  isUndefined,
   SortingDirection,
   SortingSelector,
   TokenTargetAmount
@@ -19,7 +21,7 @@ import {
   utxoSum
 } from "@fleet-sdk/common";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
-import { InsufficientAssets, InsufficientInputs } from "../../errors/insufficientInputs";
+import { InsufficientInputs } from "../../errors/insufficientInputs";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
 import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSelectionStrategy";
@@ -84,7 +86,7 @@ export class BoxSelector<T extends Box<bigint>> {
     }
 
     const unreached = this._getUnreachedTargets(selected, target);
-    if (some(unreached)) {
+    if (unreached.nanoErgs || some(unreached.tokens)) {
       throw new InsufficientInputs(unreached);
     }
 
@@ -100,12 +102,12 @@ export class BoxSelector<T extends Box<bigint>> {
     };
   }
 
-  private _getUnreachedTargets(inputs: Box<bigint>[], target: SelectionTarget): InsufficientAssets {
-    const unreached: InsufficientAssets = {};
+  private _getUnreachedTargets(inputs: Box<bigint>[], target: SelectionTarget): SelectionTarget {
+    const unreached: SelectionTarget = { nanoErgs: undefined, tokens: undefined };
     const selectedNanoergs = sumBy(inputs, (input) => input.value);
 
     if (target.nanoErgs && target.nanoErgs > selectedNanoergs) {
-      unreached["nanoErgs"] = target.nanoErgs - selectedNanoergs;
+      unreached.nanoErgs = target.nanoErgs - selectedNanoergs;
     }
 
     if (isEmpty(target.tokens)) {
@@ -115,7 +117,18 @@ export class BoxSelector<T extends Box<bigint>> {
     for (const tokenTarget of target.tokens) {
       const totalSelected = utxoSum(inputs, tokenTarget.tokenId);
       if (isDefined(tokenTarget.amount) && tokenTarget.amount > totalSelected) {
-        unreached[tokenTarget.tokenId] = tokenTarget.amount - totalSelected;
+        if (tokenTarget.tokenId === first(inputs).boxId) {
+          continue;
+        }
+
+        if (isUndefined(unreached.tokens)) {
+          unreached.tokens = [];
+        }
+
+        unreached.tokens.push({
+          tokenId: tokenTarget.tokenId,
+          amount: tokenTarget.amount - totalSelected
+        });
       }
     }
 

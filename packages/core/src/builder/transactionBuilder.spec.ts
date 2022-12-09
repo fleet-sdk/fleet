@@ -1,9 +1,12 @@
 import { Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
+import { stringToBytes } from "@scure/base";
 import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
+import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
 import { ErgoAddress, ErgoUnsignedInput, MAX_TOKENS_PER_BOX } from "../models";
+import { SByte, SColl, SConstant } from "../serialization";
 import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";
@@ -780,6 +783,27 @@ describe("Token minting", () => {
     });
   });
 
+  it("Should mint setting a the tokenId", () => {
+    const input = first(regularBoxesMock);
+
+    const transaction = new TransactionBuilder(height)
+      .from(input)
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({
+          tokenId: input.boxId,
+          amount: 100n,
+          name: "TestToken"
+        })
+      )
+
+      .sendChangeTo(a1.address)
+      .payMinFee()
+      .build();
+
+    const mintingBox = transaction.outputs[0];
+    expect(mintingBox.assets).toEqual([{ tokenId: input.boxId, amount: "100" }]);
+  });
+
   it("Should mint and transfer other tokens in the same box", () => {
     const transaction = new TransactionBuilder(height)
       .from(regularBoxesMock)
@@ -820,6 +844,94 @@ describe("Token minting", () => {
     expect(() => {
       builder.build();
     }).toThrow(MalformedTransaction);
+  });
+});
+
+/**
+ * From bk#4411 in Discord:
+ *
+ * Here's a little feedback: I'm doing something not supported by EIP-004 when I create a
+ * new token by creating a normal "mint token" style box with 1 new token, but I am also
+ * putting 1 of the same token in a separate box in the same tx.  You can see an example here:
+ * https://testnet.ergoplatform.com/en/transactions/9a8489d6d894e420a0b6a0e9f4e2c26ff65b44539789a2c275ef08df39d2e5be
+ *
+ * It's not supported in the EIP-004 sense because the "emission amount" ends up wrong (see
+ * https://testnet.ergoplatform.com/en/token/9c41d475fec39024194982e64f9c34c27c8bc11900ba85d985ccef1f5ec8d95f
+ * that it is 1 instead of 2). My fleet issue is that my tx seems to fail validation in
+ * BoxSelector._getUnreachedTargets. I have hacked around this by adding a
+ * .burnTokens({amount: '-2', tokenId: newUserTokenId,}) to my tx builder which works but
+ * feels like an abuse of the API.
+ */
+describe("Non-standardized token minting", () => {
+  const input = first(regularBoxesMock);
+  const mintingTokenId = input.boxId;
+
+  it("Should 'manually' mint tokens, this must bypass EIP-4 validations", () => {
+    const transaction = new TransactionBuilder(height)
+      .from(input)
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address)
+          .addTokens({
+            tokenId: mintingTokenId,
+            amount: 1n
+          })
+          .setAdditionalRegisters({
+            R4: SConstant(SColl(SByte, stringToBytes("utf8", "TestToken"))), //         name
+            R5: SConstant(SColl(SByte, stringToBytes("utf8", "Description test"))), //  description
+            R6: SConstant(SColl(SByte, stringToBytes("utf8", "4"))) //                  decimals
+          })
+      )
+      .and.to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).addTokens({
+          tokenId: mintingTokenId,
+          amount: 1n
+        })
+      )
+      .sendChangeTo(a1.address)
+      .payMinFee()
+      .build();
+
+    expect(transaction.outputs).toHaveLength(4); // output 1, 2, change and fee
+    expect(
+      transaction.outputs.filter((x) => x.assets.some((x) => x.tokenId === input.boxId))
+    ).toHaveLength(2);
+
+    const mintingBox = transaction.outputs[0];
+    expect(mintingBox.assets).toEqual([{ tokenId: mintingTokenId, amount: "1" }]);
+    expect(mintingBox.additionalRegisters).toEqual({
+      R4: "0e0954657374546f6b656e",
+      R5: "0e104465736372697074696f6e2074657374",
+      R6: "0e0134"
+    });
+
+    const sendingBox = transaction.outputs[1];
+    expect(sendingBox.assets).toEqual([{ tokenId: mintingTokenId, amount: "1" }]);
+    expect(sendingBox.additionalRegisters).toEqual({});
+  });
+
+  it("Should fail if trying to mint in a non-standardized way", () => {
+    expect(() => {
+      new TransactionBuilder(height)
+        .from(input)
+        .to(
+          new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({
+            tokenId: mintingTokenId,
+            amount: 1n,
+            name: "TestToken",
+            decimals: 4,
+            description: "Description test"
+          })
+        )
+        .and.to(
+          new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).addTokens({
+            tokenId: mintingTokenId,
+            amount: 1n
+          })
+        )
+        .sendChangeTo(a1.address)
+        .payMinFee()
+        .build();
+    }).toThrow(NonStandardizedMinting);
   });
 });
 

@@ -104,4 +104,8 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
 
     return this;
   }
+
+  contains(tokenId: string): boolean {
+    return this._items.some((x) => x.tokenId === tokenId);
+  }
 }

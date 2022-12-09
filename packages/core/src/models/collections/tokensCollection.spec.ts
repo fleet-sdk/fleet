@@ -23,6 +23,22 @@ describe("Tokens collection", () => {
     expect(collection).toHaveLength(2);
   });
 
+  it("Should lookup at collection and return true is a tokenId is included otherwise, return false", () => {
+    const collection = new TokensCollection([
+      { tokenId: tokenA, amount: 50n },
+      { tokenId: tokenB, amount: 20n }
+    ]);
+
+    expect(collection).toHaveLength(2);
+
+    expect(collection.contains(tokenA)).toBeTruthy();
+    expect(collection.contains(tokenB)).toBeTruthy();
+
+    expect(
+      collection.contains("d601123e8838b95cdaebe24e594276b2a89cd38e98add98405bb5327520ecf6c")
+    ).toBeFalsy();
+  });
+
   it("Should create a filled and accumulative collection", () => {
     const collection = new TokensCollection(
       [

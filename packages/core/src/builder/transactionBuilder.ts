@@ -5,6 +5,7 @@ import {
   BuildOutputType,
   EIP12UnsignedTransaction,
   HexString,
+  isUndefined,
   Network,
   TokenAmount,
   UnsignedTransaction
@@ -20,6 +21,7 @@ import {
   utxoSum
 } from "@fleet-sdk/common";
 import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
+import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { BoxSelector } from "./selector";
@@ -192,8 +194,16 @@ export class TransactionBuilder {
   public build(): UnsignedTransaction;
   public build<T extends BuildOutputType>(buildOutputType: T): TransactionType<T>;
   public build<T extends BuildOutputType>(buildOutputType?: T): TransactionType<T> {
-    if (!this._validateTokenMinting()) {
-      throw new MalformedTransaction("only one token can be minted per transaction.");
+    if (this._isMinting()) {
+      if (this._isMoreThanOneTokenBeingMinted()) {
+        throw new MalformedTransaction("only one token can be minted per transaction.");
+      }
+
+      if (this._isTheSameTokenBeingMintedOutsideTheMintingBox()) {
+        throw new NonStandardizedMinting(
+          "EIP-4 tokens cannot be minted from outside the minting box."
+        );
+      }
     }
 
     const outputs = this.outputs.clone();
@@ -277,7 +287,17 @@ export class TransactionBuilder {
     return unsignedTransaction;
   }
 
-  private _validateTokenMinting(): boolean {
+  private _isMinting(): boolean {
+    for (const output of this._outputs) {
+      if (output.minting) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private _isMoreThanOneTokenBeingMinted(): boolean {
     let mintingCount = 0;
 
     for (const output of this._outputs) {
@@ -285,12 +305,40 @@ export class TransactionBuilder {
         mintingCount++;
 
         if (mintingCount > 1) {
-          return false;
+          return true;
         }
       }
     }
 
-    return true;
+    return false;
+  }
+
+  private _isTheSameTokenBeingMintedOutsideTheMintingBox(): boolean {
+    const mintingTokenId = this._getMintingTokenId();
+
+    if (isUndefined(mintingTokenId)) {
+      return false;
+    }
+
+    for (const output of this._outputs) {
+      if (output.tokens.contains(mintingTokenId)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private _getMintingTokenId(): string | undefined {
+    let tokenId = undefined;
+    for (const output of this._outputs) {
+      if (output.minting) {
+        tokenId = output.minting.tokenId;
+        break;
+      }
+    }
+
+    return tokenId;
   }
 
   private _calcBurningBalance(
