@@ -4,7 +4,7 @@ import { DuplicateInputError, NotFoundError } from "../../errors";
 import { ErgoUnsignedInput } from "../ergoUnsignedInput";
 import { Collection } from "./collection";
 
-export class InputsCollection extends Collection<ErgoUnsignedInput> {
+export class InputsCollection extends Collection<ErgoUnsignedInput, Box<Amount>> {
   constructor();
   constructor(box: Box<Amount>);
   constructor(boxes: Box<Amount>[]);
@@ -16,34 +16,19 @@ export class InputsCollection extends Collection<ErgoUnsignedInput> {
     }
   }
 
-  public add(box: Box<Amount>): InputsCollection;
-  public add(boxes: Box<Amount>[]): InputsCollection;
-  public add(boxes: Box<Amount> | Box<Amount>[]): InputsCollection;
-  public add(boxOrBoxes: Box<Amount> | Box<Amount>[]): InputsCollection {
-    if (!Array.isArray(boxOrBoxes)) {
-      this._add(boxOrBoxes);
-
-      return this;
-    }
-
-    for (const box of boxOrBoxes) {
-      this._add(box);
-    }
-
-    return this;
-  }
-
-  private _add(box: Box<Amount>): void {
+  protected override _addOne(box: Box<Amount>): number {
     if (this._items.some((item) => item.boxId === box.boxId)) {
       throw new DuplicateInputError(box.boxId);
     }
 
     this._items.push(box instanceof ErgoUnsignedInput ? box : new ErgoUnsignedInput(box));
+
+    return this._items.length;
   }
 
-  public remove(boxId: BoxId): InputsCollection;
-  public remove(index: number): InputsCollection;
-  public remove(boxIdOrIndex: BoxId | number): InputsCollection {
+  public remove(boxId: BoxId): number;
+  public remove(index: number): number;
+  public remove(boxIdOrIndex: BoxId | number): number {
     let index = -1;
     if (typeof boxIdOrIndex === "number") {
       if (this._isIndexOutOfBounds(boxIdOrIndex)) {
@@ -65,6 +50,6 @@ export class InputsCollection extends Collection<ErgoUnsignedInput> {
       this._items.splice(index, 1);
     }
 
-    return this;
+    return this.length;
   }
 }

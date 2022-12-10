@@ -1,42 +1,27 @@
-import { _0n, BoxAmounts, isUndefined, some } from "@fleet-sdk/common";
+import { _0n, BoxAmounts, isDefined, isUndefined, some } from "@fleet-sdk/common";
 import { OutputBuilder } from "../../builder/outputBuilder";
 import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
 import { Collection } from "./collection";
 
-export class OutputsCollection extends Collection<OutputBuilder> {
+export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> {
   constructor(outputs?: OutputBuilder | OutputBuilder[]) {
     super();
 
-    if (outputs) {
+    if (isDefined(outputs)) {
       this.add(outputs);
     }
   }
 
-  private _add(outputBuilder: OutputBuilder) {
+  protected override _addOne(outputBuilder: OutputBuilder): number {
     this._items.push(outputBuilder);
+
+    return this._items.length;
   }
 
-  public add(output: OutputBuilder): OutputsCollection;
-  public add(outputs: OutputBuilder[]): OutputsCollection;
-  public add(outputs: OutputBuilder | OutputBuilder[]): OutputsCollection;
-  public add(outputs: OutputBuilder | OutputBuilder[]): OutputsCollection {
-    if (!Array.isArray(outputs)) {
-      this._add(outputs);
-
-      return this;
-    }
-
-    for (const output of outputs) {
-      this._add(output);
-    }
-
-    return this;
-  }
-
-  public remove(output: OutputBuilder): OutputsCollection;
-  public remove(index: number): OutputsCollection;
-  public remove(outputs: OutputBuilder | number): OutputsCollection {
+  public remove(output: OutputBuilder): number;
+  public remove(index: number): number;
+  public remove(outputs: OutputBuilder | number): number {
     let index = -1;
     if (typeof outputs === "number") {
       if (this._isIndexOutOfBounds(outputs)) {
@@ -58,7 +43,7 @@ export class OutputsCollection extends Collection<OutputBuilder> {
       this._items.splice(index, 1);
     }
 
-    return this;
+    return this.length;
   }
 
   public clone(): OutputsCollection {

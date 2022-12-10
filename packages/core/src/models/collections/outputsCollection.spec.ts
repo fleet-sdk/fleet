@@ -18,6 +18,7 @@ describe("outputs collection", () => {
       new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height),
       new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
     ]);
+
     expect(collection).toHaveLength(2);
   });
 
@@ -30,14 +31,17 @@ describe("outputs collection", () => {
     expect(first(collection.toArray())).toBe(output);
   });
 
-  it("Should add a multiple items", () => {
+  it("Should append items", () => {
     const collection = new OutputsCollection();
+
     const outputs = [
       new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height),
       new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, address, height)
     ];
-    collection.add(outputs);
 
+    const newLen = collection.add(outputs);
+
+    expect(newLen).toBe(2);
     expect(collection).toHaveLength(2);
     expect(collection.toArray()).toEqual(outputs);
   });
@@ -123,18 +127,20 @@ describe("Target building", () => {
   const tokenD = "5614535ba46927145c3d30fed8f14b08bd48a143b24136809f9e47afc40643c4";
 
   it("Should sum amounts", () => {
-    const collection = new OutputsCollection()
-      .add(
-        new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).addTokens({
-          tokenId: tokenA,
-          amount: 12348n
-        })
-      )
-      .add(
-        new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
-          .addTokens({ tokenId: tokenA, amount: "11" })
-          .addTokens({ tokenId: tokenB, amount: 50n })
-      );
+    const collection = new OutputsCollection();
+
+    collection.add(
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).addTokens({
+        tokenId: tokenA,
+        amount: 12348n
+      })
+    );
+
+    collection.add(
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+        .addTokens({ tokenId: tokenA, amount: "11" })
+        .addTokens({ tokenId: tokenB, amount: 50n })
+    );
 
     expect(collection.sum()).toEqual({
       nanoErgs: SAFE_MIN_BOX_VALUE * 2n,
@@ -146,7 +152,8 @@ describe("Target building", () => {
   });
 
   it("Should ignore minting tokens", () => {
-    const collection = new OutputsCollection().add(
+    const collection = new OutputsCollection();
+    collection.add(
       new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
         .addTokens({ tokenId: tokenA, amount: 12348n })
         .mintToken({ name: "testToken", amount: 10n })
@@ -168,18 +175,18 @@ describe("Target building", () => {
       ]
     };
 
-    const collection = new OutputsCollection()
-      .add(
-        new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).addTokens({
-          tokenId: tokenA,
-          amount: 12348n
-        })
-      )
-      .add(
-        new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
-          .addTokens({ tokenId: tokenA, amount: "11" })
-          .addTokens({ tokenId: tokenB, amount: 50n })
-      );
+    const collection = new OutputsCollection();
+    collection.add(
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).addTokens({
+        tokenId: tokenA,
+        amount: 12348n
+      })
+    );
+    collection.add(
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+        .addTokens({ tokenId: tokenA, amount: "11" })
+        .addTokens({ tokenId: tokenB, amount: 50n })
+    );
 
     expect(collection.sum(basis)).toEqual({
       nanoErgs: SAFE_MIN_BOX_VALUE * 2n + basis.nanoErgs,

@@ -111,7 +111,10 @@ describe("Token handling", () => {
 
   it("Should add tokens from context ejector", () => {
     builder.eject(({ tokens }) =>
-      tokens.add({ tokenId: tokenA, amount: 50n }).add({ tokenId: tokenB, amount: 10n })
+      tokens.add([
+        { tokenId: tokenA, amount: 50n },
+        { tokenId: tokenB, amount: 10n }
+      ])
     );
 
     expect(builder.tokens).toHaveLength(2);

@@ -68,11 +68,11 @@ export class BoxSelector<T extends Box<bigint>> {
       }
 
       if (isDefined(remaining.tokens) && selected.some((input) => !isEmpty(input.assets))) {
-        remaining.tokens.forEach((tokenTarget) => {
+        for (const tokenTarget of remaining.tokens) {
           if (tokenTarget.amount) {
             tokenTarget.amount -= utxoSum(selected, tokenTarget.tokenId);
           }
-        });
+        }
       }
     } else {
       selected = [];

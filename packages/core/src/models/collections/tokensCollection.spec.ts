@@ -54,7 +54,8 @@ describe("Tokens collection", () => {
 
   it("Should add distinct tokens", () => {
     const collection = new TokensCollection();
-    collection.add({ tokenId: tokenA, amount: 50n }).add({ tokenId: tokenB, amount: 10n });
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
     const tokensArray = collection.toArray();
 
     expect(collection).toHaveLength(2);
@@ -67,7 +68,9 @@ describe("Tokens collection", () => {
     const tokens = manyTokensBoxesMock.flatMap((x) => x.assets);
 
     expect(() => {
-      new TokensCollection().add({ tokenId: tokenA, amount: 50n }).add(tokens);
+      const collection = new TokensCollection();
+      collection.add({ tokenId: tokenA, amount: 50n });
+      collection.add(tokens);
     }).toThrow(MaxTokensOverflow);
   });
 
@@ -81,9 +84,9 @@ describe("Tokens collection", () => {
   });
 
   it("Should sum if the same tokenId is already included", () => {
-    const collection = new TokensCollection()
-      .add({ tokenId: tokenA, amount: 50n })
-      .add({ tokenId: tokenB, amount: 10n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
 
     expect(collection).toHaveLength(2);
     expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
@@ -96,9 +99,9 @@ describe("Tokens collection", () => {
   });
 
   it("Should add if sum = false if tokenId is already included", () => {
-    const collection = new TokensCollection()
-      .add({ tokenId: tokenA, amount: 50n })
-      .add({ tokenId: tokenB, amount: 10n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
 
     expect(collection).toHaveLength(2);
     expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
@@ -112,7 +115,8 @@ describe("Tokens collection", () => {
   });
 
   it("Should add multiple tokens and sum if the same tokenId is already included", () => {
-    const collection = new TokensCollection().add({ tokenId: tokenA, amount: "50" });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: "50" });
     expect(collection).toHaveLength(1);
     expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
@@ -127,9 +131,9 @@ describe("Tokens collection", () => {
   });
 
   it("Should remove tokens from the list by tokenId", () => {
-    const collection = new TokensCollection()
-      .add({ tokenId: tokenA, amount: 50n })
-      .add({ tokenId: tokenB, amount: 10n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
 
     collection.remove(tokenA);
 
@@ -138,9 +142,9 @@ describe("Tokens collection", () => {
   });
 
   it("Should remove tokens from the list by index", () => {
-    const collection = new TokensCollection()
-      .add({ tokenId: tokenA, amount: 50n })
-      .add({ tokenId: tokenB, amount: 10n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
 
     collection.remove(0);
 
@@ -149,9 +153,9 @@ describe("Tokens collection", () => {
   });
 
   it("Should subtract if amount is specified by tokenId", () => {
-    const collection = new TokensCollection()
-      .add({ tokenId: tokenA, amount: 50n })
-      .add({ tokenId: tokenB, amount: 10n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
 
     collection.remove(tokenA, 10n);
 
@@ -160,9 +164,9 @@ describe("Tokens collection", () => {
   });
 
   it("Should subtract if amount is specified by index", () => {
-    const collection = new TokensCollection()
-      .add({ tokenId: tokenA, amount: 50n })
-      .add({ tokenId: tokenB, amount: 10n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
 
     collection.remove(0, 10n);
 
@@ -171,9 +175,9 @@ describe("Tokens collection", () => {
   });
 
   it("Should remove token if amount is equal to already inserted amount by tokenId", () => {
-    const collection = new TokensCollection()
-      .add({ tokenId: tokenA, amount: 50n })
-      .add({ tokenId: tokenB, amount: 10n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
 
     collection.remove(tokenA, 50n);
 
@@ -182,9 +186,9 @@ describe("Tokens collection", () => {
   });
 
   it("Should remove token if amount is equal to already inserted amount by index", () => {
-    const collection = new TokensCollection()
-      .add({ tokenId: tokenA, amount: 50n })
-      .add({ tokenId: tokenB, amount: 10n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
 
     collection.remove(1, 10n);
 
@@ -193,14 +197,17 @@ describe("Tokens collection", () => {
   });
 
   it("Should throw if amount is greater than already inserted amount", () => {
-    const collection = new TokensCollection().add({ tokenId: tokenA, amount: 50n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+
     expect(() => {
       collection.remove(tokenA, 100n);
     }).toThrow(InsufficientTokenAmount);
   });
 
   it("Should throw when trying to remove using a not included tokenId", () => {
-    const collection = new TokensCollection().add({ tokenId: tokenA, amount: 50n });
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
 
     expect(() => {
       collection.remove(tokenB);
@@ -208,7 +215,8 @@ describe("Tokens collection", () => {
   });
 
   it("Should throw when trying to remove by an out of bounds index", () => {
-    const collection = new TokensCollection().add([
+    const collection = new TokensCollection();
+    collection.add([
       { tokenId: tokenA, amount: 50n },
       { tokenId: tokenB, amount: 10n }
     ]);

@@ -23,7 +23,7 @@ describe("inputs collection", () => {
     expect(first(collection.toArray()).boxId).toBe(box.boxId);
   });
 
-  it("Should add a multiple items", () => {
+  it("Should append items", () => {
     const collection = new InputsCollection();
     collection.add(regularBoxesMock);
 

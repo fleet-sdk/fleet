@@ -1,14 +1,18 @@
 import { Collection } from "./collection";
 
-class MockCollection extends Collection<number> {
+class MockCollection extends Collection<number, number> {
   constructor() {
     super();
   }
 
-  public add(numb: number[]) {
-    numb.forEach((n) => this._items.push(n));
+  protected override _addOne(numb: number) {
+    this._items.push(numb);
 
-    return this;
+    return this.length;
+  }
+
+  public remove(item: number): number {
+    throw Error("Not implemented for " + item);
   }
 }
 

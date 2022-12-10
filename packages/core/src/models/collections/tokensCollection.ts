@@ -1,4 +1,4 @@
-import { Amount, TokenAmount, TokenId } from "@fleet-sdk/common";
+import { Amount, isDefined, isUndefined, TokenAmount, TokenId } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
@@ -9,7 +9,7 @@ export const MAX_TOKENS_PER_BOX = 120;
 
 export type AddTokenOptions = { sum: boolean };
 
-export class TokensCollection extends Collection<TokenAmount<bigint>> {
+export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmount<Amount>> {
   constructor();
   constructor(token: TokenAmount<Amount>);
   constructor(tokens: TokenAmount<Amount>[]);
@@ -17,18 +17,18 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
   constructor(tokens?: TokenAmount<Amount> | TokenAmount<Amount>[], options?: AddTokenOptions) {
     super();
 
-    if (tokens) {
+    if (isDefined(tokens)) {
       this.add(tokens, options);
     }
   }
 
-  private _add(tokenId: TokenId, amount: Amount, sum: boolean): void {
-    if (sum) {
-      for (const token of this._items) {
-        if (token.tokenId === tokenId) {
-          token.amount += ensureBigInt(amount);
+  protected override _addOne(token: TokenAmount<Amount>, options?: AddTokenOptions): number {
+    if (!options || isUndefined(options.sum) || options.sum === true) {
+      for (const t of this._items) {
+        if (t.tokenId === token.tokenId) {
+          t.amount += ensureBigInt(token.amount);
 
-          return;
+          return this.length;
         }
       }
     }
@@ -37,37 +37,21 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
       throw new MaxTokensOverflow();
     }
 
-    this._items.push({ tokenId, amount: ensureBigInt(amount) });
+    this._items.push({ tokenId: token.tokenId, amount: ensureBigInt(token.amount) });
+
+    return this.length;
   }
 
-  public add(tokens: TokenAmount<Amount>[], sum?: AddTokenOptions): TokensCollection;
-  public add(token: TokenAmount<Amount>, sum?: AddTokenOptions): TokensCollection;
-  public add(
-    tokenOrTokens: TokenAmount<Amount> | TokenAmount<Amount>[],
+  public override add(
+    items: TokenAmount<Amount> | TokenAmount<Amount>[],
     options?: AddTokenOptions
-  ): TokensCollection;
-  public add(
-    tokenOrTokens: TokenAmount<Amount> | TokenAmount<Amount>[],
-    options?: AddTokenOptions
-  ): TokensCollection {
-    const sum = options ? options.sum : true;
-
-    if (!Array.isArray(tokenOrTokens)) {
-      this._add(tokenOrTokens.tokenId, tokenOrTokens.amount, sum);
-
-      return this;
-    }
-
-    for (const token of tokenOrTokens) {
-      this._add(token.tokenId, token.amount, sum);
-    }
-
-    return this;
+  ): number {
+    return super._addOneOrMore(items, options);
   }
 
-  public remove(tokenId: TokenId, amount?: Amount): TokensCollection;
-  public remove(index: number, amount?: Amount): TokensCollection;
-  public remove(tokenIdOrIndex: TokenId | number, amount?: Amount): TokensCollection {
+  public remove(tokenId: TokenId, amount?: Amount): number;
+  public remove(index: number, amount?: Amount): number;
+  public remove(tokenIdOrIndex: TokenId | number, amount?: Amount): number {
     let index = -1;
     if (typeof tokenIdOrIndex === "number") {
       if (this._isIndexOutOfBounds(tokenIdOrIndex)) {
@@ -94,7 +78,7 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
       } else if (bigAmount < token.amount) {
         token.amount -= bigAmount;
 
-        return this;
+        return this.length;
       }
     }
 
@@ -102,7 +86,7 @@ export class TokensCollection extends Collection<TokenAmount<bigint>> {
       this._items.splice(index, 1);
     }
 
-    return this;
+    return this.length;
   }
 
   contains(tokenId: string): boolean {
