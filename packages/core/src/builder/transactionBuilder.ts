@@ -22,7 +22,13 @@ import {
 } from "@fleet-sdk/common";
 import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
-import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
+import {
+  AddOutputOptions,
+  ErgoAddress,
+  InputsCollection,
+  OutputsCollection,
+  TokensCollection
+} from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
@@ -117,8 +123,11 @@ export class TransactionBuilder {
     return this;
   }
 
-  public to(outputs: OutputBuilder[] | OutputBuilder): TransactionBuilder {
-    this._outputs.add(outputs);
+  public to(
+    outputs: OutputBuilder[] | OutputBuilder,
+    options?: AddOutputOptions
+  ): TransactionBuilder {
+    this._outputs.add(outputs, options);
 
     return this;
   }

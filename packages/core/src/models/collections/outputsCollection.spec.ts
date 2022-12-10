@@ -31,6 +31,57 @@ describe("outputs collection", () => {
     expect(first(collection.toArray())).toBe(output);
   });
 
+  it("Should add a single item at a specific index", () => {
+    const first = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height);
+    const second = new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, address, height);
+
+    const collection = new OutputsCollection([first, second]);
+    expect(collection.at(0)).toBe(first);
+    expect(collection.at(1)).toBe(second);
+
+    const placedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, address, height);
+    const newLen = collection.add(placedOutput, { index: 1 });
+    expect(newLen).toBe(3);
+
+    expect(collection.at(0)).toBe(first); // should remain unchanged
+    expect(collection.at(1)).toBe(placedOutput); // should be placed at index = 1
+    expect(collection.at(2)).toBe(second); // should be moved to third place
+  });
+
+  it("Should append items at a specific index", () => {
+    const first = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height);
+    const second = new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, address, height);
+
+    const collection = new OutputsCollection([first, second]);
+    expect(collection.at(0)).toBe(first);
+    expect(collection.at(1)).toBe(second);
+
+    const fistPlacedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, address, height);
+    const secondPlacedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 4n, address, height);
+    const newLen = collection.add([fistPlacedOutput, secondPlacedOutput], { index: 1 });
+    expect(newLen).toBe(4);
+
+    expect(collection.at(0)).toBe(first); // should remain unchanged
+
+    expect(collection.at(1)).toBe(fistPlacedOutput); // should be placed at index = 1
+    expect(collection.at(2)).toBe(secondPlacedOutput); // should be placed at index = 2
+
+    expect(collection.at(3)).toBe(second); // should be moved to third place
+  });
+
+  it("Should fail when trying to add out of range", () => {
+    const collection = new OutputsCollection([
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height),
+      new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, address, height)
+    ]);
+
+    const placedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, address, height);
+
+    expect(() => {
+      collection.add(placedOutput, { index: 5 /* out of range value */ });
+    }).toThrow(RangeError);
+  });
+
   it("Should append items", () => {
     const collection = new OutputsCollection();
 

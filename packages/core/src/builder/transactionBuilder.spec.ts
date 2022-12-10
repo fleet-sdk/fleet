@@ -86,6 +86,27 @@ describe("basic construction", () => {
     expect(builder.dataInputs).toHaveLength(0);
   });
 
+  it("Should place outputs at specific index", () => {
+    const firstOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address, height);
+    const secondOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, a1.address, height);
+
+    const builder = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .to([firstOutput, secondOutput]);
+
+    expect(builder.outputs.at(0)).toBe(firstOutput);
+    expect(builder.outputs.at(1)).toBe(secondOutput);
+
+    const placedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, a2.address, height);
+
+    builder.and.to(placedOutput, { index: 1 });
+    expect(builder.outputs.length).toBe(3);
+
+    expect(builder.outputs.at(0)).toBe(firstOutput); // should remain unchanged
+    expect(builder.outputs.at(1)).toBe(placedOutput); // should be placed at index = 1
+    expect(builder.outputs.at(2)).toBe(secondOutput); // should be moved to third place
+  });
+
   it("Should set change address by base58 encoded address", () => {
     const builder = new TransactionBuilder(height).from(regularBoxesMock).sendChangeTo(a1.address);
 

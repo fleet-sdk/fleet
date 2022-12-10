@@ -41,6 +41,24 @@ describe("collection base", () => {
     expect(collection).toHaveLength(numbers.length); // push on previous line should not affect internal array.
   });
 
+  it("Should get items by index", () => {
+    const collection = new MockCollection();
+    collection.add(numbers);
+
+    for (let i = 0; i < numbers.length; i++) {
+      expect(collection.at(i)).toEqual(numbers[i]);
+    }
+  });
+
+  it("Should fail when trying to get item out of index range", () => {
+    const collection = new MockCollection();
+    collection.add(numbers);
+
+    expect(() => {
+      collection.at(collection.length + 1);
+    }).toThrow(RangeError);
+  });
+
   it("Should iterate correctly for all items", () => {
     const collection = new MockCollection();
     expect(collection.isEmpty).toBeTruthy();

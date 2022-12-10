@@ -30,6 +30,14 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
     return this.length === 0;
   }
 
+  public at(index: number): InternalType {
+    if (this._isIndexOutOfBounds(index)) {
+      throw new RangeError(`Index '${index}' is out of range.`);
+    }
+
+    return this._items[index];
+  }
+
   public add(items: ExternalType[] | ExternalType): number {
     return this._addOneOrMore(items);
   }
