@@ -23,7 +23,7 @@ import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import { ErgoAddress } from "../models";
-import { AddTokenOptions, TokensCollection } from "../models/collections/tokensCollection";
+import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
 import { SConstant } from "../serialization/sigma/constantSerializer";
 import { SByte, SColl } from "../serialization/sigma/sigmaTypes";
 
@@ -86,7 +86,7 @@ export class OutputBuilder {
 
   public addTokens(
     tokens: TokenAmount<Amount>[] | TokenAmount<Amount> | TokensCollection,
-    options?: AddTokenOptions
+    options?: TokenAddOptions
   ) {
     if (tokens instanceof TokensCollection) {
       this._tokens.add(tokens.toArray(), options);

@@ -5,10 +5,8 @@ class MockCollection extends Collection<number, number> {
     super();
   }
 
-  protected override _addOne(numb: number) {
-    this._items.push(numb);
-
-    return this.length;
+  protected override _map(item: number): number {
+    return item;
   }
 
   public remove(item: number): number {
@@ -23,6 +21,65 @@ describe("collection base", () => {
     const collection = new MockCollection();
     expect(collection).toHaveLength(0);
     expect(collection.isEmpty).toBeTruthy();
+  });
+
+  it("Should add items", () => {
+    const collection = new MockCollection();
+    collection.add(1);
+    collection.add([2, 3]);
+
+    expect(collection).toHaveLength(3);
+    expect(collection.at(0)).toBe(1);
+    expect(collection.at(1)).toBe(2);
+    expect(collection.at(2)).toBe(3);
+  });
+
+  it("Should place one item at a specific index", () => {
+    const collection = new MockCollection();
+    collection.add([1, 2, 3]);
+
+    collection.add(5, { index: 0 });
+
+    expect(collection).toHaveLength(4);
+    expect(collection.at(0)).toBe(5);
+    expect(collection.at(1)).toBe(1);
+    expect(collection.at(2)).toBe(2);
+    expect(collection.at(3)).toBe(3);
+  });
+
+  it("Should not fail when trying to place at index 0 and collection is empty", () => {
+    const collection = new MockCollection();
+
+    collection.add(5, { index: 0 });
+
+    expect(collection).toHaveLength(1);
+    expect(collection.at(0)).toBe(5);
+  });
+
+  it("Should should fail when trying to add out of range", () => {
+    const collection = new MockCollection();
+
+    expect(() => {
+      collection.add(5, { index: 1 });
+    }).toThrow(RangeError);
+
+    expect(() => {
+      collection.add(5, { index: 2 });
+    }).toThrow(RangeError);
+  });
+
+  it("Should place multiple items at a specific index", () => {
+    const collection = new MockCollection();
+    collection.add([1, 2, 3]);
+
+    collection.add([10, 20], { index: 2 });
+
+    expect(collection).toHaveLength(5);
+    expect(collection.at(0)).toBe(1);
+    expect(collection.at(1)).toBe(2);
+    expect(collection.at(2)).toBe(10);
+    expect(collection.at(3)).toBe(20);
+    expect(collection.at(4)).toBe(3);
   });
 
   it("Should create a copy of the internal array", () => {

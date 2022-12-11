@@ -4,8 +4,6 @@ import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
 import { Collection } from "./collection";
 
-export type AddOutputOptions = { index: number };
-
 export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> {
   constructor(outputs?: OutputBuilder | OutputBuilder[]) {
     super();
@@ -15,29 +13,8 @@ export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> 
     }
   }
 
-  protected override _addOne(output: OutputBuilder, options?: AddOutputOptions): number {
-    if (isDefined(options) && isDefined(options.index)) {
-      if (this._isIndexOutOfBounds(options.index)) {
-        throw new RangeError(`Index '${options.index}' is out of range.`);
-      }
-
-      this._items.splice(options.index, 0, output);
-    } else {
-      this._items.push(output);
-    }
-
-    return this._items.length;
-  }
-
-  public override add(
-    outputs: OutputBuilder | OutputBuilder[],
-    options?: AddOutputOptions
-  ): number {
-    if (Array.isArray(outputs) && isDefined(options) && isDefined(options.index)) {
-      return this._addOneOrMore(outputs.reverse(), options);
-    }
-
-    return this._addOneOrMore(outputs, options);
+  protected _map(output: OutputBuilder): OutputBuilder {
+    return output;
   }
 
   public remove(output: OutputBuilder): number;

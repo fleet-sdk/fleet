@@ -92,10 +92,38 @@ describe("Tokens collection", () => {
     expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     collection.add({ tokenId: tokenA, amount: 100n }, { sum: true });
+
     expect(collection).toHaveLength(2);
     const tokensArray = collection.toArray();
     expect(tokensArray.find((x) => x.tokenId === tokenA)?.amount).toEqual(150n);
     expect(tokensArray.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
+  });
+
+  it("Should not sum if the same tokenId is already included but index is set", () => {
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
+
+    collection.add({ tokenId: tokenA, amount: 100n }, { sum: true, index: 1 });
+
+    expect(collection).toHaveLength(3);
+    expect(collection.at(0).tokenId).toBe(tokenA);
+    expect(collection.at(1).tokenId).toBe(tokenA);
+    expect(collection.at(2).tokenId).toBe(tokenB);
+  });
+
+  it("Should place token item at specific index", () => {
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.add({ tokenId: tokenB, amount: 10n });
+
+    collection.add({ tokenId: tokenB, amount: 100n }, { index: 1 });
+
+    expect(collection).toHaveLength(3);
+
+    expect(collection.at(0).tokenId).toBe(tokenA);
+    expect(collection.at(1).tokenId).toBe(tokenB);
+    expect(collection.at(2).tokenId).toBe(tokenB);
   });
 
   it("Should add if sum = false if tokenId is already included", () => {

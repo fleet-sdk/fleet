@@ -3,18 +3,18 @@ import { ensureBigInt } from "@fleet-sdk/common";
 import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
-import { Collection } from "./collection";
+import { Collection, CollectionAddOptions } from "./collection";
 
 export const MAX_TOKENS_PER_BOX = 120;
 
-export type AddTokenOptions = { sum: boolean };
+export type TokenAddOptions = CollectionAddOptions & { sum?: boolean };
 
 export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmount<Amount>> {
   constructor();
   constructor(token: TokenAmount<Amount>);
   constructor(tokens: TokenAmount<Amount>[]);
-  constructor(tokens: TokenAmount<Amount>[], options: AddTokenOptions);
-  constructor(tokens?: TokenAmount<Amount> | TokenAmount<Amount>[], options?: AddTokenOptions) {
+  constructor(tokens: TokenAmount<Amount>[], options: TokenAddOptions);
+  constructor(tokens?: TokenAmount<Amount> | TokenAmount<Amount>[], options?: TokenAddOptions) {
     super();
 
     if (isDefined(tokens)) {
@@ -22,14 +22,17 @@ export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmoun
     }
   }
 
-  protected override _addOne(token: TokenAmount<Amount>, options?: AddTokenOptions): number {
-    if (!options || isUndefined(options.sum) || options.sum === true) {
-      for (const t of this._items) {
-        if (t.tokenId === token.tokenId) {
-          t.amount += ensureBigInt(token.amount);
+  protected override _map(token: TokenAmount<bigint> | TokenAmount<Amount>): TokenAmount<bigint> {
+    return { tokenId: token.tokenId, amount: ensureBigInt(token.amount) };
+  }
 
-          return this.length;
-        }
+  protected override _addOne(
+    token: TokenAmount<bigint> | TokenAmount<Amount>,
+    options?: TokenAddOptions
+  ): number {
+    if (isUndefined(options) || (options.sum && !isDefined(options.index))) {
+      if (this._sum(this._map(token))) {
+        return this.length;
       }
     }
 
@@ -37,16 +40,28 @@ export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmoun
       throw new MaxTokensOverflow();
     }
 
-    this._items.push({ tokenId: token.tokenId, amount: ensureBigInt(token.amount) });
+    super._addOne(token, options);
 
     return this.length;
   }
 
   public override add(
     items: TokenAmount<Amount> | TokenAmount<Amount>[],
-    options?: AddTokenOptions
+    options?: TokenAddOptions
   ): number {
-    return super._addOneOrMore(items, options);
+    return super.add(items, options);
+  }
+
+  private _sum(token: TokenAmount<bigint>): boolean {
+    for (const t of this._items) {
+      if (t.tokenId === token.tokenId) {
+        t.amount += token.amount;
+
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public remove(tokenId: TokenId, amount?: Amount): number;

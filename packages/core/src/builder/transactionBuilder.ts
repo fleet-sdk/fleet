@@ -22,13 +22,8 @@ import {
 } from "@fleet-sdk/common";
 import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
-import {
-  AddOutputOptions,
-  ErgoAddress,
-  InputsCollection,
-  OutputsCollection,
-  TokensCollection
-} from "../models";
+import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
+import { CollectionAddOptions } from "../models/collections/collection";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
@@ -117,23 +112,29 @@ export class TransactionBuilder {
     return this;
   }
 
-  public from(inputs: Box<Amount> | Box<Amount>[]): TransactionBuilder {
-    this._inputs.add(inputs);
+  public from(
+    inputs: Box<Amount> | Box<Amount>[],
+    options?: CollectionAddOptions
+  ): TransactionBuilder {
+    this._inputs.add(inputs, options);
 
     return this;
   }
 
   public to(
     outputs: OutputBuilder[] | OutputBuilder,
-    options?: AddOutputOptions
+    options?: CollectionAddOptions
   ): TransactionBuilder {
     this._outputs.add(outputs, options);
 
     return this;
   }
 
-  public withDataFrom(dataInputs: Box<Amount>[] | Box<Amount>): TransactionBuilder {
-    this._dataInputs.add(dataInputs);
+  public withDataFrom(
+    dataInputs: Box<Amount>[] | Box<Amount>,
+    options?: CollectionAddOptions
+  ): TransactionBuilder {
+    this._dataInputs.add(dataInputs, options);
 
     return this;
   }

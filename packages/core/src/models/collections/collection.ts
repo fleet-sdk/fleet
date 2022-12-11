@@ -1,3 +1,7 @@
+import { isDefined } from "@fleet-sdk/common";
+
+export type CollectionAddOptions = { index?: number };
+
 export abstract class Collection<InternalType, ExternalType> implements Iterable<InternalType> {
   protected readonly _items: InternalType[];
 
@@ -38,16 +42,45 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
     return this._items[index];
   }
 
-  public add(items: ExternalType[] | ExternalType): number {
-    return this._addOneOrMore(items);
+  public add(items: ExternalType[] | ExternalType, options?: CollectionAddOptions): number {
+    return this._addOneOrMore(items, options);
   }
 
   abstract remove(item: unknown): number;
 
-  protected abstract _addOne(item: ExternalType, options?: unknown): number;
+  protected abstract _map(item: ExternalType | InternalType): InternalType;
 
-  protected _addOneOrMore(items: ExternalType[] | ExternalType, options?: unknown): number {
+  protected _addOne(item: InternalType | ExternalType, options?: CollectionAddOptions): number {
+    if (isDefined(options) && isDefined(options.index)) {
+      if (options.index === 0 && this.length === 0) {
+        this._items.push(this._map(item));
+
+        return this.length;
+      }
+
+      if (this._isIndexOutOfBounds(options.index)) {
+        throw new RangeError(`Index '${options.index}' is out of range.`);
+      }
+
+      this._items.splice(options.index, 0, this._map(item));
+
+      return this.length;
+    }
+
+    this._items.push(this._map(item));
+
+    return this._items.length;
+  }
+
+  protected _addOneOrMore(
+    items: ExternalType[] | ExternalType,
+    options?: CollectionAddOptions
+  ): number {
     if (Array.isArray(items)) {
+      if (isDefined(options) && isDefined(options.index)) {
+        items = items.reverse();
+      }
+
       for (const item of items) {
         this._addOne(item, options);
       }
