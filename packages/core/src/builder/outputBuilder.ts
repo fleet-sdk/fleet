@@ -126,8 +126,10 @@ export class OutputBuilder {
     return this;
   }
 
-  public eject(ejector: (context: { tokens: TokensCollection }) => void) {
+  public eject(ejector: (context: { tokens: TokensCollection }) => void): OutputBuilder {
     ejector({ tokens: this._tokens });
+
+    return this;
   }
 
   public build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<string> {
