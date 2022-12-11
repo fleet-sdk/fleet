@@ -6,6 +6,7 @@ import {
   ErgoTree,
   NewToken,
   NonMandatoryRegisters,
+  OneOrMore,
   TokenAmount,
   UnsignedInput
 } from "@fleet-sdk/common";
@@ -85,7 +86,7 @@ export class OutputBuilder {
   }
 
   public addTokens(
-    tokens: TokenAmount<Amount>[] | TokenAmount<Amount> | TokensCollection,
+    tokens: OneOrMore<TokenAmount<Amount>> | TokensCollection,
     options?: TokenAddOptions
   ) {
     if (tokens instanceof TokensCollection) {

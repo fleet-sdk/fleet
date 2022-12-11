@@ -1,4 +1,4 @@
-import { Amount, Box, BoxId } from "@fleet-sdk/common";
+import { Amount, Box, BoxId, OneOrMore } from "@fleet-sdk/common";
 import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "../../errors";
 import { ErgoUnsignedInput } from "../ergoUnsignedInput";
@@ -8,7 +8,7 @@ export class InputsCollection extends Collection<ErgoUnsignedInput, Box<Amount>>
   constructor();
   constructor(box: Box<Amount>);
   constructor(boxes: Box<Amount>[]);
-  constructor(boxes?: Box<Amount> | Box<Amount>[]) {
+  constructor(boxes?: OneOrMore<Box<Amount>>) {
     super();
 
     if (isDefined(boxes)) {

@@ -7,6 +7,7 @@ import {
   HexString,
   isUndefined,
   Network,
+  OneOrMore,
   TokenAmount,
   UnsignedTransaction
 } from "@fleet-sdk/common";
@@ -112,26 +113,20 @@ export class TransactionBuilder {
     return this;
   }
 
-  public from(
-    inputs: Box<Amount> | Box<Amount>[],
-    options?: CollectionAddOptions
-  ): TransactionBuilder {
+  public from(inputs: OneOrMore<Box<Amount>>, options?: CollectionAddOptions): TransactionBuilder {
     this._inputs.add(inputs, options);
 
     return this;
   }
 
-  public to(
-    outputs: OutputBuilder[] | OutputBuilder,
-    options?: CollectionAddOptions
-  ): TransactionBuilder {
+  public to(outputs: OneOrMore<OutputBuilder>, options?: CollectionAddOptions): TransactionBuilder {
     this._outputs.add(outputs, options);
 
     return this;
   }
 
   public withDataFrom(
-    dataInputs: Box<Amount>[] | Box<Amount>,
+    dataInputs: OneOrMore<Box<Amount>>,
     options?: CollectionAddOptions
   ): TransactionBuilder {
     this._dataInputs.add(dataInputs, options);
@@ -163,7 +158,7 @@ export class TransactionBuilder {
     return this;
   }
 
-  public burnTokens(tokens: TokenAmount<Amount> | TokenAmount<Amount>[]): TransactionBuilder {
+  public burnTokens(tokens: OneOrMore<TokenAmount<Amount>>): TransactionBuilder {
     if (!this._burning) {
       this._burning = new TokensCollection();
     }

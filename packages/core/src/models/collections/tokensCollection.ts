@@ -1,4 +1,4 @@
-import { Amount, isDefined, isUndefined, TokenAmount, TokenId } from "@fleet-sdk/common";
+import { Amount, isDefined, isUndefined, OneOrMore, TokenAmount, TokenId } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
@@ -14,7 +14,7 @@ export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmoun
   constructor(token: TokenAmount<Amount>);
   constructor(tokens: TokenAmount<Amount>[]);
   constructor(tokens: TokenAmount<Amount>[], options: TokenAddOptions);
-  constructor(tokens?: TokenAmount<Amount> | TokenAmount<Amount>[], options?: TokenAddOptions) {
+  constructor(tokens?: OneOrMore<TokenAmount<Amount>>, options?: TokenAddOptions) {
     super();
 
     if (isDefined(tokens)) {
@@ -45,10 +45,7 @@ export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmoun
     return this.length;
   }
 
-  public override add(
-    items: TokenAmount<Amount> | TokenAmount<Amount>[],
-    options?: TokenAddOptions
-  ): number {
+  public override add(items: OneOrMore<TokenAmount<Amount>>, options?: TokenAddOptions): number {
     return super.add(items, options);
   }
 

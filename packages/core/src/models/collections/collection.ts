@@ -1,4 +1,4 @@
-import { isDefined } from "@fleet-sdk/common";
+import { isDefined, OneOrMore } from "@fleet-sdk/common";
 
 export type CollectionAddOptions = { index?: number };
 
@@ -42,7 +42,7 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
     return this._items[index];
   }
 
-  public add(items: ExternalType[] | ExternalType, options?: CollectionAddOptions): number {
+  public add(items: OneOrMore<ExternalType>, options?: CollectionAddOptions): number {
     return this._addOneOrMore(items, options);
   }
 
@@ -72,10 +72,7 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
     return this._items.length;
   }
 
-  protected _addOneOrMore(
-    items: ExternalType[] | ExternalType,
-    options?: CollectionAddOptions
-  ): number {
+  protected _addOneOrMore(items: OneOrMore<ExternalType>, options?: CollectionAddOptions): number {
     if (Array.isArray(items)) {
       if (isDefined(options) && isDefined(options.index)) {
         items = items.reverse();
