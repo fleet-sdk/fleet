@@ -14,14 +14,18 @@ type InputType<T> = T extends "default" ? UnsignedInput : EIP12UnsignedInput;
 type DataInputType<T> = T extends "default" ? DataInput : EIP12UnsignedDataInput;
 
 export class ErgoUnsignedInput extends ErgoBox {
-  extension?: ContextExtension;
+  private _extension?: ContextExtension;
+
+  public get extension(): ContextExtension | undefined {
+    return this._extension;
+  }
 
   constructor(box: Box<Amount>) {
     super(box);
   }
 
   public setContextVars(extension: ContextExtension): ErgoUnsignedInput {
-    this.extension = extension;
+    this._extension = extension;
 
     return this;
   }
@@ -29,7 +33,7 @@ export class ErgoUnsignedInput extends ErgoBox {
   public toUnsignedInputObject<T extends BuildOutputType>(type: T): InputType<T> {
     return {
       ...this.toObject(type),
-      extension: this.extension || {}
+      extension: this._extension || {}
     } as InputType<T>;
   }
 

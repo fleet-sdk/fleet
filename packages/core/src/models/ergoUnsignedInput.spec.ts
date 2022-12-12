@@ -19,7 +19,7 @@ describe("Construction", () => {
   });
 });
 
-describe("extension", () => {
+describe("Tweaking", () => {
   it("Should set extension", () => {
     const input = new ErgoUnsignedInput(regularBoxesMock[0]);
     input.setContextVars({ 0: "0402", 1: "0580c0fc82aa02" });
