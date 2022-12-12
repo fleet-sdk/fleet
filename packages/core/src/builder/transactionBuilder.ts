@@ -26,17 +26,19 @@ import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { CollectionAddOptions } from "../models/collections/collection";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
+import { createPluginContext, FleetPluginContext } from "./pluginContext";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
+type PluginListItem = { execute: FleetPlugin; pending: boolean };
 type TransactionType<T> = T extends "default" ? UnsignedTransaction : EIP12UnsignedTransaction;
+type SelectorSettings = Omit<BoxSelector<Box<bigint>>, "select">;
+export type SelectorCallback = (selector: SelectorSettings) => void;
+export type FleetPlugin = (context: FleetPluginContext) => void;
 
 export const RECOMMENDED_MIN_FEE_VALUE = BigInt(1100000);
 export const FEE_CONTRACT =
   "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304";
-
-type SelectorSettings = Omit<BoxSelector<Box<bigint>>, "select">;
-export type SelectorCallback = (selector: SelectorSettings) => void;
 
 type EjectorContext = {
   inputs: InputsCollection;
@@ -44,7 +46,7 @@ type EjectorContext = {
   outputs: OutputsCollection;
   burning: TokensCollection | undefined;
   settings: TransactionBuilderSettings;
-  selection: (selectorCallBack?: SelectorCallback) => void;
+  selection: (selectorCallBack: SelectorCallback) => void;
 };
 
 export class TransactionBuilder {
@@ -54,10 +56,11 @@ export class TransactionBuilder {
   private readonly _settings!: TransactionBuilderSettings;
   private readonly _creationHeight!: number;
 
-  private _selectorCallback?: SelectorCallback;
+  private _selectorCallbacks?: SelectorCallback[];
   private _changeAddress?: ErgoAddress;
   private _feeAmount?: bigint;
   private _burning?: TokensCollection;
+  private _plugins?: PluginListItem[];
 
   constructor(creationHeight: number) {
     this._inputs = new InputsCollection();
@@ -173,24 +176,35 @@ export class TransactionBuilder {
     return this;
   }
 
-  public configureSelector(selectorCallback?: SelectorCallback): TransactionBuilder {
-    this._selectorCallback = selectorCallback;
+  public configureSelector(selectorCallback: SelectorCallback): TransactionBuilder {
+    if (isUndefined(this._selectorCallbacks)) {
+      this._selectorCallbacks = [];
+    }
+
+    this._selectorCallbacks.push(selectorCallback);
+
+    return this;
+  }
+
+  public extend(plugins: FleetPlugin): TransactionBuilder {
+    if (!this._plugins) {
+      this._plugins = [];
+    }
+    this._plugins.push({ execute: plugins, pending: true });
 
     return this;
   }
 
   public eject(ejector: (context: EjectorContext) => void): TransactionBuilder {
-    const selection = (selectorCallback?: SelectorCallback) => {
-      this._selectorCallback = selectorCallback;
-    };
-
     ejector({
       inputs: this.inputs,
       dataInputs: this.dataInputs,
       outputs: this.outputs,
       burning: this.burning,
       settings: this.settings,
-      selection: selection
+      selection: (selectorCallback: SelectorCallback) => {
+        this.configureSelector(selectorCallback);
+      }
     });
 
     return this;
@@ -199,6 +213,16 @@ export class TransactionBuilder {
   public build(): UnsignedTransaction;
   public build<T extends BuildOutputType>(buildOutputType: T): TransactionType<T>;
   public build<T extends BuildOutputType>(buildOutputType?: T): TransactionType<T> {
+    if (some(this._plugins)) {
+      const context = createPluginContext(this);
+      for (const plugin of this._plugins) {
+        if (plugin.pending) {
+          plugin.execute(context);
+          plugin.pending = false;
+        }
+      }
+    }
+
     if (this._isMinting()) {
       if (this._isMoreThanOneTokenBeingMinted()) {
         throw new MalformedTransaction("only one token can be minted per transaction.");
@@ -218,8 +242,10 @@ export class TransactionBuilder {
     }
 
     const selector = new BoxSelector(this.inputs.toArray());
-    if (isDefined(this._selectorCallback)) {
-      this._selectorCallback(selector);
+    if (some(this._selectorCallbacks)) {
+      for (const selectorCallBack of this._selectorCallbacks) {
+        selectorCallBack(selector);
+      }
     }
 
     const target = some(this._burning)

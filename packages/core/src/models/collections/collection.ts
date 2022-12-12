@@ -52,7 +52,7 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
 
   protected _addOne(item: InternalType | ExternalType, options?: CollectionAddOptions): number {
     if (isDefined(options) && isDefined(options.index)) {
-      if (options.index === 0 && this.length === 0) {
+      if (options.index === this.length) {
         this._items.push(this._map(item));
 
         return this.length;

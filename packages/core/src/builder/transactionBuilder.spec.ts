@@ -1061,3 +1061,130 @@ describe("Token burning", () => {
     }).toThrow(MalformedTransaction);
   });
 });
+
+describe("Plugins", () => {
+  it("Should include inputs, data inputs and outputs from plugin", () => {
+    const tx = new TransactionBuilder(height)
+      .extend(({ addInputs, addDataInputs, addOutputs }) => {
+        addInputs(regularBoxesMock);
+        addDataInputs(first(regularBoxesMock));
+        addOutputs(new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address, height));
+      })
+      .sendChangeTo("9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ")
+      .build();
+
+    expect(tx.outputs).toHaveLength(2); // output from plugin context and change
+    expect(tx.outputs[0].ergoTree).toBe(a1.ergoTree);
+    expect(tx.inputs).toHaveLength(regularBoxesMock.length); // should include all inputs added from plugin context
+    expect(tx.dataInputs).toHaveLength(1);
+    expect(tx.dataInputs[0].boxId).toBe(regularBoxesMock[0].boxId);
+  });
+
+  it("Should include inputs, data inputs and outputs from multiple plugins", () => {
+    const tx = new TransactionBuilder(height)
+      .extend(({ addInputs, addDataInputs, addOutputs }) => {
+        addInputs(regularBoxesMock[1]);
+        addDataInputs(regularBoxesMock[1]);
+        addOutputs(new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address, height));
+      })
+      .extend(({ addInputs, addDataInputs, addOutputs }) => {
+        addInputs(regularBoxesMock[2]);
+        addDataInputs(regularBoxesMock[2]);
+        addOutputs(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address, height));
+      })
+      .sendChangeTo("9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ")
+      .build();
+
+    expect(tx.outputs).toHaveLength(3); // two output from plugin context and one from change
+    expect(tx.outputs[0].ergoTree).toBe(a1.ergoTree);
+    expect(tx.outputs[1].ergoTree).toBe(a2.ergoTree);
+
+    expect(tx.inputs).toHaveLength(2); // should include all inputs added from plugin context
+
+    expect(tx.dataInputs).toHaveLength(2);
+    expect(tx.dataInputs[0].boxId).toBe(regularBoxesMock[1].boxId);
+    expect(tx.dataInputs[1].boxId).toBe(regularBoxesMock[2].boxId);
+  });
+
+  it("Should burn tokens, plugin context allowed", () => {
+    const tokenIda = "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2";
+    const tokenIdb = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
+
+    const tx = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .configure((settings) => settings.allowTokenBurningFromPlugins(true))
+      .extend(({ burnTokens }) => {
+        burnTokens([
+          { tokenId: tokenIda, amount: 1n },
+          { tokenId: tokenIdb, amount: 126n }
+        ]);
+      })
+      .sendChangeTo("9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ")
+      .build("EIP-12");
+
+    expect(utxoSum(tx.outputs, tokenIda) - utxoSum(tx.inputs, tokenIda)).toBe(-1n);
+    expect(utxoSum(tx.outputs, tokenIdb) - utxoSum(tx.inputs, tokenIdb)).toBe(-126n);
+  });
+
+  it("Should burn tokens, global context allowed", () => {
+    const tokenIda = "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2";
+    const tokenIdb = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
+
+    const tx = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .configure((settings) => settings.allowTokenBurning(true))
+      .extend(({ burnTokens }) => {
+        burnTokens([
+          { tokenId: tokenIda, amount: 1n },
+          { tokenId: tokenIdb, amount: 126n }
+        ]);
+      })
+      .sendChangeTo("9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ")
+      .build("EIP-12");
+
+    expect(utxoSum(tx.outputs, tokenIda) - utxoSum(tx.inputs, tokenIda)).toBe(-1n);
+    expect(utxoSum(tx.outputs, tokenIdb) - utxoSum(tx.inputs, tokenIdb)).toBe(-126n);
+  });
+
+  it("Should fail if burning is not allowed", () => {
+    const tokenIda = "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2";
+    const tokenIdb = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
+
+    expect(() => {
+      new TransactionBuilder(height)
+        .from(regularBoxesMock)
+        .extend(({ burnTokens }) => {
+          burnTokens([
+            { tokenId: tokenIda, amount: 1n },
+            { tokenId: tokenIdb, amount: 126n }
+          ]);
+        })
+        .build();
+    }).toThrow(NotAllowedTokenBurning);
+  });
+
+  it("Should not execute plugins more tha one time", () => {
+    const plugin = jest.fn(({ addOutputs }) => {
+      addOutputs(new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address));
+    });
+
+    const tx = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .extend(plugin)
+      .sendChangeTo(a2.address);
+
+    let builtTx = tx.build();
+
+    expect(tx.outputs).toHaveLength(1);
+    expect(builtTx.outputs).toHaveLength(2); // output from plugin and change
+
+    expect(tx.outputs.at(0).ergoTree).toBe(a1.ergoTree);
+    expect(plugin).toBeCalledTimes(1);
+
+    for (let i = 0; i < 5; i++) {
+      builtTx = tx.build();
+    }
+
+    expect(plugin).toBeCalledTimes(1); // should not do subsequent calls
+  });
+});

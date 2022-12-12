@@ -47,13 +47,15 @@ describe("collection base", () => {
     expect(collection.at(3)).toBe(3);
   });
 
-  it("Should not fail when trying to place at index 0 and collection is empty", () => {
+  it("Should not fail when trying to place at index == Collection.length", () => {
     const collection = new MockCollection();
 
     collection.add(5, { index: 0 });
+    collection.add(6, { index: 1 });
 
-    expect(collection).toHaveLength(1);
+    expect(collection).toHaveLength(2);
     expect(collection.at(0)).toBe(5);
+    expect(collection.at(1)).toBe(6);
   });
 
   it("Should should fail when trying to add out of range", () => {
