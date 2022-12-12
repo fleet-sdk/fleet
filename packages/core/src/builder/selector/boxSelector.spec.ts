@@ -133,11 +133,65 @@ describe("Ensure input inclusion", () => {
     const selector = new BoxSelector(regularBoxesMock).ensureInclusion(
       (input) => input.boxId === arbitraryBoxId
     );
-    const boxes = selector.select(target);
+    const boxes = selector.select({ nanoErgs: 10000n });
 
     expect(boxes.some((x) => x.boxId === arbitraryBoxId)).toBe(true);
     expect(boxes).toHaveLength(1);
     expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
+  });
+
+  it("Should forcedly include inputs by boxId", () => {
+    const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
+    const selector = new BoxSelector(regularBoxesMock).ensureInclusion(arbitraryBoxId);
+    const boxes = selector.select({ nanoErgs: 10000n });
+
+    expect(boxes).toHaveLength(1);
+    expect(boxes[0].boxId).toBe(arbitraryBoxId);
+  });
+
+  it("Should forcedly include inputs by multiple boxId", () => {
+    const selector = new BoxSelector(regularBoxesMock).ensureInclusion([
+      "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
+      "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
+    ]);
+    const boxes = selector.select({ nanoErgs: 10000n });
+
+    expect(boxes).toHaveLength(2);
+    expect(boxes[0].boxId).toBe("e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e");
+    expect(boxes[1].boxId).toBe("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d");
+  });
+
+  it("Should forcedly include inputs by multiple boxId and filter criteria", () => {
+    const boxId1 = "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e";
+    const boxId2 = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
+    const boxId3 = "467b6867c6726cc5484be3cbddbf55c30c0a71594a20c1ac28d35b5049632444";
+    const boxId4 = "a2c9821f5c2df9c320f17136f043b33f7716713ab74c84d687885f9dd39d2c8a";
+
+    const selector = new BoxSelector(regularBoxesMock)
+      .ensureInclusion((box) => box.boxId === boxId1 || box.boxId === boxId3)
+      .ensureInclusion([boxId1, boxId2, boxId1])
+      .ensureInclusion(boxId4);
+
+    const boxes = selector.select({ nanoErgs: 10000n });
+
+    expect(boxes).toHaveLength(4);
+    expect(boxes[0].boxId).toBe(boxId1);
+    expect(boxes[1].boxId).toBe(boxId4);
+    expect(boxes[2].boxId).toBe(boxId3);
+    expect(boxes[3].boxId).toBe(boxId2);
+  });
+
+  it("Should forcedly include inputs by boxId and ignore duplicates", () => {
+    const selector = new BoxSelector(regularBoxesMock)
+      .ensureInclusion("e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e")
+      .ensureInclusion("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d")
+      .ensureInclusion("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d");
+
+    const boxes = selector.select({ nanoErgs: 10000n });
+
+    expect(boxes).toHaveLength(2);
+    expect(boxes[0].boxId).toBe("e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e");
+    expect(boxes[1].boxId).toBe("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d");
   });
 
   it("Should forcedly include inputs that attends to filter criteria and collect additional inputs until target is reached", () => {

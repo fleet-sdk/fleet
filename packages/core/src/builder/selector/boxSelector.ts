@@ -2,9 +2,11 @@ import {
   Amount,
   Box,
   BoxCandidate,
+  BoxId,
   FilterPredicate,
   first,
   isUndefined,
+  OneOrMore,
   SortingDirection,
   SortingSelector,
   TokenTargetAmount
@@ -34,6 +36,7 @@ export class BoxSelector<T extends Box<bigint>> {
   private _ensureFilterPredicate?: FilterPredicate<Box<bigint>>;
   private _inputsSortSelector?: SortingSelector<Box<bigint>>;
   private _inputsSortDir?: SortingDirection;
+  private _ensureInclusionBoxIds?: Set<BoxId>;
 
   constructor(inputs: T[]) {
     this._inputs = inputs;
@@ -56,12 +59,23 @@ export class BoxSelector<T extends Box<bigint>> {
 
     const remaining = this._deepCloneTarget(target);
     let unselected = [...this._inputs];
-    let selected!: Box<bigint>[];
+    let selected: Box<bigint>[] = [];
 
-    if (isDefined(this._ensureFilterPredicate)) {
-      const predicate = this._ensureFilterPredicate;
-      selected = unselected.filter(predicate);
-      unselected = unselected.filter((input) => !predicate(input));
+    const predicate = this._ensureFilterPredicate;
+    const inclusion = this._ensureInclusionBoxIds;
+
+    if (isDefined(predicate)) {
+      if (isDefined(inclusion)) {
+        selected = unselected.filter((box) => predicate(box) || inclusion.has(box.boxId));
+      } else {
+        selected = unselected.filter(predicate);
+      }
+    } else if (isDefined(inclusion)) {
+      selected = unselected.filter((box) => inclusion.has(box.boxId));
+    }
+
+    if (isDefined(selected)) {
+      unselected = unselected.filter((box) => !selected.some((sel) => sel.boxId === box.boxId));
 
       if (isDefined(remaining.nanoErgs)) {
         remaining.nanoErgs -= sumBy(selected, (input) => input.value);
@@ -74,8 +88,6 @@ export class BoxSelector<T extends Box<bigint>> {
           }
         }
       }
-    } else {
-      selected = [];
     }
 
     unselected = this._sort(unselected);
@@ -143,8 +155,26 @@ export class BoxSelector<T extends Box<bigint>> {
     return orderBy(inputs, this._inputsSortSelector, this._inputsSortDir || "asc");
   }
 
-  public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector<T> {
-    this._ensureFilterPredicate = predicate;
+  public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector<T>;
+  public ensureInclusion(boxIds: OneOrMore<BoxId>): BoxSelector<T>;
+  public ensureInclusion(
+    predicateOrBoxIds: FilterPredicate<Box<bigint>> | OneOrMore<BoxId>
+  ): BoxSelector<T> {
+    if (typeof predicateOrBoxIds === "function") {
+      this._ensureFilterPredicate = predicateOrBoxIds;
+    } else {
+      if (isUndefined(this._ensureInclusionBoxIds)) {
+        this._ensureInclusionBoxIds = new Set();
+      }
+
+      if (Array.isArray(predicateOrBoxIds)) {
+        for (const boxId of predicateOrBoxIds) {
+          this._ensureInclusionBoxIds.add(boxId);
+        }
+      } else {
+        this._ensureInclusionBoxIds.add(predicateOrBoxIds);
+      }
+    }
 
     return this;
   }
