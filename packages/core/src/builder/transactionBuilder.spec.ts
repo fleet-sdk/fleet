@@ -157,7 +157,7 @@ describe("basic construction", () => {
     expect(builder.settings.maxTokensPerChangeBox).toBe(MAX_TOKENS_PER_BOX);
 
     builder.configure((settings) => {
-      settings.allowTokenBurn(true).setMaxTokensPerChangeBox(10);
+      settings.allowTokenBurning(true).setMaxTokensPerChangeBox(10);
     });
 
     expect(builder.settings.canBurnTokens).toBeTruthy();
@@ -999,7 +999,7 @@ describe("Token burning", () => {
         })
       )
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
-      .configure((settings) => settings.allowTokenBurn(true)) // explicitly allow token burning
+      .configure((settings) => settings.allowTokenBurning(true)) // explicitly allow token burning
       .build();
 
     expect(transaction.outputs).toHaveLength(2);
@@ -1054,7 +1054,7 @@ describe("Token burning", () => {
       .from(inputs)
       .to(new OutputBuilder(outputValue - 1000000n, a1.address)) // will try to burn 1000000n
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
-      .configure((settings) => settings.allowTokenBurn(true));
+      .configure((settings) => settings.allowTokenBurning(true));
 
     expect(() => {
       builder.build();
