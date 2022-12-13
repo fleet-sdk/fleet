@@ -8,7 +8,7 @@ export type FleetPluginContext = {
    * @param inputs
    * @returns new list length
    */
-  addInputs: (inputs: OneOrMore<Box<Amount>>, options?: CollectionAddOptions) => number;
+  addInputs: (inputs: OneOrMore<Box<Amount>>) => number;
 
   /**
    * Add one or more data inputs to the data inputs list
@@ -37,9 +37,9 @@ export type FleetPluginContext = {
 
 export function createPluginContext(transactionBuilder: TransactionBuilder): FleetPluginContext {
   return {
-    addInputs: (inputs, options) =>
+    addInputs: (inputs) =>
       transactionBuilder
-        .from(inputs, options)
+        .from(inputs)
         .configureSelector((selector) =>
           selector.ensureInclusion(
             Array.isArray(inputs) ? inputs.map((input) => input.boxId) : inputs.boxId

@@ -116,8 +116,8 @@ export class TransactionBuilder {
     return this;
   }
 
-  public from(inputs: OneOrMore<Box<Amount>>, options?: CollectionAddOptions): TransactionBuilder {
-    this._inputs.add(inputs, options);
+  public from(inputs: OneOrMore<Box<Amount>>): TransactionBuilder {
+    this._inputs.add(inputs);
 
     return this;
   }
