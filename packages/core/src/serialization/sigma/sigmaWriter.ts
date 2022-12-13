@@ -3,7 +3,7 @@ import { bytesToHex } from "@noble/hashes/utils";
 import { VLQ } from "../vlq";
 import { ZigZag } from "../zigZag";
 
-export class SigmaBuffer {
+export class SigmaWriter {
   private _bytes!: Uint8Array;
   private _cursor!: number;
 
@@ -16,40 +16,40 @@ export class SigmaBuffer {
     this._cursor = 0;
   }
 
-  public putBoolean(value: boolean): SigmaBuffer {
-    this.put(value === true ? 0x01 : 0x00);
+  public writeBoolean(value: boolean): SigmaWriter {
+    this.write(value === true ? 0x01 : 0x00);
 
     return this;
   }
 
-  public putBooleans(elements: boolean[]): SigmaBuffer {
+  public writeBooleans(elements: boolean[]): SigmaWriter {
     for (let i = 0; i < elements.length; i++) {
-      this.putBoolean(elements[i]);
+      this.writeBoolean(elements[i]);
     }
 
     return this;
   }
 
-  public putInt(value: number): SigmaBuffer {
-    this.putBytes(VLQ.encode(ZigZag.encode(ensureBigInt(value))));
+  public writeInt(value: number): SigmaWriter {
+    this.writeBytes(VLQ.encode(ZigZag.encode(ensureBigInt(value))));
 
     return this;
   }
 
-  public put(byte: number): SigmaBuffer {
+  public write(byte: number): SigmaWriter {
     this._bytes[this._cursor++] = byte;
 
     return this;
   }
 
-  public putBytes(bytes: Uint8Array): SigmaBuffer {
+  public writeBytes(bytes: Uint8Array): SigmaWriter {
     this._bytes.set(bytes, this._cursor);
     this._cursor += bytes.length;
 
     return this;
   }
 
-  public putHex(hex: string): SigmaBuffer {
+  public writeHex(hex: string): SigmaWriter {
     if (hex.length % 2) {
       throw new Error("Invalid hex padding");
     }
@@ -62,13 +62,13 @@ export class SigmaBuffer {
         throw new Error("Invalid byte sequence");
       }
 
-      this.put(byte);
+      this.write(byte);
     }
 
     return this;
   }
 
-  public putBits(bits: ArrayLike<boolean>): SigmaBuffer {
+  public writeBits(bits: ArrayLike<boolean>): SigmaWriter {
     let bitOffset = 0;
 
     for (let i = 0; i < bits.length; i++) {
@@ -91,7 +91,7 @@ export class SigmaBuffer {
     return this;
   }
 
-  public putBigInt(number: bigint): SigmaBuffer {
+  public writeBigInt(number: bigint): SigmaWriter {
     if (number < _0n) {
       throw new Error("Negative BigInt values are not supported Fleet serializer.");
     }
@@ -104,8 +104,8 @@ export class SigmaBuffer {
       hex = "00" + hex;
     }
 
-    this.putBytes(VLQ.encode(hex.length / 2));
-    this.putHex(hex);
+    this.writeBytes(VLQ.encode(hex.length / 2));
+    this.writeHex(hex);
 
     return this;
   }

@@ -1,14 +1,14 @@
-import { SigmaBuffer } from "./sigmaBuffer";
 import { ISigmaType } from "./sigmaTypes";
+import { SigmaWriter } from "./sigmaWriter";
 import { isColl, isEmbeddable, isPrimitiveType } from "./utils";
 
 export class TypeSerializer {
-  public static serialize(value: ISigmaType, buffer: SigmaBuffer) {
+  public static serialize(value: ISigmaType, buffer: SigmaWriter) {
     if (isPrimitiveType(value)) {
-      buffer.put(value.type);
+      buffer.write(value.type);
     } else if (isColl(value)) {
       if (isEmbeddable(value.elementsType)) {
-        buffer.put(value.type + value.elementsType);
+        buffer.write(value.type + value.elementsType);
       }
     }
   }
