@@ -25,8 +25,8 @@ import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import { ErgoAddress } from "../models";
 import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
-import { SConstant } from "../serialization/sigma/constantSerializer";
-import { SByte, SColl } from "../serialization/sigma/sigmaTypes";
+import { SConstant } from "../serializer/sigma/constantSerializer";
+import { SByte, SColl } from "../serializer/sigma/sigmaTypes";
 
 export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 

@@ -1,5 +1,5 @@
 import { _0n, _127n, _128n, _7n } from "@fleet-sdk/common";
-import { SigmaReader } from "./sigma/sigmaReader";
+import { SigmaByteReader } from "./sigma/sigmaByteReader";
 
 /**
  * A **variable-length quantity (VLQ)** is a universal code that uses an arbitrary number
@@ -43,7 +43,7 @@ export function vlqEncode(value: number): Uint8Array {
  * @param reader VLQ bytes
  * @returns Unsigned integer value
  */
-export function vlqDecode(reader: SigmaReader): number {
+export function vlqDecode(reader: SigmaByteReader): number {
   if (reader.isEmpty) {
     return 0;
   }
@@ -95,7 +95,7 @@ export function vqlEncodeBigInt(value: bigint): Uint8Array {
  * @param reader VLQ bytes
  * @returns Unsigned integer value
  */
-export function vlqDecodeBigInt(reader: SigmaReader): bigint {
+export function vlqDecodeBigInt(reader: SigmaByteReader): bigint {
   if (reader.isEmpty) {
     return _0n;
   }

@@ -6,7 +6,7 @@ import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
 import { ErgoAddress, ErgoUnsignedInput, MAX_TOKENS_PER_BOX } from "../models";
-import { SByte, SColl, SConstant } from "../serialization";
+import { SByte, SColl, SConstant } from "../serializer";
 import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";

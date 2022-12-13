@@ -4,7 +4,7 @@ import { vlqDecode, vlqDecodeBigInt } from "../vlq";
 import { zigZagDecode, zigZagDecodeBigInt } from "../zigZag";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 
-export class SigmaReader {
+export class SigmaByteReader {
   private _bytes!: Uint8Array;
   private _cursor!: number;
 

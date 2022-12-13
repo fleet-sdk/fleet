@@ -2,7 +2,7 @@ import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/comm
 import { ensureBigInt } from "@fleet-sdk/common";
 import { blake2b } from "@noble/hashes/blake2b";
 import { bytesToHex } from "@noble/hashes/utils";
-import { serializeErgoBox } from "../serialization/sigma/chainObjects";
+import { serializeBox } from "../serializer/sigma/boxSerializer";
 
 export class ErgoBox {
   boxId!: string;
@@ -33,7 +33,7 @@ export class ErgoBox {
   }
 
   static validate(box: Box<Amount> | ErgoBox): boolean {
-    const bytes = serializeErgoBox(box);
+    const bytes = serializeBox(box);
     const hash = bytesToHex(blake2b(bytes, { dkLen: 32 }));
 
     return box.boxId === hash;

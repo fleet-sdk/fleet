@@ -3,7 +3,7 @@ import { bytesToHex } from "@noble/hashes/utils";
 import { vlqEncode, vqlEncodeBigInt } from "../vlq";
 import { zigZagEncode, zigZagEncodeBigInt } from "../zigZag";
 
-export class SigmaWriter {
+export class SigmaByteWriter {
   private _bytes!: Uint8Array;
   private _cursor!: number;
 
@@ -16,13 +16,13 @@ export class SigmaWriter {
     this._cursor = 0;
   }
 
-  public writeBoolean(value: boolean): SigmaWriter {
+  public writeBoolean(value: boolean): SigmaByteWriter {
     this.write(value === true ? 0x01 : 0x00);
 
     return this;
   }
 
-  public writeBooleans(elements: boolean[]): SigmaWriter {
+  public writeBooleans(elements: boolean[]): SigmaByteWriter {
     for (let i = 0; i < elements.length; i++) {
       this.writeBoolean(elements[i]);
     }
@@ -30,32 +30,32 @@ export class SigmaWriter {
     return this;
   }
 
-  public writeNumber(value: number): SigmaWriter {
+  public writeNumber(value: number): SigmaByteWriter {
     this.writeBytes(vlqEncode(zigZagEncode(value)));
 
     return this;
   }
 
-  public writeLong(value: bigint): SigmaWriter {
+  public writeLong(value: bigint): SigmaByteWriter {
     this.writeBytes(vqlEncodeBigInt(zigZagEncodeBigInt(value)));
 
     return this;
   }
 
-  public write(byte: number): SigmaWriter {
+  public write(byte: number): SigmaByteWriter {
     this._bytes[this._cursor++] = byte;
 
     return this;
   }
 
-  public writeBytes(bytes: Uint8Array): SigmaWriter {
+  public writeBytes(bytes: Uint8Array): SigmaByteWriter {
     this._bytes.set(bytes, this._cursor);
     this._cursor += bytes.length;
 
     return this;
   }
 
-  public writeHex(hex: string): SigmaWriter {
+  public writeHex(hex: string): SigmaByteWriter {
     if (hex.length % 2) {
       throw new Error("Invalid hex padding");
     }
@@ -74,7 +74,7 @@ export class SigmaWriter {
     return this;
   }
 
-  public writeBits(bits: ArrayLike<boolean>): SigmaWriter {
+  public writeBits(bits: ArrayLike<boolean>): SigmaByteWriter {
     let bitOffset = 0;
 
     for (let i = 0; i < bits.length; i++) {
@@ -97,7 +97,7 @@ export class SigmaWriter {
     return this;
   }
 
-  public writeBigInt(number: bigint): SigmaWriter {
+  public writeBigInt(number: bigint): SigmaByteWriter {
     if (number < _0n) {
       throw new Error("Negative BigInt values are not supported Fleet serializer.");
     }

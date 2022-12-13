@@ -4,7 +4,7 @@ import { concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { ErgoBox } from "../../models/ergoBox";
 import { vlqEncode, vqlEncodeBigInt } from "../vlq";
 
-export function serializeErgoBox(box: Box<Amount> | ErgoBox): Uint8Array {
+export function serializeBox(box: Box<Amount> | ErgoBox): Uint8Array {
   return concatBytes(
     vqlEncodeBigInt(ensureBigInt(box.value)),
     hexToBytes(box.ergoTree),

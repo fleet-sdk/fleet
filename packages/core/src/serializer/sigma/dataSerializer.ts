@@ -1,12 +1,12 @@
 import { vlqEncode } from "../vlq";
-import { SigmaReader } from "./sigmaReader";
+import { SigmaByteReader } from "./sigmaByteReader";
+import { SigmaByteWriter } from "./sigmaByteWriter";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 import { IPrimitiveSigmaType, ISigmaType } from "./sigmaTypes";
-import { SigmaWriter } from "./sigmaWriter";
 import { isColl, isPrimitiveType, isPrimitiveTypeCode } from "./utils";
 
 export class DataSerializer {
-  public static serialize(data: ISigmaType, buffer: SigmaWriter) {
+  public static serialize(data: ISigmaType, buffer: SigmaByteWriter) {
     if (isPrimitiveType(data)) {
       switch (data.type) {
         case SigmaTypeCode.Boolean:
@@ -68,7 +68,7 @@ export class DataSerializer {
     }
   }
 
-  static deserialize(typeCode: SigmaTypeCode, reader: SigmaReader): unknown {
+  static deserialize(typeCode: SigmaTypeCode, reader: SigmaByteReader): unknown {
     if (isPrimitiveTypeCode(typeCode)) {
       switch (typeCode) {
         case SigmaTypeCode.Boolean:

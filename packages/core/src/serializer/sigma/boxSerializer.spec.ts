@@ -1,5 +1,5 @@
 import { bytesToHex } from "@noble/hashes/utils";
-import { serializeErgoBox } from "./chainObjects";
+import { serializeBox } from "./boxSerializer";
 
 describe("Serialize ErgoBox", () => {
   const testVectors = [
@@ -226,7 +226,7 @@ describe("Serialize ErgoBox", () => {
 
   it("Should serialize", () => {
     for (const tv of testVectors) {
-      expect(bytesToHex(serializeErgoBox(tv.json))).toBe(tv.bytes);
+      expect(bytesToHex(serializeBox(tv.json))).toBe(tv.bytes);
     }
   });
 });
