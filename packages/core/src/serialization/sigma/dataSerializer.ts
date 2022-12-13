@@ -1,8 +1,9 @@
-import { VLQ } from "../vlq";
+import { vlqEncode } from "../vlq";
+import { SigmaReader } from "./sigmaReader";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 import { IPrimitiveSigmaType, ISigmaType } from "./sigmaTypes";
 import { SigmaWriter } from "./sigmaWriter";
-import { isColl, isPrimitiveType } from "./utils";
+import { isColl, isPrimitiveType, isPrimitiveTypeCode } from "./utils";
 
 export class DataSerializer {
   public static serialize(data: ISigmaType, buffer: SigmaWriter) {
@@ -16,8 +17,10 @@ export class DataSerializer {
           break;
         case SigmaTypeCode.Short:
         case SigmaTypeCode.Int:
+          buffer.writeNumber((data as IPrimitiveSigmaType<number>).value);
+          break;
         case SigmaTypeCode.Long:
-          buffer.writeInt((data as IPrimitiveSigmaType<number>).value);
+          buffer.writeLong((data as IPrimitiveSigmaType<bigint>).value);
           break;
         case SigmaTypeCode.BigInt: {
           buffer.writeBigInt((data as IPrimitiveSigmaType<bigint>).value);
@@ -43,7 +46,7 @@ export class DataSerializer {
           throw Error("Not implemented");
       }
     } else if (isColl(data)) {
-      buffer.writeBytes(VLQ.encode(data.value.length));
+      buffer.writeBytes(vlqEncode(data.value.length));
 
       switch (data.elementsType) {
         case SigmaTypeCode.Boolean:
@@ -63,5 +66,30 @@ export class DataSerializer {
     } else {
       throw Error("Not implemented");
     }
+  }
+
+  static deserialize(typeCode: SigmaTypeCode, reader: SigmaReader): unknown {
+    if (isPrimitiveTypeCode(typeCode)) {
+      switch (typeCode) {
+        case SigmaTypeCode.Boolean:
+          return reader.readBoolean();
+        case SigmaTypeCode.Byte:
+          return reader.readByte();
+        case SigmaTypeCode.Short:
+        case SigmaTypeCode.Int:
+          return reader.readNumber();
+        case SigmaTypeCode.Long:
+          return reader.readLong();
+        // case SigmaTypeCode.BigInt:
+        // case SigmaTypeCode.GroupElement:
+        // case SigmaTypeCode.SigmaProp:
+        // case SigmaTypeCode.Unit:
+        // case SigmaTypeCode.Box:
+        // default:
+        //   break;
+      }
+    }
+
+    throw new Error("Type parsing not yet implemented.");
   }
 }

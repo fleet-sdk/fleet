@@ -13,7 +13,7 @@ import {
   sPositiveBigIntTestVectors,
   sSigmaPropTestVectors
 } from "../../tests/testVectors/constantsTestVectors";
-import { SConstant } from "./constantSerializer";
+import { SConstant, SParse } from "./constantSerializer";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 import {
   SBigInt,
@@ -134,5 +134,43 @@ describe("SColl serialization", () => {
     for (const tv of collLongTestVectors) {
       expect(SConstant(SColl(SLong, tv.coll))).toBe(tv.hex);
     }
+  });
+});
+``;
+
+describe("Deserialization", () => {
+  it("Should deserialize SBoolean", () => {
+    expect(SParse("0101")).toBe(true);
+    expect(SParse("0100")).toBe(false);
+  });
+
+  it("Should deserialize SByte", () => {
+    expect(SParse("0201")).toBe(1);
+    expect(SParse("0202")).toBe(2);
+    expect(SParse("024c")).toBe(76);
+  });
+
+  it("Should deserialize SInt", () => {
+    for (const tv of sIntTestVectors) {
+      expect(SParse(tv.hex)).toBe(tv.value);
+    }
+  });
+
+  it("Should deserialize SLong", () => {
+    for (const tv of sLongTestVectors) {
+      expect(SParse(tv.hex)).toBe(tv.value);
+    }
+  });
+
+  it("Should deserialize SShort", () => {
+    expect(SParse("0302")).toBe(1);
+    expect(SParse("0303")).toBe(-2);
+    expect(SParse("0322")).toBe(17);
+  });
+
+  it("Should fail when trying to deserialize a not implemented type", () => {
+    expect(() => {
+      SParse("6122");
+    }).toThrow();
   });
 });

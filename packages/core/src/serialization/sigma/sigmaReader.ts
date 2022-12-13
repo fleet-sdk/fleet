@@ -22,6 +22,10 @@ export class SigmaReader {
     this._cursor = 0;
   }
 
+  public readBoolean(): boolean {
+    return this.readByte() === 0x01;
+  }
+
   public readByte(): number {
     return this._bytes[this._cursor++];
   }
