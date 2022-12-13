@@ -1,7 +1,7 @@
-import { _0n, ensureBigInt } from "@fleet-sdk/common";
+import { _0n } from "@fleet-sdk/common";
 import { bytesToHex } from "@noble/hashes/utils";
-import { VLQ } from "../vlq";
-import { ZigZag } from "../zigZag";
+import { vlqEncode, vqlEncodeBigInt } from "../vlq";
+import { zigZagEncode, zigZagEncodeBigInt } from "../zigZag";
 
 export class SigmaWriter {
   private _bytes!: Uint8Array;
@@ -30,8 +30,14 @@ export class SigmaWriter {
     return this;
   }
 
-  public writeInt(value: number): SigmaWriter {
-    this.writeBytes(VLQ.encode(ZigZag.encode(ensureBigInt(value))));
+  public writeNumber(value: number): SigmaWriter {
+    this.writeBytes(vlqEncode(zigZagEncode(value)));
+
+    return this;
+  }
+
+  public writeLong(value: bigint): SigmaWriter {
+    this.writeBytes(vqlEncodeBigInt(zigZagEncodeBigInt(value)));
 
     return this;
   }
@@ -104,7 +110,7 @@ export class SigmaWriter {
       hex = "00" + hex;
     }
 
-    this.writeBytes(VLQ.encode(hex.length / 2));
+    this.writeBytes(vlqEncode(hex.length / 2));
     this.writeHex(hex);
 
     return this;

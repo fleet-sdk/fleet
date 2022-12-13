@@ -88,8 +88,8 @@ describe("Sigma Writer", () => {
 
     const all = new SigmaWriter(MAX_CONSTANT_LENGTH);
     for (const tv of testVectors) {
-      all.writeInt(tv.int);
-      expect(new SigmaWriter(tv.hex.length).writeInt(tv.int).toHex()).toBe(tv.hex);
+      all.writeNumber(tv.int);
+      expect(new SigmaWriter(tv.hex.length).writeNumber(tv.int).toHex()).toBe(tv.hex);
     }
 
     expect(all.toHex()).toEqual(testVectors.map((x) => x.hex).join(""));

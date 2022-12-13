@@ -2,17 +2,17 @@ import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/comm
 import { ensureBigInt, isDefined, isEmpty } from "@fleet-sdk/common";
 import { concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { ErgoBox } from "../../models/ergoBox";
-import { VLQ } from "../vlq";
+import { vlqEncode, vqlEncodeBigInt } from "../vlq";
 
 export function serializeErgoBox(box: Box<Amount> | ErgoBox): Uint8Array {
   return concatBytes(
-    VLQ.encode(ensureBigInt(box.value)),
+    vqlEncodeBigInt(ensureBigInt(box.value)),
     hexToBytes(box.ergoTree),
-    VLQ.encode(box.creationHeight),
+    vlqEncode(box.creationHeight),
     serializeTokens(box.assets),
     serializeRegisters(box.additionalRegisters),
     hexToBytes(box.transactionId),
-    VLQ.encode(box.index)
+    vlqEncode(box.index)
   );
 }
 
@@ -22,9 +22,9 @@ function serializeTokens(tokens: TokenAmount<Amount>[]): Uint8Array {
   }
 
   return concatBytes(
-    VLQ.encode(tokens.length),
+    vlqEncode(tokens.length),
     ...tokens.map((asset) =>
-      concatBytes(hexToBytes(asset.tokenId), VLQ.encode(ensureBigInt(asset.amount)))
+      concatBytes(hexToBytes(asset.tokenId), vqlEncodeBigInt(ensureBigInt(asset.amount)))
     )
   );
 }
@@ -43,5 +43,5 @@ function serializeRegisters(registers: NonMandatoryRegisters): Uint8Array {
     }
   }
 
-  return concatBytes(VLQ.encode(serializedRegisters.length), concatBytes(...serializedRegisters));
+  return concatBytes(vlqEncode(serializedRegisters.length), concatBytes(...serializedRegisters));
 }
