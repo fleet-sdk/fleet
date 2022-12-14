@@ -5,5 +5,5 @@ export default {
   testEnvironment: "node",
   maxWorkers: 1, // this limit is being used to circumvent this issue https://github.com/facebook/jest/issues/11617
   preset: "ts-jest",
-  roots: ["./packages"]
+  roots: ["./packages", "./plugins"]
 };
