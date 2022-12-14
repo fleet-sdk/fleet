@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.15](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.14...v0.1.0-alpha.15) (2022-12-14)
+
+
+### Features
+
+* **core:** accept hex string on for Coll[Byte] serialization ([0253b2a](https://github.com/fleet-sdk/core/commit/0253b2aea019b2df0d769af7386df182a560cccc))
+* **core:** add `SShort`, `SInt`, `SLong`, `SByte` and `SBool` sigma parsing support ([93a03c9](https://github.com/fleet-sdk/core/commit/93a03c97285ed9bef411e93456bd83f52e21c2a3))
+* **core:** add `ZigZag` and `VLQ` encoding for `BigInt` ([1271bfd](https://github.com/fleet-sdk/core/commit/1271bfd513d94c985ae426e7c00d9b4a50cd9b8e))
+* **plugins:** add Babel Fees plugin ([3a2e23a](https://github.com/fleet-sdk/core/commit/3a2e23a9c93b8b33f7d0298f2d32a5b4f7f87d4e))
+
+
+### Bug Fixes
+
+* **core:** remove placing options from addInputs ([fe62741](https://github.com/fleet-sdk/core/commit/fe6274117dabbd973396325ad17c917e26575ea7))
+
 ## [0.1.0-alpha.14](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.13...v0.1.0-alpha.14) (2022-12-12)
 
 
