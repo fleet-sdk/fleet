@@ -28,5 +28,4 @@ jobs:
       - name: Submit core report
         uses: codecov/codecov-action@v3
         with:
-          files: ./packages/core/coverage/coverage-final.json, ./packages/common/coverage/coverage-final.json
-          root_dir: ./packages
+          files: ./packages/core/coverage/coverage-final.json, ./packages/common/coverage/coverage-final.json, ./plugins/babel-fees/coverage/coverage-final.json
