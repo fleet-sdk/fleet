@@ -1,4 +1,4 @@
-import { hexToBytes } from "@noble/hashes/utils";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { stringToBytes } from "@scure/base";
 import {
   collBoolTestVectors,
@@ -114,7 +114,9 @@ describe("SColl serialization", () => {
 
   it("Should serialize 'Coll[SByte]'", () => {
     for (const tv of collByteTestVectors) {
-      expect(SConstant(SColl(SByte, stringToBytes("utf8", tv.string)))).toBe(tv.hex);
+      const bytes = stringToBytes("utf8", tv.string);
+      expect(SConstant(SColl(SByte, bytes))).toBe(tv.hex);
+      expect(SConstant(SColl(SByte, bytesToHex(bytes)))).toBe(tv.hex);
     }
   });
 

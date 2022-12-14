@@ -1,3 +1,4 @@
+import { hexToBytes } from "@noble/hashes/utils";
 import { vlqEncode } from "../vlq";
 import { SigmaByteReader } from "./sigmaByteReader";
 import { SigmaByteWriter } from "./sigmaByteWriter";
@@ -46,15 +47,27 @@ export class DataSerializer {
           throw Error("Not implemented");
       }
     } else if (isColl(data)) {
-      buffer.writeBytes(vlqEncode(data.value.length));
+      if (typeof data.value === "string") {
+        buffer.writeBytes(vlqEncode(data.value.length / 2));
+      } else {
+        buffer.writeBytes(vlqEncode(data.value.length));
+      }
 
       switch (data.elementsType) {
         case SigmaTypeCode.Boolean:
           buffer.writeBits(data.value as boolean[]);
           break;
-        case SigmaTypeCode.Byte:
-          buffer.writeBytes(Uint8Array.from(data.value as number[]));
+        case SigmaTypeCode.Byte: {
+          let bytes!: Uint8Array;
+          if (typeof data.value === "string") {
+            bytes = hexToBytes(data.value);
+          } else {
+            bytes = Uint8Array.from(data.value as number[]);
+          }
+
+          buffer.writeBytes(bytes);
           break;
+        }
         default:
           for (let i = 0; i < data.value.length; i++) {
             DataSerializer.serialize(
