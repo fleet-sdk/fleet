@@ -2,6 +2,7 @@
   "bumpFiles": [
     "./package.json",
     "./packages/core/package.json",
-    "./packages/common/package.json"
+    "./packages/common/package.json",
+    "./plugins/babel-fees/package.json"
   ]
 }
