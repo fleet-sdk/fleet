@@ -3,7 +3,7 @@
 Easily write Ergo off-chain code with a lightweight and pure JS library.
 
 - 🪄 Easy to use
-- 🪶 Lightweight: [~13kB minified + gziped](https://bundlephobia.com/package/@fleet-sdk/core)
+- 🪶 Lightweight: [~15kB minified + gziped](https://bundlephobia.com/package/@fleet-sdk/core)
 - 🦾 Powerful: easily create complex transactions with a fluent API
 - 🧪 100% code coverage
 - 🌲 Tree-shakeable

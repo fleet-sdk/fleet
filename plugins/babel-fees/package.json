@@ -18,7 +18,8 @@
   "keywords": [
     "ergo",
     "blockchain",
-    "babel fees"
+    "babel fees",
+    "plugins"
   ],
   "dependencies": {
     "@fleet-sdk/core": "workspace:^",
