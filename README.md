@@ -2,7 +2,7 @@
 
 Fleet (Fluent Ergo Toolset) is a pure JavaScript SDK for Ergo Platform. Fleet provides an easy, fluent and flexible way to write off chain-code for Ergo Platform.
 
-# Packages
+## Packages
 
 This is a [monorepository](https://monorepo.tools/) which means this contains many sub-packages that composes full Fleet SDK implementation.
 
@@ -16,7 +16,7 @@ This is a [monorepository](https://monorepo.tools/) which means this contains ma
 | @fleet-sdk/dapp-connector             | dApp Connector (EIP-12) client library.                                                      | `not implemented`                                                                                     |
 | [@fleet-sdk/common](/packages/common) | Internal utility functions, constants and types shared across @fleet-sdk packages.           | [![npm](https://badgen.net/npm/v/@fleet-sdk/common)](https://www.npmjs.com/package/@fleet-sdk/common) |
 
-# Plugins
+## Plugins
 
 | Package                                              | Description                                            |                                                                                                                             |
 | ---------------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
