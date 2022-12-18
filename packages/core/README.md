@@ -117,8 +117,3 @@ const unsignedTransaction = new TransactionBuilder(creationHeight)
   .payMinFee()
   .build();
 ```
-
-## Examples of FLEET Usage from Ergo Projects
-
-- [Nautilus' internal transaction builder](https://github.com/capt-nemo429/nautilus-wallet/blob/master/src/api/ergo/transaction/txBuilder.ts#L95)
-- [Ergonames SDK](https://github.com/ergonames/sdk/blob/master/tx-lib/index.js)
