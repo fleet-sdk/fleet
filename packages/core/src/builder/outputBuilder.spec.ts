@@ -54,6 +54,16 @@ describe("Constructor", () => {
 
     expect(builder.address).toBe(ergoAddress);
   });
+
+  it("Should fail if value is less than or equal to zero", () => {
+    expect(() => {
+      new OutputBuilder(0n, address, height);
+    }).toThrow();
+
+    expect(() => {
+      new OutputBuilder(-1n, address, height);
+    }).toThrow();
+  });
 });
 
 describe("Creation height", () => {

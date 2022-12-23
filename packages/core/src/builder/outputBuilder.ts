@@ -1,4 +1,5 @@
 import {
+  _0n,
   Amount,
   Base58String,
   Box,
@@ -47,6 +48,10 @@ export class OutputBuilder {
     this._creationHeight = creationHeight;
     this._tokens = new TokensCollection();
     this._registers = {};
+
+    if (this._value <= _0n) {
+      throw new Error("A UTxO cannot be created without a minimum required amount.");
+    }
 
     if (typeof recipient === "string") {
       this._address = isHex(recipient)
