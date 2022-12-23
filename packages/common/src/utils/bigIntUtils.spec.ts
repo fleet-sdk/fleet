@@ -78,6 +78,7 @@ describe("strToBigInt()", () => {
     expect(strToBigInt("129-8379183", { decimals: 9, decimalMark: "-" })).toBe(129837918300n);
 
     expect(strToBigInt("-129.8379183", { decimals: 9 })).toBe(-129837918300n);
+    expect(strToBigInt("-129.8379183")).toBe(-1298379183n);
   });
 
   it("Should throw if used with wrong number format", () => {
