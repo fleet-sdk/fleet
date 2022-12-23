@@ -50,7 +50,7 @@ export class OutputBuilder {
     this._registers = {};
 
     if (this._value <= _0n) {
-      throw new Error("A UTxO cannot be created without a minimum required amount.");
+      throw new Error("An UTxO cannot be created without a minimum required amount.");
     }
 
     if (typeof recipient === "string") {
