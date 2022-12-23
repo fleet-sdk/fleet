@@ -98,6 +98,8 @@ export class SigmaByteWriter {
   }
 
   public writeBigInt(number: bigint): SigmaByteWriter {
+    // todo: take a look at https://coolaj86.com/articles/convert-decimal-to-hex-with-js-bigints/
+    // and https://coolaj86.com/articles/convert-hex-to-decimal-with-js-bigints/
     if (number < _0n) {
       throw new Error("Negative BigInt values are not supported Fleet serializer.");
     }
