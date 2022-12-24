@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.17](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.16...v0.1.0-alpha.17) (2022-12-24)
+
 ## [0.1.0-alpha.16](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.15...v0.1.0-alpha.16) (2022-12-24)
 
 
