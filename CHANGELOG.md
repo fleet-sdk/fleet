@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.16](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.15...v0.1.0-alpha.16) (2022-12-24)
+
+
+### Features
+
+* **common:** add `bigIntToStr()` and `strToBigInt()` utility functions ([5c75337](https://github.com/fleet-sdk/core/commit/5c75337819b430dc5c8a21d76e78f19fad9a7d2b))
+
+
+### Bug Fixes
+
+* **core:** validate min `OutputBuilder` value. ([529d5e1](https://github.com/fleet-sdk/core/commit/529d5e1ea7da5b2ac29fe82851d57a6aacfbf878)), closes [#2](https://github.com/fleet-sdk/core/issues/2)
+
 ## [0.1.0-alpha.15](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.14...v0.1.0-alpha.15) (2022-12-14)
 
 
