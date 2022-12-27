@@ -1,17 +1,20 @@
-import { bigIntToStr, ensureBigInt, strToBigInt, sumBy } from "./bigIntUtils";
+import { decimalize, ensureBigInt, sumBy, undecimalize } from "./bigIntUtils";
 
-describe("bigIntToStr()", () => {
+describe("decimalize()", () => {
   it("Should decimalize", () => {
-    expect(bigIntToStr(1763874n)).toBe("1763874");
-    expect(bigIntToStr(1763874n, { decimals: 2 })).toBe("17638.74");
-    expect(bigIntToStr(1874n, { decimals: 10 })).toBe("0.0000001874");
-    expect(bigIntToStr(1n, { decimals: 2 })).toBe("0.01");
-    expect(bigIntToStr(1298379183n)).toBe("1298379183");
+    expect(decimalize(1763874n)).toBe("1763874");
+    expect(decimalize(1763874n, { decimals: 2 })).toBe("17638.74");
+    expect(decimalize(1763874n, 2)).toBe("17638.74");
+    expect(decimalize(1874n, { decimals: 10 })).toBe("0.0000001874");
+    expect(decimalize(1874n, 10)).toBe("0.0000001874");
+    expect(decimalize(1n, { decimals: 2 })).toBe("0.01");
+    expect(decimalize(1n, 2)).toBe("0.01");
+    expect(decimalize(1298379183n)).toBe("1298379183");
   });
 
   it("Should format", () => {
     expect(
-      bigIntToStr(129837918300001n, {
+      decimalize(129837918300001n, {
         decimals: 5,
         thousandMark: ",",
         decimalMark: "."
@@ -19,13 +22,13 @@ describe("bigIntToStr()", () => {
     ).toBe("1,298,379,183.00001");
 
     expect(
-      bigIntToStr(129837918300001n, {
+      decimalize(129837918300001n, {
         decimals: 5
       })
     ).toBe("1298379183.00001");
 
     expect(
-      bigIntToStr(129837918300001n, {
+      decimalize(129837918300001n, {
         decimals: 5,
         thousandMark: ".",
         decimalMark: ","
@@ -33,7 +36,7 @@ describe("bigIntToStr()", () => {
     ).toBe("1.298.379.183,00001");
 
     expect(
-      bigIntToStr(129837918300001n, {
+      decimalize(129837918300001n, {
         decimals: 5,
         thousandMark: "#",
         decimalMark: "-"
@@ -41,49 +44,59 @@ describe("bigIntToStr()", () => {
     ).toBe("1#298#379#183-00001");
 
     expect(
-      bigIntToStr("129837918300001", {
+      decimalize("129837918300001", {
+        decimals: 0,
         thousandMark: "#"
       })
     ).toBe("129#837#918#300#001");
 
-    expect(bigIntToStr("1100000", { decimals: 9 })).toBe("0.0011");
-    expect(bigIntToStr(129837918300n, { decimals: 9 })).toBe("129.8379183");
-    expect(bigIntToStr(100n, { decimals: 2 })).toBe("1");
-    expect(bigIntToStr(123n, { decimals: 2 })).toBe("1.23");
-    expect(bigIntToStr(1n, { decimals: 2 })).toBe("0.01");
-    expect(bigIntToStr(1298379183n)).toBe("1298379183");
+    expect(decimalize("1100000", { decimals: 9 })).toBe("0.0011");
+    expect(decimalize(129837918300n, { decimals: 9 })).toBe("129.8379183");
+    expect(decimalize(100n, { decimals: 2 })).toBe("1");
+    expect(decimalize(123n, { decimals: 2 })).toBe("1.23");
+    expect(decimalize(1n, { decimals: 2 })).toBe("0.01");
+    expect(decimalize(1298379183n)).toBe("1298379183");
   });
 
   it("Should do a roundtrip", () => {
     const options = { decimals: 9 };
-    expect(bigIntToStr(strToBigInt("129.8379183", options), options)).toBe("129.8379183");
+    expect(decimalize(undecimalize("129.8379183", options), options)).toBe("129.8379183");
   });
 });
 
-describe("strToBigInt()", () => {
+describe("undecimalize()", () => {
   it("Should parse BigInt strings", () => {
-    expect(strToBigInt(" ")).toBe(0n);
-    expect(strToBigInt("")).toBe(0n);
-    expect(strToBigInt("", { decimals: 9 })).toBe(0n);
-    expect(strToBigInt("0.0011", { decimals: 9 })).toBe(1100000n);
-    expect(strToBigInt("129.8379183", { decimals: 9 })).toBe(129837918300n);
-    expect(strToBigInt("1", { decimals: 2 })).toBe(100n);
-    expect(strToBigInt("1.23", { decimals: 2 })).toBe(123n);
-    expect(strToBigInt("123", { decimals: 2 })).toBe(12300n);
-    expect(strToBigInt("1.233", { decimals: 2 })).toBe(1233n);
-    expect(strToBigInt("1.23")).toBe(123n);
-    expect(strToBigInt("1")).toBe(1n);
-    expect(strToBigInt("1", { decimals: 0 })).toBe(1n);
-    expect(strToBigInt("0,0011", { decimals: 9, decimalMark: "," })).toBe(1100000n);
-    expect(strToBigInt("129-8379183", { decimals: 9, decimalMark: "-" })).toBe(129837918300n);
+    expect(undecimalize(" ")).toBe(0n);
+    expect(undecimalize("")).toBe(0n);
+    expect(undecimalize("", { decimals: 9 })).toBe(0n);
+    expect(undecimalize("", 9)).toBe(0n);
+    expect(undecimalize("0.0011", { decimals: 9 })).toBe(1100000n);
+    expect(undecimalize("0.0011", 9)).toBe(1100000n);
+    expect(undecimalize("129.8379183", { decimals: 9 })).toBe(129837918300n);
+    expect(undecimalize("129.8379183", 9)).toBe(129837918300n);
+    expect(undecimalize("1", { decimals: 2 })).toBe(100n);
+    expect(undecimalize("1", 2)).toBe(100n);
+    expect(undecimalize("1.23", { decimals: 2 })).toBe(123n);
+    expect(undecimalize("1.23", 2)).toBe(123n);
+    expect(undecimalize("123", { decimals: 2 })).toBe(12300n);
+    expect(undecimalize("123", 2)).toBe(12300n);
+    expect(undecimalize("1.233", { decimals: 2 })).toBe(1233n);
+    expect(undecimalize("1.233", 2)).toBe(1233n);
+    expect(undecimalize("1.23")).toBe(123n);
+    expect(undecimalize("1")).toBe(1n);
+    expect(undecimalize("1", { decimals: 0 })).toBe(1n);
+    expect(undecimalize("1", 0)).toBe(1n);
+    expect(undecimalize("0,0011", { decimals: 9, decimalMark: "," })).toBe(1100000n);
+    expect(undecimalize("129-8379183", { decimals: 9, decimalMark: "-" })).toBe(129837918300n);
 
-    expect(strToBigInt("-129.8379183", { decimals: 9 })).toBe(-129837918300n);
-    expect(strToBigInt("-129.8379183")).toBe(-1298379183n);
+    expect(undecimalize("-129.8379183", { decimals: 9 })).toBe(-129837918300n);
+    expect(undecimalize("-129.8379183", 9)).toBe(-129837918300n);
+    expect(undecimalize("-129.8379183")).toBe(-1298379183n);
   });
 
   it("Should throw if used with wrong number format", () => {
     expect(() => {
-      strToBigInt("12.23.1");
+      undecimalize("12.23.1");
     }).toThrow();
   });
 });
@@ -110,7 +123,7 @@ describe("BigInt sumBy()", () => {
     { key: 6, value: 659n },
     { key: 7, value: 9558n }
   ];
-  // 448317n
+
   it("Should sum filled array", () => {
     expect(sumBy(values, (x) => x.value)).toBe(461475n);
   });

@@ -9,7 +9,7 @@ export function ensureBigInt(number: NumberLike): bigint {
   return typeof number === "bigint" ? number : BigInt(number);
 }
 
-type BigIntParseOptions = {
+type UndecimalizeOptions = {
   /**
    * Number of decimals.
    */
@@ -22,35 +22,42 @@ type BigIntParseOptions = {
   decimalMark?: string;
 };
 
-export function strToBigInt(value: string, options?: BigIntParseOptions): bigint {
-  if (!value) {
+export function undecimalize(decimalStr: string, options?: UndecimalizeOptions | number): bigint {
+  if (!decimalStr) {
     return _0n;
   }
 
-  const fragments = value.split(options?.decimalMark || ".");
+  options = typeof options == "number" ? { decimals: options } : options;
+  if (isUndefined(options)) {
+    options = {};
+  }
+
+  options.decimals = options.decimals || 0;
+  options.decimalMark = options.decimalMark || ".";
+
+  const fragments = decimalStr.split(options.decimalMark);
   if (fragments.length > 2) {
     throw new Error("Invalid numeric string.");
   }
 
   let [integer, decimal] = fragments;
-  integer = removeLeadingZeros(integer);
-  const decimals = options?.decimals || 0;
+  integer = _removeLeadingZeros(integer);
   const negative = integer.startsWith("-") ? "-" : "";
 
   if (!decimal) {
-    decimal = "0".repeat(decimals);
-  } else if (decimal.length < decimals) {
-    decimal = decimal.padEnd(decimals, "0");
+    decimal = "0".repeat(options.decimals);
+  } else if (decimal.length < options.decimals) {
+    decimal = decimal.padEnd(options.decimals, "0");
   }
 
   return BigInt(negative + (integer + decimal).replace(/\D/g, ""));
 }
 
-type BigIntFormatOptions = {
+type FormattingOptions = {
   /**
    * Number of decimals.
    */
-  decimals?: number;
+  decimals: number;
 
   /**
    * Thousand mark char.
@@ -64,27 +71,39 @@ type BigIntFormatOptions = {
   decimalMark?: string;
 };
 
-export function bigIntToStr(value: Amount, options?: BigIntFormatOptions): string {
+export function decimalize(value: Amount, options?: FormattingOptions | number): string {
   value = ensureBigInt(value);
   if (!options) {
     return value.toString();
   }
 
-  const decimals = options.decimals || 0;
-  const pow = _10n ** BigInt(decimals);
+  options = typeof options == "number" ? { decimals: options } : options;
+  options.decimals = options.decimals || 0;
+  options.decimalMark = options.decimalMark || ".";
+
+  const pow = _10n ** BigInt(options.decimals);
   const integer = value / pow;
   const decimal = value - integer * pow;
-  const decimalPart = stripTrailingZeros(decimal.toString(10).padStart(decimals, "0"));
-  const integerPart = addThousandMarks(integer.toString(10), options.thousandMark);
+
+  return _buildFormattedDecimal(integer.toString(10), decimal.toString(10), options);
+}
+
+function _buildFormattedDecimal(
+  integer: string,
+  decimal: string,
+  options: FormattingOptions
+): string {
+  const integerPart = _addThousandMarks(integer, options.thousandMark);
+  const decimalPart = _stripTrailingZeros(decimal.padStart(options.decimals, "0"));
 
   if (decimalPart) {
-    return `${integerPart}${options.decimalMark || "."}${decimalPart}`;
+    return `${integerPart}${options.decimalMark}${decimalPart}`;
   } else {
     return integerPart;
   }
 }
 
-function addThousandMarks(value: string, mark?: string): string {
+function _addThousandMarks(value: string, mark?: string): string {
   if (!mark) {
     return value;
   }
@@ -92,11 +111,11 @@ function addThousandMarks(value: string, mark?: string): string {
   return value.replace(/\B(?=(\d{3})+(?!\d))/g, mark);
 }
 
-function stripTrailingZeros(value: string): string {
+function _stripTrailingZeros(value: string): string {
   return value.replace(/\.?0+$/, "");
 }
 
-function removeLeadingZeros(value: string): string {
+function _removeLeadingZeros(value: string): string {
   return value.replace(/^0+\.?/, "");
 }
 
