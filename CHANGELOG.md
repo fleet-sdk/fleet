@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.18](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.17...v0.1.0-alpha.18) (2022-12-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **common:** rename `bigIntToStr()` to `decimalize()` and `strToBigInt()` to `undecimalize()`
+
+* **common:** rename `bigIntToStr()` to `decimalize()` and `strToBigInt()` to `undecimalize()` ([27d44f6](https://github.com/fleet-sdk/core/commit/27d44f6eb9a705db1021067362cebbcd77e19728))
+
 ## [0.1.0-alpha.17](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.16...v0.1.0-alpha.17) (2022-12-24)
 
 ## [0.1.0-alpha.16](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.15...v0.1.0-alpha.16) (2022-12-24)
