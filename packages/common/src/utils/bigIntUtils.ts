@@ -9,7 +9,7 @@ export function ensureBigInt(number: NumberLike): bigint {
   return typeof number === "bigint" ? number : BigInt(number);
 }
 
-type UndecimalizeOptions = {
+type ParsingOptions = {
   /**
    * Number of decimals.
    */
@@ -22,7 +22,7 @@ type UndecimalizeOptions = {
   decimalMark?: string;
 };
 
-export function undecimalize(decimalStr: string, options?: UndecimalizeOptions | number): bigint {
+export function undecimalize(decimalStr: string, options?: ParsingOptions | number): bigint {
   if (!decimalStr) {
     return _0n;
   }
@@ -50,7 +50,11 @@ export function undecimalize(decimalStr: string, options?: UndecimalizeOptions |
     decimal = decimal.padEnd(options.decimals, "0");
   }
 
-  return BigInt(negative + (integer + decimal).replace(/\D/g, ""));
+  return BigInt(negative + _stripNonDigits(integer + decimal));
+}
+
+function _stripNonDigits(value: string): string {
+  return value.replace(/\D/g, "");
 }
 
 type FormattingOptions = {
@@ -112,10 +116,18 @@ function _addThousandMarks(value: string, mark?: string): string {
 }
 
 function _stripTrailingZeros(value: string): string {
+  if (!value.endsWith("0")) {
+    return value;
+  }
+
   return value.replace(/\.?0+$/, "");
 }
 
 function _removeLeadingZeros(value: string): string {
+  if (!value.startsWith("0")) {
+    return value;
+  }
+
   return value.replace(/^0+\.?/, "");
 }
 
