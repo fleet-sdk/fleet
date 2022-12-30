@@ -20,10 +20,11 @@ This is a [monorepository](https://monorepo.tools/) which means this contains ma
 
 | Package                                              | Description                                            |                                                                                                                             |
 | ---------------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| [@fleet-sdk/babel-fees-plugin](/plugins/babel-fees/) | Fleet SDK plugin and utility functions for Babel Fees. | [![npm](https://badgen.net/npm/v/@fleet-sdk/babel-fees-plugin)](https://www.npmjs.com/package/@fleet-sdk/babel-fees-plugin) |
+| [@fleet-sdk/babel-fees-plugin](/plugins/babel-fees/) | Fleet SDK plugin and utility functions for Babel Fees protocol. | [![npm](https://badgen.net/npm/v/@fleet-sdk/babel-fees-plugin)](https://www.npmjs.com/package/@fleet-sdk/babel-fees-plugin) |
 
 ## Fleet SDK Usage Examples
 
 - [Nautilus' internal transaction builder](https://github.com/capt-nemo429/nautilus-wallet/blob/master/src/api/ergo/transaction/txBuilder.ts#L95)
 - [Ergonames SDK](https://github.com/ergonames/sdk/blob/master/tx-lib/index.js)
 - [Stealth Address example implementation](https://github.com/ross-weir/ergo-stealth-address-example)
+- [SigmaFi UI](https://github.com/capt-nemo429/sigmafi-ui)
