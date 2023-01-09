@@ -1,6 +1,7 @@
 import {
   invalidBoxesMock,
   manyTokensBoxesMock,
+  outOfOrderRegistersBox,
   regularBoxesMock,
   validBoxesMock
 } from "../tests/mocks/mockBoxes";
@@ -36,6 +37,8 @@ describe("Validation", () => {
     for (const box of validBoxesMock) {
       expect(new ErgoBox(box).isValid()).toBeTruthy();
     }
+
+    expect(new ErgoBox(outOfOrderRegistersBox).isValid()).toBeTruthy();
   });
 
   it("Should not validate invalid boxes", () => {

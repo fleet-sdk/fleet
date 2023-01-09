@@ -30,12 +30,13 @@ function serializeTokens(tokens: TokenAmount<Amount>[]): Uint8Array {
 }
 
 function serializeRegisters(registers: NonMandatoryRegisters): Uint8Array {
-  const keys = Object.keys(registers);
+  let keys = Object.keys(registers);
   if (isEmpty(keys)) {
     return Uint8Array.from([0]);
   }
 
   const serializedRegisters: Uint8Array[] = [];
+  keys = keys.sort();
   for (const key of keys) {
     const val = registers[key as keyof NonMandatoryRegisters];
     if (isDefined(val)) {
