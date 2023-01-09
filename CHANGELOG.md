@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.19](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.18...v0.1.0-alpha.19) (2023-01-09)
+
+
+### Bug Fixes
+
+* fix out of order registers serialization ([45321dd](https://github.com/fleet-sdk/core/commit/45321dd751b58af3a3a5a3df6f26f7be467e2c77))
+
 ## [0.1.0-alpha.18](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.17...v0.1.0-alpha.18) (2022-12-27)
 
 
