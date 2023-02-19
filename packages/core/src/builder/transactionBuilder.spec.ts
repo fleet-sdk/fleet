@@ -372,10 +372,6 @@ describe("Building", () => {
             tokenId: "aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed",
             amount: "4"
           })
-          // .addTokens({
-          //   tokenId: "aef39c526e0c5d9b94e4b93f03b661c8e232382a32c71e1e74b14fc45e09fbed",
-          //   amount: "2"
-          // })
           .setAdditionalRegisters({
             R4: "08cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
             R5: "05c0a38601",
