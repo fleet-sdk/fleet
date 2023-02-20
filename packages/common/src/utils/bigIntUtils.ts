@@ -132,7 +132,7 @@ function _removeLeadingZeros(value: string): string {
 }
 
 export function sumBy<T>(
-  collection: T[],
+  collection: readonly T[],
   iteratee: (value: T) => bigint,
   condition?: (value: T) => boolean
 ): bigint {

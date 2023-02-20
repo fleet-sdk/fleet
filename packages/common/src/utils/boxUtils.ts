@@ -5,9 +5,9 @@ import { isDefined, isUndefined } from "./objectUtils";
 
 const NANOERGS_TOKEN_ID = "nanoErgs";
 
-export function utxoSum(boxes: MinimalBoxAmountFields[]): BoxAmounts;
-export function utxoSum(boxes: MinimalBoxAmountFields[], tokenId: TokenId): bigint;
-export function utxoSum(boxes: MinimalBoxAmountFields[], tokenId?: TokenId): BoxAmounts | bigint {
+export function utxoSum(boxes: MinimalBoxAmounts): BoxAmounts;
+export function utxoSum(boxes: MinimalBoxAmounts, tokenId: TokenId): bigint;
+export function utxoSum(boxes: MinimalBoxAmounts, tokenId?: TokenId): BoxAmounts | bigint {
   const balances: { [tokenId: string]: bigint } = {};
 
   for (const box of boxes) {
@@ -36,6 +36,22 @@ export function utxoSum(boxes: MinimalBoxAmountFields[], tokenId?: TokenId): Box
       .filter((x) => x !== NANOERGS_TOKEN_ID)
       .map((tokenId) => ({ tokenId, amount: balances[tokenId] }))
   };
+}
+
+export function utxoSumResultDiff(amountsA: BoxAmounts, amountsB: BoxAmounts): BoxAmounts {
+  const tokens: TokenAmount<bigint>[] = [];
+  const nanoErgs = amountsA.nanoErgs - amountsB.nanoErgs;
+
+  for (const token of amountsA.tokens) {
+    const balance =
+      token.amount - (amountsB.tokens.find((t) => t.tokenId === token.tokenId)?.amount || _0n);
+
+    if (balance !== _0n) {
+      tokens.push({ tokenId: token.tokenId, amount: balance });
+    }
+  }
+
+  return { nanoErgs, tokens };
 }
 
 const MIN_REGISTER_NUMBER = 4;
@@ -71,7 +87,7 @@ export type BoxAmounts = {
   tokens: TokenAmount<bigint>[];
 };
 
-type MinimalBoxAmountFields = {
+type MinimalBoxAmounts = readonly {
   value: Amount;
   assets: TokenAmount<Amount>[];
-};
+}[];

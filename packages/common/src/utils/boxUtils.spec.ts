@@ -1,6 +1,6 @@
 import { Box } from "../types";
 import { sumBy } from "./bigIntUtils";
-import { areRegistersDenselyPacked, utxoSum } from "./boxUtils";
+import { areRegistersDenselyPacked, BoxAmounts, utxoSum, utxoSumResultDiff } from "./boxUtils";
 
 export const regularBoxesMock: Box<bigint>[] = [
   {
@@ -239,6 +239,43 @@ describe("UTxO sum", () => {
 
     expect(utxoSum(boxes)).toEqual({
       nanoErgs: sumBy(boxes, (x) => x.value),
+      tokens: []
+    });
+  });
+});
+
+describe("utxoSumResultDiff()", () => {
+  it("Should calculate the difference between two summaries", () => {
+    const sumA: BoxAmounts = {
+      nanoErgs: 100n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 5n },
+        { tokenId: "token_id_2", amount: 875n },
+        { tokenId: "token_id_3", amount: 100n },
+        { tokenId: "token_id_4", amount: 200n }
+      ]
+    };
+
+    const sumB: BoxAmounts = {
+      nanoErgs: 10n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 2n },
+        { tokenId: "token_id_2", amount: 880n },
+        { tokenId: "token_id_3", amount: 100n }
+      ]
+    };
+
+    expect(utxoSumResultDiff(sumA, sumB)).toEqual({
+      nanoErgs: 90n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 3n },
+        { tokenId: "token_id_2", amount: -5n },
+        { tokenId: "token_id_4", amount: 200n }
+      ]
+    });
+
+    expect(utxoSumResultDiff(sumA, sumA)).toEqual({
+      nanoErgs: 0n,
       tokens: []
     });
   });
