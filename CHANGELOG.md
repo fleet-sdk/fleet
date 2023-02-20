@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.20](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.19...v0.1.0-alpha.20) (2023-02-20)
+
+
+### Features
+
+* add transaction serializer ([198a0b7](https://github.com/fleet-sdk/core/commit/198a0b70c3d0354a845d1bb4b0b3352e9d3b7f8d))
+* **common:** add `utxoSumResultDiff()` function ([79caa7b](https://github.com/fleet-sdk/core/commit/79caa7b4331f4ec1eaece26db4b5dd34d99283e0))
+* **core:** add `ErgoUnsignedTransaction` model ([a8546eb](https://github.com/fleet-sdk/core/commit/a8546eba5e867b7bc24eaf20ec4cb005c42067ca))
+
 ## [0.1.0-alpha.19](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.18...v0.1.0-alpha.19) (2023-01-09)
 
 
