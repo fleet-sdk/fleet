@@ -6,13 +6,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-- add transaction serializer ([198a0b7](https://github.com/fleet-sdk/core/commit/198a0b70c3d0354a845d1bb4b0b3352e9d3b7f8d))
+- **core:** add transaction serializer ([198a0b7](https://github.com/fleet-sdk/core/commit/198a0b70c3d0354a845d1bb4b0b3352e9d3b7f8d))
 - **common:** add `utxoSumResultDiff()` function ([79caa7b](https://github.com/fleet-sdk/core/commit/79caa7b4331f4ec1eaece26db4b5dd34d99283e0))
 - **core:** add `ErgoUnsignedTransaction` model ([a8546eb](https://github.com/fleet-sdk/core/commit/a8546eba5e867b7bc24eaf20ec4cb005c42067ca))
 
 ### ⚠ BREAKING CHANGES
 
-- **core:** "default" and "EIP-12" params will be no longer supported on `TransactionBuilder.build()` as now it returns an instance of`ErgoUnsignedTransaction`. `ErgoUnsignedTransaction.toPlainObject()` and `ErgoUnsignedTransaction.toEIP12Object()` can be used to achieve the same results.
+- **core:** "default" and "EIP-12" params will be no longer supported on `TransactionBuilder.build()` as now it returns an instance of`ErgoUnsignedTransaction`. `ErgoUnsignedTransaction.toPlainObject()` and `ErgoUnsignedTransaction.toEIP12Object()` can be used to achieve the same results. ([a8546eb](https://github.com/fleet-sdk/core/commit/a8546eba5e867b7bc24eaf20ec4cb005c42067ca))
 
 ## [0.1.0-alpha.19](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.18...v0.1.0-alpha.19) (2023-01-09)
 
