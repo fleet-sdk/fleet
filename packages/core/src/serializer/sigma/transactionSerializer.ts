@@ -2,16 +2,22 @@ import {
   Amount,
   BoxCandidate,
   ContextExtension,
+  DataInput,
   isDefined,
   isEmpty,
-  UnsignedInput,
-  UnsignedTransaction
+  UnsignedInput
 } from "@fleet-sdk/common";
 import { concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { vlqEncode } from "../vlq";
 import { serializeBox } from "./boxSerializer";
 
-export function serializeTransaction(transaction: UnsignedTransaction) {
+type MinimalUnsignedTransaction = {
+  inputs: readonly UnsignedInput[];
+  dataInputs: readonly DataInput[];
+  outputs: readonly BoxCandidate<Amount>[];
+};
+
+export function serializeTransaction(transaction: MinimalUnsignedTransaction) {
   const tokenIds = getDistinctTokenIds(transaction.outputs);
 
   return concatBytes(
@@ -59,7 +65,7 @@ function serializeExtension(extension: ContextExtension) {
   return concatBytes(vlqEncode(keys.length), concatBytes(...bytes));
 }
 
-function getDistinctTokenIds(outputs: BoxCandidate<Amount>[]) {
+function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {
   const tokenIds = new Set<string>();
   outputs.flatMap((output) => output.assets.map((asset) => tokenIds.add(asset.tokenId)));
 

@@ -184,7 +184,8 @@ describe("Building", () => {
     const transaction = new TransactionBuilder(height)
       .from(inputs)
       .to(new OutputBuilder(inputsSum, a1.address))
-      .build();
+      .build()
+      .toPlainObject();
 
     expect(transaction.inputs).toHaveLength(inputs.length);
     expect(transaction.inputs).toEqual(
@@ -205,7 +206,8 @@ describe("Building", () => {
       .from(inputs)
       .to(new OutputBuilder(inputsSum - RECOMMENDED_MIN_FEE_VALUE, a1.address))
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
-      .build();
+      .build()
+      .toPlainObject();
 
     expect(transaction.inputs).toHaveLength(inputs.length);
     expect(transaction.inputs).toEqual(
@@ -381,7 +383,8 @@ describe("Building", () => {
       .configureSelector((selector) =>
         selector.ensureInclusion((input) => input.boxId === babelBox.boxId)
       )
-      .build("EIP-12");
+      .build()
+      .toEIP12Object();
 
     expect(tx.outputs).toEqual([
       expectedSendingBox,
@@ -400,7 +403,8 @@ describe("Building", () => {
       .from(inputs)
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .sendChangeTo(a1.address)
-      .build();
+      .build()
+      .toPlainObject();
 
     expect(transaction.inputs).toHaveLength(inputs.length);
     expect(transaction.inputs).toEqual(
@@ -441,7 +445,8 @@ describe("Building", () => {
       ])
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .sendChangeTo(a1.address)
-      .build();
+      .build()
+      .toPlainObject();
 
     expect(transaction.inputs).toHaveLength(inputs.length);
     expect(transaction.inputs).toEqual(
@@ -516,28 +521,28 @@ describe("Building", () => {
 
     expect(customOutput.ergoTree).toBe(a2.ergoTree);
     expect(customOutput.creationHeight).toBe(height);
-    expect(customOutput.value).toBe(SAFE_MIN_BOX_VALUE.toString());
+    expect(customOutput.value).toBe(SAFE_MIN_BOX_VALUE);
     expect(customOutput.assets).toEqual([
       {
         tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
-        amount: "100"
+        amount: 100n
       }
     ]);
     expect(customOutput.additionalRegisters).toEqual({});
 
     expect(feeOutput.ergoTree).toBe(FEE_CONTRACT);
     expect(feeOutput.creationHeight).toBe(height);
-    expect(feeOutput.value).toBe(RECOMMENDED_MIN_FEE_VALUE.toString());
+    expect(feeOutput.value).toBe(RECOMMENDED_MIN_FEE_VALUE);
     expect(feeOutput.assets).toHaveLength(0);
     expect(feeOutput.additionalRegisters).toEqual({});
 
     expect(changeOutput.ergoTree).toBe(a1.ergoTree);
     expect(changeOutput.creationHeight).toBe(height);
-    expect(changeOutput.value).toBe("67498900000");
+    expect(changeOutput.value).toBe(67498900000n);
     expect(changeOutput.assets).toEqual([
       {
         tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
-        amount: "9900"
+        amount: 9900n
       }
     ]);
     expect(changeOutput.additionalRegisters).toEqual({});
@@ -565,7 +570,8 @@ describe("Building", () => {
       )
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .sendChangeTo(a1.address)
-      .build("default");
+      .build()
+      .toPlainObject();
 
     expect(transaction.inputs).toEqual([
       { boxId: "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d", extension: {} },
@@ -643,34 +649,34 @@ describe("Building", () => {
 
     expect(customOutput.ergoTree).toBe(a2.ergoTree);
     expect(customOutput.creationHeight).toBe(height);
-    expect(customOutput.value).toBe("2200000");
+    expect(customOutput.value).toBe(2200000n);
     expect(customOutput.assets).toEqual([
-      { tokenId: "31d6f93435540f52f067efe2c5888b8d4c4418a4fd28156dd834102c8336a804", amount: "1" },
-      { tokenId: "8565b6d9b72d0cb8ca052f7e5b8cdf32905333b9e026162e3a6d585ae78e697b", amount: "1" }
+      { tokenId: "31d6f93435540f52f067efe2c5888b8d4c4418a4fd28156dd834102c8336a804", amount: 1n },
+      { tokenId: "8565b6d9b72d0cb8ca052f7e5b8cdf32905333b9e026162e3a6d585ae78e697b", amount: 1n }
     ]);
     expect(customOutput.additionalRegisters).toEqual({});
 
     expect(feeOutput.ergoTree).toBe(FEE_CONTRACT);
     expect(feeOutput.creationHeight).toBe(height);
-    expect(feeOutput.value).toBe((RECOMMENDED_MIN_FEE_VALUE * 2n).toString());
+    expect(feeOutput.value).toBe(RECOMMENDED_MIN_FEE_VALUE * 2n);
     expect(feeOutput.assets).toHaveLength(0);
     expect(feeOutput.additionalRegisters).toEqual({});
 
     expect(change1.ergoTree).toBe(a1.ergoTree);
     expect(change1.creationHeight).toBe(height);
-    expect(change1.value).toBe("3465648");
+    expect(change1.value).toBe(3465648n);
     expect(change1.assets).toHaveLength(MAX_TOKENS_PER_BOX);
     expect(change1.additionalRegisters).toEqual({});
 
     expect(change2.ergoTree).toBe(a1.ergoTree);
     expect(change2.creationHeight).toBe(height);
-    expect(change2.value).toBe(SAFE_MIN_BOX_VALUE.toString());
+    expect(change2.value).toBe(SAFE_MIN_BOX_VALUE);
     expect(change2.assets).toHaveLength(MAX_TOKENS_PER_BOX);
     expect(change2.additionalRegisters).toEqual({});
 
     expect(change3.ergoTree).toBe(a1.ergoTree);
     expect(change3.creationHeight).toBe(height);
-    expect(change3.value).toBe(SAFE_MIN_BOX_VALUE.toString());
+    expect(change3.value).toBe(SAFE_MIN_BOX_VALUE);
     expect(change3.assets).toHaveLength(32);
     expect(change3.additionalRegisters).toEqual({});
   });
@@ -705,7 +711,8 @@ describe("Building", () => {
       .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
       .payMinFee()
       .sendChangeTo(a1.address)
-      .build("EIP-12");
+      .build()
+      .toEIP12Object();
 
     expect(transaction.inputs).toEqual([
       {
@@ -792,7 +799,7 @@ describe("Token minting", () => {
       .build();
 
     const mintingBox = transaction.outputs[0];
-    expect(mintingBox.assets).toEqual([{ tokenId: transaction.inputs[0].boxId, amount: "100" }]);
+    expect(mintingBox.assets).toEqual([{ tokenId: transaction.inputs[0].boxId, amount: 100n }]);
     expect(mintingBox.additionalRegisters).toEqual({
       R4: "0e0954657374546f6b656e",
       R5: "0e104465736372697074696f6e2074657374",
@@ -818,7 +825,7 @@ describe("Token minting", () => {
       .build();
 
     const mintingBox = transaction.outputs[0];
-    expect(mintingBox.assets).toEqual([{ tokenId: input.boxId, amount: "100" }]);
+    expect(mintingBox.assets).toEqual([{ tokenId: input.boxId, amount: 100n }]);
   });
 
   it("Should mint and transfer other tokens in the same box", () => {
@@ -842,10 +849,10 @@ describe("Token minting", () => {
 
     const mintingBox = transaction.outputs[0];
     expect(mintingBox.assets).toEqual([
-      { tokenId: transaction.inputs[0].boxId, amount: "100" },
+      { tokenId: transaction.inputs[0].boxId, amount: 100n },
       {
         tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
-        amount: "1"
+        amount: 1n
       }
     ]);
   });
@@ -914,7 +921,7 @@ describe("Non-standardized token minting", () => {
     ).toHaveLength(2);
 
     const mintingBox = transaction.outputs[0];
-    expect(mintingBox.assets).toEqual([{ tokenId: mintingTokenId, amount: "1" }]);
+    expect(mintingBox.assets).toEqual([{ tokenId: mintingTokenId, amount: 1n }]);
     expect(mintingBox.additionalRegisters).toEqual({
       R4: "0e0954657374546f6b656e",
       R5: "0e104465736372697074696f6e2074657374",
@@ -922,7 +929,7 @@ describe("Non-standardized token minting", () => {
     });
 
     const sendingBox = transaction.outputs[1];
-    expect(sendingBox.assets).toEqual([{ tokenId: mintingTokenId, amount: "1" }]);
+    expect(sendingBox.assets).toEqual([{ tokenId: mintingTokenId, amount: 1n }]);
     expect(sendingBox.additionalRegisters).toEqual({});
   });
 
@@ -961,7 +968,7 @@ describe("Token burning", () => {
       utxoSum(regularBoxesMock, "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283")
     ).toBe(226679716n);
 
-    const transactions = new TransactionBuilder(height)
+    const transaction = new TransactionBuilder(height)
       .from(regularBoxesMock)
       .burnTokens([
         { tokenId: nftTokenId, amount: 1n },
@@ -970,8 +977,9 @@ describe("Token burning", () => {
       .sendChangeTo(a1.address)
       .build();
 
-    const allOutputTokens = transactions.outputs.flatMap((x) => x.assets);
+    const allOutputTokens = transaction.outputs.flatMap((x) => x.assets);
     expect(allOutputTokens.find((x) => x.tokenId === nftTokenId)).toBeFalsy();
+    expect(transaction.burning.tokens).not.toHaveLength(0);
     expect(
       sumBy(
         allOutputTokens.filter((x) => x.tokenId === regularTokenId),
@@ -999,12 +1007,13 @@ describe("Token burning", () => {
       .build();
 
     expect(transaction.outputs).toHaveLength(2);
+    expect(transaction.burning.tokens).not.toHaveLength(0);
     const output = transaction.outputs[0];
 
     expect(output.assets).toEqual([
       {
         tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
-        amount: "5"
+        amount: 5n
       }
     ]);
   });
@@ -1116,7 +1125,8 @@ describe("Plugins", () => {
         ]);
       })
       .sendChangeTo("9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ")
-      .build("EIP-12");
+      .build()
+      .toPlainObject("EIP-12");
 
     expect(utxoSum(tx.outputs, tokenIda) - utxoSum(tx.inputs, tokenIda)).toBe(-1n);
     expect(utxoSum(tx.outputs, tokenIdb) - utxoSum(tx.inputs, tokenIdb)).toBe(-126n);
@@ -1136,7 +1146,8 @@ describe("Plugins", () => {
         ]);
       })
       .sendChangeTo("9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ")
-      .build("EIP-12");
+      .build()
+      .toEIP12Object();
 
     expect(utxoSum(tx.outputs, tokenIda) - utxoSum(tx.inputs, tokenIda)).toBe(-1n);
     expect(utxoSum(tx.outputs, tokenIdb) - utxoSum(tx.inputs, tokenIdb)).toBe(-126n);

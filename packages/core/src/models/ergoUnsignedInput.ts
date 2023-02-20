@@ -12,6 +12,7 @@ import { ErgoBox } from "./ergoBox";
 
 type InputType<T> = T extends "default" ? UnsignedInput : EIP12UnsignedInput;
 type DataInputType<T> = T extends "default" ? DataInput : EIP12UnsignedDataInput;
+type InputBox = Box<Amount> & { extension?: ContextExtension };
 
 export class ErgoUnsignedInput extends ErgoBox {
   private _extension?: ContextExtension;
@@ -20,8 +21,12 @@ export class ErgoUnsignedInput extends ErgoBox {
     return this._extension;
   }
 
-  constructor(box: Box<Amount>) {
+  constructor(box: InputBox) {
     super(box);
+
+    if (box.extension) {
+      this.setContextVars(box.extension);
+    }
   }
 
   public setContextVars(extension: ContextExtension): ErgoUnsignedInput {
@@ -32,12 +37,12 @@ export class ErgoUnsignedInput extends ErgoBox {
 
   public toUnsignedInputObject<T extends BuildOutputType>(type: T): InputType<T> {
     return {
-      ...this.toObject(type),
+      ...this.toPlainObject(type),
       extension: this._extension || {}
     } as InputType<T>;
   }
 
-  public toObject<T extends BuildOutputType>(type: T): DataInputType<T> {
+  public toPlainObject<T extends BuildOutputType>(type: T): DataInputType<T> {
     if (type === "EIP-12") {
       return {
         boxId: this.boxId,

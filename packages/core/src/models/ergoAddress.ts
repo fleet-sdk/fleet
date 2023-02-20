@@ -1,12 +1,11 @@
 import { AddressType, Base58String, HexString, Network } from "@fleet-sdk/common";
 import { areEqual, endsWith, first, isDefined, startsWith } from "@fleet-sdk/common";
-import { blake2b } from "@noble/hashes/blake2b";
 import { bytesToHex, concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { base58 } from "@scure/base";
 import { InvalidAddress } from "../errors/invalidAddress";
+import { blake2b256, BLAKE_256_HASH_LENGTH } from "../serializer/utils";
 
 const CHECKSUM_LENGTH = 4;
-const BLAKE_256_HASH_LENGTH = 32;
 
 const P2PK_ERGOTREE_PREFIX = hexToBytes("0008cd");
 const P2PK_ERGOTREE_LENGTH = 36;
@@ -30,10 +29,6 @@ function _ensureBytes(content: HexString | Uint8Array): Uint8Array {
   }
 
   return content;
-}
-
-function blake2b256(input: Uint8Array): Uint8Array {
-  return blake2b(input, { dkLen: BLAKE_256_HASH_LENGTH });
 }
 
 function _getErgoTreeType(ergoTree: Uint8Array): AddressType {

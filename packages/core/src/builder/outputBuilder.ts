@@ -137,7 +137,7 @@ export class OutputBuilder {
     return this;
   }
 
-  public build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<string> {
+  public build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<bigint> {
     let tokens = this.tokens.toArray();
 
     if (this.minting) {
@@ -169,15 +169,13 @@ export class OutputBuilder {
     }
 
     return {
-      value: this.value.toString(),
+      value: this.value,
       ergoTree: this.ergoTree,
       creationHeight: this.creationHeight,
-      assets: tokens.map((token) => {
-        return {
-          tokenId: token.tokenId,
-          amount: token.amount.toString()
-        };
-      }),
+      assets: tokens.map((token) => ({
+        tokenId: token.tokenId,
+        amount: token.amount
+      })),
       additionalRegisters: this.additionalRegisters
     };
   }

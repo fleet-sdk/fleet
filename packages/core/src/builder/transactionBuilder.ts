@@ -2,36 +2,25 @@ import {
   Amount,
   Base58String,
   Box,
-  BuildOutputType,
-  EIP12UnsignedTransaction,
   HexString,
   isUndefined,
   Network,
   OneOrMore,
   TokenAmount,
-  UnsignedTransaction
+  utxoSumResultDiff
 } from "@fleet-sdk/common";
-import {
-  _0n,
-  BoxAmounts,
-  chunk,
-  ensureBigInt,
-  isDefined,
-  isHex,
-  some,
-  utxoSum
-} from "@fleet-sdk/common";
+import { _0n, chunk, ensureBigInt, isDefined, isHex, some, utxoSum } from "@fleet-sdk/common";
 import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { CollectionAddOptions } from "../models/collections/collection";
+import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 import { createPluginContext, FleetPluginContext } from "./pluginContext";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
 type PluginListItem = { execute: FleetPlugin; pending: boolean };
-type TransactionType<T> = T extends "default" ? UnsignedTransaction : EIP12UnsignedTransaction;
 type SelectorSettings = Omit<BoxSelector<Box<bigint>>, "select">;
 export type SelectorCallback = (selector: SelectorSettings) => void;
 export type FleetPlugin = (context: FleetPluginContext) => void;
@@ -210,9 +199,7 @@ export class TransactionBuilder {
     return this;
   }
 
-  public build(): UnsignedTransaction;
-  public build<T extends BuildOutputType>(buildOutputType: T): TransactionType<T>;
-  public build<T extends BuildOutputType>(buildOutputType?: T): TransactionType<T> {
+  public build(): ErgoUnsignedTransaction {
     if (some(this._plugins)) {
       const context = createPluginContext(this);
       for (const plugin of this._plugins) {
@@ -254,7 +241,7 @@ export class TransactionBuilder {
     let inputs = selector.select(target);
 
     if (isDefined(this._changeAddress)) {
-      let change = this._calcDiff(utxoSum(inputs), target);
+      let change = utxoSumResultDiff(utxoSum(inputs), target);
 
       if (some(change.tokens)) {
         let requiredNanoErgs = this._calcRequiredNanoErgsForChange(change.tokens.length);
@@ -263,7 +250,8 @@ export class TransactionBuilder {
             nanoErgs: target.nanoErgs + requiredNanoErgs,
             tokens: target.tokens
           });
-          change = this._calcDiff(utxoSum(inputs), target);
+
+          change = utxoSumResultDiff(utxoSum(inputs), target);
           requiredNanoErgs = this._calcRequiredNanoErgsForChange(change.tokens.length);
         }
 
@@ -290,25 +278,23 @@ export class TransactionBuilder {
       }
     }
 
-    const unsignedTransaction = {
-      inputs: inputs.map((input) => input.toUnsignedInputObject(buildOutputType || "default")),
-      dataInputs: this.dataInputs
-        .toArray()
-        .map((input) => input.toObject(buildOutputType || "default")),
-      outputs: outputs
+    const unsignedTransaction = new ErgoUnsignedTransaction(
+      inputs,
+      this.dataInputs.toArray(),
+      outputs
         .toArray()
         .map((output) =>
           output.setCreationHeight(this._creationHeight, { replace: false }).build(inputs)
         )
-    } as TransactionType<T>;
+    );
 
-    let burning = this._calcBurningBalance(unsignedTransaction, inputs);
+    let burning = unsignedTransaction.burning;
     if (burning.nanoErgs > _0n) {
       throw new MalformedTransaction("it's not possible to burn ERG.");
     }
 
     if (some(burning.tokens) && some(this._burning)) {
-      burning = this._calcDiff(burning, { nanoErgs: _0n, tokens: this._burning.toArray() });
+      burning = utxoSumResultDiff(burning, { nanoErgs: _0n, tokens: this._burning.toArray() });
     }
 
     if (!this._settings.canBurnTokens && some(burning.tokens)) {
@@ -372,17 +358,6 @@ export class TransactionBuilder {
     return tokenId;
   }
 
-  private _calcBurningBalance(
-    unsignedTransaction: UnsignedTransaction,
-    inputs: Box<bigint>[]
-  ): BoxAmounts {
-    const usedInputs = inputs.filter((input) =>
-      isDefined(unsignedTransaction.inputs.find((txInput) => txInput.boxId === input.boxId))
-    );
-
-    return this._calcDiff(utxoSum(usedInputs), utxoSum(unsignedTransaction.outputs));
-  }
-
   private _calcChangeLength(tokensLength: number): number {
     return Math.ceil(tokensLength / this._settings.maxTokensPerChangeBox);
   }
@@ -392,21 +367,5 @@ export class TransactionBuilder {
     minNanoErgsPerBox = SAFE_MIN_BOX_VALUE
   ): bigint {
     return minNanoErgsPerBox * BigInt(this._calcChangeLength(tokensLength));
-  }
-
-  private _calcDiff(inputs: BoxAmounts, outputs: BoxAmounts): BoxAmounts {
-    const tokens: TokenAmount<bigint>[] = [];
-    const nanoErgs = inputs.nanoErgs - outputs.nanoErgs;
-
-    for (const token of inputs.tokens) {
-      const balance =
-        token.amount - (outputs.tokens.find((t) => t.tokenId === token.tokenId)?.amount || _0n);
-
-      if (balance > _0n) {
-        tokens.push({ tokenId: token.tokenId, amount: balance });
-      }
-    }
-
-    return { nanoErgs, tokens };
   }
 }

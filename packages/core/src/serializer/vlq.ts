@@ -23,7 +23,7 @@ export function vlqEncode(value: number): Uint8Array {
     throw new RangeError("Variable Length Quantity not supported for negative numbers");
   }
 
-  const bytes = [];
+  const bytes: number[] = [];
   do {
     let lower7bits = value & 0x7f;
     value >>= 7;

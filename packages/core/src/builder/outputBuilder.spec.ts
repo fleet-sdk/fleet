@@ -286,7 +286,7 @@ describe("Building", () => {
     const boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).build();
 
     expect(boxCandidate.boxId).toBeUndefined();
-    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
+    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
     expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([]);
@@ -300,12 +300,12 @@ describe("Building", () => {
       .build();
 
     expect(boxCandidate.boxId).toBeUndefined();
-    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
+    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
     expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
-      { tokenId: tokenA, amount: "15" },
-      { tokenId: tokenB, amount: "1" }
+      { tokenId: tokenA, amount: 15n },
+      { tokenId: tokenB, amount: 1n }
     ]);
     expect(boxCandidate.additionalRegisters).toEqual({});
   });
@@ -321,13 +321,13 @@ describe("Building", () => {
       .build(regularBoxesMock);
 
     expect(boxCandidate.boxId).toBeUndefined();
-    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
+    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
     expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
         tokenId: regularBoxesMock[0].boxId, // should be the same as the first input
-        amount: "100"
+        amount: 100n
       }
     ]);
     expect(boxCandidate.additionalRegisters).toEqual({
@@ -350,16 +350,16 @@ describe("Building", () => {
       .build(regularBoxesMock);
 
     expect(boxCandidate.boxId).toBeUndefined();
-    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
+    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
     expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
         tokenId: regularBoxesMock[0].boxId, // should be the same as the first input
-        amount: "100"
+        amount: 100n
       },
-      { tokenId: tokenA, amount: "15" },
-      { tokenId: tokenB, amount: "1" }
+      { tokenId: tokenA, amount: 15n },
+      { tokenId: tokenB, amount: 1n }
     ]);
     expect(boxCandidate.additionalRegisters).toEqual({
       R4: "0e0954657374546f6b656e",
@@ -376,13 +376,13 @@ describe("Building", () => {
       .build(regularBoxesMock);
 
     expect(boxCandidate.boxId).toBeUndefined();
-    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
+    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
     expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
         tokenId: regularBoxesMock[0].boxId, // should be the same as the first input
-        amount: "100"
+        amount: 100n
       }
     ]);
     expect(boxCandidate.additionalRegisters).toEqual({
@@ -402,13 +402,13 @@ describe("Building", () => {
       .build(regularBoxesMock);
 
     expect(boxCandidate.boxId).toBeUndefined();
-    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE.toString());
+    expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
     expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
         tokenId: regularBoxesMock[0].boxId, // should be the same as the first input
-        amount: "100"
+        amount: 100n
       }
     ]);
     expect(boxCandidate.additionalRegisters).toEqual({ R4: "0e00" });

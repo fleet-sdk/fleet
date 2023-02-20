@@ -23,7 +23,8 @@ describe("Babel Swap Plugin", () => {
       )
       .payMinFee()
       .sendChangeTo(changeAddress)
-      .build("EIP-12");
+      .build()
+      .toEIP12Object();
 
     const input = tx.inputs.find((box) => isValidBabelBox(box));
     if (!input || !input.extension[0]) {
@@ -60,7 +61,7 @@ describe("Babel Swap Plugin", () => {
         )
         .payMinFee()
         .sendChangeTo(changeAddress)
-        .build("EIP-12");
+        .build();
     }).toThrow();
   });
 
@@ -78,7 +79,7 @@ describe("Babel Swap Plugin", () => {
         )
         .payMinFee()
         .sendChangeTo(changeAddress)
-        .build("EIP-12");
+        .build();
     }).toThrow();
   });
 
@@ -96,7 +97,7 @@ describe("Babel Swap Plugin", () => {
         )
         .payMinFee()
         .sendChangeTo(changeAddress)
-        .build("EIP-12");
+        .build();
     }).toThrow();
   });
 });
