@@ -6,6 +6,9 @@ import { SigmaTypeCode } from "./sigmaTypeCode";
 import { IPrimitiveSigmaType, ISigmaType } from "./sigmaTypes";
 import { isColl, isPrimitiveType, isPrimitiveTypeCode } from "./utils";
 
+const GROUP_ELEMENT_LENGTH = 33;
+const PROVE_DLOG_OP = 0xcd;
+
 export class DataSerializer {
   public static serialize(data: ISigmaType, writer: SigmaByteWriter) {
     if (isPrimitiveType(data)) {
@@ -33,7 +36,7 @@ export class DataSerializer {
         case SigmaTypeCode.SigmaProp: {
           const node = (data as IPrimitiveSigmaType<ISigmaType>).value;
           if (node.type === SigmaTypeCode.GroupElement) {
-            writer.write(0xcd); // CreateProveDlog operation
+            writer.write(PROVE_DLOG_OP);
             DataSerializer.serialize(node, writer);
           } else {
             throw Error("Not implemented");
@@ -42,7 +45,7 @@ export class DataSerializer {
         }
         case SigmaTypeCode.Unit: // same as void, don't need to save anything
           break;
-        case SigmaTypeCode.Box:
+        // case SigmaTypeCode.Box:
         default:
           throw Error("Not implemented");
       }
@@ -96,16 +99,23 @@ export class DataSerializer {
         case SigmaTypeCode.Long:
           return reader.readLong();
         // case SigmaTypeCode.BigInt:
+        //   break;
         case SigmaTypeCode.GroupElement:
-          return reader.readBytes(34);
-        // case SigmaTypeCode.SigmaProp:
+          return reader.readBytes(GROUP_ELEMENT_LENGTH);
+        case SigmaTypeCode.SigmaProp: {
+          if (reader.readByte() === PROVE_DLOG_OP) {
+            return this.deserialize(SigmaTypeCode.GroupElement, reader);
+          }
+
+          break;
+        }
         // case SigmaTypeCode.Unit:
         // case SigmaTypeCode.Box:
-        // default:
-        //   break;
+        default:
+          break;
       }
     }
 
-    throw new Error("Type parsing not yet implemented.");
+    throw new Error("Parsing error: type implemented.");
   }
 }

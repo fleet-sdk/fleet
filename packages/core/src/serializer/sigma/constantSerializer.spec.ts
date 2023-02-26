@@ -172,11 +172,17 @@ describe("Deserialization", () => {
 
   it("Should deserialize SGroupElement", () => {
     for (const tv of sGroupElementTestVectors) {
-      expect(bytesToHex(SParse(hexToBytes(tv.hex)))).toBe(tv.value);
+      expect(bytesToHex(SParse(tv.hex))).toBe(tv.value);
     }
   });
 
-  it("Should fail when trying to deserialize a not implemented type", () => {
+  it("Should deserialize SSigmaProp", () => {
+    for (const tv of sSigmaPropTestVectors) {
+      expect(bytesToHex(SParse(tv.hex))).toBe(tv.value);
+    }
+  });
+
+  it("Should fail while trying to deserialize a not implemented type", () => {
     expect(() => {
       SParse("6122");
     }).toThrow();
