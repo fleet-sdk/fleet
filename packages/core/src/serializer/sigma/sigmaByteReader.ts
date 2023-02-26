@@ -30,6 +30,13 @@ export class SigmaByteReader {
     return this._bytes[this._cursor++];
   }
 
+  public readBytes(length: number): Uint8Array {
+    const bytes = this._bytes.subarray(this._cursor, length);
+    this._cursor += length;
+
+    return bytes;
+  }
+
   public readType(): SigmaTypeCode {
     return this.readByte();
   }

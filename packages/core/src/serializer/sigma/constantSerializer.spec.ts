@@ -170,6 +170,12 @@ describe("Deserialization", () => {
     expect(SParse("0322")).toBe(17);
   });
 
+  it("Should deserialize SGroupElement", () => {
+    for (const tv of sGroupElementTestVectors) {
+      expect(bytesToHex(SParse(hexToBytes(tv.hex)))).toBe(tv.value);
+    }
+  });
+
   it("Should fail when trying to deserialize a not implemented type", () => {
     expect(() => {
       SParse("6122");
