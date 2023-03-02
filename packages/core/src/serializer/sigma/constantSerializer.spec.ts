@@ -1,5 +1,5 @@
-import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
-import { stringToBytes } from "@scure/base";
+import { bytesToHex, hexToBytes, randomBytes } from "@noble/hashes/utils";
+import { bytesToString, stringToBytes } from "@scure/base";
 import {
   collBoolTestVectors,
   collByteTestVectors,
@@ -88,7 +88,7 @@ describe("Primary types serialization", () => {
     }
   });
 
-  it("Should for not implemented SSigmaProp expression", () => {
+  it("Should fail for not implemented SSigmaProp expression", () => {
     expect(() => {
       SConstant(SSigmaProp({ type: SigmaTypeCode.AvlTree, value: Uint8Array.from([]) }));
     }).toThrow();
@@ -138,7 +138,6 @@ describe("SColl serialization", () => {
     }
   });
 });
-``;
 
 describe("Deserialization", () => {
   it("Should deserialize SBoolean", () => {
@@ -182,9 +181,116 @@ describe("Deserialization", () => {
     }
   });
 
+  it("Should fail for not implemented SSigmaProp expression", () => {
+    expect(() => {
+      SParse("08ce");
+    }).toThrow();
+  });
+
   it("Should fail while trying to deserialize a not implemented type", () => {
     expect(() => {
       SParse("6122");
     }).toThrow();
+  });
+});
+
+describe("SColl deserialization", () => {
+  it("Should deserialize 'Coll[SBoolean]'", () => {
+    for (const tv of collBoolTestVectors) {
+      expect(SParse(tv.hex)).toEqual(tv.coll);
+    }
+  });
+
+  it("Should deserialize 'Coll[SByte]'", () => {
+    for (const tv of collByteTestVectors) {
+      expect(bytesToString("utf8", SParse(tv.hex))).toBe(tv.string);
+    }
+  });
+
+  it("Should deserialize 'Coll[SShort]'", () => {
+    for (const tv of collShortTestVectors) {
+      expect(SParse(tv.hex)).toEqual(tv.coll);
+    }
+  });
+
+  it("Should deserialize 'Coll[SInt]'", () => {
+    for (const tv of collIntTestVectors) {
+      expect(SParse(tv.hex)).toEqual(tv.coll);
+    }
+  });
+
+  it("Should deserialize 'Coll[SLong]'", () => {
+    for (const tv of collLongTestVectors) {
+      expect(SParse(tv.hex)).toEqual(tv.coll);
+    }
+  });
+});
+
+describe("Serialize -> Parse roundtrip", () => {
+  function randomInt(min: number, max: number) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function getRandomBigInt(bytes: number) {
+    return BigInt(`0x${bytesToHex(randomBytes(bytes))}`);
+  }
+
+  function randomBigInt(min: bigint, max: bigint) {
+    // increase the chances of negative numbers generation;
+    const rand = getRandomBigInt(1) % 2n === 0n ? getRandomBigInt(1) : getRandomBigInt(1) * -1n;
+
+    return (rand * (max - min + 1n) + min) / 10_000n;
+  }
+
+  it("Should roundtrip SBoolean", () => {
+    expect(SParse(SConstant(SBool(true)))).toBe(true);
+    expect(SParse(SConstant(SBool(false)))).toBe(false);
+  });
+
+  it("Should roundtrip SByte", () => {
+    for (let i = 0; i < 100; i++) {
+      const value = randomInt(0, 127);
+      expect(SParse(SConstant(SByte(value)))).toBe(value);
+    }
+  });
+
+  it("Should roundtrip SShort", () => {
+    for (let i = 0; i < 100; i++) {
+      const value = randomInt(-32_768, 32_767);
+      expect(SParse(SConstant(SShort(value)))).toBe(value);
+    }
+  });
+
+  it("Should roundtrip SInt", () => {
+    // https://docs.scala-lang.org/overviews/scala-book/built-in-types.html
+
+    for (let i = 0; i < 100; i++) {
+      const value = randomInt(-2_147_483_648, 2_147_483_647);
+      expect(SParse(SConstant(SInt(value)))).toBe(value);
+    }
+  });
+
+  it("Should roundtrip SLong", () => {
+    for (let i = 0; i < 100; i++) {
+      const value = randomBigInt(-9_223_372_036_854_775_808n, 9_223_372_036_854_775_807n);
+      expect(SParse(SConstant(SLong(value)))).toBe(value);
+    }
+  });
+
+  it("Should roundtrip SGroupElement", () => {
+    for (const tv of sGroupElementTestVectors) {
+      expect(SParse(SConstant(SGroupElement(hexToBytes(tv.value))))).toEqual(hexToBytes(tv.value));
+    }
+  });
+
+  it("Should roundtrip SSigmaProp", () => {
+    for (const tv of sSigmaPropTestVectors) {
+      expect(SParse(SConstant(SSigmaProp(SGroupElement(hexToBytes(tv.value)))))).toEqual(
+        hexToBytes(tv.value)
+      );
+    }
   });
 });

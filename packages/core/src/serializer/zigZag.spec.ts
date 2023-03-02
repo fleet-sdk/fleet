@@ -42,7 +42,6 @@ describe("BigInt ZigZag encoding", () => {
     expect(zigZagEncodeBigInt(-2n)).toBe(3n);
     expect(zigZagEncodeBigInt(2n)).toBe(4n);
     expect(zigZagEncodeBigInt(-3n)).toBe(5n);
-
     expect(zigZagEncodeBigInt(0x3fffffffn)).toBe(0x7ffffffen);
     expect(zigZagEncodeBigInt(0x000000003fffffffn)).toBe(0x000000007ffffffen);
   });

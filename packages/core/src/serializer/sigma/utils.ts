@@ -6,7 +6,11 @@ export function isPrimitiveType<T>(data: ISigmaType): data is IPrimitiveSigmaTyp
 }
 
 export function isColl<T>(data: ISigmaType): data is ISigmaCollection<T> {
-  return data.type >= 0x0c && data.type <= 0x23;
+  return isCollTypeCode(data.type);
+}
+
+export function isCollTypeCode(typeCode: number): boolean {
+  return typeCode >= 0x0c && typeCode <= 0x23;
 }
 
 export function isEmbeddableTypeCode(typeCode: number): boolean {

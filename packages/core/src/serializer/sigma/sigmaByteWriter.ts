@@ -22,16 +22,14 @@ export class SigmaByteWriter {
     return this;
   }
 
-  public writeBooleans(elements: boolean[]): SigmaByteWriter {
-    for (let i = 0; i < elements.length; i++) {
-      this.writeBoolean(elements[i]);
-    }
+  public writeShort(value: number): SigmaByteWriter {
+    this.writeBytes(vlqEncode(zigZagEncode(value)));
 
     return this;
   }
 
-  public writeNumber(value: number): SigmaByteWriter {
-    this.writeBytes(vlqEncode(zigZagEncode(value)));
+  public writeInt(value: number): SigmaByteWriter {
+    this.writeLong(BigInt(value));
 
     return this;
   }

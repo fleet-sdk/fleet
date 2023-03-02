@@ -26,6 +26,27 @@ export class SigmaByteReader {
     return this.readByte() === 0x01;
   }
 
+  public readBits(length: number): ArrayLike<boolean> {
+    const bits = new Array<boolean>(length);
+    let bitOffset = 0;
+
+    for (let i = 0; i < length; i++) {
+      const bit = (this._bytes[this._cursor] >> bitOffset++) & 1;
+      bits[i] = bit === 1;
+
+      if (bitOffset == 8) {
+        bitOffset = 0;
+        this._cursor++;
+      }
+    }
+
+    if (bitOffset > 0) {
+      this._cursor++;
+    }
+
+    return bits;
+  }
+
   public readByte(): number {
     return this._bytes[this._cursor++];
   }
@@ -38,8 +59,18 @@ export class SigmaByteReader {
     return this.readByte();
   }
 
-  public readNumber(): number {
+  public readVlq(): number {
+    return vlqDecode(this);
+  }
+
+  public readShort(): number {
     return Number(zigZagDecode(vlqDecode(this)));
+  }
+
+  public readInt(): number {
+    const int = this.readLong();
+
+    return Number(int);
   }
 
   public readLong(): bigint {

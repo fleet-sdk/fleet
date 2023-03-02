@@ -4,7 +4,7 @@ import { SigmaByteReader } from "./sigmaByteReader";
 import { SigmaByteWriter } from "./sigmaByteWriter";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 import { IPrimitiveSigmaType, ISigmaType } from "./sigmaTypes";
-import { isColl, isPrimitiveType, isPrimitiveTypeCode } from "./utils";
+import { isColl, isCollTypeCode, isPrimitiveType, isPrimitiveTypeCode } from "./utils";
 
 const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
@@ -20,8 +20,10 @@ export class DataSerializer {
           writer.write((data as IPrimitiveSigmaType<number>).value);
           break;
         case SigmaTypeCode.Short:
+          writer.writeShort((data as IPrimitiveSigmaType<number>).value);
+          break;
         case SigmaTypeCode.Int:
-          writer.writeNumber((data as IPrimitiveSigmaType<number>).value);
+          writer.writeInt((data as IPrimitiveSigmaType<number>).value);
           break;
         case SigmaTypeCode.Long:
           writer.writeLong((data as IPrimitiveSigmaType<bigint>).value);
@@ -94,8 +96,9 @@ export class DataSerializer {
         case SigmaTypeCode.Byte:
           return reader.readByte();
         case SigmaTypeCode.Short:
+          return reader.readShort();
         case SigmaTypeCode.Int:
-          return reader.readNumber();
+          return reader.readInt();
         case SigmaTypeCode.Long:
           return reader.readLong();
         // case SigmaTypeCode.BigInt:
@@ -113,6 +116,27 @@ export class DataSerializer {
         // case SigmaTypeCode.Box:
         default:
           break;
+      }
+    } else if (isCollTypeCode(typeCode)) {
+      const embeddedType = typeCode - SigmaTypeCode.Coll;
+      const length = reader.readVlq();
+
+      switch (embeddedType) {
+        case SigmaTypeCode.Boolean: {
+          return reader.readBits(length);
+        }
+        case SigmaTypeCode.Byte: {
+          return reader.readBytes(length);
+        }
+        default: {
+          const elements = new Array(length);
+
+          for (let i = 0; i < length; i++) {
+            elements[i] = this.deserialize(embeddedType, reader);
+          }
+
+          return elements;
+        }
       }
     }
 

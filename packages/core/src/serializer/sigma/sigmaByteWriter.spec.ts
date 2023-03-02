@@ -54,14 +54,6 @@ describe("Sigma Writer", () => {
     expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x01, 0x00]));
   });
 
-  it("Should put multiple booleans", () => {
-    const sigmaBuffer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
-    sigmaBuffer.writeBooleans([true, false]);
-
-    expect(sigmaBuffer).toHaveLength(2);
-    expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x01, 0x00]));
-  });
-
   it("Should put Int", () => {
     const testVectors = [
       { int: 0, hex: "00" },
@@ -88,8 +80,8 @@ describe("Sigma Writer", () => {
 
     const all = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     for (const tv of testVectors) {
-      all.writeNumber(tv.int);
-      expect(new SigmaByteWriter(tv.hex.length).writeNumber(tv.int).toHex()).toBe(tv.hex);
+      all.writeShort(tv.int);
+      expect(new SigmaByteWriter(tv.hex.length).writeShort(tv.int).toHex()).toBe(tv.hex);
     }
 
     expect(all.toHex()).toEqual(testVectors.map((x) => x.hex).join(""));
