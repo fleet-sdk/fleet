@@ -140,6 +140,6 @@ export class DataSerializer {
       }
     }
 
-    throw new Error("Parsing error: type implemented.");
+    throw new Error("Parsing error: type not implemented.");
   }
 }
