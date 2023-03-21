@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.21](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.20...v0.1.0-alpha.21) (2023-03-21)
+
+
+### Features
+
+* **core:** add `SColl` parser ([cb9c958](https://github.com/fleet-sdk/core/commit/cb9c95882bd3936338b9509dbf5552fb20a3a264))
+* **core:** add `SGroupElement` parser. ([048ba88](https://github.com/fleet-sdk/core/commit/048ba887c1fd4e5f2888dad5354a493f0b07bd8b))
+* **core:** add `SigmaProp.ProveDlog` parser ([584029d](https://github.com/fleet-sdk/core/commit/584029d2cc9e50d6e9d89eb8e2086e765d0c1012))
+
+
+### Bug Fixes
+
+* wrong error message ([b94ee22](https://github.com/fleet-sdk/core/commit/b94ee22a33af22f4b21599acadba42e6929518fa))
+
 ## [0.1.0-alpha.20](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.19...v0.1.0-alpha.20) (2023-02-20)
 
 ### Features
