@@ -1,5 +1,6 @@
 import { _0n, _127n, _128n, _7n } from "@fleet-sdk/common";
-import { SigmaByteReader } from "./sigma/sigmaByteReader";
+import { SigmaReader } from "./sigma/sigmaReader";
+import { SigmaWriter } from "./sigma/sigmaWriter";
 
 /**
  * A **variable-length quantity (VLQ)** is a universal code that uses an arbitrary number
@@ -10,20 +11,20 @@ import { SigmaByteReader } from "./sigma/sigmaByteReader";
  */
 
 /**
- * Decode VLQ bytes to an unsigned integer value
- * @param reader VLQ bytes
- * @returns Unsigned integer value
+ * Write an unsigned integer value as VLQ to a `SigmaWriter`.
+ * @param value: Integer value
+ * @param writer: Sigma writer
+ * @returns Sigma writer passed as function argument.
  */
-export function vlqEncode(value: number): Uint8Array {
+export function writeVLQ(writer: SigmaWriter, value: number): SigmaWriter {
   // source: https://stackoverflow.com/a/3564685
 
   if (value === 0) {
-    return Uint8Array.from([0]);
+    return writer.write(0);
   } else if (value < 0) {
-    throw new RangeError("Variable Length Quantity not supported for negative numbers");
+    throw new RangeError("Variable Length Quantity not supported for negative numbers.");
   }
 
-  const bytes: number[] = [];
   do {
     let lower7bits = value & 0x7f;
     value >>= 7;
@@ -32,10 +33,10 @@ export function vlqEncode(value: number): Uint8Array {
       lower7bits |= 0x80;
     }
 
-    bytes.push(lower7bits);
+    writer.write(lower7bits);
   } while (value > 0);
 
-  return Uint8Array.from(bytes);
+  return writer;
 }
 
 /**
@@ -43,7 +44,7 @@ export function vlqEncode(value: number): Uint8Array {
  * @param reader VLQ bytes
  * @returns Unsigned integer value
  */
-export function vlqDecode(reader: SigmaByteReader): number {
+export function readVLQ(reader: SigmaReader): number {
   if (reader.isEmpty) {
     return 0;
   }
@@ -62,20 +63,20 @@ export function vlqDecode(reader: SigmaByteReader): number {
 }
 
 /**
- * Encode a unsigned big integer to VLQ bytes
- * @param value unsigned bit integer
- * @returns VLQ bytes
+ * Write an unsigned integer value as VLQ to a `SigmaWriter`.
+ * @param value: Big integer value
+ * @param writer: Sigma writer
+ * @returns Sigma writer passed as function argument.
  */
-export function vqlEncodeBigInt(value: bigint): Uint8Array {
+export function writeBigVLQ(writer: SigmaWriter, value: bigint): SigmaWriter {
   // source: https://stackoverflow.com/a/3564685
 
   if (value === _0n) {
-    return Uint8Array.from([0]);
+    return writer.write(0);
   } else if (value < _0n) {
     throw new RangeError("Variable Length Quantity not supported for negative numbers");
   }
 
-  const bytes = [];
   do {
     let lower7bits = Number(value & _127n);
     value >>= _7n;
@@ -84,10 +85,10 @@ export function vqlEncodeBigInt(value: bigint): Uint8Array {
       lower7bits |= 0x80;
     }
 
-    bytes.push(lower7bits);
+    writer.write(lower7bits);
   } while (value > 0);
 
-  return Uint8Array.from(bytes);
+  return writer;
 }
 
 /**
@@ -95,7 +96,7 @@ export function vqlEncodeBigInt(value: bigint): Uint8Array {
  * @param reader VLQ bytes
  * @returns Unsigned integer value
  */
-export function vlqDecodeBigInt(reader: SigmaByteReader): bigint {
+export function readBigVLQ(reader: SigmaReader): bigint {
   if (reader.isEmpty) {
     return _0n;
   }

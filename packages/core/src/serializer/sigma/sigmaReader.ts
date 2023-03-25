@@ -1,10 +1,10 @@
 import { HexString, isEmpty } from "@fleet-sdk/common";
 import { hexToBytes } from "@noble/hashes/utils";
-import { vlqDecode, vlqDecodeBigInt } from "../vlq";
+import { readBigVLQ, readVLQ } from "../vlq";
 import { zigZagDecode, zigZagDecodeBigInt } from "../zigZag";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 
-export class SigmaByteReader {
+export class SigmaReader {
   private _bytes!: Uint8Array;
   private _cursor!: number;
 
@@ -60,11 +60,11 @@ export class SigmaByteReader {
   }
 
   public readVlq(): number {
-    return vlqDecode(this);
+    return readVLQ(this);
   }
 
   public readShort(): number {
-    return Number(zigZagDecode(vlqDecode(this)));
+    return Number(zigZagDecode(readVLQ(this)));
   }
 
   public readInt(): number {
@@ -74,6 +74,6 @@ export class SigmaByteReader {
   }
 
   public readLong(): bigint {
-    return zigZagDecodeBigInt(vlqDecodeBigInt(this));
+    return zigZagDecodeBigInt(readBigVLQ(this));
   }
 }

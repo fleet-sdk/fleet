@@ -69,7 +69,7 @@ export class ErgoUnsignedTransaction {
       inputs: this.inputs.map((input) => input.toUnsignedInputObject("default")),
       dataInputs: this.dataInputs.map((input) => input.toPlainObject("default")),
       outputs: this.outputs
-    });
+    }).toBytes();
   }
 }
 

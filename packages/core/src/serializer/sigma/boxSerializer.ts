@@ -7,32 +7,39 @@ import {
   TokenAmount
 } from "@fleet-sdk/common";
 import { ensureBigInt, isDefined, isEmpty } from "@fleet-sdk/common";
-import { concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { ErgoBox } from "../../models/ergoBox";
-import { vlqEncode, vqlEncodeBigInt } from "../vlq";
+import { SigmaWriter } from "./sigmaWriter";
 
-export function serializeBox(box: Box<Amount> | ErgoBox): Uint8Array;
-export function serializeBox(box: BoxCandidate<Amount>, distinctTokenIds: string[]): Uint8Array;
+export function serializeBox(box: Box<Amount> | ErgoBox): SigmaWriter;
+export function serializeBox(box: Box<Amount> | ErgoBox, writer: SigmaWriter): SigmaWriter;
+export function serializeBox(
+  box: BoxCandidate<Amount>,
+  writer: SigmaWriter,
+  distinctTokenIds: string[]
+): SigmaWriter;
 export function serializeBox(
   box: Box<Amount> | ErgoBox | BoxCandidate<Amount>,
+  writer?: SigmaWriter,
   distinctTokenIds?: string[]
-): Uint8Array {
-  const bytes = concatBytes(
-    vqlEncodeBigInt(ensureBigInt(box.value)),
-    hexToBytes(box.ergoTree),
-    vlqEncode(box.creationHeight),
-    serializeTokens(box.assets, distinctTokenIds),
-    serializeRegisters(box.additionalRegisters)
-  );
+): SigmaWriter {
+  if (!writer) {
+    writer = new SigmaWriter(5_0000);
+  }
+
+  writer.writeBigVLQ(ensureBigInt(box.value));
+  writer.writeHex(box.ergoTree);
+  writer.writeVLQ(box.creationHeight);
+  writeTokens(writer, box.assets, distinctTokenIds);
+  writeRegisters(writer, box.additionalRegisters);
 
   if (isDefined(distinctTokenIds)) {
-    return bytes;
+    return writer;
   } else {
     if (!isBox(box)) {
       throw new Error("Invalid box type.");
     }
 
-    return concatBytes(bytes, hexToBytes(box.transactionId), vlqEncode(box.index));
+    return writer.writeHex(box.transactionId).writeVLQ(box.index);
   }
 }
 
@@ -42,45 +49,46 @@ function isBox<T extends Amount>(box: Box<Amount> | ErgoBox | BoxCandidate<Amoun
   return isDefined(castedBox.transactionId) && isDefined(castedBox.index);
 }
 
-function serializeTokens(tokens: TokenAmount<Amount>[], tokenIds?: string[]): Uint8Array {
+function writeTokens(
+  writer: SigmaWriter,
+  tokens: TokenAmount<Amount>[],
+  tokenIds?: string[]
+): void {
   if (isEmpty(tokens)) {
-    return Uint8Array.from([0]);
+    writer.write(0);
+
+    return;
   }
 
+  writer.writeVLQ(tokens.length);
   if (some(tokenIds)) {
-    return concatBytes(
-      vlqEncode(tokens.length),
-      ...tokens.map((token) =>
-        concatBytes(
-          vlqEncode(tokenIds.indexOf(token.tokenId)),
-          vqlEncodeBigInt(ensureBigInt(token.amount))
-        )
-      )
+    tokens.map((token) =>
+      writer.writeVLQ(tokenIds.indexOf(token.tokenId)).writeBigVLQ(ensureBigInt(token.amount))
     );
+  } else {
+    tokens.map((token) => writer.writeHex(token.tokenId).writeBigVLQ(ensureBigInt(token.amount)));
   }
-
-  return concatBytes(
-    vlqEncode(tokens.length),
-    ...tokens.map((token) =>
-      concatBytes(hexToBytes(token.tokenId), vqlEncodeBigInt(ensureBigInt(token.amount)))
-    )
-  );
 }
 
-function serializeRegisters(registers: NonMandatoryRegisters): Uint8Array {
-  let keys = Object.keys(registers);
-  if (isEmpty(keys)) {
-    return Uint8Array.from([0]);
-  }
+function writeRegisters(writer: SigmaWriter, registers: NonMandatoryRegisters): void {
+  const keys = Object.keys(registers).sort();
+  let length = 0;
 
-  const serializedRegisters: Uint8Array[] = [];
-  keys = keys.sort();
   for (const key of keys) {
-    const val = registers[key as keyof NonMandatoryRegisters];
-    if (isDefined(val)) {
-      serializedRegisters.push(hexToBytes(val));
+    if (registers[key as keyof NonMandatoryRegisters]) {
+      length++;
     }
   }
 
-  return concatBytes(vlqEncode(serializedRegisters.length), concatBytes(...serializedRegisters));
+  writer.writeVLQ(length);
+  if (length == 0) {
+    return;
+  }
+
+  for (const key of keys) {
+    const register = registers[key as keyof NonMandatoryRegisters];
+    if (isDefined(register)) {
+      writer.writeHex(register);
+    }
+  }
 }

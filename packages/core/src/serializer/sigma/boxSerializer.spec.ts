@@ -1,5 +1,4 @@
 import { Box } from "@fleet-sdk/common";
-import { bytesToHex } from "@noble/hashes/utils";
 import { serializeBox } from "./boxSerializer";
 
 describe("Serialize ErgoBox", () => {
@@ -227,7 +226,7 @@ describe("Serialize ErgoBox", () => {
 
   it("Should serialize", () => {
     for (const tv of testVectors) {
-      expect(bytesToHex(serializeBox(tv.json))).toBe(tv.serialized);
+      expect(serializeBox(tv.json).toHex()).toBe(tv.serialized);
     }
   });
 

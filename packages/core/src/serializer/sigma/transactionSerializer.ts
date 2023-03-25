@@ -4,12 +4,10 @@ import {
   ContextExtension,
   DataInput,
   isDefined,
-  isEmpty,
   UnsignedInput
 } from "@fleet-sdk/common";
-import { concatBytes, hexToBytes } from "@noble/hashes/utils";
-import { vlqEncode } from "../vlq";
 import { serializeBox } from "./boxSerializer";
+import { SigmaWriter } from "./sigmaWriter";
 
 type MinimalUnsignedTransaction = {
   inputs: readonly UnsignedInput[];
@@ -17,52 +15,56 @@ type MinimalUnsignedTransaction = {
   outputs: readonly BoxCandidate<Amount>[];
 };
 
-export function serializeTransaction(transaction: MinimalUnsignedTransaction) {
-  const tokenIds = getDistinctTokenIds(transaction.outputs);
+export function serializeTransaction(transaction: MinimalUnsignedTransaction): SigmaWriter {
+  const writer = new SigmaWriter(100_000);
 
-  return concatBytes(
-    vlqEncode(transaction.inputs.length),
-    concatBytes(...transaction.inputs.map((input) => serializeInput(input))),
+  // write inputs
+  writer.writeVLQ(transaction.inputs.length);
+  transaction.inputs.map((input) => writeInput(writer, input));
 
-    vlqEncode(transaction.dataInputs.length),
-    concatBytes(...transaction.dataInputs.map((dataInput) => hexToBytes(dataInput.boxId))),
+  // write data inputs
+  writer.writeVLQ(transaction.dataInputs.length);
+  transaction.dataInputs.map((dataInput) => writer.writeHex(dataInput.boxId));
 
-    vlqEncode(tokenIds.length),
-    concatBytes(...tokenIds.map((tokenId) => hexToBytes(tokenId))),
+  // write distinct token IDs
+  const distinctTokenIds = getDistinctTokenIds(transaction.outputs);
+  writer.writeVLQ(distinctTokenIds.length);
+  distinctTokenIds.map((tokenId) => writer.writeHex(tokenId));
 
-    vlqEncode(transaction.outputs.length),
-    concatBytes(...transaction.outputs.map((output) => serializeBox(output, tokenIds)))
-  );
+  // write outputs
+  writer.writeVLQ(transaction.outputs.length);
+  transaction.outputs.map((output) => serializeBox(output, writer, distinctTokenIds));
+
+  return writer;
 }
 
-function serializeInput(input: UnsignedInput) {
-  return concatBytes(
-    hexToBytes(input.boxId),
-    generateEmptyProofBytes(),
-    serializeExtension(input.extension)
-  );
+function writeInput(writer: SigmaWriter, input: UnsignedInput): void {
+  writer.writeHex(input.boxId);
+  writer.write(0); // empty proof
+  writeExtension(writer, input.extension);
 }
 
-function generateEmptyProofBytes() {
-  return Uint8Array.from([0]);
-}
-
-function serializeExtension(extension: ContextExtension) {
+function writeExtension(writer: SigmaWriter, extension: ContextExtension): void {
   const keys = Object.keys(extension);
-  if (isEmpty(keys)) {
-    return Uint8Array.from([0]);
-  }
+  let length = 0;
 
-  const bytes: Uint8Array[] = [];
   for (const key of keys) {
-    const val = extension[key as unknown as keyof ContextExtension];
-    if (isDefined(val)) {
-      bytes.push(vlqEncode(Number(key)));
-      bytes.push(hexToBytes(val));
+    if (extension[key as unknown as keyof ContextExtension]) {
+      length++;
     }
   }
 
-  return concatBytes(vlqEncode(keys.length), concatBytes(...bytes));
+  writer.writeVLQ(length);
+  if (length == 0) {
+    return;
+  }
+
+  for (const key of keys) {
+    const ext = extension[key as unknown as keyof ContextExtension];
+    if (isDefined(ext)) {
+      writer.writeVLQ(Number(key)).writeHex(ext);
+    }
+  }
 }
 
 function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {

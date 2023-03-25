@@ -1,5 +1,6 @@
-import { SigmaByteReader } from "./sigma/sigmaByteReader";
-import { vlqDecode, vlqDecodeBigInt, vlqEncode, vqlEncodeBigInt } from "./vlq";
+import { SigmaReader } from "./sigma/sigmaReader";
+import { SigmaWriter } from "./sigma/sigmaWriter";
+import { readBigVLQ, readVLQ, writeBigVLQ, writeVLQ } from "./vlq";
 
 describe("32-bit VLQ encoding/decoding", () => {
   const testVectors = [
@@ -17,38 +18,46 @@ describe("32-bit VLQ encoding/decoding", () => {
     { uint: 268435456, bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x01]) }
   ];
 
+  function toVLQBytes(value: number) {
+    return writeVLQ(new SigmaWriter(5), value).toBytes();
+  }
+
   it("Should encode", () => {
     testVectors.forEach((tv) => {
-      expect(vlqEncode(tv.uint)).toEqual(tv.bytes);
+      expect(toVLQBytes(tv.uint)).toEqual(tv.bytes);
     });
   });
 
   it("Should fail trying to encode negative values", () => {
     expect(() => {
-      vlqEncode(-1);
+      toVLQBytes(-1);
     }).toThrow();
   });
 
   it("Should decode", () => {
     testVectors.forEach((tv) => {
-      expect(vlqDecode(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
+      expect(readVLQ(new SigmaReader(tv.bytes))).toEqual(tv.uint);
     });
   });
 
   it("Should decode empty Buffer to 0", () => {
-    expect(vlqDecode(new SigmaByteReader(Uint8Array.from([])))).toEqual(0);
+    expect(readVLQ(new SigmaReader(Uint8Array.from([])))).toEqual(0);
   });
 
   it("Should encode/decode radom numbers", () => {
     Array.from(Array(100))
       .map(() => Math.ceil(Math.random() * 100000))
       .forEach((n) => {
-        expect(vlqDecode(new SigmaByteReader(vlqEncode(n)))).toBe(n);
+        expect(readVLQ(new SigmaReader(toVLQBytes(n)))).toBe(n);
       });
   });
 });
 
 describe("64-bit VLQ encoding/decoding", () => {
+  function toBigVLQBytes(value: bigint) {
+    return writeBigVLQ(new SigmaWriter(100), value).toBytes();
+  }
+
   const testVectors = [
     { uint: 0n, bytes: Uint8Array.from([0x00]) },
     { uint: 126n, bytes: Uint8Array.from([0x7e]) },
@@ -66,31 +75,31 @@ describe("64-bit VLQ encoding/decoding", () => {
 
   it("Should encode", () => {
     testVectors.forEach((tv) => {
-      expect(vqlEncodeBigInt(tv.uint)).toEqual(tv.bytes);
+      expect(toBigVLQBytes(tv.uint)).toEqual(tv.bytes);
     });
   });
 
   it("Should fail trying to encode negative values", () => {
     expect(() => {
-      vqlEncodeBigInt(-1n);
+      toBigVLQBytes(-1n);
     }).toThrow();
   });
 
   it("Should decode", () => {
     testVectors.forEach((tv) => {
-      expect(vlqDecodeBigInt(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
+      expect(readBigVLQ(new SigmaReader(tv.bytes))).toEqual(tv.uint);
     });
   });
 
   it("Should decode empty Buffer to 0", () => {
-    expect(vlqDecodeBigInt(new SigmaByteReader(Uint8Array.from([])))).toEqual(0n);
+    expect(readBigVLQ(new SigmaReader(Uint8Array.from([])))).toEqual(0n);
   });
 
   it("Should encode/decode radom numbers", () => {
     Array.from(Array(100))
       .map(() => BigInt(Math.ceil(Math.random() * 100000000000)) * BigInt(Number.MAX_SAFE_INTEGER))
       .forEach((n) => {
-        expect(vlqDecodeBigInt(new SigmaByteReader(vqlEncodeBigInt(n)))).toBe(n);
+        expect(readBigVLQ(new SigmaReader(toBigVLQBytes(n)))).toBe(n);
       });
   });
 });

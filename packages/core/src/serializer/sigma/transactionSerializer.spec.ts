@@ -599,7 +599,7 @@ describe("Transaction serializer", () => {
 
   testVectors.map((tv) => {
     it(`Should serialize [${tv.name}]`, () => {
-      const bytes = serializeTransaction(tv.json);
+      const bytes = serializeTransaction(tv.json).toBytes();
 
       expect(bytesToHex(bytes)).toBe(tv.serialized);
       expect(bytesToHex(blake2b(bytes, { dkLen: 32 }))).toBe(tv.txId);

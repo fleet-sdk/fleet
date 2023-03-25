@@ -33,7 +33,7 @@ export class ErgoBox {
   }
 
   static validate(box: Box<Amount> | ErgoBox): boolean {
-    const bytes = serializeBox(box);
+    const bytes = serializeBox(box).toBytes();
     const hash = bytesToHex(blake2b(bytes, { dkLen: 32 }));
 
     return box.boxId === hash;

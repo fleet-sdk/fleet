@@ -1,16 +1,15 @@
 import { hexToBytes } from "@noble/hashes/utils";
-import { vlqEncode } from "../vlq";
-import { SigmaByteReader } from "./sigmaByteReader";
-import { SigmaByteWriter } from "./sigmaByteWriter";
+import { SigmaReader } from "./sigmaReader";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 import { IPrimitiveSigmaType, ISigmaType } from "./sigmaTypes";
+import { SigmaWriter } from "./sigmaWriter";
 import { isColl, isCollTypeCode, isPrimitiveType, isPrimitiveTypeCode } from "./utils";
 
 const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
 
 export class DataSerializer {
-  public static serialize(data: ISigmaType, writer: SigmaByteWriter) {
+  public static serialize(data: ISigmaType, writer: SigmaWriter) {
     if (isPrimitiveType(data)) {
       switch (data.type) {
         case SigmaTypeCode.Boolean:
@@ -53,9 +52,9 @@ export class DataSerializer {
       }
     } else if (isColl(data)) {
       if (typeof data.value === "string") {
-        writer.writeBytes(vlqEncode(data.value.length / 2));
+        writer.writeVLQ(data.value.length / 2);
       } else {
-        writer.writeBytes(vlqEncode(data.value.length));
+        writer.writeVLQ(data.value.length);
       }
 
       switch (data.elementsType) {
@@ -88,7 +87,7 @@ export class DataSerializer {
     }
   }
 
-  static deserialize(typeCode: SigmaTypeCode, reader: SigmaByteReader): unknown {
+  static deserialize(typeCode: SigmaTypeCode, reader: SigmaReader): unknown {
     if (isPrimitiveTypeCode(typeCode)) {
       switch (typeCode) {
         case SigmaTypeCode.Boolean:

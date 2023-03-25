@@ -1,9 +1,9 @@
 import { _0n } from "@fleet-sdk/common";
 import { bytesToHex } from "@noble/hashes/utils";
-import { vlqEncode, vqlEncodeBigInt } from "../vlq";
+import { writeBigVLQ, writeVLQ } from "../vlq";
 import { zigZagEncode, zigZagEncodeBigInt } from "../zigZag";
 
-export class SigmaByteWriter {
+export class SigmaWriter {
   private _bytes!: Uint8Array;
   private _cursor!: number;
 
@@ -16,44 +16,52 @@ export class SigmaByteWriter {
     this._cursor = 0;
   }
 
-  public writeBoolean(value: boolean): SigmaByteWriter {
+  public writeBoolean(value: boolean): SigmaWriter {
     this.write(value === true ? 0x01 : 0x00);
 
     return this;
   }
 
-  public writeShort(value: number): SigmaByteWriter {
-    this.writeBytes(vlqEncode(zigZagEncode(value)));
+  public writeVLQ(value: number): SigmaWriter {
+    return writeVLQ(this, value);
+  }
+
+  public writeBigVLQ(value: bigint): SigmaWriter {
+    return writeBigVLQ(this, value);
+  }
+
+  public writeShort(value: number): SigmaWriter {
+    this.writeVLQ(zigZagEncode(value));
 
     return this;
   }
 
-  public writeInt(value: number): SigmaByteWriter {
+  public writeInt(value: number): SigmaWriter {
     this.writeLong(BigInt(value));
 
     return this;
   }
 
-  public writeLong(value: bigint): SigmaByteWriter {
-    this.writeBytes(vqlEncodeBigInt(zigZagEncodeBigInt(value)));
+  public writeLong(value: bigint): SigmaWriter {
+    this.writeBigVLQ(zigZagEncodeBigInt(value));
 
     return this;
   }
 
-  public write(byte: number): SigmaByteWriter {
+  public write(byte: number): SigmaWriter {
     this._bytes[this._cursor++] = byte;
 
     return this;
   }
 
-  public writeBytes(bytes: Uint8Array): SigmaByteWriter {
+  public writeBytes(bytes: Uint8Array): SigmaWriter {
     this._bytes.set(bytes, this._cursor);
     this._cursor += bytes.length;
 
     return this;
   }
 
-  public writeHex(hex: string): SigmaByteWriter {
+  public writeHex(hex: string): SigmaWriter {
     if (hex.length % 2) {
       throw new Error("Invalid hex padding");
     }
@@ -72,7 +80,7 @@ export class SigmaByteWriter {
     return this;
   }
 
-  public writeBits(bits: ArrayLike<boolean>): SigmaByteWriter {
+  public writeBits(bits: ArrayLike<boolean>): SigmaWriter {
     let bitOffset = 0;
 
     for (let i = 0; i < bits.length; i++) {
@@ -95,7 +103,7 @@ export class SigmaByteWriter {
     return this;
   }
 
-  public writeBigInt(number: bigint): SigmaByteWriter {
+  public writeBigInt(number: bigint): SigmaWriter {
     // todo: take a look at https://coolaj86.com/articles/convert-decimal-to-hex-with-js-bigints/
     // and https://coolaj86.com/articles/convert-hex-to-decimal-with-js-bigints/
     if (number < _0n) {
@@ -110,7 +118,7 @@ export class SigmaByteWriter {
       hex = "00" + hex;
     }
 
-    this.writeBytes(vlqEncode(hex.length / 2));
+    this.writeVLQ(hex.length / 2);
     this.writeHex(hex);
 
     return this;
