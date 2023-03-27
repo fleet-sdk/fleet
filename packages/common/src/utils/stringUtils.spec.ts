@@ -1,4 +1,4 @@
-import { isHex } from "./stringUtils";
+import { hexSize, isHex } from "./stringUtils";
 
 describe("isHex() test", () => {
   it("Should pass with VALID hex strings", () => {
@@ -17,5 +17,11 @@ describe("isHex() test", () => {
   it("Should fail with falsy arguments", () => {
     expect(isHex("")).toBeFalsy();
     expect(isHex(undefined)).toBeFalsy();
+  });
+
+  it("Should return the byte size of a hex string", () => {
+    expect(
+      hexSize("0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7")
+    ).toBe(36);
   });
 });

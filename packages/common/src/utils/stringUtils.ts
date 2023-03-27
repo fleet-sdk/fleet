@@ -7,3 +7,12 @@ export function isHex(value?: string) {
 
   return HEX_PATTERN.test(value);
 }
+
+/**
+ * Get hex string size in bytes
+ * @param hex
+ * @returns the byte size if the hex string
+ */
+export function hexSize(hex: string): number {
+  return hex.length / 2;
+}
