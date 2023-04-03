@@ -2,12 +2,16 @@ import {
   Amount,
   Box,
   BoxCandidate,
+  hexSize,
+  isUndefined,
   NonMandatoryRegisters,
   some,
   TokenAmount
 } from "@fleet-sdk/common";
 import { ensureBigInt, isDefined, isEmpty } from "@fleet-sdk/common";
+import { OutputBuilder } from "../../builder";
 import { ErgoBox } from "../../models/ergoBox";
+import { estimateVLQSize } from "../vlq";
 import { SigmaWriter } from "./sigmaWriter";
 
 export function serializeBox(box: Box<Amount> | ErgoBox): SigmaWriter;
@@ -43,7 +47,9 @@ export function serializeBox(
   }
 }
 
-function isBox<T extends Amount>(box: Box<Amount> | ErgoBox | BoxCandidate<Amount>): box is Box<T> {
+function isBox<T extends Amount>(
+  box: Box<Amount> | ErgoBox | BoxCandidate<Amount> | OutputBuilder
+): box is Box<T> {
   const castedBox = box as Box<T>;
 
   return isDefined(castedBox.transactionId) && isDefined(castedBox.index);
@@ -91,4 +97,52 @@ function writeRegisters(writer: SigmaWriter, registers: NonMandatoryRegisters): 
       writer.writeHex(register);
     }
   }
+}
+
+const MAX_UINT16_VALUE = 65535;
+const TRANSACTION_ID_BYTE_SIZE = 32;
+
+/**
+ * Estimates the byte size a box.
+ * @returns byte size of the box.
+ */
+export function estimateBoxSize(
+  box: Box<Amount> | BoxCandidate<Amount> | OutputBuilder,
+  withValue?: Amount
+): number {
+  if (isUndefined(box.creationHeight)) {
+    throw new Error("Box size estimation error: creation height is undefined.");
+  }
+
+  let size = 0;
+
+  if (isDefined(withValue)) {
+    size += estimateVLQSize(withValue);
+  } else {
+    size += estimateVLQSize(box.value);
+  }
+
+  size += hexSize(box.ergoTree);
+  size += estimateVLQSize(box.creationHeight);
+
+  size += estimateVLQSize(box.assets.length);
+  size += box.assets.reduce(
+    (acc: number, curr) => (acc += hexSize(curr.tokenId) + estimateVLQSize(curr.amount)),
+    0
+  );
+
+  let registersLength = 0;
+  for (const key in box.additionalRegisters) {
+    const register = box.additionalRegisters[key as keyof NonMandatoryRegisters];
+    if (register) {
+      size += hexSize(register);
+      registersLength++;
+    }
+  }
+  size += estimateVLQSize(registersLength);
+
+  size += TRANSACTION_ID_BYTE_SIZE;
+  size += estimateVLQSize(isBox(box) ? box.index : MAX_UINT16_VALUE);
+
+  return size;
 }

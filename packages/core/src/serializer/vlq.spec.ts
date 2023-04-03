@@ -1,8 +1,8 @@
 import { SigmaReader } from "./sigma/sigmaReader";
 import { SigmaWriter } from "./sigma/sigmaWriter";
-import { readBigVLQ, readVLQ, writeBigVLQ, writeVLQ } from "./vlq";
+import { estimateVLQSize, readBigVLQ, readVLQ, writeBigVLQ, writeVLQ } from "./vlq";
 
-describe("32-bit VLQ encoding/decoding", () => {
+describe("VLQ encoding/decoding", () => {
   const testVectors = [
     { uint: 0, bytes: Uint8Array.from([0x00]) },
     { uint: 126, bytes: Uint8Array.from([0x7e]) },
@@ -51,9 +51,15 @@ describe("32-bit VLQ encoding/decoding", () => {
         expect(readVLQ(new SigmaReader(toVLQBytes(n)))).toBe(n);
       });
   });
+
+  it("Should estimate the byte size of numbers", () => {
+    for (const tv of testVectors) {
+      expect(estimateVLQSize(tv.uint)).toBe(tv.bytes.length);
+    }
+  });
 });
 
-describe("64-bit VLQ encoding/decoding", () => {
+describe("Big VLQ encoding/decoding", () => {
   function toBigVLQBytes(value: bigint) {
     return writeBigVLQ(new SigmaWriter(100), value).toBytes();
   }
@@ -101,5 +107,11 @@ describe("64-bit VLQ encoding/decoding", () => {
       .forEach((n) => {
         expect(readBigVLQ(new SigmaReader(toBigVLQBytes(n)))).toBe(n);
       });
+  });
+
+  it("Should estimate the byte size of numbers", () => {
+    for (const tv of testVectors) {
+      expect(estimateVLQSize(tv.uint)).toBe(tv.bytes.length);
+    }
   });
 });

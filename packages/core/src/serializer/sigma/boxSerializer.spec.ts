@@ -1,5 +1,7 @@
-import { Box } from "@fleet-sdk/common";
-import { serializeBox } from "./boxSerializer";
+import { Box, ensureBigInt, hexSize } from "@fleet-sdk/common";
+import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "../../builder";
+import { manyTokensBoxesMock, regularBoxesMock, validBoxesMock } from "../../tests/mocks/mockBoxes";
+import { estimateBoxSize, serializeBox } from "./boxSerializer";
 
 describe("Serialize ErgoBox", () => {
   const testVectors = [
@@ -251,5 +253,51 @@ describe("Serialize ErgoBox", () => {
         }
       } as unknown as Box<string>);
     }).toThrow();
+  });
+
+  it("Should estimate the box size in bytes", () => {
+    for (const tv of testVectors) {
+      expect(estimateBoxSize(tv.json)).toBe(hexSize(tv.serialized));
+    }
+
+    for (const box of regularBoxesMock) {
+      expect(estimateBoxSize(box)).toBe(serializeBox(box).length);
+    }
+
+    for (const box of manyTokensBoxesMock) {
+      expect(estimateBoxSize(box)).toBe(serializeBox(box).length);
+    }
+
+    for (const box of validBoxesMock) {
+      expect(estimateBoxSize(box)).toBe(serializeBox(box).length);
+    }
+  });
+
+  it("Should estimate the box size in bytes with custom value", () => {
+    for (const tv of testVectors) {
+      expect(estimateBoxSize(tv.json, ensureBigInt(tv.json.value) * 4n)).toBeGreaterThan(
+        hexSize(tv.serialized)
+      );
+    }
+  });
+
+  it("Should estimate output builder size in bytes", () => {
+    for (const tv of testVectors) {
+      const output = new OutputBuilder(tv.json.value, tv.json.address)
+        .addTokens(tv.json.assets)
+        .setAdditionalRegisters(tv.json.additionalRegisters)
+        .setCreationHeight(tv.json.creationHeight);
+
+      expect(estimateBoxSize(output)).toBeGreaterThanOrEqual(hexSize(tv.serialized));
+    }
+  });
+
+  it("Should fail if creation height is undefined", () => {
+    const output = new OutputBuilder(
+      SAFE_MIN_BOX_VALUE,
+      "9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ"
+    );
+
+    expect(() => estimateBoxSize(output)).toThrow();
   });
 });

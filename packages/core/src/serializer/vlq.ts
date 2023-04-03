@@ -1,4 +1,4 @@
-import { _0n, _127n, _128n, _7n } from "@fleet-sdk/common";
+import { _0n, _127n, _128n, _7n, ensureBigInt } from "@fleet-sdk/common";
 import { SigmaReader } from "./sigma/sigmaReader";
 import { SigmaWriter } from "./sigma/sigmaWriter";
 
@@ -112,4 +112,21 @@ export function readBigVLQ(reader: SigmaReader): bigint {
   } while ((lower7bits & _128n) != _0n);
 
   return value;
+}
+
+/**
+ * Estimates the byte size of a given unsigned integer.
+ * @param value: the value to be evaluated.
+ * @returns the byte size of the value.
+ */
+export function estimateVLQSize(value: number | bigint | string): number {
+  value = ensureBigInt(value);
+  let size = 0;
+
+  do {
+    size++;
+    value /= _128n;
+  } while (value > _0n);
+
+  return size;
 }
