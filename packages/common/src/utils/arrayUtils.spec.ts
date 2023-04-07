@@ -158,6 +158,22 @@ describe("Array ordering", () => {
     { a: "y", b: 2 }
   ];
 
+  it("Should not mutate the original array", () => {
+    expect(orderBy(objects, (x) => x.a, "asc")).toStrictEqual([
+      { a: "x", b: 3 },
+      { a: "x", b: 1 },
+      { a: "y", b: 4 },
+      { a: "y", b: 2 }
+    ]);
+
+    expect(objects).toStrictEqual([
+      { a: "x", b: 3 },
+      { a: "y", b: 4 },
+      { a: "x", b: 1 },
+      { a: "y", b: 2 }
+    ]);
+  });
+
   it("Should order descending", () => {
     expect(orderBy(objects, (x) => x.a, "desc")).toStrictEqual([
       { a: "y", b: 4 },

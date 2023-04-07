@@ -67,7 +67,7 @@ export function orderBy<T>(
   iteratee: SortingSelector<T>,
   order: SortingDirection = "asc"
 ): T[] {
-  return array.sort((a: T, b: T) => {
+  return [...array].sort((a: T, b: T) => {
     if (iteratee(a) > iteratee(b)) {
       return order === "asc" ? 1 : -1;
     } else if (iteratee(a) < iteratee(b)) {
