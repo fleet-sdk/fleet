@@ -129,4 +129,11 @@ describe("collection base", () => {
       expect(n).toBe(numbers[counter++]);
     }
   });
+
+  it("Should reduce", () => {
+    const collection = new MockCollection();
+    collection.add([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+    expect(collection.reduce((acc, curr) => (acc += curr), 0)).toBe(45);
+  });
 });

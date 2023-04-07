@@ -5,6 +5,7 @@ import {
   Box,
   BoxCandidate,
   ErgoTree,
+  isDefined,
   NewToken,
   NonMandatoryRegisters,
   OneOrMore,
@@ -26,32 +27,40 @@ import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import { ErgoAddress } from "../models";
 import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
+import { estimateBoxSize } from "../serializer/sigma/boxSerializer";
 import { SConstant } from "../serializer/sigma/constantSerializer";
 import { SByte, SColl } from "../serializer/sigma/sigmaTypes";
 
+export const BOX_VALUE_PER_BYTE = BigInt(360);
 export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 
+export type BoxValueEstimationCallback = (outputBuilder: OutputBuilder) => bigint;
+
+export function estimateMinBoxValue(valuePerByte = BOX_VALUE_PER_BYTE): BoxValueEstimationCallback {
+  return (output: OutputBuilder) => {
+    return BigInt(estimateBoxSize(output, SAFE_MIN_BOX_VALUE)) * valuePerByte;
+  };
+}
+
 export class OutputBuilder {
-  private readonly _value: bigint;
   private readonly _address: ErgoAddress;
   private readonly _tokens: TokensCollection;
+  private _value!: bigint;
+  private _valueEstimator?: BoxValueEstimationCallback;
   private _creationHeight?: number;
   private _registers: NonMandatoryRegisters;
   private _minting?: NewToken<bigint>;
 
   constructor(
-    value: Amount,
+    value: Amount | BoxValueEstimationCallback,
     recipient: Base58String | ErgoTree | ErgoAddress,
     creationHeight?: number
   ) {
-    this._value = ensureBigInt(value);
+    this.setValue(value);
+
     this._creationHeight = creationHeight;
     this._tokens = new TokensCollection();
     this._registers = {};
-
-    if (this._value <= _0n) {
-      throw new Error("An UTxO cannot be created without a minimum required amount.");
-    }
 
     if (typeof recipient === "string") {
       this._address = isHex(recipient)
@@ -63,7 +72,7 @@ export class OutputBuilder {
   }
 
   public get value(): bigint {
-    return this._value;
+    return isDefined(this._valueEstimator) ? this._valueEstimator(this) : this._value;
   }
 
   public get address(): ErgoAddress {
@@ -78,7 +87,7 @@ export class OutputBuilder {
     return this._creationHeight;
   }
 
-  public get tokens(): TokensCollection {
+  public get assets(): TokensCollection {
     return this._tokens;
   }
 
@@ -90,10 +99,25 @@ export class OutputBuilder {
     return this._minting;
   }
 
+  public setValue(value: Amount | BoxValueEstimationCallback): OutputBuilder {
+    if (typeof value === "function") {
+      this._valueEstimator = value;
+    } else {
+      this._value = ensureBigInt(value);
+      this._valueEstimator = undefined;
+
+      if (this._value <= _0n) {
+        throw new Error("An UTxO cannot be created without a minimum required amount.");
+      }
+    }
+
+    return this;
+  }
+
   public addTokens(
     tokens: OneOrMore<TokenAmount<Amount>> | TokensCollection,
     options?: TokenAddOptions
-  ) {
+  ): OutputBuilder {
     if (tokens instanceof TokensCollection) {
       this._tokens.add(tokens.toArray(), options);
     } else {
@@ -138,7 +162,7 @@ export class OutputBuilder {
   }
 
   public build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<bigint> {
-    let tokens = this.tokens.toArray();
+    let tokens = this.assets.toArray();
 
     if (this.minting) {
       if (isEmpty(transactionInputs)) {

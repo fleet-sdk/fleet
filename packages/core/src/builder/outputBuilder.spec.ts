@@ -3,7 +3,7 @@ import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import { ErgoAddress, TokensCollection } from "../models";
 import { regularBoxesMock } from "../tests/mocks/mockBoxes";
-import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
+import { estimateMinBoxValue, OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 
 const address = "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c";
 const ergoTree = "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7";
@@ -113,8 +113,8 @@ describe("Token handling", () => {
   it("Should add distinct tokens", () => {
     builder.addTokens({ tokenId: tokenA, amount: 50n }).addTokens({ tokenId: tokenB, amount: 10n });
 
-    expect(builder.tokens).toHaveLength(2);
-    const tokens = builder.tokens.toArray();
+    expect(builder.assets).toHaveLength(2);
+    const tokens = builder.assets.toArray();
     expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toBe(50n);
     expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toBe(10n);
   });
@@ -127,8 +127,8 @@ describe("Token handling", () => {
       ])
     );
 
-    expect(builder.tokens).toHaveLength(2);
-    const tokens = builder.tokens.toArray();
+    expect(builder.assets).toHaveLength(2);
+    const tokens = builder.assets.toArray();
     expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
     expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
@@ -141,8 +141,8 @@ describe("Token handling", () => {
 
     builder.addTokens(collection);
 
-    expect(builder.tokens).toHaveLength(2);
-    const tokens = builder.tokens.toArray();
+    expect(builder.assets).toHaveLength(2);
+    const tokens = builder.assets.toArray();
     expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
     expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
@@ -151,35 +151,35 @@ describe("Token handling", () => {
     builder
       .addTokens({ tokenId: tokenA, amount: "50" })
       .addTokens({ tokenId: tokenB, amount: 10n });
-    expect(builder.tokens).toHaveLength(2);
-    expect(builder.tokens.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(builder.assets).toHaveLength(2);
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     builder.addTokens({ tokenId: tokenA, amount: 100n });
-    expect(builder.tokens).toHaveLength(2);
-    const tokens = builder.tokens.toArray();
+    expect(builder.assets).toHaveLength(2);
+    const tokens = builder.assets.toArray();
     expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toEqual(150n);
     expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should add multiple tokens and sum if the same tokenId is added more than one time", () => {
     builder.addTokens({ tokenId: tokenA, amount: "50" });
-    expect(builder.tokens.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
-    expect(builder.tokens).toHaveLength(1);
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(builder.assets).toHaveLength(1);
 
     builder.addTokens([
       { tokenId: tokenA, amount: 100n },
       { tokenId: tokenB, amount: "10" }
     ]);
-    expect(builder.tokens).toHaveLength(2);
-    const tokens = builder.tokens.toArray();
+    expect(builder.assets).toHaveLength(2);
+    const tokens = builder.assets.toArray();
     expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toEqual(150n);
     expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
   it("Should not sum if the same tokenId is added more than one time", () => {
     builder.addTokens({ tokenId: tokenA, amount: "50" });
-    expect(builder.tokens.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
-    expect(builder.tokens).toHaveLength(1);
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(builder.assets).toHaveLength(1);
 
     builder.addTokens(
       [
@@ -188,8 +188,8 @@ describe("Token handling", () => {
       ],
       { sum: false }
     );
-    expect(builder.tokens).toHaveLength(3);
-    const tokens = builder.tokens.toArray();
+    expect(builder.assets).toHaveLength(3);
+    const tokens = builder.assets.toArray();
     expect(tokens.find((x) => x.tokenId === tokenA && x.amount === 50n)).not.toBeFalsy();
     expect(tokens.find((x) => x.tokenId === tokenB && x.amount === 10n)).not.toBeFalsy();
     expect(tokens.find((x) => x.tokenId === tokenA && x.amount === 110n)).not.toBeFalsy();
@@ -197,12 +197,12 @@ describe("Token handling", () => {
 
   it("Should remove tokens from the list using context ejector", () => {
     builder.addTokens({ tokenId: tokenA, amount: 50n }).addTokens({ tokenId: tokenB, amount: 10n });
-    expect(builder.tokens).toHaveLength(2);
+    expect(builder.assets).toHaveLength(2);
 
     builder.eject(({ tokens }) => tokens.remove(tokenA));
 
-    expect(builder.tokens).toHaveLength(1);
-    expect(builder.tokens.toArray().find((x) => x.tokenId === tokenA)).toBeFalsy();
+    expect(builder.assets).toHaveLength(1);
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)).toBeFalsy();
   });
 });
 
@@ -433,5 +433,51 @@ describe("Building", () => {
     expect(() => {
       builder.build();
     }).toThrow(UndefinedCreationHeight);
+  });
+
+  it("Should set min box value", () => {
+    const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, address);
+    expect(output.value).toBe(SAFE_MIN_BOX_VALUE);
+
+    output.setValue(SAFE_MIN_BOX_VALUE * 2n);
+    expect(output.value).toBe(SAFE_MIN_BOX_VALUE * 2n);
+  });
+
+  it("Should estimate min box value", () => {
+    const output = new OutputBuilder(estimateMinBoxValue(), address, height);
+    expect(output.value).toBe(28440n);
+
+    output.addTokens({ tokenId: tokenA, amount: 10n });
+    expect(output.value).toBe(40320n);
+
+    output.addTokens({ tokenId: tokenB, amount: 90n });
+    expect(output.value).toBe(52200n);
+  });
+
+  it("Should estimate min box value with custom value per byte", () => {
+    const output = new OutputBuilder(estimateMinBoxValue(200n), address, height);
+    expect(output.value).toBe(15800n);
+
+    output.addTokens({ tokenId: tokenA, amount: 10n });
+    expect(output.value).toBe(22400n);
+
+    output.addTokens({ tokenId: tokenB, amount: 90n });
+    expect(output.value).toBe(29000n);
+  });
+
+  it("Should replace dynamic value estimation by fixed value", () => {
+    const output = new OutputBuilder(estimateMinBoxValue(), address, height);
+    expect(output.value).toBe(28440n);
+
+    output.setValue(SAFE_MIN_BOX_VALUE);
+    expect(output.value).toBe(SAFE_MIN_BOX_VALUE);
+  });
+
+  it("Should replace fixed value by dynamic value estimation", () => {
+    const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height);
+    expect(output.value).toBe(SAFE_MIN_BOX_VALUE);
+
+    output.setValue(estimateMinBoxValue());
+    expect(output.value).toBe(28440n);
   });
 });

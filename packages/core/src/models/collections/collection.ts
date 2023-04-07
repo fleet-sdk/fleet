@@ -91,4 +91,16 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
   public toArray(): InternalType[] {
     return [...this._items];
   }
+
+  public reduce<U>(
+    callbackFn: (
+      accumulator: U,
+      currentValue: InternalType,
+      currentIndex: number,
+      array: InternalType[]
+    ) => U,
+    initialValue: U
+  ): U {
+    return this._items.reduce(callbackFn, initialValue);
+  }
 }

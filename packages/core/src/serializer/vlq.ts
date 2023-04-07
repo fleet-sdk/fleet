@@ -120,9 +120,18 @@ export function readBigVLQ(reader: SigmaReader): bigint {
  * @returns the byte size of the value.
  */
 export function estimateVLQSize(value: number | bigint | string): number {
-  value = ensureBigInt(value);
   let size = 0;
 
+  if (typeof value === "number") {
+    do {
+      size++;
+      value = Math.floor(value / 128);
+    } while (value > 0);
+
+    return size;
+  }
+
+  value = ensureBigInt(value);
   do {
     size++;
     value /= _128n;

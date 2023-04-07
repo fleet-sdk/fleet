@@ -2,6 +2,8 @@ import {
   Amount,
   Base58String,
   Box,
+  first,
+  hexSize,
   HexString,
   isUndefined,
   Network,
@@ -15,7 +17,14 @@ import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { CollectionAddOptions } from "../models/collections/collection";
 import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
-import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
+import { BLAKE_256_HASH_LENGTH } from "../serializer/utils";
+import { estimateVLQSize } from "../serializer/vlq";
+import {
+  BOX_VALUE_PER_BYTE,
+  estimateMinBoxValue,
+  OutputBuilder,
+  SAFE_MIN_BOX_VALUE
+} from "./outputBuilder";
 import { createPluginContext, FleetPluginContext } from "./pluginContext";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
@@ -217,11 +226,14 @@ export class TransactionBuilder {
 
       if (this._isTheSameTokenBeingMintedOutsideTheMintingBox()) {
         throw new NonStandardizedMinting(
-          "EIP-4 tokens cannot be minted from outside the minting box."
+          "EIP-4 tokens cannot be minted from outside of the minting box."
         );
       }
     }
 
+    this.outputs
+      .toArray()
+      .map((output) => output.setCreationHeight(this._creationHeight, { replace: false }));
     const outputs = this.outputs.clone();
 
     if (isDefined(this._feeAmount)) {
@@ -242,33 +254,55 @@ export class TransactionBuilder {
 
     if (isDefined(this._changeAddress)) {
       let change = utxoSumResultDiff(utxoSum(inputs), target);
+      const changeBoxes: OutputBuilder[] = [];
 
       if (some(change.tokens)) {
-        let requiredNanoErgs = this._calcRequiredNanoErgsForChange(change.tokens.length);
-        while (requiredNanoErgs > change.nanoErgs) {
+        let minRequiredNanoErgs = estimateMinChangeValue({
+          changeAddress: this._changeAddress,
+          creationHeight: this._creationHeight,
+          tokens: change.tokens,
+          maxTokensPerBox: this.settings.maxTokensPerChangeBox,
+          baseIndex: this.outputs.length + 1
+        });
+
+        while (minRequiredNanoErgs > change.nanoErgs) {
           inputs = selector.select({
-            nanoErgs: target.nanoErgs + requiredNanoErgs,
+            nanoErgs: target.nanoErgs + minRequiredNanoErgs,
             tokens: target.tokens
           });
 
           change = utxoSumResultDiff(utxoSum(inputs), target);
-          requiredNanoErgs = this._calcRequiredNanoErgsForChange(change.tokens.length);
+          minRequiredNanoErgs = estimateMinChangeValue({
+            changeAddress: this._changeAddress,
+            creationHeight: this._creationHeight,
+            tokens: change.tokens,
+            maxTokensPerBox: this.settings.maxTokensPerChangeBox,
+            baseIndex: this.outputs.length + 1
+          });
         }
 
         const chunkedTokens = chunk(change.tokens, this._settings.maxTokensPerChangeBox);
         for (const tokens of chunkedTokens) {
-          const nanoErgs =
-            change.nanoErgs > requiredNanoErgs
-              ? change.nanoErgs - requiredNanoErgs + SAFE_MIN_BOX_VALUE
-              : SAFE_MIN_BOX_VALUE;
-          change.nanoErgs -= nanoErgs;
+          const output = new OutputBuilder(
+            estimateMinBoxValue(),
+            this._changeAddress,
+            this._creationHeight
+          ).addTokens(tokens);
 
-          outputs.add(new OutputBuilder(nanoErgs, this._changeAddress).addTokens(tokens));
+          change.nanoErgs -= output.value;
+          changeBoxes.push(output);
         }
       }
 
       if (change.nanoErgs > _0n) {
-        outputs.add(new OutputBuilder(change.nanoErgs, this._changeAddress));
+        if (some(changeBoxes)) {
+          const firstChangeBox = first(changeBoxes);
+          firstChangeBox.setValue(firstChangeBox.value + change.nanoErgs);
+
+          outputs.add(changeBoxes);
+        } else {
+          outputs.add(new OutputBuilder(change.nanoErgs, this._changeAddress));
+        }
       }
     }
 
@@ -338,7 +372,7 @@ export class TransactionBuilder {
     }
 
     for (const output of this._outputs) {
-      if (output.tokens.contains(mintingTokenId)) {
+      if (output.assets.contains(mintingTokenId)) {
         return true;
       }
     }
@@ -357,15 +391,57 @@ export class TransactionBuilder {
 
     return tokenId;
   }
+}
 
-  private _calcChangeLength(tokensLength: number): number {
-    return Math.ceil(tokensLength / this._settings.maxTokensPerChangeBox);
+type ChangeEstimationParams = {
+  changeAddress: ErgoAddress;
+  creationHeight: number;
+  tokens: TokenAmount<bigint>[];
+  baseIndex: number;
+  maxTokensPerBox: number;
+};
+
+function estimateMinChangeValue(params: ChangeEstimationParams): bigint {
+  const size = BigInt(estimateChangeSize(params));
+
+  return size * BOX_VALUE_PER_BYTE;
+}
+
+function estimateChangeSize({
+  changeAddress,
+  creationHeight,
+  tokens,
+  baseIndex,
+  maxTokensPerBox
+}: ChangeEstimationParams): number {
+  const neededBoxes = Math.ceil(tokens.length / maxTokensPerBox);
+  let size = 0;
+  size += estimateVLQSize(SAFE_MIN_BOX_VALUE);
+  size += hexSize(changeAddress.ergoTree);
+  size += estimateVLQSize(creationHeight);
+  size += estimateVLQSize(0); // empty registers length
+  size += BLAKE_256_HASH_LENGTH;
+
+  size = size * neededBoxes;
+  for (let i = 0; i < neededBoxes; i++) {
+    size += estimateVLQSize(baseIndex + i);
   }
 
-  private _calcRequiredNanoErgsForChange(
-    tokensLength: number,
-    minNanoErgsPerBox = SAFE_MIN_BOX_VALUE
-  ): bigint {
-    return minNanoErgsPerBox * BigInt(this._calcChangeLength(tokensLength));
+  size += tokens.reduce(
+    (acc: number, curr) => (acc += hexSize(curr.tokenId) + estimateVLQSize(curr.amount)),
+    0
+  );
+
+  if (tokens.length > maxTokensPerBox) {
+    if (tokens.length % maxTokensPerBox > 0) {
+      size += estimateVLQSize(maxTokensPerBox) * Math.floor(tokens.length / maxTokensPerBox);
+      size += estimateVLQSize(tokens.length % maxTokensPerBox);
+    } else {
+      size += estimateVLQSize(maxTokensPerBox) * neededBoxes;
+    }
+  } else {
+    size += estimateVLQSize(tokens.length);
   }
+
+  return size;
 }

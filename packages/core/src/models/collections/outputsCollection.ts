@@ -70,7 +70,7 @@ export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> 
 
     for (const box of this._items) {
       nanoErgs += box.value;
-      for (const token of box.tokens) {
+      for (const token of box.assets) {
         tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + token.amount;
       }
     }

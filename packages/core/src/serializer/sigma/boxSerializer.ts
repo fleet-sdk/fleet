@@ -11,8 +11,11 @@ import {
 import { ensureBigInt, isDefined, isEmpty } from "@fleet-sdk/common";
 import { OutputBuilder } from "../../builder";
 import { ErgoBox } from "../../models/ergoBox";
+import { BLAKE_256_HASH_LENGTH } from "../utils";
 import { estimateVLQSize } from "../vlq";
 import { SigmaWriter } from "./sigmaWriter";
+
+const MAX_UINT16_VALUE = 65535;
 
 export function serializeBox(box: Box<Amount> | ErgoBox): SigmaWriter;
 export function serializeBox(box: Box<Amount> | ErgoBox, writer: SigmaWriter): SigmaWriter;
@@ -99,9 +102,6 @@ function writeRegisters(writer: SigmaWriter, registers: NonMandatoryRegisters): 
   }
 }
 
-const MAX_UINT16_VALUE = 65535;
-const TRANSACTION_ID_BYTE_SIZE = 32;
-
 /**
  * Estimates the byte size a box.
  * @returns byte size of the box.
@@ -141,7 +141,7 @@ export function estimateBoxSize(
   }
   size += estimateVLQSize(registersLength);
 
-  size += TRANSACTION_ID_BYTE_SIZE;
+  size += BLAKE_256_HASH_LENGTH; // transaction id
   size += estimateVLQSize(isBox(box) ? box.index : MAX_UINT16_VALUE);
 
   return size;

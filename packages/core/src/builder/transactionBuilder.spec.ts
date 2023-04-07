@@ -1,4 +1,4 @@
-import { Network } from "@fleet-sdk/common";
+import { Amount, BoxCandidate, Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
 import { stringToBytes } from "@scure/base";
 import { InvalidInput } from "../errors";
@@ -7,8 +7,14 @@ import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
 import { ErgoAddress, ErgoUnsignedInput, MAX_TOKENS_PER_BOX } from "../models";
 import { SByte, SColl, SConstant } from "../serializer";
+import { estimateBoxSize } from "../serializer/sigma/boxSerializer";
 import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../tests/mocks/mockBoxes";
-import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
+import {
+  BOX_VALUE_PER_BYTE,
+  estimateMinBoxValue,
+  OutputBuilder,
+  SAFE_MIN_BOX_VALUE
+} from "./outputBuilder";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";
 
 const height = 844540;
@@ -617,6 +623,27 @@ describe("Building", () => {
     expect(changeOutput.additionalRegisters).toEqual({});
   });
 
+  it("Should build with min box value estimation", () => {
+    const transaction = new TransactionBuilder(height)
+      .from(manyTokensBoxesMock)
+      .to(
+        new OutputBuilder(estimateMinBoxValue(), a2.address)
+          .addTokens({
+            tokenId: "31d6f93435540f52f067efe2c5888b8d4c4418a4fd28156dd834102c8336a804",
+            amount: 1n
+          })
+          .addTokens({
+            tokenId: "8565b6d9b72d0cb8ca052f7e5b8cdf32905333b9e026162e3a6d585ae78e697b",
+            amount: 1n
+          })
+      )
+      .payFee(RECOMMENDED_MIN_FEE_VALUE)
+      .sendChangeTo(a1.address)
+      .build();
+
+    expect(first(transaction.outputs).value).toBe(52200n);
+  });
+
   it("Should produce multiple change boxes and run multiple input selections if necessary", () => {
     const transaction = new TransactionBuilder(height)
       .from(manyTokensBoxesMock)
@@ -664,22 +691,26 @@ describe("Building", () => {
 
     expect(change1.ergoTree).toBe(a1.ergoTree);
     expect(change1.creationHeight).toBe(height);
-    expect(change1.value).toBe(3465648n);
+    expect(change1.value).toBe(3595808n);
     expect(change1.assets).toHaveLength(MAX_TOKENS_PER_BOX);
     expect(change1.additionalRegisters).toEqual({});
 
     expect(change2.ergoTree).toBe(a1.ergoTree);
     expect(change2.creationHeight).toBe(height);
-    expect(change2.value).toBe(SAFE_MIN_BOX_VALUE);
+    expect(change2.value).toBe(_estimateBoxValue(change2));
     expect(change2.assets).toHaveLength(MAX_TOKENS_PER_BOX);
     expect(change2.additionalRegisters).toEqual({});
 
     expect(change3.ergoTree).toBe(a1.ergoTree);
     expect(change3.creationHeight).toBe(height);
-    expect(change3.value).toBe(SAFE_MIN_BOX_VALUE);
+    expect(change3.value).toBe(_estimateBoxValue(change3));
     expect(change3.assets).toHaveLength(32);
     expect(change3.additionalRegisters).toEqual({});
   });
+
+  function _estimateBoxValue(box: BoxCandidate<Amount>) {
+    return BigInt(estimateBoxSize(box)) * BOX_VALUE_PER_BYTE;
+  }
 
   it("Should produce multiple change boxes based on maxTokensPerChangeBox param", () => {
     const tokensPerBox = 2;
@@ -700,6 +731,33 @@ describe("Building", () => {
         expect(transaction.outputs[i].assets).toHaveLength(tokensPerBox);
       } else {
         expect(transaction.outputs[i].assets.length <= tokensPerBox).toBeTruthy();
+      }
+
+      if (i > 0) {
+        expect(transaction.outputs[i].value).toBe(_estimateBoxValue(transaction.outputs[i]));
+      }
+    }
+  });
+
+  it("Should produce multiple change boxes based on maxTokensPerChangeBox param with equal tokens", () => {
+    const tokensPerBox = 3;
+
+    const transaction = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .sendChangeTo(a1.address)
+      .configureSelector((selector) => selector.ensureInclusion((i) => some(i.assets)))
+      .configure((settings) => settings.setMaxTokensPerChangeBox(tokensPerBox))
+      .build();
+
+    expect(transaction.inputs).toHaveLength(4);
+    expect(transaction.dataInputs).toHaveLength(0);
+    expect(transaction.outputs).toHaveLength(7);
+
+    for (let i = 0; i < transaction.outputs.length; i++) {
+      expect(transaction.outputs[i].assets).toHaveLength(tokensPerBox);
+
+      if (i > 0) {
+        expect(transaction.outputs[i].value).toBe(_estimateBoxValue(transaction.outputs[i]));
       }
     }
   });
