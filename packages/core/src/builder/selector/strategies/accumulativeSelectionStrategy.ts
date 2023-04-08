@@ -1,10 +1,10 @@
-import { Box, TokenId, TokenTargetAmount } from "@fleet-sdk/common";
+import { Box, isDefined, some, TokenId, TokenTargetAmount } from "@fleet-sdk/common";
 import { _0n, isEmpty, isUndefined, sumBy, utxoSum } from "@fleet-sdk/common";
 import { SelectionTarget } from "../boxSelector";
 import { ISelectionStrategy } from "./ISelectionStrategy";
 
 /**
- * Accumulative selection strategy accumulates inputs until the target
+ * Accumulative selection strategy accumulates inputs until the target amounts
  * value is reached, skipping detrimental inputs.
  */
 export class AccumulativeSelectionStrategy implements ISelectionStrategy {
@@ -14,16 +14,16 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
     this._inputs = inputs;
 
     let selection: Box<bigint>[] = [];
-    if (!isEmpty(target.tokens)) {
+    if (some(target.tokens)) {
       selection = this._selectTokens(target.tokens);
     }
 
     const selectedNanoErgs = sumBy(selection, (input) => input.value);
     if (
       (isUndefined(target.nanoErgs) && isEmpty(target.tokens)) ||
-      (!isUndefined(target.nanoErgs) && selectedNanoErgs < target.nanoErgs)
+      (isDefined(target.nanoErgs) && selectedNanoErgs < target.nanoErgs)
     ) {
-      const targetAmount = !isUndefined(target.nanoErgs)
+      const targetAmount = isDefined(target.nanoErgs)
         ? target.nanoErgs - selectedNanoErgs
         : undefined;
 
@@ -37,7 +37,7 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
     let selection: Box<bigint>[] = [];
 
     for (const target of targets) {
-      const targetAmount = !isUndefined(target.amount)
+      const targetAmount = isDefined(target.amount)
         ? target.amount - utxoSum(selection, target.tokenId)
         : undefined;
 
@@ -52,34 +52,35 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
   }
 
   private _select(target?: bigint, tokenId?: TokenId): Box<bigint>[] {
+    const inputs = this._inputs;
     let acc = _0n;
     let selection: Box<bigint>[] = [];
 
     if (isUndefined(target)) {
       if (tokenId) {
-        selection = this._inputs.filter((x) => x.assets.some((asset) => asset.tokenId === tokenId));
+        selection = inputs.filter((x) => x.assets.some((asset) => asset.tokenId === tokenId));
       } else {
-        selection = this._inputs;
+        selection = inputs;
       }
     } else {
-      for (let i = 0; i < this._inputs.length && acc < target; i++) {
+      for (let i = 0; i < inputs.length && acc < target; i++) {
         if (tokenId) {
-          for (const token of this._inputs[i].assets) {
+          for (const token of inputs[i].assets) {
             if (token.tokenId !== tokenId) {
               continue;
             }
 
             acc += token.amount;
-            selection.push(this._inputs[i]);
+            selection.push(inputs[i]);
           }
         } else {
-          acc += this._inputs[i].value;
-          selection.push(this._inputs[i]);
+          acc += inputs[i].value;
+          selection.push(inputs[i]);
         }
       }
     }
 
-    if (!isEmpty(selection)) {
+    if (some(selection)) {
       this._inputs = this._inputs.filter((input) => !selection.includes(input));
     }
 

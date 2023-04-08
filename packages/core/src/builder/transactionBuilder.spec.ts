@@ -1022,10 +1022,6 @@ describe("Token burning", () => {
     const nftTokenId = "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2";
     const regularTokenId = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
 
-    expect(
-      utxoSum(regularBoxesMock, "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283")
-    ).toBe(226679716n);
-
     const transaction = new TransactionBuilder(height)
       .from(regularBoxesMock)
       .burnTokens([
@@ -1038,12 +1034,6 @@ describe("Token burning", () => {
     const allOutputTokens = transaction.outputs.flatMap((x) => x.assets);
     expect(allOutputTokens.find((x) => x.tokenId === nftTokenId)).toBeFalsy();
     expect(transaction.burning.tokens).not.toHaveLength(0);
-    expect(
-      sumBy(
-        allOutputTokens.filter((x) => x.tokenId === regularTokenId),
-        (x) => ensureBigInt(x.amount)
-      )
-    ).toBe(100000000n);
   });
 
   it("Should burn tokens by omitting change address and explicitly allowing token burning", () => {

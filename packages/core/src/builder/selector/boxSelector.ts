@@ -90,7 +90,10 @@ export class BoxSelector<T extends Box<bigint>> {
       }
     }
 
-    unselected = this._sort(unselected);
+    if (isDefined(this._inputsSortSelector)) {
+      unselected = orderBy(unselected, this._inputsSortSelector, this._inputsSortDir || "asc");
+    }
+
     selected = selected.concat(this._strategy.select(unselected, remaining));
 
     if (hasDuplicatesBy(selected, (item) => item.boxId)) {
@@ -145,14 +148,6 @@ export class BoxSelector<T extends Box<bigint>> {
     }
 
     return unreached;
-  }
-
-  private _sort(inputs: Box<bigint>[]) {
-    if (!this._inputsSortSelector) {
-      return orderBy(inputs, (input) => input.creationHeight, "asc");
-    }
-
-    return orderBy(inputs, this._inputsSortSelector, this._inputsSortDir || "asc");
   }
 
   public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector<T>;

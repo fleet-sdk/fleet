@@ -116,13 +116,11 @@ describe("Inputs sorting", () => {
     expect(selection).toHaveLength(regularBoxesMock.length);
   });
 
-  it("Should fallback order to ascending creationHeight if no orderBy is called", () => {
+  it("Should not touch ordering if no orderBy is called", () => {
     const nanoErgs = sumBy(regularBoxesMock, (x) => x.value);
     const selection = new BoxSelector(regularBoxesMock).select({ nanoErgs });
 
-    expect(isAscending(selection.map((x) => x.creationHeight))).toBe(true);
-    expect(isAscending(regularBoxesMock.map((x) => x.boxId))).not.toBe(true);
-    expect(selection).toHaveLength(regularBoxesMock.length);
+    expect(selection).toStrictEqual(regularBoxesMock);
   });
 });
 

@@ -49,7 +49,7 @@ describe("Accumulative selection strategy", () => {
     expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(10000n);
   });
 
-  it("Should select inputs for tokens", () => {
+  it("Should select inputs for tokens and nanoErgs", () => {
     const selector = new AccumulativeSelectionStrategy();
     const target = {
       nanoErgs: 100000n,
@@ -64,15 +64,12 @@ describe("Accumulative selection strategy", () => {
         }
       ]
     };
-    const boxes = selector.select(regularBoxesMock, target);
+    const inputs = selector.select(regularBoxesMock, target);
 
-    expect(boxes).toHaveLength(1); // should try to reuse already selected inputs
-    expect(sumBy(boxes, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
-    expect(
-      utxoSum(boxes, "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
-    ).toBeGreaterThanOrEqual(100n);
-    expect(
-      utxoSum(boxes, "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283")
-    ).toBeGreaterThanOrEqual(10n);
+    expect(inputs).toHaveLength(1); // should try to reuse already selected inputs
+    expect(sumBy(inputs, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
+    for (const t of target.tokens) {
+      expect(utxoSum(inputs, t.tokenId)).toBeGreaterThanOrEqual(t.amount);
+    }
   });
 });
