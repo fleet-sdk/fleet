@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.25](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.24...v0.1.0-alpha.25) (2023-04-08)
+
+
+### Bug Fixes
+
+* **common:** mark common library as `sideEffect: true` ([aa7bb38](https://github.com/fleet-sdk/core/commit/aa7bb38475a3d4961e33949d8bb62446977a9e57))
+
 ## [0.1.0-alpha.24](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.23...v0.1.0-alpha.24) (2023-04-08)
 
 
