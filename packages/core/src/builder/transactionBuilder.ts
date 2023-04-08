@@ -37,6 +37,7 @@ import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
 type PluginListItem = { execute: FleetPlugin; pending: boolean };
 type SelectorSettings = Omit<BoxSelector<Box<bigint>>, "select">;
+export type ConfigureCallback = (settings: TransactionBuilderSettings) => void;
 export type SelectorCallback = (selector: SelectorSettings) => void;
 export type FleetPlugin = (context: FleetPluginContext) => void;
 
@@ -174,7 +175,7 @@ export class TransactionBuilder {
     return this;
   }
 
-  public configure(callback: (settings: TransactionBuilderSettings) => void): TransactionBuilder {
+  public configure(callback: ConfigureCallback): TransactionBuilder {
     callback(this._settings);
 
     return this;
