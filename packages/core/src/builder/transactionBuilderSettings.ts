@@ -2,13 +2,13 @@ import { MAX_TOKENS_PER_BOX } from "../models";
 
 export class TransactionBuilderSettings {
   private _maxDistinctTokensPerChangeBox: number;
-  private _allowTokenBurn: boolean;
-  private _allowTokenPluginFromPlugins: boolean;
+  private _allowTokenBurning: boolean;
+  private _allowTokenBurningFromPlugins: boolean;
 
   constructor() {
     this._maxDistinctTokensPerChangeBox = MAX_TOKENS_PER_BOX;
-    this._allowTokenBurn = false;
-    this._allowTokenPluginFromPlugins = false;
+    this._allowTokenBurning = false;
+    this._allowTokenBurningFromPlugins = false;
   }
 
   public get maxTokensPerChangeBox(): number {
@@ -16,11 +16,11 @@ export class TransactionBuilderSettings {
   }
 
   public get canBurnTokens(): boolean {
-    return this._allowTokenBurn;
+    return this._allowTokenBurning;
   }
 
   public get canBurnTokensFromPlugins(): boolean {
-    return this.canBurnTokens || this._allowTokenPluginFromPlugins;
+    return this.canBurnTokens || this._allowTokenBurningFromPlugins;
   }
 
   /**
@@ -36,7 +36,7 @@ export class TransactionBuilderSettings {
    * Allows or denies token burning from all contexts
    */
   public allowTokenBurning(allow: boolean): TransactionBuilderSettings {
-    this._allowTokenBurn = allow;
+    this._allowTokenBurning = allow;
 
     return this;
   }
@@ -45,7 +45,7 @@ export class TransactionBuilderSettings {
    * Allows or denies token burning **only** from plugins context.
    */
   public allowTokenBurningFromPlugins(allow: boolean): TransactionBuilderSettings {
-    this._allowTokenPluginFromPlugins = allow;
+    this._allowTokenBurningFromPlugins = allow;
 
     return this;
   }
