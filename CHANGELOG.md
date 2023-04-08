@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.23](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.22...v0.1.0-alpha.23) (2023-04-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* **core:** `BoxSelector` ordering no longer fallbacks to ascending sort by `creationHeight` if no order callback is specified at `BoxSelector.orderBy`.
+
+### Features
+
+* **common:** add `hexSize` method ([78f724b](https://github.com/fleet-sdk/core/commit/78f724b92c0bc85deb54e471d2d400b87c9f1395))
+* **core:** add `CherryPickSelectionStrategy` ([af79a01](https://github.com/fleet-sdk/core/commit/af79a01e25715b842646d87af44b72c469b31db3))
+* **core:** add `estimateBoxSize` method ([5931453](https://github.com/fleet-sdk/core/commit/5931453f48deb6dc87fb87550bdd9e5dbd07add3))
+* **core:** add min box value estimation ([03fcb9e](https://github.com/fleet-sdk/core/commit/03fcb9e3e9bf5dc2404efcd11b81753fd058140c))
+
+
+### Bug Fixes
+
+* **common:** make `orderBy` non-mutable ([02e208a](https://github.com/fleet-sdk/core/commit/02e208a0888a41d8f4051dedc8666d308740b14a))
+
 ## [0.1.0-alpha.22](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.21...v0.1.0-alpha.22) (2023-03-21)
 
 ## [0.1.0-alpha.21](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.20...v0.1.0-alpha.21) (2023-03-21)

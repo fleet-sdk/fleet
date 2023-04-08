@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/common",
-  "version": "0.1.0-alpha.22",
+  "version": "0.1.0-alpha.23",
   "description": "Internal utility functions, constants and types shared across @fleet-sdk packages.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
