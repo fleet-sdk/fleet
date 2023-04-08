@@ -13,6 +13,6 @@ export function isHex(value?: string) {
  * @param hex
  * @returns the byte size if the hex string
  */
-export function hexSize(hex: string): number {
+export function hexByteSize(hex: string): number {
   return hex.length / 2;
 }

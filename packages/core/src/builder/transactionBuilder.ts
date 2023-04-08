@@ -1,17 +1,23 @@
 import {
+  _0n,
   Amount,
   Base58String,
   Box,
+  chunk,
+  ensureBigInt,
   first,
-  hexSize,
+  hexByteSize,
   HexString,
+  isDefined,
+  isHex,
   isUndefined,
   Network,
   OneOrMore,
+  some,
   TokenAmount,
+  utxoSum,
   utxoSumResultDiff
 } from "@fleet-sdk/common";
-import { _0n, chunk, ensureBigInt, isDefined, isHex, some, utxoSum } from "@fleet-sdk/common";
 import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
@@ -417,7 +423,7 @@ function estimateChangeSize({
   const neededBoxes = Math.ceil(tokens.length / maxTokensPerBox);
   let size = 0;
   size += estimateVLQSize(SAFE_MIN_BOX_VALUE);
-  size += hexSize(changeAddress.ergoTree);
+  size += hexByteSize(changeAddress.ergoTree);
   size += estimateVLQSize(creationHeight);
   size += estimateVLQSize(0); // empty registers length
   size += BLAKE_256_HASH_LENGTH;
@@ -428,7 +434,7 @@ function estimateChangeSize({
   }
 
   size += tokens.reduce(
-    (acc: number, curr) => (acc += hexSize(curr.tokenId) + estimateVLQSize(curr.amount)),
+    (acc: number, curr) => (acc += hexByteSize(curr.tokenId) + estimateVLQSize(curr.amount)),
     0
   );
 

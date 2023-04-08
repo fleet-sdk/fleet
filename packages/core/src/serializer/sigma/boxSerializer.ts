@@ -2,13 +2,15 @@ import {
   Amount,
   Box,
   BoxCandidate,
-  hexSize,
+  ensureBigInt,
+  hexByteSize,
+  isDefined,
+  isEmpty,
   isUndefined,
   NonMandatoryRegisters,
   some,
   TokenAmount
 } from "@fleet-sdk/common";
-import { ensureBigInt, isDefined, isEmpty } from "@fleet-sdk/common";
 import { OutputBuilder } from "../../builder";
 import { ErgoBox } from "../../models/ergoBox";
 import { BLAKE_256_HASH_LENGTH } from "../utils";
@@ -122,12 +124,12 @@ export function estimateBoxSize(
     size += estimateVLQSize(box.value);
   }
 
-  size += hexSize(box.ergoTree);
+  size += hexByteSize(box.ergoTree);
   size += estimateVLQSize(box.creationHeight);
 
   size += estimateVLQSize(box.assets.length);
   size += box.assets.reduce(
-    (acc: number, curr) => (acc += hexSize(curr.tokenId) + estimateVLQSize(curr.amount)),
+    (acc: number, curr) => (acc += hexByteSize(curr.tokenId) + estimateVLQSize(curr.amount)),
     0
   );
 
@@ -135,7 +137,7 @@ export function estimateBoxSize(
   for (const key in box.additionalRegisters) {
     const register = box.additionalRegisters[key as keyof NonMandatoryRegisters];
     if (register) {
-      size += hexSize(register);
+      size += hexByteSize(register);
       registersLength++;
     }
   }
