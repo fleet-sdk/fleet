@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.26](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.25...v0.1.0-alpha.26) (2023-04-09)
+
+
+### Features
+
+* **core:** add 'isolateErgOnChange' setting ([569c077](https://github.com/fleet-sdk/core/commit/569c07734e8ed7e6d076f7f32bc8c48503a092a5))
+
 ## [0.1.0-alpha.25](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.24...v0.1.0-alpha.25) (2023-04-08)
 
 
