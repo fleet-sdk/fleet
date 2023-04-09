@@ -1,25 +1,23 @@
 import {
   _0n,
   Amount,
+  areRegistersDenselyPacked,
   Base58String,
   Box,
   BoxCandidate,
-  ErgoTree,
-  isDefined,
-  NewToken,
-  NonMandatoryRegisters,
-  OneOrMore,
-  TokenAmount,
-  UnsignedInput
-} from "@fleet-sdk/common";
-import {
-  areRegistersDenselyPacked,
   ensureBigInt,
+  ErgoTree,
   first,
+  isDefined,
   isEmpty,
   isHex,
   isUndefined,
-  removeUndefined
+  NewToken,
+  NonMandatoryRegisters,
+  OneOrMore,
+  removeUndefined,
+  TokenAmount,
+  UnsignedInput
 } from "@fleet-sdk/common";
 import { stringToBytes } from "@scure/base";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";

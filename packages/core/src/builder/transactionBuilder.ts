@@ -303,8 +303,12 @@ export class TransactionBuilder {
 
       if (change.nanoErgs > _0n) {
         if (some(changeBoxes)) {
-          const firstChangeBox = first(changeBoxes);
-          firstChangeBox.setValue(firstChangeBox.value + change.nanoErgs);
+          if (this.settings.shouldIsolateErgOnChange) {
+            outputs.add(new OutputBuilder(change.nanoErgs, this._changeAddress));
+          } else {
+            const firstChangeBox = first(changeBoxes);
+            firstChangeBox.setValue(firstChangeBox.value + change.nanoErgs);
+          }
 
           outputs.add(changeBoxes);
         } else {

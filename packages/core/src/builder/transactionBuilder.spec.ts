@@ -762,6 +762,30 @@ describe("Building", () => {
     }
   });
 
+  it("Should produce multiple change boxes based on maxTokensPerChangeBox and isolate erg in a exclusive box ", () => {
+    const tokensPerBox = 3;
+
+    const transaction = new TransactionBuilder(height)
+      .from(regularBoxesMock)
+      .sendChangeTo(a1.address)
+      .configureSelector((selector) => selector.ensureInclusion((i) => some(i.assets)))
+      .configure((settings) => settings.setMaxTokensPerChangeBox(tokensPerBox).isolateErgOnChange())
+      .build();
+
+    expect(transaction.inputs).toHaveLength(4);
+    expect(transaction.dataInputs).toHaveLength(0);
+    expect(transaction.outputs).toHaveLength(8);
+
+    const [firstChange] = transaction.outputs;
+    expect(firstChange.value).toBe(1390599941n);
+    expect(firstChange.assets).toHaveLength(0);
+
+    for (let i = 1; i < transaction.outputs.length; i++) {
+      expect(transaction.outputs[i].assets).toHaveLength(tokensPerBox);
+      expect(transaction.outputs[i].value).toBe(_estimateBoxValue(transaction.outputs[i]));
+    }
+  });
+
   it("Should build in EIP-12 format", () => {
     const transaction = new TransactionBuilder(height)
       .from(regularBoxesMock)
