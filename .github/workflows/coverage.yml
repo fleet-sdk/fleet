@@ -21,8 +21,8 @@ jobs:
           node-version: 16.x
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
       - run: pnpm run cov:check
-
       - name: Submit core report
         uses: codecov/codecov-action@v3
         with:
