@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NotAllowedTokenBurning } from "../errors";
 import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { OutputBuilder } from "./outputBuilder";
@@ -15,20 +16,20 @@ describe("Plugin context", () => {
   });
 
   it("Should add inputs", () => {
-    const fromMethod = jest.spyOn(builder, "from");
-    const configureSelectorMethod = jest.spyOn(builder, "configureSelector");
+    const fromSpy = vi.spyOn(builder, "from");
+    const configureSelectorMethod = vi.spyOn(builder, "configureSelector");
 
     const newLen = context.addInputs(regularBoxesMock);
 
-    expect(fromMethod).toBeCalledTimes(1);
+    expect(fromSpy).toBeCalledTimes(1);
     expect(configureSelectorMethod).toBeCalledTimes(1);
     expect(builder.inputs).toHaveLength(newLen);
     expect(builder.inputs).toHaveLength(regularBoxesMock.length);
   });
 
   it("Should add a single input", () => {
-    const fromMethod = jest.spyOn(builder, "from");
-    const configureSelectorMethod = jest.spyOn(builder, "configureSelector");
+    const fromMethod = vi.spyOn(builder, "from");
+    const configureSelectorMethod = vi.spyOn(builder, "configureSelector");
 
     let newLen = context.addInputs(regularBoxesMock[0]);
     expect(fromMethod).toBeCalledTimes(1);
@@ -44,7 +45,7 @@ describe("Plugin context", () => {
   });
 
   it("Should add data inputs", () => {
-    const withDataFromMethod = jest.spyOn(builder, "withDataFrom");
+    const withDataFromMethod = vi.spyOn(builder, "withDataFrom");
 
     const newLen = context.addDataInputs(regularBoxesMock);
 
@@ -54,7 +55,7 @@ describe("Plugin context", () => {
   });
 
   it("Should add outputs", () => {
-    const toMethod = jest.spyOn(builder, "to");
+    const toMethod = vi.spyOn(builder, "to");
 
     let newLen = context.addOutputs(
       new OutputBuilder(10000n, "9gn5Jo6T7m4pAzCdD9JFdRMPxnfKLPgcX68rD8RQvPLyJsTpKcq")
@@ -73,7 +74,7 @@ describe("Plugin context", () => {
   });
 
   it("Should burn tokens, plugin context allowed", () => {
-    const burnTokensMethod = jest.spyOn(builder, "burnTokens");
+    const burnTokensMethod = vi.spyOn(builder, "burnTokens");
 
     builder
       .from(regularBoxesMock)
@@ -89,7 +90,7 @@ describe("Plugin context", () => {
   });
 
   it("Should burn tokens, globally allowed", () => {
-    const burnTokensMethod = jest.spyOn(builder, "burnTokens");
+    const burnTokensMethod = vi.spyOn(builder, "burnTokens");
 
     builder.from(regularBoxesMock).configure((settings) => settings.allowTokenBurning(true));
 
@@ -103,7 +104,7 @@ describe("Plugin context", () => {
   });
 
   it("Should fail if token burning is not allowed", () => {
-    const burnTokensMethod = jest.spyOn(builder, "burnTokens");
+    const burnTokensMethod = vi.spyOn(builder, "burnTokens");
 
     builder.from(regularBoxesMock);
 

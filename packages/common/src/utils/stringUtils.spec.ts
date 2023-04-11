@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { hexByteSize, isHex } from "./stringUtils";
 
 describe("isHex() test", () => {

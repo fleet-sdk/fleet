@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { Box } from "../types";
 import { sumBy } from "./bigIntUtils";
 import { areRegistersDenselyPacked, BoxAmounts, utxoSum, utxoSumResultDiff } from "./boxUtils";

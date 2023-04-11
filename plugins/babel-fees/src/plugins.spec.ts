@@ -1,5 +1,7 @@
+import { fail } from "assert";
 import { ensureBigInt, first } from "@fleet-sdk/common";
 import { SByte, SColl, SConstant, SParse, TransactionBuilder } from "@fleet-sdk/core";
+import { describe, expect, it } from "vitest";
 import { BabelSwapPlugin } from "./plugins";
 import { babelBoxesMock } from "./tests/babelBoxesMock";
 import { regularBoxesMock } from "./tests/regularBoxesMock";

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { InsufficientInputs } from "./insufficientInputs";
 
 describe("Insufficient inputs error", () => {
@@ -14,7 +15,7 @@ describe("Insufficient inputs error", () => {
 
     const error = new InsufficientInputs(unreached);
 
-    expect(error.unreached).toBe(unreached);
+    expect(error.unreached).toEqual(unreached);
     expect(
       error.message.includes("nanoErgs") &&
         error.message.includes("007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283")

@@ -1,5 +1,6 @@
 import { Box } from "@fleet-sdk/common";
 import { first, sumBy, utxoSum } from "@fleet-sdk/common";
+import { describe, expect, it, vi } from "vitest";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientInputs } from "../../errors/insufficientInputs";
 import { regularBoxesMock } from "../../tests/mocks/mockBoxes";
@@ -23,7 +24,7 @@ describe("Selection strategies", () => {
     }
 
     const strategy = new CustomStrategy();
-    const selectSpy = jest.spyOn(strategy, "select");
+    const selectSpy = vi.spyOn(strategy, "select");
     const selector = new BoxSelector(regularBoxesMock).defineStrategy(strategy);
 
     expect(selector.select({ nanoErgs: 0n })).toHaveLength(regularBoxesMock.length);
@@ -31,7 +32,7 @@ describe("Selection strategies", () => {
   });
 
   it("Should use specified selection strategy function", () => {
-    const mockSelectorFunction = jest.fn((inputs: Box<bigint>[]) => {
+    const mockSelectorFunction = vi.fn((inputs: Box<bigint>[]) => {
       return inputs;
     });
 

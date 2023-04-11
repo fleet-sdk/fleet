@@ -37,9 +37,7 @@ export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> 
       }
     }
 
-    if (index > -1) {
-      this._items.splice(index, 1);
-    }
+    this._items.splice(index, 1);
 
     return this.length;
   }

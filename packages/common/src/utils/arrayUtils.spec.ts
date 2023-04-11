@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import {
   areEqual,
   chunk,
@@ -203,6 +204,15 @@ describe("Array ordering", () => {
       { a: "y", b: 2 },
       { a: "x", b: 3 },
       { a: "y", b: 4 }
+    ]);
+  });
+
+  it("Should order ascending by default", () => {
+    expect(orderBy(objects, (x) => x.a)).toStrictEqual([
+      { a: "x", b: 3 },
+      { a: "x", b: 1 },
+      { a: "y", b: 4 },
+      { a: "y", b: 2 }
     ]);
   });
 });

@@ -1,25 +1,22 @@
 import {
+  _0n,
   Amount,
   Box,
   BoxCandidate,
   BoxId,
+  ensureBigInt,
   FilterPredicate,
   first,
+  hasDuplicatesBy,
+  isEmpty,
   isUndefined,
   OneOrMore,
-  SortingDirection,
-  SortingSelector,
-  TokenTargetAmount
-} from "@fleet-sdk/common";
-import {
-  _0n,
-  ensureBigInt,
-  hasDuplicatesBy,
-  isDefined,
-  isEmpty,
   orderBy,
   some,
+  SortingDirection,
+  SortingSelector,
   sumBy,
+  TokenTargetAmount,
   utxoSum
 } from "@fleet-sdk/common";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
@@ -64,33 +61,33 @@ export class BoxSelector<T extends Box<bigint>> {
     const predicate = this._ensureFilterPredicate;
     const inclusion = this._ensureInclusionBoxIds;
 
-    if (isDefined(predicate)) {
-      if (isDefined(inclusion)) {
+    if (predicate) {
+      if (inclusion) {
         selected = unselected.filter((box) => predicate(box) || inclusion.has(box.boxId));
       } else {
         selected = unselected.filter(predicate);
       }
-    } else if (isDefined(inclusion)) {
+    } else if (inclusion) {
       selected = unselected.filter((box) => inclusion.has(box.boxId));
     }
 
-    if (isDefined(selected)) {
+    if (some(selected)) {
       unselected = unselected.filter((box) => !selected.some((sel) => sel.boxId === box.boxId));
 
-      if (isDefined(remaining.nanoErgs)) {
+      if (remaining.nanoErgs && remaining.nanoErgs > _0n) {
         remaining.nanoErgs -= sumBy(selected, (input) => input.value);
       }
 
-      if (isDefined(remaining.tokens) && selected.some((input) => !isEmpty(input.assets))) {
-        for (const tokenTarget of remaining.tokens) {
-          if (tokenTarget.amount) {
-            tokenTarget.amount -= utxoSum(selected, tokenTarget.tokenId);
+      if (some(remaining.tokens) && selected.some((input) => !isEmpty(input.assets))) {
+        for (const t of remaining.tokens) {
+          if (t.amount && t.amount > _0n) {
+            t.amount -= utxoSum(selected, t.tokenId);
           }
         }
       }
     }
 
-    if (isDefined(this._inputsSortSelector)) {
+    if (this._inputsSortSelector) {
       unselected = orderBy(unselected, this._inputsSortSelector, this._inputsSortDir || "asc");
     }
 
@@ -111,7 +108,7 @@ export class BoxSelector<T extends Box<bigint>> {
   private _deepCloneTarget(target: SelectionTarget): SelectionTarget {
     return {
       nanoErgs: target.nanoErgs,
-      tokens: isDefined(target.tokens)
+      tokens: target.tokens
         ? target.tokens.map((t) => ({ tokenId: t.tokenId, amount: t.amount }))
         : undefined
     };
@@ -131,7 +128,7 @@ export class BoxSelector<T extends Box<bigint>> {
 
     for (const tokenTarget of target.tokens) {
       const totalSelected = utxoSum(inputs, tokenTarget.tokenId);
-      if (isDefined(tokenTarget.amount) && tokenTarget.amount > totalSelected) {
+      if (tokenTarget.amount && tokenTarget.amount > totalSelected) {
         if (tokenTarget.tokenId === first(inputs).boxId) {
           continue;
         }

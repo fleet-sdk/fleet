@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 

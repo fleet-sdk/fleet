@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { isDefined, isUndefined, removeUndefined } from "./objectUtils";
 
 describe("Remove undefined fields", () => {

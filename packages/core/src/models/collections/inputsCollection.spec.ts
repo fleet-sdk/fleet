@@ -1,4 +1,5 @@
 import { first } from "@fleet-sdk/common";
+import { describe, expect, it } from "vitest";
 import { DuplicateInputError, NotFoundError } from "../../errors";
 import { regularBoxesMock } from "../../tests/mocks/mockBoxes";
 import { InputsCollection } from "./inputsCollection";

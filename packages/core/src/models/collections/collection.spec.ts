@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { Collection } from "./collection";
 
 class MockCollection extends Collection<number, number> {

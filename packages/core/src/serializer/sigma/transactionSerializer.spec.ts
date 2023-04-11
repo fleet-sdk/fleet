@@ -1,6 +1,7 @@
 import { BoxCandidate, DataInput, UnsignedInput } from "@fleet-sdk/common";
 import { blake2b } from "@noble/hashes/blake2b";
 import { bytesToHex } from "@noble/hashes/utils";
+import { describe, expect, it } from "vitest";
 import { serializeTransaction } from "./transactionSerializer";
 
 describe("Transaction serializer", () => {
@@ -143,7 +144,8 @@ describe("Transaction serializer", () => {
           {
             boxId: "7de60b1b86f2f517aa00fab7db85996279f897fa6e91c66b187a9c0d7276d414",
             extension: {
-              "0": "0402"
+              "0": "0402",
+              "1": undefined
             }
           },
           {

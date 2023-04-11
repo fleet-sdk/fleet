@@ -1,4 +1,5 @@
 import { first } from "@fleet-sdk/common";
+import { describe, expect, it } from "vitest";
 import { babelBoxesMock } from "./tests/babelBoxesMock";
 import { regularBoxesMock } from "./tests/regularBoxesMock";
 import { babelContractTestVectors } from "./tests/testVectors";

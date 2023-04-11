@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { zigZagDecode, zigZagDecodeBigInt, zigZagEncode, zigZagEncodeBigInt } from "./zigZag";
 
 describe("ZigZag encoding", () => {

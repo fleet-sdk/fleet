@@ -1,5 +1,6 @@
 import { bytesToHex, hexToBytes, randomBytes } from "@noble/hashes/utils";
 import { bytesToString, stringToBytes } from "@scure/base";
+import { describe, expect, it } from "vitest";
 import {
   collBoolTestVectors,
   collByteTestVectors,

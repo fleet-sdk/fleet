@@ -49,7 +49,8 @@ function writeExtension(writer: SigmaWriter, extension: ContextExtension): void 
   let length = 0;
 
   for (const key of keys) {
-    if (extension[key as unknown as keyof ContextExtension]) {
+    const ext = extension[key as unknown as keyof ContextExtension];
+    if (isDefined(ext)) {
       length++;
     }
   }

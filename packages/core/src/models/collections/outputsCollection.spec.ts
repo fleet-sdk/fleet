@@ -1,4 +1,5 @@
 import { first } from "@fleet-sdk/common";
+import { describe, expect, it } from "vitest";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "../../builder/outputBuilder";
 import { RECOMMENDED_MIN_FEE_VALUE } from "../../builder/transactionBuilder";
 import { NotFoundError } from "../../errors";
@@ -244,6 +245,65 @@ describe("Target building", () => {
       tokens: [
         { tokenId: tokenA, amount: 12359n + (basis.tokens[0].amount || 0n) },
         { tokenId: basis.tokens[1].tokenId, amount: basis.tokens[1].amount },
+        { tokenId: tokenB, amount: 50n }
+      ]
+    });
+  });
+
+  it("Should sum amounts and build target starting from a basis object with only tokens", () => {
+    const basis = {
+      tokens: [
+        { tokenId: tokenA, amount: 12359n },
+        { tokenId: tokenC, amount: 20n },
+        { tokenId: tokenD, amount: undefined }
+      ]
+    };
+
+    const collection = new OutputsCollection();
+    collection.add(
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).addTokens({
+        tokenId: tokenA,
+        amount: 12348n
+      })
+    );
+    collection.add(
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+        .addTokens({ tokenId: tokenA, amount: "11" })
+        .addTokens({ tokenId: tokenB, amount: 50n })
+    );
+
+    expect(collection.sum(basis)).toEqual({
+      nanoErgs: SAFE_MIN_BOX_VALUE * 2n,
+      tokens: [
+        { tokenId: tokenA, amount: 12359n + (basis.tokens[0].amount || 0n) },
+        { tokenId: basis.tokens[1].tokenId, amount: basis.tokens[1].amount },
+        { tokenId: tokenB, amount: 50n }
+      ]
+    });
+  });
+
+  it("Should sum amounts and build target starting from a basis object with only erg", () => {
+    const basis = {
+      nanoErgs: RECOMMENDED_MIN_FEE_VALUE
+    };
+
+    const collection = new OutputsCollection();
+    collection.add(
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).addTokens({
+        tokenId: tokenA,
+        amount: 12348n
+      })
+    );
+    collection.add(
+      new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+        .addTokens({ tokenId: tokenA, amount: "11" })
+        .addTokens({ tokenId: tokenB, amount: 50n })
+    );
+
+    expect(collection.sum(basis)).toEqual({
+      nanoErgs: SAFE_MIN_BOX_VALUE * 2n + basis.nanoErgs,
+      tokens: [
+        { tokenId: tokenA, amount: 12359n },
         { tokenId: tokenB, amount: 50n }
       ]
     });

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { MAX_CONSTANT_LENGTH } from "./constantSerializer";
 import { SigmaWriter } from "./sigmaWriter";
 

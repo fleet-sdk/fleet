@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { SigmaReader } from "./sigma/sigmaReader";
 import { SigmaWriter } from "./sigma/sigmaWriter";
 import { estimateVLQSize, readBigVLQ, readVLQ, writeBigVLQ, writeVLQ } from "./vlq";

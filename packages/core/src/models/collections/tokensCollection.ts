@@ -94,9 +94,7 @@ export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmoun
       }
     }
 
-    if (index > -1) {
-      this._items.splice(index, 1);
-    }
+    this._items.splice(index, 1);
 
     return this.length;
   }

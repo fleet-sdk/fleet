@@ -48,9 +48,7 @@ export class InputsCollection extends Collection<ErgoUnsignedInput, Box<Amount>>
       }
     }
 
-    if (index > -1) {
-      this._items.splice(index, 1);
-    }
+    this._items.splice(index, 1);
 
     return this.length;
   }

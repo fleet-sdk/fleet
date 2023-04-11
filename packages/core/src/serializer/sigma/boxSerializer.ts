@@ -118,12 +118,7 @@ export function estimateBoxSize(
 
   let size = 0;
 
-  if (isDefined(withValue)) {
-    size += estimateVLQSize(withValue);
-  } else {
-    size += estimateVLQSize(box.value);
-  }
-
+  size += estimateVLQSize(isDefined(withValue) ? withValue : box.value);
   size += hexByteSize(box.ergoTree);
   size += estimateVLQSize(box.creationHeight);
 

@@ -1,6 +1,7 @@
 import { Amount, BoxCandidate, Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
 import { stringToBytes } from "@scure/base";
+import { describe, expect, it, vi } from "vitest";
 import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
@@ -1243,7 +1244,7 @@ describe("Plugins", () => {
   });
 
   it("Should not execute plugins more tha one time", () => {
-    const plugin = jest.fn(({ addOutputs }) => {
+    const plugin = vi.fn(({ addOutputs }) => {
       addOutputs(new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address));
     });
 

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { decimalize, ensureBigInt, sumBy, undecimalize } from "./bigIntUtils";
 
 describe("decimalize()", () => {

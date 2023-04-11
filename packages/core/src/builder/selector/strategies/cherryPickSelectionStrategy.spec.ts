@@ -1,4 +1,5 @@
 import { sumBy, utxoSum } from "@fleet-sdk/common";
+import { describe, expect, it } from "vitest";
 import { regularBoxesMock } from "../../../tests/mocks/mockBoxes";
 import { CherryPickSelectionStrategy } from "./cherryPickSelectionStrategy";
 

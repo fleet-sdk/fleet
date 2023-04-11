@@ -1,10 +1,12 @@
+import { describe, expect, it } from "vitest";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "../builder";
+import { serializeTransaction } from "../serializer/sigma/transactionSerializer";
 import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { mockTransactions } from "../tests/mocks/mockTransactions";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
 
-describe("ErgoUsignedTransaction model", () => {
+describe("ErgoUnsignedTransaction model", () => {
   it("Should generate the right transactionId", () => {
     for (const tx of mockTransactions) {
       const unsigned = new ErgoUnsignedTransaction(
@@ -21,6 +23,25 @@ describe("ErgoUsignedTransaction model", () => {
       );
 
       expect(unsigned.id).toBe(tx.id);
+    }
+  });
+
+  it("Should serialize", () => {
+    for (const tx of mockTransactions) {
+      const unsigned = new ErgoUnsignedTransaction(
+        tx.inputs.map((input) => new ErgoUnsignedInput(input)),
+        tx.dataInputs.map((dataInput) => new ErgoUnsignedInput(dataInput)),
+        tx.outputs.map((output) => ({
+          ...output,
+          value: BigInt(output.value),
+          assets: output.assets.map((token) => ({
+            tokenId: token.tokenId,
+            amount: BigInt(token.amount)
+          }))
+        }))
+      );
+
+      expect(unsigned.toBytes()).toEqual(serializeTransaction(tx).toBytes());
     }
   });
 
