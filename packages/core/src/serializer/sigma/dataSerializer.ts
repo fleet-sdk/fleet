@@ -100,8 +100,8 @@ export class DataSerializer {
           return reader.readInt();
         case SigmaTypeCode.Long:
           return reader.readLong();
-        // case SigmaTypeCode.BigInt:
-        //   break;
+        case SigmaTypeCode.BigInt:
+          return reader.readBigInt();
         case SigmaTypeCode.GroupElement:
           return reader.readBytes(GROUP_ELEMENT_LENGTH);
         case SigmaTypeCode.SigmaProp: {

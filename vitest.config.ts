@@ -8,7 +8,7 @@ export default defineConfig({
       reporter: ["text", "json", "html"],
       lines: 100,
       statements: 100,
-      branches: 98.34,
+      branches: 98.38,
       functions: 100,
       thresholdAutoUpdate: true,
       exclude: ["**/tests/**", "**/*.spec.ts"]

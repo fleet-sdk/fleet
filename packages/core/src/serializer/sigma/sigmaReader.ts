@@ -1,5 +1,5 @@
-import { HexString, isEmpty } from "@fleet-sdk/common";
-import { hexToBytes } from "@noble/hashes/utils";
+import { HexString, hexToBigInt, isEmpty } from "@fleet-sdk/common";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { readBigVLQ, readVLQ } from "../vlq";
 import { zigZagDecode, zigZagDecodeBigInt } from "../zigZag";
 import { SigmaTypeCode } from "./sigmaTypeCode";
@@ -75,5 +75,12 @@ export class SigmaReader {
 
   public readLong(): bigint {
     return zigZagDecodeBigInt(readBigVLQ(this));
+  }
+
+  public readBigInt(): bigint {
+    const len = readVLQ(this);
+    const hex = bytesToHex(this.readBytes(len));
+
+    return hexToBigInt(hex);
   }
 }

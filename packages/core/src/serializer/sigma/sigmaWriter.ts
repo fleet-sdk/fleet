@@ -1,4 +1,4 @@
-import { _0n } from "@fleet-sdk/common";
+import { bigIntToHex } from "@fleet-sdk/common";
 import { bytesToHex } from "@noble/hashes/utils";
 import { writeBigVLQ, writeVLQ } from "../vlq";
 import { zigZagEncode, zigZagEncodeBigInt } from "../zigZag";
@@ -103,21 +103,8 @@ export class SigmaWriter {
     return this;
   }
 
-  public writeBigInt(number: bigint): SigmaWriter {
-    // todo: take a look at https://coolaj86.com/articles/convert-decimal-to-hex-with-js-bigints/
-    // and https://coolaj86.com/articles/convert-hex-to-decimal-with-js-bigints/
-    if (number < _0n) {
-      throw new Error("Negative BigInt values are not supported Fleet serializer.");
-    }
-
-    let hex = number.toString(16);
-    if (hex.length % 2) {
-      hex = "0" + hex;
-    } else if (Number.parseInt(hex.substring(0, 1), 16) >= 8) {
-      // maximum positive need to prepend 0 otherwise results in negative number
-      hex = "00" + hex;
-    }
-
+  public writeBigInt(value: bigint): SigmaWriter {
+    const hex = bigIntToHex(value);
     this.writeVLQ(hex.length / 2);
     this.writeHex(hex);
 

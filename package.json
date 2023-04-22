@@ -20,7 +20,8 @@
     "test:prettier": "prettier ./**/*.ts --list-different",
     "test:unit": "vitest run",
     "cov:check": "vitest run --coverage",
-    "cov:open": "vitest run --coverage ; open-cli coverage/index.html"
+    "cov:open": "vitest run --coverage ; open-cli coverage/index.html",
+    "bench": "vitest bench"
   },
   "devDependencies": {
     "@noble/hashes": "^1.3.0",

@@ -7,11 +7,10 @@ import {
   collIntTestVectors,
   collLongTestVectors,
   collShortTestVectors,
+  sBigIntTestVectors,
   sGroupElementTestVectors,
   sIntTestVectors,
   sLongTestVectors,
-  sNegativeBigIntTestVectors,
-  sPositiveBigIntTestVectors,
   sSigmaPropTestVectors
 } from "../../tests/testVectors/constantsTestVectors";
 import { SConstant, SParse } from "./constantSerializer";
@@ -59,17 +58,9 @@ describe("Primary types serialization", () => {
     }
   });
 
-  it("Should serialize positive SBigInt", () => {
-    for (const tv of sPositiveBigIntTestVectors) {
+  it("Should serialize SBigInt", () => {
+    for (const tv of sBigIntTestVectors) {
       expect(SConstant(SBigInt(tv.value))).toBe(tv.hex);
-    }
-  });
-
-  it("Should fail for negative SBigInt", () => {
-    for (const tv of sNegativeBigIntTestVectors) {
-      expect(() => {
-        SConstant(SBigInt(tv.value));
-      }).toThrow();
     }
   });
 
@@ -220,10 +211,37 @@ describe("SColl deserialization", () => {
     }
   });
 
+  it("Should deserialize SBigInt", () => {
+    for (const tv of sBigIntTestVectors) {
+      expect(SParse<bigint>(tv.hex).toString()).toBe(tv.value);
+    }
+  });
+
   it("Should deserialize 'Coll[SLong]'", () => {
     for (const tv of collLongTestVectors) {
       expect(SParse(tv.hex)).toEqual(tv.coll);
     }
+  });
+
+  it("Should deserialize 'Coll[Coll[Byte]]'", () => {
+    const hex =
+      "1a0c4065653430323366366564303963313332326234363630376538633163663737653733653030353039613334343838306232663339616332643430623433376463046572676f0763617264616e6f3339666965744263636a48774c774b4c5339573131453641766d565a6e4e6938347042487854317a3946723978314b6b79424a686761646472317179733577356d76796665783572646c75683039393273766d3074747834643439346336767979346a3933336573707a6d776e6c343277633833763837736b6c71773979387266766a6366743973616433376c61747778677170637132747a36347a08000000003b9aca00080000000002faf080080000000000013880036572672c6173736574316a7935713561307670737475747135713664386367646d72643471753579656663646e6a677a40366331346131353637363364613936303962383065386638326363613436663630363330346630613864306363363665356565323234306336333165666166640800000000000ee48c";
+    const expected = [
+      "65653430323366366564303963313332326234363630376538633163663737653733653030353039613334343838306232663339616332643430623433376463",
+      "6572676f",
+      "63617264616e6f",
+      "39666965744263636a48774c774b4c5339573131453641766d565a6e4e6938347042487854317a3946723978314b6b79424a68",
+      "61646472317179733577356d76796665783572646c75683039393273766d3074747834643439346336767979346a3933336573707a6d776e6c343277633833763837736b6c71773979387266766a6366743973616433376c61747778677170637132747a36347a",
+      "000000003b9aca00",
+      "0000000002faf080",
+      "0000000000013880",
+      "657267",
+      "6173736574316a7935713561307670737475747135713664386367646d72643471753579656663646e6a677a",
+      "36633134613135363736336461393630396238306538663832636361343666363036333034663061386430636336366535656532323430633633316566616664",
+      "00000000000ee48c"
+    ].map((x) => hexToBytes(x));
+
+    expect(SParse(hex)).toStrictEqual(expected);
   });
 });
 
@@ -278,6 +296,13 @@ describe("Serialize -> Parse roundtrip", () => {
     for (let i = 0; i < 100; i++) {
       const value = randomBigInt(-9_223_372_036_854_775_808n, 9_223_372_036_854_775_807n);
       expect(SParse(SConstant(SLong(value)))).toBe(value);
+    }
+  });
+
+  it("Should roundtrip SBigInt", () => {
+    for (let i = 0; i < 1000; i++) {
+      const value = randomBigInt(-9_223_372_036_854_775_808_000n, 9_223_372_036_854_775_807_000n);
+      expect(SParse(SConstant(SBigInt(value)))).toBe(value);
     }
   });
 
