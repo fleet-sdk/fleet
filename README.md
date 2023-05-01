@@ -6,15 +6,11 @@ Fleet (Fluent Ergo Toolset) is a pure JavaScript SDK for Ergo Platform. Fleet pr
 
 This is a [monorepository](https://monorepo.tools/) which means this contains many sub-packages that composes full Fleet SDK implementation.
 
-| Package                               | Description                                                                                  |                                                                                                       |
-| ------------------------------------- | -------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------: |
-| [@fleet-sdk/core](/packages/core/)    | Core library with transaction builder and basic serialization.                               |   [![npm](https://badgen.net/npm/v/@fleet-sdk/core)](https://www.npmjs.com/package/@fleet-sdk/core)   |
-| [@fleet-sdk/common](/packages/common) | Internal utility functions, constants and types shared across @fleet-sdk packages.           | [![npm](https://badgen.net/npm/v/@fleet-sdk/common)](https://www.npmjs.com/package/@fleet-sdk/common) |
-| [@fleet-sdk/wallet](/packages/wallet) | Wallet related library, with keys creation, derivation and signing.                          | [![npm](https://badgen.net/npm/v/@fleet-sdk/wallet)](https://www.npmjs.com/package/@fleet-sdk/wallet) |
-| @fleet-sdk/interpreter                | Sigma state interpreter and serialization library powered by Sigma.JS.                       |                                               `planned`                                               |
-| @fleet-sdk/compiler                   | ErgoScript compiler library powered by Sigma.JS.                                             |                                               `planned`                                               |
-| @fleet-sdk/graphql-client             | Data client library for [ergo-graphql](https://github.com/capt-nemo429/ergo-graphql) server. |                                               `planned`                                               |
-| @fleet-sdk/dapp-connector             | dApp Connector (EIP-12) client library.                                                      |                                               `planned`                                               |
+| Package                               | Description                                                                        |                                                                                                       |
+| ------------------------------------- | ---------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------: |
+| [@fleet-sdk/core](/packages/core/)    | Core library with transaction builder and basic serialization.                     |   [![npm](https://badgen.net/npm/v/@fleet-sdk/core)](https://www.npmjs.com/package/@fleet-sdk/core)   |
+| [@fleet-sdk/common](/packages/common) | Internal utility functions, constants and types shared across @fleet-sdk packages. | [![npm](https://badgen.net/npm/v/@fleet-sdk/common)](https://www.npmjs.com/package/@fleet-sdk/common) |
+| [@fleet-sdk/wallet](/packages/wallet) | Wallet related library, with keys creation, derivation and signing.                | [![npm](https://badgen.net/npm/v/@fleet-sdk/wallet)](https://www.npmjs.com/package/@fleet-sdk/wallet) |
 
 ## Plugins
 
