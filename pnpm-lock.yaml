@@ -88,6 +88,9 @@ importers:
 
   packages/wallet:
     dependencies:
+      '@fleet-sdk/common':
+        specifier: workspace:^
+        version: link:../common
       '@fleet-sdk/core':
         specifier: workspace:^
         version: link:../core

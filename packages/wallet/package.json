@@ -29,6 +29,7 @@
     "watch:unit": "vitest"
   },
   "dependencies": {
+    "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/core": "workspace:^",
     "@scure/bip32": "^1.3.0",
     "@scure/bip39": "^1.2.0"
