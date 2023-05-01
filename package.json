@@ -44,13 +44,11 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
-    "vitest": "^0.30.1"
+    "vitest": "^0.30.1",
+    "ergo-lib-wasm-nodejs": "^0.23.0"
   },
   "engines": {
     "node": ">=10",
     "pnpm": ">=8.1.1 <9"
-  },
-  "dependencies": {
-    "ergo-lib-wasm-nodejs": "^0.23.0"
   }
 }
