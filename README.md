@@ -9,8 +9,8 @@ This is a [monorepository](https://monorepo.tools/) which means this contains ma
 | Package                               | Description                                                                        |                                                                                                       |
 | ------------------------------------- | ---------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------: |
 | [@fleet-sdk/core](/packages/core/)    | Core library with transaction builder and basic serialization.                     |   [![npm](https://badgen.net/npm/v/@fleet-sdk/core)](https://www.npmjs.com/package/@fleet-sdk/core)   |
-| [@fleet-sdk/common](/packages/common) | Internal utility functions, constants and types shared across @fleet-sdk packages. | [![npm](https://badgen.net/npm/v/@fleet-sdk/common)](https://www.npmjs.com/package/@fleet-sdk/common) |
 | [@fleet-sdk/wallet](/packages/wallet) | Wallet related library, with keys creation, derivation and signing.                | [![npm](https://badgen.net/npm/v/@fleet-sdk/wallet)](https://www.npmjs.com/package/@fleet-sdk/wallet) |
+| [@fleet-sdk/common](/packages/common) | Internal utility functions, constants and types shared across @fleet-sdk packages. | [![npm](https://badgen.net/npm/v/@fleet-sdk/common)](https://www.npmjs.com/package/@fleet-sdk/common) |
 
 ## Plugins
 
