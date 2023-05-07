@@ -52,6 +52,7 @@ function _getErgoTreeType(ergoTree: Uint8Array): AddressType {
  *
  * `0x02` = compressed, positive Y coordinate.
  * `0x03` = compressed, negative Y coordinate.
+ *
  * @param pointBytes ECPoint bytes
  */
 function _validateCompressedEcPoint(pointBytes: Uint8Array) {
@@ -122,7 +123,12 @@ export class ErgoAddress {
    * @param publicKey Public key hex string
    */
   public static fromPublicKey(publicKey: HexString | Uint8Array, network?: Network): ErgoAddress {
-    const ergoTree = concatBytes(P2PK_ERGOTREE_PREFIX, _ensureBytes(publicKey));
+    const bytes = _ensureBytes(publicKey);
+    if (!_validateCompressedEcPoint(bytes)) {
+      throw new Error("The Public Key is invalid.");
+    }
+
+    const ergoTree = concatBytes(P2PK_ERGOTREE_PREFIX, bytes);
 
     return new ErgoAddress(ergoTree, network);
   }

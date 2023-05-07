@@ -162,6 +162,7 @@ describe("Encoding", () => {
 describe("Address validation", () => {
   it("Should not validate address (valid encoding but invalid PK)", () => {
     expect(ErgoAddress.validate("9dg7gpByCWzoXdx5VeCvHeQYjx3q2TuTjzHqHfrsMsHszG49Rfj")).to.be.false;
+    expect(ErgoAddress.validate("2xgTiYUcGDwvJ41XhN2nxGajWkFa3xy9pXCMEKS8fwT8QpR19R")).to.be.false;
   });
 
   it("Should validate VALID address from encoded address string", () => {
@@ -269,17 +270,31 @@ describe("Public key", () => {
     expect(ErgoAddress.fromBase58(FEE_MAINNET_ADDRESS_TV).getPublicKeys()).toHaveLength(0);
   });
 
-  it("Should parse from public key hex string", () => {
+  it("Should create from public key hex string", () => {
     for (const testVector of publicKeyTestVectors) {
       expect(ErgoAddress.fromPublicKey(testVector.publicKey).toString()).toBe(testVector.base58);
     }
   });
 
-  it("Should parse from public key buffer", () => {
+  it("Should create from public key bytes", () => {
     for (const testVector of publicKeyTestVectors) {
       expect(ErgoAddress.fromPublicKey(hexToBytes(testVector.publicKey)).toString()).toBe(
         testVector.base58
       );
+    }
+  });
+
+  it("Should fail with invalid public keys", () => {
+    const invalidPKs = [
+      "01200a1c1b8fa17ec82de54bcaef96f23d7b34196c0410f6f578abdbf163b14b25", //     not starting with 0x02 or 0x03
+      "09200a1c1b8fa17ec82de54bcaef96f23d7b34196c0410f6f578abdbf163b14b25", //     not starting with 0x02 or 0x03
+      "02200a1c1b8fa17ec82de54bcaef96f23d7b34196c0410f6f578abdbf163b14b", //       invalid length
+      "02200a1c1b8fa17ec82de54bcaef96f23d7b34196c041014b25f6f578abdbf163b1b", //   invalid length
+      "000000000000000000000000000000000000000000000000000000000000000000" //      infinity point
+    ];
+
+    for (const pk of invalidPKs) {
+      expect(() => ErgoAddress.fromPublicKey(pk)).to.throw("The Public Key is invalid.");
     }
   });
 
