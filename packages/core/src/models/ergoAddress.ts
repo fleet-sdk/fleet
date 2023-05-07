@@ -1,4 +1,4 @@
-import { AddressType, Base58String, HexString, Network } from "@fleet-sdk/common";
+import { AddressType, Base58String, HexString, isEmpty, Network } from "@fleet-sdk/common";
 import { areEqual, endsWith, first, isDefined, startsWith } from "@fleet-sdk/common";
 import { bytesToHex, concatBytes, hexToBytes } from "@noble/hashes/utils";
 import { base58 } from "@scure/base";
@@ -43,6 +43,23 @@ function _getErgoTreeType(ergoTree: Uint8Array): AddressType {
   } else {
     return AddressType.P2S;
   }
+}
+
+/**
+ * Validates a compressed Elliptic Curve point. Every non-infinity
+ * compressed point must contain 33 bytes, and the first byte must
+ * be equal to `0x02` or `0x03`, as described above:
+ *
+ * `0x02` = compressed, positive Y coordinate.
+ * `0x03` = compressed, negative Y coordinate.
+ * @param ecBytes ECPoint bytes
+ */
+function _validateCompressedEcPoint(ecBytes: Uint8Array) {
+  if (isEmpty(ecBytes) || ecBytes.length !== 33) {
+    return false;
+  }
+
+  return ecBytes[0] === 0x02 || ecBytes[0] === 0x03;
 }
 
 /**
@@ -161,6 +178,14 @@ export class ErgoAddress {
     const checksum = bytes.subarray(bytes.length - CHECKSUM_LENGTH, bytes.length);
     const blakeHash = blake2b256(script);
     const calculatedChecksum = blakeHash.subarray(0, CHECKSUM_LENGTH);
+
+    if (_getEncodedAddressType(bytes) === AddressType.P2PK) {
+      const pk = bytes.subarray(1, bytes.length - CHECKSUM_LENGTH);
+
+      if (!_validateCompressedEcPoint(pk)) {
+        return false;
+      }
+    }
 
     return areEqual(calculatedChecksum, checksum);
   }

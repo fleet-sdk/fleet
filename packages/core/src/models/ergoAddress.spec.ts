@@ -160,10 +160,15 @@ describe("Encoding", () => {
 });
 
 describe("Address validation", () => {
-  it("Should validate VALID address from address string", () => {
+  it("Should not validate address (valid encoding but invalid PK)", () => {
+    expect(ErgoAddress.validate("9dg7gpByCWzoXdx5VeCvHeQYjx3q2TuTjzHqHfrsMsHszG49Rfj")).to.be.false;
+  });
+
+  it("Should validate VALID address from encoded address string", () => {
     expect(
       ErgoAddress.validate("9iPgSVU3yrRnTxtJC6hYA7bS5mMqZtjeJHrT3fNdLV7JZVpY5By")
     ).toBeTruthy();
+
     expect(
       ErgoAddress.validate("3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3")
     ).toBeTruthy();
