@@ -52,14 +52,14 @@ function _getErgoTreeType(ergoTree: Uint8Array): AddressType {
  *
  * `0x02` = compressed, positive Y coordinate.
  * `0x03` = compressed, negative Y coordinate.
- * @param ecBytes ECPoint bytes
+ * @param pointBytes ECPoint bytes
  */
-function _validateCompressedEcPoint(ecBytes: Uint8Array) {
-  if (isEmpty(ecBytes) || ecBytes.length !== 33) {
+function _validateCompressedEcPoint(pointBytes: Uint8Array) {
+  if (isEmpty(pointBytes) || pointBytes.length !== 33) {
     return false;
   }
 
-  return ecBytes[0] === 0x02 || ecBytes[0] === 0x03;
+  return pointBytes[0] === 0x02 || pointBytes[0] === 0x03;
 }
 
 /**
