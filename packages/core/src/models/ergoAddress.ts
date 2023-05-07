@@ -180,11 +180,6 @@ export class ErgoAddress {
       return false;
     }
 
-    const script = bytes.subarray(0, bytes.length - CHECKSUM_LENGTH);
-    const checksum = bytes.subarray(bytes.length - CHECKSUM_LENGTH, bytes.length);
-    const blakeHash = blake2b256(script);
-    const calculatedChecksum = blakeHash.subarray(0, CHECKSUM_LENGTH);
-
     if (_getEncodedAddressType(bytes) === AddressType.P2PK) {
       const pk = bytes.subarray(1, bytes.length - CHECKSUM_LENGTH);
 
@@ -192,6 +187,11 @@ export class ErgoAddress {
         return false;
       }
     }
+
+    const script = bytes.subarray(0, bytes.length - CHECKSUM_LENGTH);
+    const checksum = bytes.subarray(bytes.length - CHECKSUM_LENGTH, bytes.length);
+    const blakeHash = blake2b256(script);
+    const calculatedChecksum = blakeHash.subarray(0, CHECKSUM_LENGTH);
 
     return areEqual(calculatedChecksum, checksum);
   }
