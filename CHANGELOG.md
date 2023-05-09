@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.27](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.26...v0.1.0-alpha.27) (2023-05-09)
+
+
+### Features
+
+* **core:** add full `BigInt` parser/serializer ([43540c1](https://github.com/fleet-sdk/core/commit/43540c12e8577017991c0c623837a4cc3c3d202c))
+* **wallet:** add `ErgoHDKey` for key handling ([22aac26](https://github.com/fleet-sdk/core/commit/22aac260cd6d16729f194a3040aa6e98284b7a0f))
+
+
+### Bug Fixes
+
+* **core:** Validate PK if address is a P2PK ([699cc4a](https://github.com/fleet-sdk/core/commit/699cc4a2f4c669530e702bd72ca9f0384c194f2f))
+* **core:** validate public key on instantiating by `ErgoAddress.fromPublicKey()` ([0f1ffe5](https://github.com/fleet-sdk/core/commit/0f1ffe5be666285e44963aae54ce55539c8d4f86))
+* **wallet:** add `@fleet-sdk/common` as dependency ([276a456](https://github.com/fleet-sdk/core/commit/276a456c2448966dcf86b4073a228c7e7785d880))
+
 ## [0.1.0-alpha.26](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.25...v0.1.0-alpha.26) (2023-04-09)
 
 
