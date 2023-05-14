@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.28](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.27...v0.1.0-alpha.28) (2023-05-14)
+
+
+### Bug Fixes
+
+* export `estimateBoxSize` function ([6b67963](https://github.com/fleet-sdk/core/commit/6b67963d2a935472b972d5dfd62062894e7df65e))
+
 ## [0.1.0-alpha.27](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.26...v0.1.0-alpha.27) (2023-05-09)
 
 
