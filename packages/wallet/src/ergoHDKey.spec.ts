@@ -1,10 +1,15 @@
 import { first } from "@fleet-sdk/common";
+import { sha256 } from "@noble/hashes/sha256";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { base58check as base58Checker } from "@scure/base";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import SigmaRust from "ergo-lib-wasm-nodejs";
 import { describe, expect, it } from "vitest";
 import { ERGO_HD_CHANGE_PATH, ErgoHDKey } from "./ergoHDKey";
 import { generateMnemonic } from "./mnemonic";
 import { keyAddressesTestVectors } from "./tests/keyTestVectors";
+
+const base58check = base58Checker(sha256);
 
 describe("Instantiation", () => {
   it("Should create from mnemonic and auto derive to ergo's default change path by default", async () => {
@@ -84,6 +89,17 @@ describe("Extended keys", () => {
     expect(recreatedKeyFromPk.privateKey).to.deep.equal(key.privateKey);
     expect(recreatedKeyFromPk.publicKey).to.be.deep.equal(key.publicKey);
     expect(recreatedKeyFromPk.chainCode).to.be.deep.equal(key.chainCode);
+  });
+
+  it("Should create from encoded private extended key", async () => {
+    const encodedXPriv = base58check.encode(
+      hexToBytes(
+        "0488ade4000000000000000000824d14ff80e181dc9038efd121c4e97b090ab52064f1bf3cd53a7625ecfd7f0800a8738fe8def3a4c50c25dcbd10177679c3e5aef0d42e2aea3e59b9b79f8d21f7"
+      )
+    );
+
+    const key = ErgoHDKey.fromExtendedKey(encodedXPriv).derive("m/44'/429'/0'/0").deriveChild(0);
+    expect(key.address.encode()).to.be.equal("9i13CmR9JpR2F6S81kokfApsWEpZsfoTPw7gRCjhX433VEsfBqq");
   });
 });
 
