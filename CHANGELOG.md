@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.29](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.28...v0.1.0-alpha.29) (2023-05-20)
+
+
+### Features
+
+* **common:** add `areEqualBy` function ([062b1a5](https://github.com/fleet-sdk/core/commit/062b1a5186cf7a5729b0a229e1ea56d709f8ed22))
+
 ## [0.1.0-alpha.28](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.27...v0.1.0-alpha.28) (2023-05-14)
 
 
