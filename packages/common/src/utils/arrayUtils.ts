@@ -96,6 +96,28 @@ export function areEqual<T>(array1: ArrayLike<T>, array2: ArrayLike<T>): boolean
   return true;
 }
 
+export function areEqualBy<T>(
+  array1: ArrayLike<T>,
+  array2: ArrayLike<T>,
+  selector: (item: T) => T[keyof T]
+): boolean {
+  if (array1 === array2) {
+    return true;
+  }
+
+  if (array1.length != array2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < array1.length; i++) {
+    if (selector(array1[i]) !== selector(array2[i])) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export function startsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolean {
   if (array === target) {
     return true;

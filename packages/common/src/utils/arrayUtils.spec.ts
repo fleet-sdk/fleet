@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   areEqual,
+  areEqualBy,
   chunk,
   endsWith,
   first,
@@ -233,6 +234,43 @@ describe("areEqual()", () => {
     expect(areEqual(array1, [1, 2])).toBeFalsy();
     expect(areEqual(array1, [])).toBeFalsy();
     expect(areEqual(array1, [1, 2, 10, 5, 0])).toBeFalsy();
+  });
+});
+
+describe("areEqualBy()", () => {
+  const array1 = [
+    { a: "x", b: 3 },
+    { a: "x", b: 1 },
+    { a: "y", b: 4 },
+    { a: "y", b: 2 }
+  ];
+
+  const array2 = [
+    { a: "x", b: 3 },
+    { a: "x", b: 1 },
+    { a: "y", b: 400 }, // b is different than array1[2].b, but a is equal
+    { a: "y", b: 2 }
+  ];
+
+  it("Should return true for equal array items and false for different ones", () => {
+    expect(areEqual(array1, array2)).to.be.false; // arrays are different but properties can be equal
+
+    expect(areEqualBy(array1, array2, (item) => item.a)).to.be.true;
+    expect(areEqualBy(array1, array2, (item) => item.b)).to.be.false;
+  });
+
+  it("Should return true without comparing items if the same array is compared", () => {
+    expect(areEqualBy(array1, array1, (item) => item.a)).to.be.true;
+    expect(areEqualBy(array1, array1, (item) => item.b)).to.be.true;
+  });
+
+  it("Should return false without comparing items different array lengths are passed", () => {
+    const array3 = [
+      { a: "x", b: 3 },
+      { a: "x", b: 1 }
+    ];
+
+    expect(areEqualBy(array1, array3, (item) => item.a)).to.be.false;
   });
 });
 
