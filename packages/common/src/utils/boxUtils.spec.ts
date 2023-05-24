@@ -186,10 +186,13 @@ describe("UTxO sum", () => {
     ).toBe(3819n);
   });
 
-  it("Should return zero for empty arrays", () => {
+  it("Should not return undefined results for empty arrays", () => {
     expect(utxoSum([], "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")).toBe(
       0n
     );
+
+    expect(utxoSum([]).nanoErgs).toBe(0n);
+    expect(utxoSum([]).tokens).toStrictEqual([]);
   });
 
   it("Should sum all tokens and nanoErgs", () => {
