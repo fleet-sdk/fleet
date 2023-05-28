@@ -31,8 +31,8 @@ export class BoxSelector<T extends Box<bigint>> {
   private readonly _inputs: Box<bigint>[];
   private _strategy?: ISelectionStrategy;
   private _ensureFilterPredicate?: FilterPredicate<Box<bigint>>;
-  private _inputsSortSelector?: SortingSelector<Box<bigint>>;
-  private _inputsSortDir?: SortingDirection;
+  private _selector?: SortingSelector<Box<bigint>>;
+  private _sortDirection?: SortingDirection;
   private _ensureInclusionBoxIds?: Set<BoxId>;
 
   constructor(inputs: T[]) {
@@ -87,8 +87,8 @@ export class BoxSelector<T extends Box<bigint>> {
       }
     }
 
-    if (this._inputsSortSelector) {
-      unselected = orderBy(unselected, this._inputsSortSelector, this._inputsSortDir || "asc");
+    if (this._selector) {
+      unselected = orderBy(unselected, this._selector, this._sortDirection || "asc");
     }
 
     selected = selected.concat(this._strategy.select(unselected, remaining));
@@ -149,11 +149,14 @@ export class BoxSelector<T extends Box<bigint>> {
 
   public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector<T>;
   public ensureInclusion(boxIds: OneOrMore<BoxId>): BoxSelector<T>;
+  public ensureInclusion(filter: "all"): BoxSelector<T>;
   public ensureInclusion(
-    predicateOrBoxIds: FilterPredicate<Box<bigint>> | OneOrMore<BoxId>
+    predicateOrBoxIds: FilterPredicate<Box<bigint>> | OneOrMore<BoxId> | "all"
   ): BoxSelector<T> {
     if (typeof predicateOrBoxIds === "function") {
       this._ensureFilterPredicate = predicateOrBoxIds;
+    } else if (predicateOrBoxIds === "all") {
+      this._ensureFilterPredicate = (box) => box.value > 0n;
     } else {
       if (isUndefined(this._ensureInclusionBoxIds)) {
         this._ensureInclusionBoxIds = new Set();
@@ -175,8 +178,8 @@ export class BoxSelector<T extends Box<bigint>> {
     selector: SortingSelector<Box<bigint>>,
     direction?: SortingDirection
   ): BoxSelector<T> {
-    this._inputsSortSelector = selector;
-    this._inputsSortDir = direction;
+    this._selector = selector;
+    this._sortDirection = direction;
 
     return this;
   }

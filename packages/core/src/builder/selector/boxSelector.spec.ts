@@ -148,6 +148,13 @@ describe("Ensure input inclusion", () => {
     expect(boxes[0].boxId).toBe(arbitraryBoxId);
   });
 
+  it("Should forcedly include all inputs", () => {
+    const selector = new BoxSelector(regularBoxesMock).ensureInclusion("all");
+    const boxes = selector.select({ nanoErgs: 10000n });
+
+    expect(boxes).to.be.deep.equal(regularBoxesMock);
+  });
+
   it("Should forcedly include inputs by multiple boxId", () => {
     const selector = new BoxSelector(regularBoxesMock).ensureInclusion([
       "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
