@@ -15,8 +15,8 @@ import {
   OneOrMore,
   some,
   TokenAmount,
-  utxoSum,
-  utxoSumResultDiff
+  utxoDiff,
+  utxoSum
 } from "@fleet-sdk/common";
 import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
@@ -260,7 +260,7 @@ export class TransactionBuilder {
     let inputs = selector.select(target);
 
     if (isDefined(this._changeAddress)) {
-      let change = utxoSumResultDiff(utxoSum(inputs), target);
+      let change = utxoDiff(utxoSum(inputs), target);
       const changeBoxes: OutputBuilder[] = [];
 
       if (some(change.tokens)) {
@@ -278,7 +278,7 @@ export class TransactionBuilder {
             tokens: target.tokens
           });
 
-          change = utxoSumResultDiff(utxoSum(inputs), target);
+          change = utxoDiff(utxoSum(inputs), target);
           minRequiredNanoErgs = estimateMinChangeValue({
             changeAddress: this._changeAddress,
             creationHeight: this._creationHeight,
@@ -339,7 +339,7 @@ export class TransactionBuilder {
     }
 
     if (some(burning.tokens) && some(this._burning)) {
-      burning = utxoSumResultDiff(burning, { nanoErgs: _0n, tokens: this._burning.toArray() });
+      burning = utxoDiff(burning, { nanoErgs: _0n, tokens: this._burning.toArray() });
     }
 
     if (!this._settings.canBurnTokens && some(burning.tokens)) {

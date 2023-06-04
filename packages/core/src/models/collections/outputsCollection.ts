@@ -1,4 +1,4 @@
-import { _0n, BoxAmounts, isDefined, isUndefined, OneOrMore, some } from "@fleet-sdk/common";
+import { _0n, BoxSummary, isDefined, isUndefined, OneOrMore, some } from "@fleet-sdk/common";
 import { OutputBuilder } from "../../builder/outputBuilder";
 import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
@@ -46,7 +46,7 @@ export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> 
     return new OutputsCollection(this._items);
   }
 
-  public sum(basis?: SelectionTarget | BoxAmounts): BoxAmounts {
+  public sum(basis?: SelectionTarget | BoxSummary): BoxSummary {
     const tokens: { [tokenId: string]: bigint } = {};
     let nanoErgs = _0n;
 

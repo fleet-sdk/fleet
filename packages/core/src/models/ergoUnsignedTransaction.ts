@@ -1,11 +1,11 @@
 import {
-  BoxAmounts,
   BoxCandidate,
+  BoxSummary,
   BuildOutputType,
   EIP12UnsignedTransaction,
   UnsignedTransaction,
-  utxoSum,
-  utxoSumResultDiff
+  utxoDiff,
+  utxoSum
 } from "@fleet-sdk/common";
 import { bytesToHex } from "@noble/hashes/utils";
 import { serializeTransaction } from "../serializer/sigma/transactionSerializer";
@@ -46,8 +46,8 @@ export class ErgoUnsignedTransaction {
     return this._outputs;
   }
 
-  get burning(): BoxAmounts {
-    return utxoSumResultDiff(utxoSum(this.inputs), utxoSum(this.outputs));
+  get burning(): BoxSummary {
+    return utxoDiff(utxoSum(this.inputs), utxoSum(this.outputs));
   }
 
   toPlainObject(): UnsignedTransaction;
