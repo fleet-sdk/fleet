@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Box } from "../types";
 import { sumBy } from "./bigIntUtils";
-import { areRegistersDenselyPacked, BoxAmounts, utxoSum, utxoSumResultDiff } from "./boxUtils";
+import { areRegistersDenselyPacked, BoxSummary, utxoDiff, utxoSum } from "./boxUtils";
 
 export const regularBoxesMock: Box<bigint>[] = [
   {
@@ -248,9 +248,9 @@ describe("UTxO sum", () => {
   });
 });
 
-describe("utxoSumResultDiff()", () => {
+describe("utxoDiff()", () => {
   it("Should calculate the difference between two summaries", () => {
-    const sumA: BoxAmounts = {
+    const sumA: BoxSummary = {
       nanoErgs: 100n,
       tokens: [
         { tokenId: "token_id_1", amount: 5n },
@@ -260,7 +260,7 @@ describe("utxoSumResultDiff()", () => {
       ]
     };
 
-    const sumB: BoxAmounts = {
+    const sumB: BoxSummary = {
       nanoErgs: 10n,
       tokens: [
         { tokenId: "token_id_1", amount: 2n },
@@ -269,7 +269,7 @@ describe("utxoSumResultDiff()", () => {
       ]
     };
 
-    expect(utxoSumResultDiff(sumA, sumB)).toEqual({
+    expect(utxoDiff(sumA, sumB)).toEqual({
       nanoErgs: 90n,
       tokens: [
         { tokenId: "token_id_1", amount: 3n },
@@ -278,7 +278,7 @@ describe("utxoSumResultDiff()", () => {
       ]
     });
 
-    expect(utxoSumResultDiff(sumA, sumA)).toEqual({
+    expect(utxoDiff(sumA, sumA)).toEqual({
       nanoErgs: 0n,
       tokens: []
     });

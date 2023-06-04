@@ -5,9 +5,9 @@ import { isDefined, isUndefined } from "./objectUtils";
 
 const NANOERGS_TOKEN_ID = "nanoErgs";
 
-export function utxoSum(boxes: MinimalBoxAmounts): BoxAmounts;
+export function utxoSum(boxes: MinimalBoxAmounts): BoxSummary;
 export function utxoSum(boxes: MinimalBoxAmounts, tokenId: TokenId): bigint;
-export function utxoSum(boxes: MinimalBoxAmounts, tokenId?: TokenId): BoxAmounts | bigint {
+export function utxoSum(boxes: MinimalBoxAmounts, tokenId?: TokenId): BoxSummary | bigint {
   const balances: { [tokenId: string]: bigint } = {};
 
   for (const box of boxes) {
@@ -38,7 +38,8 @@ export function utxoSum(boxes: MinimalBoxAmounts, tokenId?: TokenId): BoxAmounts
   };
 }
 
-export function utxoSumResultDiff(amountsA: BoxAmounts, amountsB: BoxAmounts): BoxAmounts {
+// todo: make it accept arrays of utxos as params
+export function utxoDiff(amountsA: BoxSummary, amountsB: BoxSummary): BoxSummary {
   const tokens: TokenAmount<bigint>[] = [];
   const nanoErgs = amountsA.nanoErgs - amountsB.nanoErgs;
 
@@ -82,7 +83,7 @@ type TokenAmount<AmountType> = {
   amount: AmountType;
 };
 
-export type BoxAmounts = {
+export type BoxSummary = {
   nanoErgs: bigint;
   tokens: TokenAmount<bigint>[];
 };
