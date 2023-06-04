@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { Box } from "../types";
+import { hasDuplicatesBy, isEmpty, uniq } from "./arrayUtils";
 import { sumBy } from "./bigIntUtils";
-import { areRegistersDenselyPacked, BoxSummary, utxoDiff, utxoSum } from "./boxUtils";
+import { areRegistersDenselyPacked, BoxSummary, utxoDiff, utxoFilter, utxoSum } from "./boxUtils";
 
 export const regularBoxesMock: Box<bigint>[] = [
   {
@@ -342,5 +343,72 @@ describe("Densely pack check - areRegistersDenselyPacked()", () => {
         R9: "07036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17"
       })
     ).toBeFalsy();
+  });
+});
+
+describe("UTxO filter", () => {
+  it("Should filter by max UTxO count", () => {
+    expect(utxoFilter(regularBoxesMock, { max: { count: 2 } })).to.has.length(2);
+    expect(utxoFilter(regularBoxesMock, { max: { count: regularBoxesMock.length } })).to.has.length(
+      regularBoxesMock.length
+    );
+  });
+
+  it("Should filter by max distinct tokens count", () => {
+    const filtered = utxoFilter(regularBoxesMock, { max: { aggregatedDistinctTokens: 3 } });
+
+    expect(filtered).to.have.length(5);
+    expect(filtered.some((x) => isEmpty(x.assets))).to.be.true;
+    expect(hasDuplicatesBy(filtered, (x) => x.boxId)).to.be.false;
+    expect(
+      uniq(filtered.flatMap((x) => x.assets.map((x) => x.tokenId)))
+    ).to.has.length.lessThanOrEqual(3);
+  });
+
+  it("Should filter by predicate", () => {
+    const filtered = utxoFilter(regularBoxesMock, { by: (box) => isEmpty(box.assets) });
+
+    expect(filtered).to.have.length(2);
+    expect(filtered.every((x) => isEmpty(x.assets))).to.be.true;
+    expect(hasDuplicatesBy(filtered, (x) => x.boxId)).to.be.false;
+  });
+
+  it("Should filter by max distinct tokens and UTxO count", () => {
+    const filter = {
+      max: {
+        count: 2,
+        aggregatedDistinctTokens: 3
+      }
+    };
+
+    const filtered = utxoFilter(regularBoxesMock, filter);
+
+    expect(filtered).to.have.length(filter.max.count);
+    expect(hasDuplicatesBy(filtered, (x) => x.boxId)).to.be.false;
+    expect(
+      uniq(filtered.flatMap((x) => x.assets.map((x) => x.tokenId)))
+    ).to.has.length.lessThanOrEqual(filter.max.aggregatedDistinctTokens);
+  });
+
+  it("Should filter by predicate, max distinct tokens and UTxO count", () => {
+    const filtered = utxoFilter(regularBoxesMock, {
+      by: (box) => box.value > 1000000n,
+      max: {
+        count: 10,
+        aggregatedDistinctTokens: 2
+      }
+    });
+
+    expect(filtered).to.have.length(3);
+    expect(filtered.some((x) => x.value <= 1000000n)).to.be.false;
+    expect(hasDuplicatesBy(filtered, (x) => x.boxId)).to.be.false;
+    expect(
+      uniq(filtered.flatMap((x) => x.assets.map((x) => x.tokenId)))
+    ).to.has.length.lessThanOrEqual(2);
+  });
+
+  it("Should should return empty array for empty inputs and non-matching filters", () => {
+    expect(utxoFilter(regularBoxesMock, { by: (box) => box.value === 0n })).to.be.empty;
+    expect(utxoFilter([], { max: { count: 10 } })).to.be.empty;
   });
 });

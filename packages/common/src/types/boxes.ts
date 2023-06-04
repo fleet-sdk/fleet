@@ -4,20 +4,21 @@ import { TokenAmount } from "./token";
 import { TransactionId } from "./transactions";
 
 export type BoxId = string;
+export type AmountType = string | bigint;
 
-type BoxBaseType<AmountType> = {
+type BoxBaseType<T extends AmountType> = {
   ergoTree: ErgoTree;
   creationHeight: number;
-  value: AmountType;
-  assets: TokenAmount<AmountType>[];
+  value: T;
+  assets: TokenAmount<T>[];
   additionalRegisters: NonMandatoryRegisters;
 };
 
-export type BoxCandidate<AmountType> = BoxBaseType<AmountType> & {
+export type BoxCandidate<T extends AmountType> = BoxBaseType<T> & {
   boxId?: BoxId;
 };
 
-export type Box<AmountType> = BoxBaseType<AmountType> & {
+export type Box<T extends AmountType> = BoxBaseType<T> & {
   boxId: BoxId;
   transactionId: TransactionId;
   index: number;

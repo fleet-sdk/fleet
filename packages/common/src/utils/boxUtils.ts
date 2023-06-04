@@ -1,4 +1,5 @@
-import { Amount, NonMandatoryRegisters, TokenId } from "../types";
+import { Amount, AmountType, Box, NonMandatoryRegisters, TokenAmount, TokenId } from "../types";
+import { isEmpty } from "./arrayUtils";
 import { _0n } from "./bigIntLiterals";
 import { ensureBigInt } from "./bigIntUtils";
 import { isDefined, isUndefined } from "./objectUtils";
@@ -55,14 +56,14 @@ export function utxoDiff(amountsA: BoxSummary, amountsB: BoxSummary): BoxSummary
   return { nanoErgs, tokens };
 }
 
-const MIN_REGISTER_NUMBER = 4;
-const MAX_REGISTER_NUMBER = 9;
+const MIN_REGISTERS = 4;
+const MAX_REGISTERS = 9;
 
 export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boolean {
   let lastValueIndex = 0;
-  for (let i = MIN_REGISTER_NUMBER; i <= MAX_REGISTER_NUMBER; i++) {
+  for (let i = MIN_REGISTERS; i <= MAX_REGISTERS; i++) {
     if (registers[`R${i}` as keyof NonMandatoryRegisters]) {
-      if (i === MIN_REGISTER_NUMBER) {
+      if (i === MIN_REGISTERS) {
         lastValueIndex = i;
         continue;
       }
@@ -78,9 +79,64 @@ export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boo
   return true;
 }
 
-type TokenAmount<AmountType> = {
-  tokenId: TokenId;
-  amount: AmountType;
+export function utxoFilter<T extends AmountType>(
+  utxos: Box<T>[],
+  filterParams: UTxOFilterParams<T>
+) {
+  if (isEmpty(filterParams) || isEmpty(utxos)) {
+    return utxos;
+  }
+
+  const { by, max } = filterParams;
+  let filtered = utxos;
+
+  if (by) {
+    filtered = utxos.filter(by);
+    if (isEmpty(filtered)) {
+      return filtered;
+    }
+  }
+
+  if (!max) {
+    return filtered;
+  }
+
+  if (isDefined(max.aggregatedDistinctTokens)) {
+    const tokenIds = _getDistinctTokenIds(filtered, max.aggregatedDistinctTokens);
+    filtered = filtered.filter(
+      (utxo) => isEmpty(utxo.assets) || utxo.assets.every((token) => tokenIds.has(token.tokenId))
+    );
+  }
+
+  if (isDefined(max.count) && filtered.length > max.count) {
+    filtered = filtered.slice(0, max.count);
+  }
+
+  return filtered;
+}
+
+function _getDistinctTokenIds(utxos: Box<AmountType>[], max: number): Set<string> {
+  const tokenIds = new Set<string>();
+
+  for (let i = 0; i < utxos.length && tokenIds.size < max; i++) {
+    if (isEmpty(utxos[i].assets) || utxos[i].assets.length > max) {
+      continue;
+    }
+
+    for (const token of utxos[i].assets) {
+      tokenIds.add(token.tokenId);
+    }
+  }
+
+  return tokenIds;
+}
+
+export type UTxOFilterParams<T extends AmountType> = {
+  by?: (utxo: Box<T>) => boolean;
+  max?: {
+    count?: number;
+    aggregatedDistinctTokens?: number;
+  };
 };
 
 export type BoxSummary = {
@@ -88,7 +144,7 @@ export type BoxSummary = {
   tokens: TokenAmount<bigint>[];
 };
 
-type MinimalBoxAmounts = readonly {
+export type MinimalBoxAmounts = readonly {
   value: Amount;
   assets: TokenAmount<Amount>[];
 }[];
