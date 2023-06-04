@@ -1,5 +1,7 @@
 import { SortingDirection, SortingSelector } from "../types";
 
+type ObjectSelector<T> = (item: T) => T[keyof T];
+
 export function isEmpty<T extends object>(obj?: T): obj is undefined;
 export function isEmpty<T>(array?: T[]): array is undefined;
 export function isEmpty<T>(obj?: T[] | object): obj is undefined {
@@ -43,7 +45,7 @@ export function hasDuplicates<T>(array: T[]): boolean {
 /**
  * Check for duplicate keys in complex elements
  */
-export function hasDuplicatesBy<T>(array: T[], selector: (value: T) => unknown): boolean {
+export function hasDuplicatesBy<T>(array: T[], selector: ObjectSelector<T>): boolean {
   return array.some((item, index) => {
     return array.findIndex((x) => selector(x) === selector(item)) !== index;
   });
@@ -99,7 +101,7 @@ export function areEqual<T>(array1: ArrayLike<T>, array2: ArrayLike<T>): boolean
 export function areEqualBy<T>(
   array1: ArrayLike<T>,
   array2: ArrayLike<T>,
-  selector: (item: T) => T[keyof T]
+  selector: ObjectSelector<T>
 ): boolean {
   if (array1 === array2) {
     return true;
@@ -154,4 +156,36 @@ export function endsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolean 
   }
 
   return true;
+}
+
+export function uniq<T>(array: Array<T>): Array<T> {
+  if (isEmpty(array)) {
+    return array;
+  }
+
+  return Array.from(new Set(array));
+}
+
+export function uniqBy<T>(
+  array: Array<T>,
+  selector: ObjectSelector<T>,
+  selection: "keep-first" | "keep-last" = "keep-first"
+): Array<T> {
+  if (isEmpty(array)) {
+    return array;
+  }
+
+  return Array.from(
+    array
+      .reduce((map, e) => {
+        const key = selector(e);
+
+        if (selection === "keep-first" && map.has(key)) {
+          return map;
+        }
+
+        return map.set(key, e);
+      }, new Map())
+      .values()
+  );
 }

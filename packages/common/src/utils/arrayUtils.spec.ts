@@ -10,7 +10,9 @@ import {
   isEmpty,
   orderBy,
   some,
-  startsWith
+  startsWith,
+  uniq,
+  uniqBy
 } from "./arrayUtils";
 
 describe("isEmpty() guard", () => {
@@ -312,5 +314,81 @@ describe("endsWith()", () => {
     expect(endsWith(array, [10, 2, 4, 5, 0])).toBeFalsy();
     expect(endsWith(array, [8])).toBeFalsy();
     expect(endsWith(array, [1, 2, 10, 5, 0, 1])).toBeFalsy();
+  });
+});
+
+describe("uniq()", () => {
+  const array1 = [1, 2, 0, 0, 1, 4, 5, 6, 7, 7, 8, 8, 2];
+
+  it("Should return a unique arrays", () => {
+    expect(uniq(array1)).to.be.deep.equal([1, 2, 0, 4, 5, 6, 7, 8]);
+
+    const uniqArray = [1, 2, 3, 4];
+    expect(uniq(uniqArray)).to.be.deep.equal([1, 2, 3, 4]);
+
+    expect(uniq([])).to.be.deep.equal([]);
+  });
+
+  it("Should roundtrip with hasDuplicates()", () => {
+    expect(hasDuplicates(uniq(array1))).to.be.false;
+  });
+});
+
+describe("uniqBy()", () => {
+  const objectArray1 = [
+    { a: "x", b: 3 },
+    { a: "x", b: 1 },
+    { a: "y", b: 4 },
+    { a: "y", b: 2 }
+  ];
+
+  it("Should return unique arrays from selected property", () => {
+    const array1 = [
+      { a: "x", b: 3 },
+      { a: "x", b: 1 },
+      { a: "y", b: 4 },
+      { a: "y", b: 2 }
+    ];
+
+    expect(uniqBy(array1, (x) => x.a, "keep-first")).to.be.deep.equal([
+      { a: "x", b: 3 },
+      { a: "y", b: 4 }
+    ]);
+
+    expect(uniqBy(array1, (x) => x.a, "keep-last")).to.be.deep.equal([
+      { a: "x", b: 1 },
+      { a: "y", b: 2 }
+    ]);
+
+    expect(uniqBy([], (x) => x)).to.be.deep.equal([]);
+  });
+
+  it("Should keep first by default", () => {
+    expect(uniqBy(objectArray1, (x) => x.a)).to.be.deep.equal(
+      uniqBy(objectArray1, (x) => x.a, "keep-first")
+    );
+  });
+
+  it("Should roundtrip with hasDuplicatesBy()", () => {
+    expect(
+      hasDuplicatesBy(
+        uniqBy(objectArray1, (x) => x.a),
+        (x) => x.a
+      )
+    ).to.be.false;
+
+    expect(
+      hasDuplicatesBy(
+        uniqBy(objectArray1, (x) => x.b),
+        (x) => x.b
+      )
+    ).to.be.false;
+
+    expect(
+      hasDuplicatesBy(
+        uniqBy(objectArray1, (x) => x.b),
+        (x) => x.a
+      )
+    ).to.be.true;
   });
 });
