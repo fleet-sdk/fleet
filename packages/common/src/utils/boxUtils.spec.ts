@@ -284,6 +284,25 @@ describe("utxoDiff()", () => {
       tokens: []
     });
   });
+
+  it("Should calculate the difference between two box arrays", () => {
+    const boxes1 = regularBoxesMock;
+    const boxes2 = regularBoxesMock.slice(1);
+    const diff = utxoDiff(boxes1, boxes2);
+
+    expect(diff.nanoErgs).to.be.equal(regularBoxesMock[0].value);
+    expect(diff.tokens).to.be.deep.equal(regularBoxesMock[0].assets);
+  });
+
+  it("Should calculate the difference between a box array and a summary", () => {
+    const summary = utxoSum(regularBoxesMock);
+    const boxes = regularBoxesMock.slice(0, -1);
+    const diff = utxoDiff(summary, boxes);
+
+    expect(diff.nanoErgs).to.be.equal(regularBoxesMock[5].value);
+    expect(diff.tokens).to.be.deep.equal(regularBoxesMock[5].assets);
+    expect(utxoDiff(regularBoxesMock, summary)).to.be.deep.equal({ nanoErgs: 0n, tokens: [] });
+  });
 });
 
 describe("Densely pack check - areRegistersDenselyPacked()", () => {

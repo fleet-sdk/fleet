@@ -39,14 +39,24 @@ export function utxoSum(boxes: MinimalBoxAmounts, tokenId?: TokenId): BoxSummary
   };
 }
 
-// todo: make it accept arrays of utxos as params
-export function utxoDiff(amountsA: BoxSummary, amountsB: BoxSummary): BoxSummary {
-  const tokens: TokenAmount<bigint>[] = [];
-  const nanoErgs = amountsA.nanoErgs - amountsB.nanoErgs;
+export function utxoDiff(
+  minuend: BoxSummary | Box<Amount>[],
+  subtrahend: BoxSummary | Box<Amount>[]
+): BoxSummary {
+  if (Array.isArray(minuend)) {
+    minuend = utxoSum(minuend);
+  }
 
-  for (const token of amountsA.tokens) {
+  if (Array.isArray(subtrahend)) {
+    subtrahend = utxoSum(subtrahend);
+  }
+
+  const tokens: TokenAmount<bigint>[] = [];
+  const nanoErgs = minuend.nanoErgs - subtrahend.nanoErgs;
+
+  for (const token of minuend.tokens) {
     const balance =
-      token.amount - (amountsB.tokens.find((t) => t.tokenId === token.tokenId)?.amount || _0n);
+      token.amount - (subtrahend.tokens.find((t) => t.tokenId === token.tokenId)?.amount || _0n);
 
     if (balance !== _0n) {
       tokens.push({ tokenId: token.tokenId, amount: balance });
