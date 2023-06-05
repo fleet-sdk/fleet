@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.30](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.29...v0.1.0-alpha.30) (2023-06-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **common:** rename `utxoSumResultDiff` to `utxoDiff`
+
+### Features
+
+* **common:** add `uniq` and `uniqBy` ([3b61d2b](https://github.com/fleet-sdk/core/commit/3b61d2b7fd0a3f2082fc92085d3444737f41149d))
+* **common:** add `utxoFilter` function ([ca3cd58](https://github.com/fleet-sdk/core/commit/ca3cd588640128912c91a7d8e3aa7303ca5fea45))
+* **core:** add `ensureSelection("all")` param ([29edf0b](https://github.com/fleet-sdk/core/commit/29edf0b5dfcff90e742a2025b7a4c942ec7a8630))
+
+
+### Bug Fixes
+
+* **common:** fix undefined `utxoSum` nanoErgs result. ([448c4e4](https://github.com/fleet-sdk/core/commit/448c4e47d7e01ab76a1199e18ee86d9231f60c94))
+
+
+* **common:** rename `utxoSumResultDiff` to `utxoDiff` ([43025d9](https://github.com/fleet-sdk/core/commit/43025d99892c0ef7e34a5a53fcb2fe447ffc1bd8))
+
 ## [0.1.0-alpha.29](https://github.com/fleet-sdk/core/compare/v0.1.0-alpha.28...v0.1.0-alpha.29) (2023-05-20)
 
 
