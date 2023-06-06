@@ -70,20 +70,20 @@ const MIN_NON_MANDATORY_REGISTER_INDEX = 4;
 const MAX_NON_MANDATORY_REGISTER_INDEX = 9;
 
 export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boolean {
-  let lastValueIndex = 0;
+  let lastIndex = 0;
   for (let i = MIN_NON_MANDATORY_REGISTER_INDEX; i <= MAX_NON_MANDATORY_REGISTER_INDEX; i++) {
     const key = `R${i}` as keyof NonMandatoryRegisters;
     if (registers[key]) {
       if (i === MIN_NON_MANDATORY_REGISTER_INDEX) {
-        lastValueIndex = i;
+        lastIndex = i;
         continue;
       }
 
-      if (i - lastValueIndex > 1) {
+      if (i - lastIndex > 1) {
         return false;
       }
 
-      lastValueIndex = i;
+      lastIndex = i;
     }
   }
 
