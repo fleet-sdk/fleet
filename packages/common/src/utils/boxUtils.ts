@@ -66,14 +66,15 @@ export function utxoDiff(
   return { nanoErgs, tokens };
 }
 
-const MIN_REGISTERS = 4;
-const MAX_REGISTERS = 9;
+const MIN_NON_MANDATORY_REGISTER_INDEX = 4;
+const MAX_NON_MANDATORY_REGISTER_INDEX = 9;
 
 export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boolean {
   let lastValueIndex = 0;
-  for (let i = MIN_REGISTERS; i <= MAX_REGISTERS; i++) {
-    if (registers[`R${i}` as keyof NonMandatoryRegisters]) {
-      if (i === MIN_REGISTERS) {
+  for (let i = MIN_NON_MANDATORY_REGISTER_INDEX; i <= MAX_NON_MANDATORY_REGISTER_INDEX; i++) {
+    const key = `R${i}` as keyof NonMandatoryRegisters;
+    if (registers[key]) {
+      if (i === MIN_NON_MANDATORY_REGISTER_INDEX) {
         lastValueIndex = i;
         continue;
       }
