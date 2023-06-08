@@ -18,7 +18,7 @@ export class ErgoHDKey {
   private readonly _address: ErgoAddress;
 
   private constructor(hdKey: HDKey) {
-    /* istanbul ignore if -- @preserve */
+    /* c8 ignore next 3 */
     if (!hdKey.publicKey) {
       throw new Error("Public key is not present");
     }
