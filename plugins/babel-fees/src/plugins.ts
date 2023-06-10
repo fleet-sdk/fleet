@@ -31,7 +31,7 @@ export function BabelSwapPlugin(babelBox: Box<Amount>, token: TokenAmount<Amount
 
     if (changeAmount < SAFE_MIN_BOX_VALUE) {
       throw new Error(
-        "The selected Babel Box does not have enough ERG to swap for the selected amount of tokens."
+        "The selected Babel Box does not have enough ERG to perform a swap for the selected amount of tokens."
       );
     }
 

@@ -50,12 +50,14 @@ export function isValidBabelContract(ergoTree: string): boolean {
   );
 }
 
+export type BabelBox = Box<Amount, R4ToR5Registers>;
+
 /**
  * Verify if a Box is a valid Babel Box
  * @param tokenId
  * @returns
  */
-export function isValidBabelBox(box: Box<Amount>): box is Box<Amount, R4ToR5Registers> {
+export function isValidBabelBox(box: Box<Amount>): box is BabelBox {
   return (
     isDefined(box.additionalRegisters.R4) &&
     isDefined(box.additionalRegisters.R5) &&
