@@ -1,5 +1,5 @@
 import { isDefined, isHex, isUndefined } from "@fleet-sdk/common";
-import { Amount, Box, SParse } from "@fleet-sdk/core";
+import { Amount, Box, R4ToR5Registers, SParse } from "@fleet-sdk/core";
 import { BABEL_ERGOTREE_PREFIX, BABEL_ERGOTREE_SUFFIX } from "./constants";
 
 const TOKEN_ID_HEX_LENGTH = 64;
@@ -55,7 +55,7 @@ export function isValidBabelContract(ergoTree: string): boolean {
  * @param tokenId
  * @returns
  */
-export function isValidBabelBox(box: Box<Amount>): boolean {
+export function isValidBabelBox(box: Box<Amount>): box is Box<Amount, R4ToR5Registers> {
   return (
     isDefined(box.additionalRegisters.R4) &&
     isDefined(box.additionalRegisters.R5) &&

@@ -8,6 +8,7 @@ import {
   ensureBigInt,
   ErgoTree,
   first,
+  HexString,
   isDefined,
   isEmpty,
   isHex,
@@ -23,7 +24,15 @@ import { stringToBytes } from "@scure/base";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
-import { ErgoAddress } from "../models";
+import {
+  ErgoAddress,
+  OnlyR4Register,
+  R4ToR5Registers,
+  R4ToR6Registers,
+  R4ToR7Registers,
+  R4ToR8Registers,
+  R4ToR9Registers
+} from "../models";
 import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
 import { estimateBoxSize } from "../serializer/sigma/boxSerializer";
 import { SConstant } from "../serializer/sigma/constantSerializer";
@@ -143,7 +152,9 @@ export class OutputBuilder {
     return this;
   }
 
-  public setAdditionalRegisters(registers: NonMandatoryRegisters): OutputBuilder {
+  public setAdditionalRegisters<T extends NonMandatoryRegisters>(
+    registers: SequentialNonMandatoryRegisters<T>
+  ): OutputBuilder {
     this._registers = removeUndefined(registers);
 
     if (!areRegistersDenselyPacked(registers)) {
@@ -202,3 +213,19 @@ export class OutputBuilder {
     };
   }
 }
+
+export type SequentialNonMandatoryRegisters<T extends NonMandatoryRegisters> = T extends {
+  R9: HexString;
+}
+  ? R4ToR9Registers
+  : T extends { R8: HexString }
+  ? R4ToR8Registers
+  : T extends { R7: HexString }
+  ? R4ToR7Registers
+  : T extends { R6: HexString }
+  ? R4ToR6Registers
+  : T extends { R5: HexString }
+  ? R4ToR5Registers
+  : T extends { R4: HexString }
+  ? OnlyR4Register
+  : T;

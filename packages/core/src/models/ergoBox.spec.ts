@@ -1,3 +1,4 @@
+import { NonMandatoryRegisters } from "@fleet-sdk/common";
 import { describe, expect, it } from "vitest";
 import {
   invalidBoxesMock,
@@ -33,10 +34,11 @@ describe("Validation", () => {
 
     for (const box of manyTokensBoxesMock) {
       expect(ErgoBox.validate(box)).toBeTruthy();
+      new ErgoBox(box);
     }
 
     for (const box of validBoxesMock) {
-      expect(new ErgoBox(box).isValid()).toBeTruthy();
+      expect(new ErgoBox<NonMandatoryRegisters>(box).isValid()).toBeTruthy();
     }
 
     expect(new ErgoBox(outOfOrderRegistersBox).isValid()).toBeTruthy();
@@ -45,7 +47,7 @@ describe("Validation", () => {
   it("Should not validate invalid boxes", () => {
     for (const box of invalidBoxesMock) {
       expect(ErgoBox.validate(box)).toBeFalsy();
-      expect(new ErgoBox(box).isValid()).toBeFalsy();
+      expect(new ErgoBox<NonMandatoryRegisters>(box).isValid()).toBeFalsy();
     }
   });
 });

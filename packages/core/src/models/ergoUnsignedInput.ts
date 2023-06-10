@@ -6,22 +6,27 @@ import {
   DataInput,
   EIP12UnsignedDataInput,
   EIP12UnsignedInput,
+  NonMandatoryRegisters,
   UnsignedInput
 } from "@fleet-sdk/common";
 import { ErgoBox } from "./ergoBox";
 
 type InputType<T> = T extends "default" ? UnsignedInput : EIP12UnsignedInput;
 type DataInputType<T> = T extends "default" ? DataInput : EIP12UnsignedDataInput;
-type InputBox = Box<Amount> & { extension?: ContextExtension };
+type InputBox<R extends NonMandatoryRegisters> = Box<Amount, R> & {
+  extension?: ContextExtension;
+};
 
-export class ErgoUnsignedInput extends ErgoBox {
+export class ErgoUnsignedInput<
+  R extends NonMandatoryRegisters = NonMandatoryRegisters
+> extends ErgoBox<R> {
   private _extension?: ContextExtension;
 
   public get extension(): ContextExtension | undefined {
     return this._extension;
   }
 
-  constructor(box: InputBox) {
+  constructor(box: InputBox<R>) {
     super(box);
 
     if (box.extension) {

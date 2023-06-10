@@ -1,3 +1,4 @@
+import { NonMandatoryRegisters } from "@fleet-sdk/common";
 import { beforeEach, describe, expect, it } from "vitest";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
@@ -274,7 +275,7 @@ describe("Additional registers", () => {
     expect(() => {
       builder.setAdditionalRegisters({
         R6: "0580c0fc82aa02"
-      });
+      } as NonMandatoryRegisters);
     }).toThrow(InvalidRegistersPacking);
   });
 });
