@@ -12,6 +12,7 @@
     "fix": "run-s fix:*",
     "test": "run-s test:*",
     "watch": "vitest",
+    "ci:publish": "pnpm clear && pnpm -r build && pnpm -r publish",
     "ver:stable": "standard-version",
     "ver:alpha": "standard-version --prerelease alpha",
     "fix:prettier": "prettier ./**/*.ts --write",

@@ -17,14 +17,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - uses: pnpm/action-setup@v2
         with:
           version: 8
+
       - name: Build and Test ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r build
       - run: pnpm run test
