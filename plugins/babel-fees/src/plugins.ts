@@ -15,26 +15,26 @@ import {
 import { getTokenPrice, isBabelContractForTokenId, isValidBabelBox } from "./utils";
 
 export function BabelSwapPlugin(babelBox: Box<Amount>, token: TokenAmount<Amount>): FleetPlugin {
+  if (!isValidBabelBox(babelBox)) {
+    throw new Error("Invalid Babel Box.");
+  }
+
+  if (!isBabelContractForTokenId(babelBox.ergoTree, token.tokenId)) {
+    throw new Error(
+      `The Babel Box '${babelBox.boxId}' is not compatible with Token ID '${token.tokenId}'.`
+    );
+  }
+
+  const input = new ErgoUnsignedInput(babelBox);
+  const changeAmount = input.value - ensureBigInt(token.amount) * getTokenPrice(babelBox);
+
+  if (changeAmount < SAFE_MIN_BOX_VALUE) {
+    throw new Error(
+      "The selected Babel Box does not have enough ERG to perform a swap for the selected amount of tokens."
+    );
+  }
+
   return ({ addInputs, addOutputs }) => {
-    if (!isValidBabelBox(babelBox)) {
-      throw new Error("Invalid Babel Box.");
-    }
-
-    if (!isBabelContractForTokenId(babelBox.ergoTree, token.tokenId)) {
-      throw new Error(
-        `The Babel Box '${babelBox.boxId}' is not compatible with Token ID '${token.tokenId}'.`
-      );
-    }
-
-    const input = new ErgoUnsignedInput(babelBox);
-    const changeAmount = input.value - ensureBigInt(token.amount) * getTokenPrice(babelBox);
-
-    if (changeAmount < SAFE_MIN_BOX_VALUE) {
-      throw new Error(
-        "The selected Babel Box does not have enough ERG to perform a swap for the selected amount of tokens."
-      );
-    }
-
     const outputsLength = addOutputs(
       new OutputBuilder(changeAmount, input.ergoTree)
         .addTokens(input.assets)
