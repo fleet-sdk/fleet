@@ -8,13 +8,15 @@ on:
 
 jobs:
   coverage:
+    name: Coverage
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
+
       - uses: pnpm/action-setup@v2
         with:
           version: 8
+
       - name: Collect coverage
         uses: actions/setup-node@v3
         with:
@@ -23,6 +25,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r build
       - run: pnpm run cov:check
+
       - name: Submit core report
         uses: codecov/codecov-action@v3
         with:
