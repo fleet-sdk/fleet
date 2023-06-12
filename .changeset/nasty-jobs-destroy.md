@@ -2,4 +2,4 @@
 "@fleet-sdk/common": patch
 ---
 
-Add `Box<T, R>` improvements
+Add `Box<T, R>` type improvements
