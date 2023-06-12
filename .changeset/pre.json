@@ -7,5 +7,9 @@
     "@fleet-sdk/wallet": "0.1.0-alpha.30",
     "@fleet-sdk/babel-fees-plugin": "0.1.0-alpha.30"
   },
-  "changesets": []
+  "changesets": [
+    "large-plums-mix",
+    "nasty-jobs-destroy",
+    "rich-sheep-sing"
+  ]
 }
