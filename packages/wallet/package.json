@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/wallet",
-  "version": "0.1.0-alpha.30",
+  "version": "0.1.0-alpha.31",
   "description": "Key management and signature for Ergo Platform.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
