@@ -6,9 +6,7 @@ on:
   pull_request:
     branches: ["master"]
 
-concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   lint:
