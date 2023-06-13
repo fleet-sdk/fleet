@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: ["master"]
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
-
 jobs:
   coverage:
     name: Coverage
