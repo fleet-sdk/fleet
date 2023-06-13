@@ -32,6 +32,9 @@ jobs:
           node-version: 20
           cache: "pnpm"
 
+      - name: Ensure latest npm version to be installed for npm provenance support
+        run: npm install -g npm
+
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
