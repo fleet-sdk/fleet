@@ -1,5 +1,14 @@
 # @fleet-sdk/wallet
 
+## 0.1.2
+
+### Patch Changes
+
+- 72a8b4f: Fix NPM provenance
+- Updated dependencies [72a8b4f]
+  - @fleet-sdk/common@0.1.2
+  - @fleet-sdk/core@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
