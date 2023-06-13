@@ -1,5 +1,14 @@
 # @fleet-sdk/wallet
 
+## 0.1.1
+
+### Patch Changes
+
+- ca22fab: Fix changesets
+- Updated dependencies [ca22fab]
+  - @fleet-sdk/common@0.1.1
+  - @fleet-sdk/core@0.1.1
+
 ## 0.1.0
 
 ### Patch Changes

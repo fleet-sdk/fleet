@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.1.1
+
+### Patch Changes
+
+- ca22fab: Fix changesets
+
 ## 0.1.0
 
 ### Patch Changes
