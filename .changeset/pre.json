@@ -8,6 +8,7 @@
     "@fleet-sdk/babel-fees-plugin": "0.1.0-alpha.30"
   },
   "changesets": [
+    "fifty-cows-sin",
     "large-plums-mix",
     "nasty-jobs-destroy",
     "rich-sheep-sing"
