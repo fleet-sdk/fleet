@@ -6,11 +6,7 @@
   "module": "dist/esm/index.js",
   "typings": "dist/esm/index.d.ts",
   "sideEffects": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fleet-sdk/fleet.git",
-    "directory": "packages/common"
-  },
+  "repository": "fleet-sdk/fleet",
   "license": "MIT",
   "publishConfig": {
     "access": "public",

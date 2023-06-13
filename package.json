@@ -2,17 +2,14 @@
   "version": "0.1.0-alpha.30",
   "private": "true",
   "packageManager": "pnpm@8.1.1",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fleet-sdk/fleet.git"
-  },
+  "repository": "fleet-sdk/fleet",
   "license": "MIT",
   "scripts": {
     "clear": "pnpm -r exec rm -rf dist",
     "fix": "run-s fix:*",
     "test": "run-s test:*",
     "watch": "vitest",
-    "ci:publish": "pnpm clear && pnpm -r build && pnpm -r publish",
+    "ci:publish": "pnpm clear && pnpm -r build && pnpm -r publish --provenance",
     "fix:prettier": "prettier ./**/*.ts --write",
     "fix:lint": "eslint ./ --ext .ts --fix",
     "test:lint": "eslint ./ --ext .ts",
