@@ -9,7 +9,7 @@
     "fix": "run-s fix:*",
     "test": "run-s test:*",
     "watch": "vitest",
-    "ci:publish": "pnpm clear && pnpm -r build && pnpm -r publish --provenance",
+    "ci:publish": "pnpm clear && pnpm -r build && changeset publish --provenance",
     "fix:prettier": "prettier ./**/*.ts --write",
     "fix:lint": "eslint ./ --ext .ts --fix",
     "test:lint": "eslint ./ --ext .ts",
