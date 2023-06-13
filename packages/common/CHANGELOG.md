@@ -1,5 +1,12 @@
 # @fleet-sdk/common
 
+## 0.1.0
+
+### Patch Changes
+
+- 4759a8f: Add NPM provenance
+- b67472a: Add `Box<T, R>` type improvements
+
 ## 0.1.0-alpha.32
 
 ### Patch Changes
