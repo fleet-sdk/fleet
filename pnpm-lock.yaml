@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -81,6 +85,18 @@ importers:
       '@scure/base':
         specifier: ^1.1.1
         version: 1.1.1
+
+  packages/mock-chain:
+    dependencies:
+      '@fleet-sdk/common':
+        specifier: workspace:^
+        version: link:../common
+      '@fleet-sdk/core':
+        specifier: workspace:^
+        version: link:../core
+      '@fleet-sdk/wallet':
+        specifier: workspace:^
+        version: link:../wallet
 
   packages/wallet:
     dependencies:
