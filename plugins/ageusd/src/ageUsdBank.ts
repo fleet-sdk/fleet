@@ -256,8 +256,9 @@ export class AgeUSDBank {
 
   getRedeemReserveCoinReserveRatioFor(amount: bigint) {
     const redeemAmount = this.getReserveCoinMintingBaseCost(amount);
-    let newBaseReserve = _0n;
     const baseReserve = this.baseReserves;
+    let newBaseReserve = _0n;
+
     if (redeemAmount < baseReserve) {
       newBaseReserve = baseReserve - redeemAmount;
     }
