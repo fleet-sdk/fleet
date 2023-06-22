@@ -1,4 +1,4 @@
-import { Amount, Box, SBool, SConstant, SParse } from "@fleet-sdk/core";
+import { Amount, Box, RECOMMENDED_MIN_FEE_VALUE, SBool, SConstant, SParse } from "@fleet-sdk/core";
 import { describe, expect, it, test } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_test/mocking";
 import { AgeUSDBank } from "./ageUsdBank";
@@ -225,6 +225,29 @@ describe("Bank calculations", () => {
     expect(bank.canRedeemReserveCoinAmount(1n)).to.be.false;
     expect(bank.canMintStableCoin(1n)).to.be.false;
     expect(bank.canRedeemStableCoinAmount(bank.circulatingStableCoins)).to.be.true;
+
+    const minerFee = RECOMMENDED_MIN_FEE_VALUE;
+    const scAmount = 15000n;
+    expect(bank.stableCoinNominalPrice * scAmount).to.be.equal(118110225000n);
+
+    // mint stable coin
+    expect(bank.getTotalStableCoinMintingCost(scAmount, minerFee)).to.be.equal(120734474359n);
+    expect(bank.getStableCoinMintingFees(scAmount, minerFee)).to.be.equal(2604249359n);
+
+    // redeem stable coin
+    expect(bank.getTotalStableCoinRedeemingAmount(scAmount, minerFee)).to.be.equal(115515424459n);
+    expect(bank.getRedeemingStableCoinFees(scAmount, minerFee)).to.be.equal(2604249359n);
+
+    const rsAmount = 40504n;
+    expect(bank.reserveCoinNominalPrice * rsAmount).to.be.equal(17129303616n);
+
+    // mint reserve coin
+    expect(bank.getTotalReserveCoinMintingCost(rsAmount, minerFee)).to.be.equal(17527933467n);
+    expect(bank.getReserveCoinMintingFees(rsAmount, minerFee)).to.be.equal(378629851n);
+
+    // redeem reserve coin
+    expect(bank.getTotalReserveCoinRedeemingAmount(rsAmount, minerFee)).to.be.equal(16752044109n);
+    expect(bank.getReserveCoinRedeemingFees(rsAmount, minerFee)).to.be.equal(377259507n);
   });
 
   it("Should return base reserve and reserve ration equal to zero if bank box value is under min value", () => {

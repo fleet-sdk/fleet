@@ -5,7 +5,7 @@ import { AgeUSDBankParameters } from "./sigmaUsdParameters";
 const _2n = BigInt(2);
 const _100n = BigInt(100);
 const _1000n = BigInt(1000);
-const _1000000000n = BigInt(1e9);
+const _1000000000n = BigInt(1000000000);
 
 export type AgeUSDBankBox<T extends Amount = Amount> = Box<T, R4ToR5Registers>;
 export type OracleBox = Box<Amount, OnlyR4Register>;
@@ -287,9 +287,9 @@ export class AgeUSDBank {
   }
 
   getStableCoinMintingFees(amount: bigint, transactionFee: bigint): bigint {
-    const feeLessAmount = this.stableCoinNominalPrice * amount;
-    const protocolFee = feeLessAmount + this.getProtocolFee(feeLessAmount);
-    const implementorFee = this.getImplementorFee(feeLessAmount + protocolFee);
+    const baseAmount = this.stableCoinNominalPrice * amount;
+    const protocolFee = this.getProtocolFee(baseAmount);
+    const implementorFee = this.getImplementorFee(baseAmount + protocolFee);
 
     return transactionFee + protocolFee + implementorFee;
   }
@@ -309,61 +309,61 @@ export class AgeUSDBank {
   }
 
   getReserveCoinMintingFees(amount: bigint, transactionFee: bigint): bigint {
-    const feeLessAmount = this.reserveCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(feeLessAmount);
-    const implementorFee = this.getImplementorFee(this.getStableCoinMintingBaseCost(amount));
+    const baseAmount = this.reserveCoinNominalPrice * amount;
+    const protocolFee = this.getProtocolFee(baseAmount);
+    const implementorFee = this.getImplementorFee(baseAmount + protocolFee);
 
     return transactionFee + protocolFee + implementorFee;
   }
 
   getReserveCoinMintingBaseCost(amount: bigint): bigint {
-    const feeLessAmount = this.reserveCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(feeLessAmount);
+    const baseAmount = this.reserveCoinNominalPrice * amount;
+    const protocolFee = this.getProtocolFee(baseAmount);
 
-    return feeLessAmount + protocolFee;
+    return baseAmount + protocolFee;
   }
 
   getTotalReserveCoinRedeemingAmount(amount: bigint, transactionFee: bigint): bigint {
     const baseAmount = this.getReserveCoinRedeemingBaseAmount(amount);
     const fees = transactionFee + this.getImplementorFee(baseAmount);
 
-    return baseAmount < fees ? baseAmount - fees : _0n;
+    return baseAmount > fees ? baseAmount - fees : _0n;
   }
 
   getReserveCoinRedeemingFees(amount: bigint, transactionFee: bigint): bigint {
-    const feeLessAmount = this.reserveCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(feeLessAmount);
+    const baseAmount = this.reserveCoinNominalPrice * amount;
+    const protocolFee = this.getProtocolFee(baseAmount);
     const implementorFee = this.getImplementorFee(this.getReserveCoinRedeemingBaseAmount(amount));
 
     return transactionFee + protocolFee + implementorFee;
   }
 
   getReserveCoinRedeemingBaseAmount(amount: bigint): bigint {
-    const feeLessAmount = this.reserveCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(feeLessAmount);
+    const baseAmount = this.reserveCoinNominalPrice * amount;
+    const protocolFee = this.getProtocolFee(baseAmount);
 
-    return feeLessAmount - protocolFee;
+    return baseAmount - protocolFee;
   }
 
   getTotalStableCoinRedeemingAmount(amount: bigint, transactionFee: bigint): bigint {
     const baseAmount = this.getStableCoinRedeemingBaseAmount(amount);
     const fees = transactionFee + this.getImplementorFee(baseAmount);
 
-    return baseAmount < fees ? baseAmount - fees : _0n;
+    return baseAmount > fees ? baseAmount - fees : _0n;
   }
 
   getRedeemingStableCoinFees(amount: bigint, transactionFee: bigint): bigint {
-    const feeLessAmount = this.stableCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(feeLessAmount);
-    const implementorFee = this.getImplementorFee(feeLessAmount + protocolFee);
+    const baseAmount = this.stableCoinNominalPrice * amount;
+    const protocolFee = this.getProtocolFee(baseAmount);
+    const implementorFee = this.getImplementorFee(baseAmount + protocolFee);
 
     return protocolFee + transactionFee + implementorFee;
   }
 
   getStableCoinRedeemingBaseAmount(amount: bigint): bigint {
-    const feeLessAmount = this.stableCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(feeLessAmount);
+    const baseAmount = this.stableCoinNominalPrice * amount;
+    const protocolFee = this.getProtocolFee(baseAmount);
 
-    return feeLessAmount - protocolFee;
+    return baseAmount - protocolFee;
   }
 }
