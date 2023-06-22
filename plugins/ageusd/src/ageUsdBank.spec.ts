@@ -196,7 +196,6 @@ describe("Bank calculations", () => {
     expect(bank.getMintStableCoinReserveRatioFor(availableStableCoin)).to.be.equal(400n);
 
     const redeemableReserveCoin = bank.reserveCoinRedeemableAmount;
-    // expect(redeemableReserveCoin).to.be.equal(125926620246n);
     expect(bank.getRedeemReserveCoinReserveRatioFor(redeemableReserveCoin)).to.be.equal(400n);
   });
 
