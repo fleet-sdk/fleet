@@ -215,7 +215,7 @@ describe("Bank calculations", () => {
 
   it("Should return liabilities equal to zero if there is no stable coin in circulation", () => {
     const bankBox = mockBankBox({
-      reserveNanoergs: SIGMA_USD_PARAMETERS.minBoxValue, // reserve under min value
+      reserveNanoergs: SIGMA_USD_PARAMETERS.minBoxValue,
       circulatingStableCoin: 0n,
       circulatingReserveCoin: 1361641506n
     });
