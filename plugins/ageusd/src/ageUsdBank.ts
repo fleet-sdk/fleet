@@ -5,6 +5,7 @@ import { AgeUSDBankParameters } from "./sigmaUsdParameters";
 const _2n = BigInt(2);
 const _100n = BigInt(100);
 const _1000n = BigInt(1000);
+const _1000000000n = BigInt(1e9);
 
 export type AgeUSDBankBox<T extends Amount = Amount> = Box<T, R4ToR5Registers>;
 export type OracleBox = Box<Amount, OnlyR4Register>;
@@ -178,6 +179,14 @@ export class AgeUSDBank {
     return low;
   }
 
+  get ergPriceInStableCoin(): bigint {
+    return _1000000000n / this.stableCoinNominalPrice;
+  }
+
+  get ergPriceInReserveCoin(): bigint {
+    return _1000000000n / this.reserveCoinNominalPrice;
+  }
+
   protected validateBankBox(bankBox: AgeUSDBankBox, params: AgeUSDBankParameters): boolean {
     return (
       bankBox.assets.length === 3 &&
@@ -264,6 +273,10 @@ export class AgeUSDBank {
     }
 
     return this.getReserveRatio(newBaseReserve, this.circulatingStableCoins, this._oracleRate);
+  }
+
+  canRedeemStableCoinAmount(amount: bigint): boolean {
+    return amount <= this.circulatingStableCoins;
   }
 
   getTotalStableCoinMintingCost(amount: bigint, transactionFee: bigint): bigint {

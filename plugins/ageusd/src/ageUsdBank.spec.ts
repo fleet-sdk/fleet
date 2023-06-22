@@ -1,4 +1,4 @@
-import { Amount, Box, SBool, SConstant } from "@fleet-sdk/core";
+import { Amount, Box, SBool, SConstant, SParse } from "@fleet-sdk/core";
 import { describe, expect, it, test } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_test/mocking";
 import { AgeUSDBank } from "./ageUsdBank";
@@ -105,6 +105,9 @@ describe("Bank calculations", () => {
     expect(bank.reserveCoinNominalPrice).to.be.equal(828471n);
     expect(bank.reserveRatio).to.be.equal(437n);
 
+    expect(bank.canRedeemStableCoinAmount(bank.circulatingStableCoins)).to.be.true;
+    expect(bank.canRedeemStableCoinAmount(bank.circulatingStableCoins + 1n)).to.be.false;
+
     const availableStableCoin = bank.stableCoinAvailableAmount;
     expect(bank.getMintStableCoinReserveRatioFor(availableStableCoin)).to.be.equal(400n);
     expect(bank.canMintStableCoin(availableStableCoin)).to.be.true;
@@ -197,6 +200,31 @@ describe("Bank calculations", () => {
 
     const redeemableReserveCoin = bank.reserveCoinRedeemableAmount;
     expect(bank.getRedeemReserveCoinReserveRatioFor(redeemableReserveCoin)).to.be.equal(400n);
+  });
+
+  it("Should be able to mint reserve coins and redeem stable coin, but not mint stable. Reserve == 341", () => {
+    const bankBox = mockBankBox({
+      reserveNanoergs: 1_503_178_749_566_874n,
+      circulatingStableCoin: SParse("05c4c9b035"),
+      circulatingReserveCoin: SParse("05eac7f1db12")
+    });
+    const oracleBox = mockOracleBox(SParse("05ccadf6ee05"));
+    const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
+
+    expect(bank.stableCoinNominalPrice).to.be.equal(7_874_015n);
+    expect(bank.reserveCoinNominalPrice).to.be.equal(422_904n);
+    expect(bank.reserveRatio).to.be.equal(341n);
+    expect(bank.circulatingStableCoins).to.be.equal(55_972_450n);
+    expect(bank.circulatingReserveCoins).to.be.equal(2_512_269_813n);
+    expect(bank.baseReserves).to.be.equal(1_503_178_749_566_874n);
+    expect(bank.ergPriceInStableCoin).to.be.equal(127n);
+    expect(bank.ergPriceInReserveCoin).to.be.equal(2364n);
+    expect(bank.canMintReserveCoinAmount(3381618240n)).to.be.true;
+
+    expect(bank.canMintReserveCoinAmount(1n)).to.be.true;
+    expect(bank.canRedeemReserveCoinAmount(1n)).to.be.false;
+    expect(bank.canMintStableCoin(1n)).to.be.false;
+    expect(bank.canRedeemStableCoinAmount(bank.circulatingStableCoins)).to.be.true;
   });
 
   it("Should return base reserve and reserve ration equal to zero if bank box value is under min value", () => {
