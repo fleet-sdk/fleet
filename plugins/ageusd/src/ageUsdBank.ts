@@ -10,7 +10,7 @@ export type AgeUSDBankBox<T extends Amount = Amount> = Box<T, R4ToR5Registers>;
 export type OracleBox = Box<Amount, OnlyR4Register>;
 
 export class AgeUSDBank {
-  private readonly _box: AgeUSDBankBox;
+  private readonly _bankBox: AgeUSDBankBox;
   private readonly _oracleBox: OracleBox;
   private readonly _oracleRate: bigint;
   private readonly _params: AgeUSDBankParameters;
@@ -24,7 +24,7 @@ export class AgeUSDBank {
       throw new Error("Invalid oracle box.");
     }
 
-    this._box = bankBox;
+    this._bankBox = bankBox;
     this._oracleBox = oracleBox;
     this._params = params;
 
@@ -37,19 +37,19 @@ export class AgeUSDBank {
   }
 
   get bankBox() {
-    return this._box;
+    return this._bankBox;
   }
 
   get stableCoin(): TokenAmount<Amount> {
-    return this._box.assets[0];
+    return this._bankBox.assets[0];
   }
 
   get reserveCoin(): TokenAmount<Amount> {
-    return this._box.assets[1];
+    return this._bankBox.assets[1];
   }
 
   get nft(): TokenAmount<Amount> {
-    return this._box.assets[2];
+    return this._bankBox.assets[2];
   }
 
   get params(): AgeUSDBankParameters {
@@ -61,7 +61,7 @@ export class AgeUSDBank {
   }
 
   get baseReserves(): bigint {
-    const value = ensureBigInt(this._box.value);
+    const value = ensureBigInt(this._bankBox.value);
 
     return value < this._params.minBoxValue ? _0n : value;
   }
@@ -85,11 +85,11 @@ export class AgeUSDBank {
   }
 
   get circulatingStableCoins(): bigint {
-    return SParse(this._box.additionalRegisters.R4);
+    return SParse(this._bankBox.additionalRegisters.R4);
   }
 
   get circulatingReserveCoins(): bigint {
-    return SParse(this._box.additionalRegisters.R5);
+    return SParse(this._bankBox.additionalRegisters.R5);
   }
 
   get stableCoinNominalPrice(): bigint {
