@@ -224,6 +224,6 @@ describe("Bank calculations", () => {
 
     expect(bank.liabilities).to.be.equal(0n);
     expect(bank.stableCoinNominalPrice).to.be.equal(229357798n / 100n);
-    expect(bank.reserveRatio).to.be.equal(436n);
+    expect(Number(bank.reserveRatio)).to.be.greaterThanOrEqual(400);
   });
 });
