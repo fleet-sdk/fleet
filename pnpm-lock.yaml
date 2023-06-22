@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -96,6 +100,15 @@ importers:
       '@scure/bip39':
         specifier: ^1.2.0
         version: 1.2.0
+
+  plugins/ageusd:
+    dependencies:
+      '@fleet-sdk/common':
+        specifier: workspace:^
+        version: link:../../packages/common
+      '@fleet-sdk/core':
+        specifier: workspace:^
+        version: link:../../packages/core
 
   plugins/babel-fees:
     dependencies:
