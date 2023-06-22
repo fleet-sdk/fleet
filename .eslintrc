@@ -60,7 +60,7 @@
         "selector": "memberLike",
         "modifiers": ["protected"],
         "format": ["camelCase"],
-        "leadingUnderscore": "require"
+        "leadingUnderscore": "allow"
       }
     ],
     "eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }],

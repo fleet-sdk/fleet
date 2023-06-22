@@ -8,7 +8,7 @@ on:
 
 jobs:
   coverage:
-    name: Coverage
+    name: Check and submit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -26,7 +26,8 @@ jobs:
       - run: pnpm -r build
       - run: pnpm run cov:check
 
-      - name: Submit core report
+      - name: Submit report
+        if: success() || failure()
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage/coverage-final.json
