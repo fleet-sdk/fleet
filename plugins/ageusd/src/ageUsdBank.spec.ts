@@ -1,6 +1,6 @@
 import { Amount, Box, RECOMMENDED_MIN_FEE_VALUE, SBool, SConstant, SParse } from "@fleet-sdk/core";
 import { describe, expect, it, test } from "vitest";
-import { mockBankBox, mockOracleBox } from "./_test/mocking";
+import { mockBankBox, mockOracleBox } from "./_tests/mocking";
 import { AgeUSDBank } from "./ageUsdBank";
 import { AgeUSDBankParameters, SIGMA_USD_PARAMETERS } from "./sigmaUsdParameters";
 

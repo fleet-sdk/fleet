@@ -11,7 +11,7 @@ export default defineConfig({
       branches: 100,
       functions: 100,
       thresholdAutoUpdate: true,
-      exclude: ["**/tests/**", "**/*.spec.ts"]
+      exclude: ["**/tests/**", "**/_tests/**", "**/*.spec.ts"]
     }
   }
 });

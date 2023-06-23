@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { mockBankBox, mockOracleBox } from "./_test/mocking";
+import { mockBankBox, mockOracleBox } from "./_tests/mocking";
 import { SigmaUSDBank } from "./sigmaUsdBank";
 import { SIGMA_USD_PARAMETERS } from "./sigmaUsdParameters";
 
