@@ -26,7 +26,7 @@ export function first<T>(array?: ArrayLike<T> | Uint8Array): T | number | undefi
     return;
   }
 
-  if (!array[0]) {
+  if (array.length < 1) {
     throw Error("Empty array.");
   }
 
