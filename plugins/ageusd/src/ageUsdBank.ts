@@ -1,4 +1,14 @@
-import { _0n, _1n, Amount, Box, ensureBigInt, isDefined, TokenAmount } from "@fleet-sdk/common";
+import {
+  _0n,
+  _1n,
+  Amount,
+  Box,
+  ensureBigInt,
+  isDefined,
+  max,
+  min,
+  TokenAmount
+} from "@fleet-sdk/common";
 import { OnlyR4Register, R4ToR5Registers, SParse } from "@fleet-sdk/core";
 import { AgeUSDBankParameters } from "./sigmaUsdParameters";
 
@@ -75,7 +85,7 @@ export class AgeUSDBank {
     const baseReservesNeeded = this.circulatingStableCoins * this._oracleRate;
     const baseReserve = this.baseReserves;
 
-    return baseReservesNeeded < baseReserve ? baseReservesNeeded : baseReserve;
+    return min(baseReserve, baseReservesNeeded);
   }
 
   get equity() {
@@ -122,7 +132,7 @@ export class AgeUSDBank {
     const rate = this._oracleRate * (minReserveRatio - _100n - 2n);
     const available = base / rate;
 
-    return available >= _0n ? available : _0n;
+    return max(available, _0n);
   }
 
   get reserveCoinAvailableAmount(): bigint {
@@ -327,7 +337,7 @@ export class AgeUSDBank {
     const baseAmount = this.getReserveCoinRedeemingBaseAmount(amount);
     const fees = transactionFee + this.getImplementorFee(baseAmount);
 
-    return baseAmount > fees ? baseAmount - fees : _0n;
+    return max(baseAmount - fees, _0n);
   }
 
   getReserveCoinRedeemingFees(amount: bigint, transactionFee: bigint): bigint {
@@ -349,7 +359,7 @@ export class AgeUSDBank {
     const baseAmount = this.getStableCoinRedeemingBaseAmount(amount);
     const fees = transactionFee + this.getImplementorFee(baseAmount);
 
-    return baseAmount > fees ? baseAmount - fees : _0n;
+    return max(baseAmount - fees, _0n);
   }
 
   getRedeemingStableCoinFees(amount: bigint, transactionFee: bigint): bigint {
