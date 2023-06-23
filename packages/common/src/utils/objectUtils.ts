@@ -18,6 +18,6 @@ export function isDefined<T>(value: T | undefined): value is T {
   return !isUndefined(value);
 }
 
-export function hasKey(o: object, key: PropertyKey) {
+export function hasKey(o: unknown, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(o, key);
 }
