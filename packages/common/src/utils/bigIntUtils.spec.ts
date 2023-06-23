@@ -4,6 +4,8 @@ import {
   decimalize,
   ensureBigInt,
   hexToBigInt,
+  max,
+  min,
   sumBy,
   undecimalize
 } from "./bigIntUtils";
@@ -202,5 +204,27 @@ describe("BigInt sumBy()", () => {
     expect(hexToBigInt("9c2404f2634ef40afccc320eed30b3")).toBe(
       -518499127179672366370132270668500813n
     );
+  });
+});
+
+describe("min and max functions", () => {
+  it("Should get min from arbitrary numbers", () => {
+    expect(min(1, 2, 3, 4, 5, 6, 7)).to.be.equal(1);
+    expect(min(1, 2, 3, 4, 5, 6, 7, -10)).to.be.equal(-10);
+    expect(min(10, 23, 4, 41, 5, 2, 5)).to.be.equal(2);
+    expect(min(10, 23, 4, 41, 5, 2, 5, 0)).to.be.equal(0);
+  });
+
+  it("Should get min from arbitrary bigint numbers", () => {
+    expect(min(1n, 2n, 3n, 4n, 5n, 6n, 7n)).to.be.equal(1n);
+    expect(min(1n, 2n, 3n, 4n, 5n, 6n, 7n, -10n)).to.be.equal(-10n);
+    expect(min(10n, 23n, 4n, 41n, 5n, 2n, 5n)).to.be.equal(2n);
+    expect(min(10n, 23n, 4n, 41n, 5n, 2n, 5n, 0n)).to.be.equal(0n);
+  });
+
+  it("Should get min from arbitrary numbers", () => {
+    expect(max(1, 2, 3, 4, 56)).to.be.equal(56);
+    expect(max(0, 1, 2, 3)).to.be.equal(3);
+    expect(max(5, 6, 2, 3, 6, -1)).to.be.equal(6);
   });
 });
