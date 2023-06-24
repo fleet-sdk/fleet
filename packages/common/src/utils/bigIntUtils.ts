@@ -92,6 +92,10 @@ export function decimalize(value: Amount, options?: FormattingOptions | number):
   return _buildFormattedDecimal(integer.toString(10), decimal.toString(10), options);
 }
 
+export function percent(value: bigint, percentage: bigint, precision = 2n) {
+  return (value * percentage) / 10n ** precision;
+}
+
 function _buildFormattedDecimal(
   integer: string,
   decimal: string,
