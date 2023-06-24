@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { Box } from "../types";
 import { hasDuplicatesBy, isEmpty, uniq } from "./arrayUtils";
-import { sumBy } from "./bigIntUtils";
-import { areRegistersDenselyPacked, BoxSummary, utxoDiff, utxoFilter, utxoSum } from "./boxUtils";
+import { ensureBigInt, sumBy } from "./bigIntUtils";
+import {
+  areRegistersDenselyPacked,
+  BoxSummary,
+  ensureBigIntUTxO,
+  utxoDiff,
+  utxoFilter,
+  utxoSum
+} from "./boxUtils";
 
 export const regularBoxesMock: Box<bigint>[] = [
   {
@@ -429,5 +436,44 @@ describe("UTxO filter", () => {
   it("Should should return empty array for empty inputs and non-matching filters", () => {
     expect(utxoFilter(regularBoxesMock, { by: (box) => box.value === 0n })).to.be.empty;
     expect(utxoFilter([], { max: { count: 10 } })).to.be.empty;
+  });
+});
+
+describe("ensureBigIntUTxO()", () => {
+  it("Shoudl bigint value properties for nanoergs and tokens", () => {
+    const stringAmountsUTxO = {
+      boxId: "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
+      transactionId: "22525acc8b9438ded1e0fef41bb38ac57b8be23c650c82dd8ba545ccdc0b97c2",
+      index: 0,
+      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      creationHeight: 804138,
+      value: "1000000",
+      assets: [
+        {
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          amount: "10000"
+        }
+      ],
+      additionalRegisters: {}
+    };
+
+    const bigIntAmountsUTxO = {
+      boxId: "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
+      transactionId: "22525acc8b9438ded1e0fef41bb38ac57b8be23c650c82dd8ba545ccdc0b97c2",
+      index: 0,
+      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      creationHeight: 804138,
+      value: 1000000n,
+      assets: [
+        {
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          amount: 10000n
+        }
+      ],
+      additionalRegisters: {}
+    };
+
+    expect(ensureBigIntUTxO(stringAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
+    expect(ensureBigIntUTxO(bigIntAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
   });
 });
