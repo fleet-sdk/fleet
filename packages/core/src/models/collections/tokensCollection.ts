@@ -1,9 +1,17 @@
-import { Amount, isDefined, isUndefined, OneOrMore, TokenAmount, TokenId } from "@fleet-sdk/common";
+import {
+  Amount,
+  Collection,
+  CollectionAddOptions,
+  isDefined,
+  isUndefined,
+  OneOrMore,
+  TokenAmount,
+  TokenId
+} from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
-import { Collection, CollectionAddOptions } from "./collection";
 
 export const MAX_TOKENS_PER_BOX = 120;
 
