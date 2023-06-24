@@ -1,0 +1,10 @@
+comment:
+  layout: "reach, diff, files"
+  behavior: default
+
+coverage:
+  status:
+    project:
+      default:
+        target: 100
+        only_pulls: true

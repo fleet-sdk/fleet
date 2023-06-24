@@ -221,3 +221,27 @@ export function _bitNegate(value: bigint): bigint {
 
   return (~value & mask) + 1n; // invert bits, mask it, and add one
 }
+
+export function min<T extends bigint | number>(...numbers: T[]): T {
+  let min = first(numbers);
+
+  for (const num of numbers) {
+    if (num < min) {
+      min = num;
+    }
+  }
+
+  return min;
+}
+
+export function max<T extends bigint | number>(...numbers: T[]): T {
+  let max = first(numbers);
+
+  for (const num of numbers) {
+    if (num > max) {
+      max = num;
+    }
+  }
+
+  return max;
+}
