@@ -1,3 +1,4 @@
+import { percent } from "@fleet-sdk/common";
 import { Amount, Box, RECOMMENDED_MIN_FEE_VALUE, SBool, SConstant, SParse } from "@fleet-sdk/core";
 import { describe, expect, it, test } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_tests/mocking";
@@ -22,6 +23,59 @@ describe("Bank construction", () => {
     expect(bank.stableCoin).to.be.deep.equal(_bankBox.assets[0]);
     expect(bank.reserveCoin).to.be.deep.equal(_bankBox.assets[1]);
     expect(bank.nft).to.be.deep.equal(_bankBox.assets[2]);
+
+    expect(bank.getUIFee(100n)).to.be.equal(0n); // no configured UI fee, should be zero
+  });
+
+  it("Should set percentage based UI fee parameters", () => {
+    const bank = new AgeUSDBank(_bankBox, _oracleBox, SIGMA_USD_PARAMETERS);
+    bank.setUIFee({
+      percentage: 20n,
+      precision: 4n,
+      address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+    });
+
+    expect(bank.uiFeeAddress).to.be.equal("9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin");
+    expect(bank.getUIFee(1500n)).to.be.equal(3n);
+
+    bank.setUIFee({
+      percentage: 20n,
+      address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+    });
+
+    expect(bank.uiFeeAddress).to.be.equal("9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin");
+    expect(bank.getUIFee(1500n)).to.be.equal(30n);
+
+    bank.setUIFee({
+      percentage: 0n,
+      address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+    });
+
+    expect(bank.uiFeeAddress).to.be.equal("9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin");
+    expect(bank.getUIFee(1501232310n)).to.be.equal(0n);
+  });
+
+  it("Should set callback based UI fee parameters", () => {
+    const bank = new AgeUSDBank(_bankBox, _oracleBox, SIGMA_USD_PARAMETERS);
+    // percentage
+    bank.setUIFee({
+      callback: (amount) => percent(amount, 2n),
+      address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+    });
+
+    expect(bank.uiFeeAddress).to.be.equal("9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin");
+    expect(bank.getUIFee(1500n)).to.be.equal(30n);
+
+    // flat fee
+    bank.setUIFee({
+      callback: () => 100n,
+      address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+    });
+
+    expect(bank.uiFeeAddress).to.be.equal("9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin");
+    expect(bank.getUIFee(1500n)).to.be.equal(100n);
+    expect(bank.getUIFee(1n)).to.be.equal(100n);
+    expect(bank.getUIFee(1123n)).to.be.equal(100n);
   });
 
   it("Should fail with incorrect bank parameters", () => {
@@ -210,6 +264,12 @@ describe("Bank calculations", () => {
     });
     const oracleBox = mockOracleBox(SParse("05ccadf6ee05"));
     const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
+
+    bank.setUIFee({
+      percentage: 2n,
+      precision: 3n,
+      address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+    });
 
     expect(bank.stableCoinNominalPrice).to.be.equal(7_874_015n);
     expect(bank.reserveCoinNominalPrice).to.be.equal(422_904n);

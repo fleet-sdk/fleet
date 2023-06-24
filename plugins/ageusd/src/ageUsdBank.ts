@@ -4,27 +4,49 @@ import {
   Amount,
   Box,
   ensureBigInt,
+  hasKey,
   isDefined,
   max,
   min,
+  percent,
   TokenAmount
 } from "@fleet-sdk/common";
 import { OnlyR4Register, R4ToR5Registers, SParse } from "@fleet-sdk/core";
 import { AgeUSDBankParameters } from "./sigmaUsdParameters";
 
 const _2n = BigInt(2);
+const _3n = BigInt(3);
 const _100n = BigInt(100);
-const _1000n = BigInt(1000);
 const _1000000000n = BigInt(1000000000);
 
 export type AgeUSDBankBox<T extends Amount = Amount> = Box<T, R4ToR5Registers>;
 export type OracleBox = Box<Amount, OnlyR4Register>;
+export type UIFeeCallback = (amount: bigint) => bigint;
+
+export type UIFeeCallbackParams = {
+  callback: UIFeeCallback;
+  address: string;
+};
+
+export type UIFeePercentageParams = {
+  percentage: bigint;
+  precision?: bigint;
+  address: string;
+};
+
+type UIFeeParams = UIFeeCallbackParams | UIFeePercentageParams;
+
+function isUIFeeCallbackParams(params: UIFeeParams): params is UIFeeCallbackParams {
+  return hasKey(params, "callback");
+}
 
 export class AgeUSDBank {
   private readonly _bankBox: AgeUSDBankBox;
   private readonly _oracleBox: OracleBox;
   private readonly _oracleRate: bigint;
   private readonly _params: AgeUSDBankParameters;
+
+  private _uiFeeParams?: UIFeeCallbackParams;
 
   constructor(bankBox: AgeUSDBankBox, oracleBox: OracleBox, params: AgeUSDBankParameters) {
     if (!this.validateBankBox(bankBox, params)) {
@@ -197,6 +219,10 @@ export class AgeUSDBank {
     return _1000000000n / this.reserveCoinNominalPrice;
   }
 
+  get uiFeeAddress(): string | undefined {
+    return this._uiFeeParams?.address;
+  }
+
   protected validateBankBox(bankBox: AgeUSDBankBox, params: AgeUSDBankParameters): boolean {
     return (
       bankBox.assets.length === 3 &&
@@ -215,12 +241,36 @@ export class AgeUSDBank {
     );
   }
 
-  protected getImplementorFee(amount: bigint): bigint {
-    return (amount * _2n) / _1000n;
+  setUIFee(params: UIFeeCallbackParams): AgeUSDBank;
+  setUIFee(params: UIFeePercentageParams): AgeUSDBank;
+  setUIFee(params: UIFeeParams): AgeUSDBank {
+    if (isUIFeeCallbackParams(params)) {
+      this._uiFeeParams = params;
+
+      return this;
+    }
+
+    this._uiFeeParams = {
+      address: params.address,
+      callback:
+        params.percentage > _0n
+          ? (amount) => percent(amount, params.percentage, params.precision || _3n)
+          : () => _0n
+    };
+
+    return this;
   }
 
-  protected getProtocolFee(amount: bigint): bigint {
-    return (amount * _2n) / _100n;
+  getUIFee(amount: bigint): bigint {
+    if (!this._uiFeeParams || !this._uiFeeParams.callback) {
+      return _0n;
+    }
+
+    return this._uiFeeParams.callback(amount);
+  }
+
+  getProtocolFee(amount: bigint): bigint {
+    return percent(amount, _2n);
   }
 
   protected getReserveRatio(
@@ -293,37 +343,37 @@ export class AgeUSDBank {
     const baseCost = this.getStableCoinMintingBaseCost(amount);
     const minBoxValue = this._params.minBoxValue;
 
-    return baseCost + transactionFee + minBoxValue * _2n + this.getImplementorFee(baseCost);
+    return baseCost + transactionFee + minBoxValue * _2n + this.getUIFee(baseCost);
   }
 
   getStableCoinMintingFees(amount: bigint, transactionFee: bigint): bigint {
     const baseAmount = this.stableCoinNominalPrice * amount;
     const protocolFee = this.getProtocolFee(baseAmount);
-    const implementorFee = this.getImplementorFee(baseAmount + protocolFee);
+    const uiFee = this.getUIFee(baseAmount + protocolFee);
 
-    return transactionFee + protocolFee + implementorFee;
+    return transactionFee + protocolFee + uiFee;
   }
 
   getStableCoinMintingBaseCost(amount: bigint): bigint {
-    const feeLessAmount = this.stableCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(feeLessAmount);
+    const baseAmount = this.stableCoinNominalPrice * amount;
+    const protocolFee = this.getProtocolFee(baseAmount);
 
-    return feeLessAmount + protocolFee;
+    return baseAmount + protocolFee;
   }
 
   getTotalReserveCoinMintingCost(amount: bigint, transactionFee: bigint): bigint {
     const baseCost = this.getReserveCoinMintingBaseCost(amount);
     const minBoxValue = this._params.minBoxValue;
 
-    return baseCost + transactionFee + minBoxValue * _2n + this.getImplementorFee(baseCost);
+    return baseCost + transactionFee + minBoxValue * _2n + this.getUIFee(baseCost);
   }
 
   getReserveCoinMintingFees(amount: bigint, transactionFee: bigint): bigint {
     const baseAmount = this.reserveCoinNominalPrice * amount;
     const protocolFee = this.getProtocolFee(baseAmount);
-    const implementorFee = this.getImplementorFee(baseAmount + protocolFee);
+    const uiFee = this.getUIFee(baseAmount + protocolFee);
 
-    return transactionFee + protocolFee + implementorFee;
+    return transactionFee + protocolFee + uiFee;
   }
 
   getReserveCoinMintingBaseCost(amount: bigint): bigint {
@@ -335,7 +385,7 @@ export class AgeUSDBank {
 
   getTotalReserveCoinRedeemingAmount(amount: bigint, transactionFee: bigint): bigint {
     const baseAmount = this.getReserveCoinRedeemingBaseAmount(amount);
-    const fees = transactionFee + this.getImplementorFee(baseAmount);
+    const fees = transactionFee + this.getUIFee(baseAmount);
 
     return max(baseAmount - fees, _0n);
   }
@@ -343,9 +393,9 @@ export class AgeUSDBank {
   getReserveCoinRedeemingFees(amount: bigint, transactionFee: bigint): bigint {
     const baseAmount = this.reserveCoinNominalPrice * amount;
     const protocolFee = this.getProtocolFee(baseAmount);
-    const implementorFee = this.getImplementorFee(this.getReserveCoinRedeemingBaseAmount(amount));
+    const uiFee = this.getUIFee(this.getReserveCoinRedeemingBaseAmount(amount));
 
-    return transactionFee + protocolFee + implementorFee;
+    return transactionFee + protocolFee + uiFee;
   }
 
   getReserveCoinRedeemingBaseAmount(amount: bigint): bigint {
@@ -357,7 +407,7 @@ export class AgeUSDBank {
 
   getTotalStableCoinRedeemingAmount(amount: bigint, transactionFee: bigint): bigint {
     const baseAmount = this.getStableCoinRedeemingBaseAmount(amount);
-    const fees = transactionFee + this.getImplementorFee(baseAmount);
+    const fees = transactionFee + this.getUIFee(baseAmount);
 
     return max(baseAmount - fees, _0n);
   }
@@ -365,9 +415,9 @@ export class AgeUSDBank {
   getRedeemingStableCoinFees(amount: bigint, transactionFee: bigint): bigint {
     const baseAmount = this.stableCoinNominalPrice * amount;
     const protocolFee = this.getProtocolFee(baseAmount);
-    const implementorFee = this.getImplementorFee(baseAmount + protocolFee);
+    const uiFee = this.getUIFee(baseAmount + protocolFee);
 
-    return protocolFee + transactionFee + implementorFee;
+    return protocolFee + transactionFee + uiFee;
   }
 
   getStableCoinRedeemingBaseAmount(amount: bigint): bigint {
