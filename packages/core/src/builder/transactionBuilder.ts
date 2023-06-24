@@ -4,6 +4,7 @@ import {
   Base58String,
   Box,
   chunk,
+  CollectionAddOptions,
   ensureBigInt,
   first,
   hexByteSize,
@@ -21,7 +22,6 @@ import {
 import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
-import { CollectionAddOptions } from "../models/collections/collection";
 import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
 import { BLAKE_256_HASH_LENGTH } from "../serializer/utils";
 import { estimateVLQSize } from "../serializer/vlq";

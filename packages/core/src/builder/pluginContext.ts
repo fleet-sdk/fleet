@@ -1,6 +1,5 @@
-import { Amount, Box, OneOrMore, TokenAmount } from "@fleet-sdk/common";
+import { Amount, Box, CollectionAddOptions, OneOrMore, TokenAmount } from "@fleet-sdk/common";
 import { NotAllowedTokenBurning, OutputBuilder, TransactionBuilder } from "..";
-import { CollectionAddOptions } from "../models/collections/collection";
 
 export type FleetPluginContext = {
   /**
