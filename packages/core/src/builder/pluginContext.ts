@@ -33,6 +33,12 @@ export type FleetPluginContext = {
    * it will thrown a {@link NotAllowedTokenBurning} exception.
    */
   burnTokens: (tokens: OneOrMore<TokenAmount<Amount>>) => void;
+
+  /**
+   * Set transaction fee amount
+   * @param amount amount in nanoergs
+   */
+  setFee: (amount: Amount) => void;
 };
 
 export function createPluginContext(transactionBuilder: TransactionBuilder): FleetPluginContext {
@@ -53,6 +59,7 @@ export function createPluginContext(transactionBuilder: TransactionBuilder): Fle
         throw new NotAllowedTokenBurning();
       }
       transactionBuilder.burnTokens(tokens);
-    }
+    },
+    setFee: (amount) => transactionBuilder.payFee(amount)
   };
 }
