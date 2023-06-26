@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Box } from "../types";
 import { hasDuplicatesBy, isEmpty, uniq } from "./arrayUtils";
-import { ensureBigInt, sumBy } from "./bigIntUtils";
+import { sumBy } from "./bigIntUtils";
 import {
   areRegistersDenselyPacked,
   BoxSummary,

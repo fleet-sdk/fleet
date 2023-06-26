@@ -1,4 +1,4 @@
-import { Amount, Box, BoxCandidate, first, isDefined, some } from "@fleet-sdk/common";
+import { first, isDefined, some } from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction, SParse } from "@fleet-sdk/core";
 import { ErgoHDKey } from "@fleet-sdk/wallet";
 import pc from "picocolors";
