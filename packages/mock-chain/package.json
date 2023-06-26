@@ -6,14 +6,11 @@
   "module": "dist/esm/index.js",
   "typings": "dist/esm/index.d.ts",
   "sideEffects": false,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fleet-sdk/fleet.git",
-    "directory": "packages/mock-chain"
-  },
+  "repository": "fleet-sdk/fleet",
   "license": "MIT",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "keywords": [
     "ergo",
