@@ -1,7 +1,6 @@
 import {
   Amount,
   BoxCandidate,
-  BoxSummary,
   NonMandatoryRegisters,
   OneOrMore,
   TokenAmount,
@@ -10,6 +9,7 @@ import {
 import { Box, ErgoAddress, SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { ErgoHDKey } from "@fleet-sdk/wallet";
 import { randomBytes } from "@noble/hashes/utils";
+import { stringifyBalance } from "./balancePrinting";
 import { MockChain } from "./mockChain";
 import { MockUTxOCollection } from "./mockUtxoCollection";
 
@@ -126,5 +126,9 @@ export class MockChainParty {
    */
   withBalance(balance: AddBalance, additionalRegisters?: NonMandatoryRegisters): MockChainParty {
     return this.addBalance(balance, additionalRegisters);
+  }
+
+  toString(width = 50): string {
+    return stringifyBalance(this.balance, this.name, width, this._chain.assetsMetadata);
   }
 }

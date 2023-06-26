@@ -1,4 +1,4 @@
-import { BoxCandidate, hasDuplicates, hasDuplicatesBy } from "@fleet-sdk/common";
+import { BoxCandidate, hasDuplicatesBy } from "@fleet-sdk/common";
 import { ErgoBox } from "@fleet-sdk/core";
 import { bytesToHex, randomBytes } from "@noble/hashes/utils";
 import { describe, expect, it } from "vitest";
@@ -38,6 +38,7 @@ describe("mockHeaders()", () => {
     expect(hasDuplicatesBy(headers, (x) => x.parentId)).to.be.false;
 
     for (let i = headers.length - 1; i > 0; i--) {
+      expect(headers[i].height).to.be.greaterThan(0);
       expect(headers[i].parentId).to.be.equal(headers[i - 1].id);
       expect(headers[i].height).to.be.equal(headers[i - 1].height - 1);
       expect(headers[i - 1].timestamp - headers[i].timestamp).to.be.equal(120000); // 2 min
