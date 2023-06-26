@@ -1,4 +1,5 @@
-import { isDefined, OneOrMore } from "@fleet-sdk/common";
+import { OneOrMore } from "../types";
+import { isDefined } from "../utils";
 
 export type CollectionAddOptions = { index?: number };
 

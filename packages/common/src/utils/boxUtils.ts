@@ -1,4 +1,12 @@
-import { Amount, AmountType, Box, NonMandatoryRegisters, TokenAmount, TokenId } from "../types";
+import {
+  Amount,
+  AmountType,
+  Box,
+  BoxCandidate,
+  NonMandatoryRegisters,
+  TokenAmount,
+  TokenId
+} from "../types";
 import { isEmpty } from "./arrayUtils";
 import { _0n } from "./bigIntLiterals";
 import { ensureBigInt } from "./bigIntUtils";
@@ -159,3 +167,18 @@ export type MinimalBoxAmounts = readonly {
   value: Amount;
   assets: TokenAmount<Amount>[];
 }[];
+
+export function ensureBigIntUTxO(box: Box<Amount>): Box<bigint>;
+export function ensureBigIntUTxO(candidate: BoxCandidate<Amount>): BoxCandidate<bigint>;
+export function ensureBigIntUTxO(
+  box: Box<Amount> | BoxCandidate<Amount>
+): BoxCandidate<bigint> | Box<bigint> {
+  return {
+    ...box,
+    value: ensureBigInt(box.value),
+    assets: box.assets.map((token) => ({
+      tokenId: token.tokenId,
+      amount: ensureBigInt(token.amount)
+    }))
+  };
+}
