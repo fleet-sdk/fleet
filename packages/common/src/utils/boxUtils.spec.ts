@@ -5,7 +5,7 @@ import { sumBy } from "./bigIntUtils";
 import {
   areRegistersDenselyPacked,
   BoxSummary,
-  ensureBigIntUTxO,
+  ensureUTxOBigInt,
   utxoDiff,
   utxoFilter,
   utxoSum
@@ -439,7 +439,7 @@ describe("UTxO filter", () => {
   });
 });
 
-describe("ensureBigIntUTxO()", () => {
+describe("ensureUTxOBigInt()", () => {
   it("Shoudl bigint value properties for nanoergs and tokens", () => {
     const stringAmountsUTxO = {
       boxId: "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
@@ -473,7 +473,7 @@ describe("ensureBigIntUTxO()", () => {
       additionalRegisters: {}
     };
 
-    expect(ensureBigIntUTxO(stringAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
-    expect(ensureBigIntUTxO(bigIntAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
+    expect(ensureUTxOBigInt(stringAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
+    expect(ensureUTxOBigInt(bigIntAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
   });
 });
