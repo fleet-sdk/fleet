@@ -1,8 +1,15 @@
-import { _0n, BoxSummary, isDefined, isUndefined, OneOrMore, some } from "@fleet-sdk/common";
+import {
+  _0n,
+  BoxSummary,
+  Collection,
+  isDefined,
+  isUndefined,
+  OneOrMore,
+  some
+} from "@fleet-sdk/common";
 import { OutputBuilder } from "../../builder/outputBuilder";
 import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
-import { Collection } from "./collection";
 
 export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> {
   constructor(outputs?: OneOrMore<OutputBuilder>) {
