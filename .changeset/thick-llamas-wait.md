@@ -2,4 +2,4 @@
 "@fleet-sdk/common": patch
 ---
 
-fix `first()` function when the first item is equal to zero.
+Fix `first()` function when the first item is equal to zero.
