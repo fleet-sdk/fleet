@@ -2,4 +2,4 @@
 "@fleet-sdk/common": patch
 ---
 
-Add `ensureUTxOBigInt` function.
+Add `ensureUTxOBigInt()` function.
