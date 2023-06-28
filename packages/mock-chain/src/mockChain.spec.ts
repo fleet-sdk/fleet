@@ -159,7 +159,7 @@ describe("Contract execution and chain mocking", () => {
     expect(consoleMock).not.toBeCalled();
   });
 
-  it("Should should execute burning transaction", () => {
+  it("Should execute burning transaction", () => {
     const chain = new MockChain();
 
     const bob = chain.newParty().withBalance({
@@ -344,7 +344,7 @@ describe("Contract execution and chain mocking", () => {
       )
     );
 
-    // should not change
+    // should not affect balances
     expect(bob.balance).to.be.deep.equal({ nanoergs: 1000000000n, tokens: [] });
     expect(alice.balance).to.be.deep.equal({ nanoergs: 0n, tokens: [] });
 
