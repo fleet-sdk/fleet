@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { execute } from "./executor";
 import { MockChain } from "./mockChain";
 import { MockChainParty } from "./mockChainParty";
-import { candidateToUTxO } from "./objectMock";
+import { mockUTxO } from "./objectMocking";
 import { regularBoxesMock } from "./tests/regularBoxesMock";
 
 describe("Transaction executor", () => {
@@ -26,7 +26,7 @@ describe("Transaction executor", () => {
 
   it("Should not execute transaction", () => {
     const bob = new MockChainParty(chain, "bob");
-    const input = candidateToUTxO({
+    const input = mockUTxO({
       ergoTree: bob.address.ergoTree,
       value: 10000000n,
       assets: [],

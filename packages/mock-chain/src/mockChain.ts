@@ -5,7 +5,7 @@ import pc from "picocolors";
 import { printDiff } from "./balancePrinting";
 import { execute } from "./executor";
 import { MockChainParty, MockChainPartyParams } from "./mockChainParty";
-import { mockHeaders } from "./objectMock";
+import { mockHeaders } from "./objectMocking";
 
 const BLOCK_TIME_MS = 120000;
 
