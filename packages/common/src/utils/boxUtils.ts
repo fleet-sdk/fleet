@@ -168,9 +168,9 @@ export type MinimalBoxAmounts = readonly {
   assets: TokenAmount<Amount>[];
 }[];
 
-export function ensureBigIntUTxO(box: Box<Amount>): Box<bigint>;
-export function ensureBigIntUTxO(candidate: BoxCandidate<Amount>): BoxCandidate<bigint>;
-export function ensureBigIntUTxO(
+export function ensureUTxOBigInt(box: Box<Amount>): Box<bigint>;
+export function ensureUTxOBigInt(candidate: BoxCandidate<Amount>): BoxCandidate<bigint>;
+export function ensureUTxOBigInt(
   box: Box<Amount> | BoxCandidate<Amount>
 ): BoxCandidate<bigint> | Box<bigint> {
   return {

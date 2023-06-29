@@ -2,4 +2,4 @@
 "@fleet-sdk/common": patch
 ---
 
-Add `ensureBigIntUTxO` function.
+Add `ensureUTxOBigInt()` function.

@@ -2,4 +2,4 @@
 "@fleet-sdk/common": patch
 ---
 
-add `min()` and `max()` utility functions.
+Add `min()` and `max()` utility functions.

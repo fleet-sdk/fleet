@@ -4,7 +4,7 @@ import {
   BoxCandidate,
   BoxId,
   Collection,
-  ensureBigIntUTxO,
+  ensureUTxOBigInt,
   isUndefined,
   OneOrMore
 } from "@fleet-sdk/common";
@@ -33,10 +33,10 @@ export class MockUTxOCollection extends Collection<Box<bigint>, MockUTxOInput> {
 
   protected override _map(utxo: BoxCandidate<Amount> | Box<Amount>): Box<bigint> {
     if (isUTxOCandidate(utxo)) {
-      return candidateToUTxO(ensureBigIntUTxO(utxo));
+      return candidateToUTxO(ensureUTxOBigInt(utxo));
     }
 
-    return ensureBigIntUTxO(utxo);
+    return ensureUTxOBigInt(utxo);
   }
 
   protected override _addOne(utxo: Box<Amount>): number {
