@@ -227,15 +227,15 @@ export class AgeUSDBank {
     return (
       bankBox.assets.length === 3 &&
       params.contract === bankBox.ergoTree &&
-      bankBox.assets[0].tokenId === params.tokens.stableCoinTokenId &&
-      bankBox.assets[1].tokenId === params.tokens.reserveCoinTokenId &&
-      bankBox.assets[2].tokenId === params.tokens.nftTokenId
+      bankBox.assets[0].tokenId === params.tokens.stableCoinId &&
+      bankBox.assets[1].tokenId === params.tokens.reserveCoinId &&
+      bankBox.assets[2].tokenId === params.tokens.nftId
     );
   }
 
   protected validateOracleBox(oracleBox: OracleBox, params: AgeUSDBankParameters): boolean {
     return (
-      oracleBox.assets[0].tokenId === params.oracle.nftTokenId &&
+      oracleBox.assets[0].tokenId === params.oracle.nftId &&
       isDefined(oracleBox.additionalRegisters.R4) &&
       typeof SParse(oracleBox.additionalRegisters.R4) === "bigint"
     );

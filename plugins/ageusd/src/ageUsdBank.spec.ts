@@ -82,9 +82,9 @@ describe("Bank construction", () => {
     const params: AgeUSDBankParameters = {
       ...SIGMA_USD_PARAMETERS,
       tokens: {
-        stableCoinTokenId: "9a06d9e545a41fd51eeffc5e20d818073bf820c635e2a9d922269913e0de369d",
-        reserveCoinTokenId: "c5d6629329285b14ed3eac1dba0e07dbd1e61ee332c2039a7a9c04e8be0cb74e",
-        nftTokenId: "de5ee573c6a492c129d51119649bfeaedfc9afa6f54af576e62e1f7f3bbd4207"
+        stableCoinId: "9a06d9e545a41fd51eeffc5e20d818073bf820c635e2a9d922269913e0de369d",
+        reserveCoinId: "c5d6629329285b14ed3eac1dba0e07dbd1e61ee332c2039a7a9c04e8be0cb74e",
+        nftId: "de5ee573c6a492c129d51119649bfeaedfc9afa6f54af576e62e1f7f3bbd4207"
       }
     };
 

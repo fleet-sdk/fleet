@@ -1,14 +1,14 @@
 import { HexString } from "@fleet-sdk/common";
 
 export type AgeUSDBankParametersTokens = Readonly<{
-  stableCoinTokenId: HexString;
-  reserveCoinTokenId: HexString;
-  nftTokenId: HexString;
+  stableCoinId: HexString;
+  reserveCoinId: HexString;
+  nftId: HexString;
 }>;
 
 export type AgeUSDBankOracleParameters = Readonly<{
-  nftTokenId: HexString;
-  datapointDecimals: number;
+  nftId: HexString;
+  datapointDecimals?: number;
 }>;
 
 export type AgeUSDBankParameters = Readonly<{
@@ -31,12 +31,12 @@ export const SIGMA_USD_PARAMETERS: AgeUSDBankParameters = {
   maxReserveRatio: BigInt(800),
   coolingOffHeight: 460000,
   tokens: {
-    stableCoinTokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
-    reserveCoinTokenId: "003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0",
-    nftTokenId: "7d672d1def471720ca5782fd6473e47e796d9ac0c138d9911346f118b2f6d9d9"
+    stableCoinId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
+    reserveCoinId: "003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0",
+    nftId: "7d672d1def471720ca5782fd6473e47e796d9ac0c138d9911346f118b2f6d9d9"
   },
   oracle: {
-    nftTokenId: "011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f",
+    nftId: "011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f",
     datapointDecimals: 2
   }
 };

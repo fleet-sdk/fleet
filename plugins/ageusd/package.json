@@ -22,6 +22,9 @@
     "@fleet-sdk/core": "workspace:^",
     "@fleet-sdk/common": "workspace:^"
   },
+  "devDependencies": {
+    "@fleet-sdk/mock-chain": "workspace:^"
+  },
   "scripts": {
     "build": "run-p build:*",
     "build:cjs": "tsc -p tsconfig.json",

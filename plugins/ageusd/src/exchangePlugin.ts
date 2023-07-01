@@ -1,4 +1,4 @@
-import { _0n, ensureBigInt, hasKey, min } from "@fleet-sdk/common";
+import { _0n, ensureBigInt, hasKey } from "@fleet-sdk/common";
 import {
   Amount,
   ErgoAddress,
@@ -29,12 +29,12 @@ export type AgeUSDRedeemAction = AgeUSDActionBase & {
 
 export type AgeUSDExchangeAction = AgeUSDMintAction | AgeUSDRedeemAction;
 
-function minting(coin: CoinType, params: AgeUSDExchangeAction): params is AgeUSDMintAction {
-  return hasKey(params, "mint") && (params as AgeUSDMintAction).mint === coin;
+function minting(params: AgeUSDExchangeAction): params is AgeUSDMintAction {
+  return hasKey(params, "mint");
 }
 
-function redeeming(coin: CoinType, params: AgeUSDExchangeAction): params is AgeUSDRedeemAction {
-  return hasKey(params, "redeem") && (params as AgeUSDRedeemAction).redeem === coin;
+function redeeming(params: AgeUSDExchangeAction): params is AgeUSDRedeemAction {
+  return hasKey(params, "redeem");
 }
 
 export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDMintAction): FleetPlugin;
@@ -44,36 +44,47 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
   let stableDelta = _0n;
   let reserveDelta = _0n;
   let nanoergsDelta = _0n;
+  let circulationDelta = _0n;
 
-  if (minting("stable", action)) {
-    if (!bank.canMintStableCoin(amount)) {
-      throw new Error(`Can't mint Stable Coin.`);
+  if (minting(action)) {
+    circulationDelta = amount;
+
+    if (action.mint === "stable") {
+      if (!bank.canMintStableCoin(amount)) {
+        throw new Error(`Can't mint Stable Coin.`);
+      }
+
+      nanoergsDelta += bank.getStableCoinMintingBaseCost(amount);
+      stableDelta -= amount;
+    } else if (action.mint === "reserve") {
+      if (!bank.canMintReserveCoinAmount(amount)) {
+        throw new Error(`Can't mint Reserve Coin.`);
+      }
+
+      nanoergsDelta += bank.getReserveCoinMintingBaseCost(amount);
+      reserveDelta -= amount;
     }
+  } else if (redeeming(action)) {
+    circulationDelta -= amount;
 
-    nanoergsDelta += bank.getStableCoinMintingBaseCost(amount);
-    stableDelta -= amount;
-  } else if (minting("reserve", action)) {
-    if (!bank.canMintReserveCoinAmount(amount)) {
-      throw new Error(`Can't mint Reserve Coin.`);
+    if (action.redeem === "stable") {
+      if (!bank.canRedeemStableCoinAmount(amount)) {
+        throw new Error(`Can't redeem Stable Coin.`);
+      }
+
+      nanoergsDelta -= bank.getStableCoinRedeemingBaseAmount(amount);
+      stableDelta += amount;
+    } else if (action.redeem === "reserve") {
+      if (!bank.canRedeemReserveCoinAmount(amount)) {
+        throw new Error(`Can't redeem Reserve Coin.`);
+      }
+
+      nanoergsDelta -= bank.getReserveCoinRedeemingBaseAmount(amount);
+      reserveDelta += amount;
     }
+  }
 
-    nanoergsDelta += bank.getReserveCoinMintingBaseCost(amount);
-    reserveDelta -= amount;
-  } else if (redeeming("stable", action)) {
-    if (!bank.canRedeemStableCoinAmount(amount)) {
-      throw new Error(`Can't redeem Stable Coin.`);
-    }
-
-    nanoergsDelta -= bank.getStableCoinRedeemingBaseAmount(amount);
-    stableDelta += amount;
-  } else if (redeeming("reserve", action)) {
-    if (!bank.canRedeemReserveCoinAmount(amount)) {
-      throw new Error(`Can't redeem Reserve Coin.`);
-    }
-
-    nanoergsDelta -= bank.getReserveCoinRedeemingBaseAmount(amount);
-    reserveDelta += amount;
-  } else {
+  if (nanoergsDelta === _0n) {
     throw new Error(`Invalid params.`);
   }
 
@@ -106,7 +117,7 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
         nanoergsDelta > _0n ? SAFE_MIN_BOX_VALUE : -nanoergsDelta,
         action.recipient
       ).setAdditionalRegisters({
-        R4: SConstant(SLong(min(stableDelta, reserveDelta))),
+        R4: SConstant(SLong(circulationDelta)),
         R5: SConstant(SLong(nanoergsDelta))
       });
 

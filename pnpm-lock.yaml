@@ -142,6 +142,10 @@ importers:
       '@fleet-sdk/core':
         specifier: workspace:^
         version: link:../../packages/core
+    devDependencies:
+      '@fleet-sdk/mock-chain':
+        specifier: workspace:^
+        version: link:../../packages/mock-chain
 
   plugins/babel-fees:
     dependencies:
