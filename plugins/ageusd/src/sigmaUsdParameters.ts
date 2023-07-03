@@ -8,7 +8,7 @@ export type AgeUSDBankParametersTokens = Readonly<{
 
 export type AgeUSDBankOracleParameters = Readonly<{
   nftId: HexString;
-  datapointDecimals?: number;
+  decimals?: number;
 }>;
 
 export type AgeUSDBankParameters = Readonly<{
@@ -37,6 +37,6 @@ export const SIGMA_USD_PARAMETERS: AgeUSDBankParameters = {
   },
   oracle: {
     nftId: "011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f",
-    datapointDecimals: 2
+    decimals: 2
   }
 };

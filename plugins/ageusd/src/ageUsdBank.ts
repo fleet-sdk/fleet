@@ -62,7 +62,8 @@ export class AgeUSDBank {
     this._params = params;
 
     const datapoint = oracleBox.additionalRegisters.R4;
-    this._oracleRate = SParse<bigint>(datapoint) / BigInt(10 ** params.oracle.datapointDecimals);
+    const decimals = params.oracle.decimals ?? 0;
+    this._oracleRate = SParse<bigint>(datapoint) / BigInt(10 ** decimals);
   }
 
   get oracleBox(): OracleBox {
