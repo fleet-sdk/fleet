@@ -1,4 +1,4 @@
-import { _0n, ensureBigInt, hasKey } from "@fleet-sdk/common";
+import { _0n, ensureBigInt } from "@fleet-sdk/common";
 import {
   Amount,
   ErgoAddress,
@@ -30,11 +30,11 @@ export type AgeUSDRedeemAction = AgeUSDActionBase & {
 export type AgeUSDExchangeAction = AgeUSDMintAction | AgeUSDRedeemAction;
 
 function minting(params: AgeUSDExchangeAction): params is AgeUSDMintAction {
-  return hasKey(params, "mint");
+  return !!(params as AgeUSDMintAction).mint;
 }
 
 function redeeming(params: AgeUSDExchangeAction): params is AgeUSDRedeemAction {
-  return hasKey(params, "redeem");
+  return !!(params as AgeUSDRedeemAction).redeem;
 }
 
 export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDMintAction): FleetPlugin;
