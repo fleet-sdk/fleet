@@ -2,62 +2,20 @@ import { describe, expect, it } from "vitest";
 import {
   areEqual,
   areEqualBy,
+  at,
   chunk,
   endsWith,
   first,
   hasDuplicates,
   hasDuplicatesBy,
-  isEmpty,
+  last,
   orderBy,
-  some,
   startsWith,
   uniq,
   uniqBy
 } from "./arrayUtils";
 
-describe("isEmpty() guard", () => {
-  it("Should return true if array is undefined or empty", () => {
-    expect(isEmpty([])).toBe(true);
-    expect(isEmpty(undefined)).toBe(true);
-  });
-
-  it("Should return true if object contains no props", () => {
-    expect(isEmpty({})).toBe(true);
-  });
-
-  it("Should return false if object contains at least one prop", () => {
-    expect(isEmpty({ test: undefined })).toBe(false);
-    expect(isEmpty({ foo: true, bar: false })).toBe(false);
-  });
-
-  it("Should return false if array contains elements", () => {
-    expect(isEmpty([1, 2, 4])).toBe(false);
-    expect(isEmpty([1])).toBe(false);
-  });
-});
-
-describe("some() guard", () => {
-  it("Should return false if array is undefined or empty", () => {
-    expect(some([])).toBe(false);
-    expect(some(undefined)).toBe(false);
-  });
-
-  it("Should return false if object contains no props", () => {
-    expect(some({})).toBe(false);
-  });
-
-  it("Should return true if object contains at least one prop", () => {
-    expect(some({ test: undefined })).toBe(true);
-    expect(some({ foo: true, bar: false })).toBe(true);
-  });
-
-  it("Should return true if array contains elements", () => {
-    expect(some([1, 2, 4])).toBe(true);
-    expect(some([1])).toBe(true);
-  });
-});
-
-describe("fist() fetcher", () => {
+describe("fist()", () => {
   it("Should return first element of the array", () => {
     expect(first([4, 5, 1])).toBe(4);
   });
@@ -74,6 +32,53 @@ describe("fist() fetcher", () => {
     expect(() => {
       first([]);
     }).toThrow();
+  });
+});
+
+describe("last()", () => {
+  it("Should return last element of the array", () => {
+    expect(last([4, 5, 1])).toBe(1);
+  });
+
+  it("Should return undefined if the array is undefined", () => {
+    expect(last(undefined)).toBeUndefined();
+  });
+
+  it("Should return number if the array is a Buffer", () => {
+    expect(last(Uint8Array.from([2, 4, 6]))).toBe(6);
+  });
+
+  it("Should throw an error if the array is empty", () => {
+    expect(() => {
+      last([]);
+    }).toThrow();
+  });
+});
+
+describe("at()", () => {
+  it("Should return n element of the array", () => {
+    expect(at([4, 5, 1], 0)).toBe(4);
+    expect(at([4, 5, 1], 1)).toBe(5);
+    expect(at([4, 5, 1], 2)).toBe(1);
+
+    expect(at([4, 5, 1], -3)).toBe(4);
+    expect(at([4, 5, 1], -2)).toBe(5);
+    expect(at([4, 5, 1], -1)).toBe(1);
+  });
+
+  it("Should return undefined if the array is undefined", () => {
+    expect(at(undefined, 1)).toBeUndefined();
+  });
+
+  it("Should return number if the array is a Buffer", () => {
+    expect(at(Uint8Array.from([2, 4, 6]), 2)).toBe(6);
+  });
+
+  it("Should return undefined if index is out of bounds", () => {
+    expect(at([2, 4, 6], 10)).to.be.undefined;
+    expect(at([2, 4, 6], -10)).to.be.undefined;
+    expect(at([2, 4, 6], -10)).to.be.undefined;
+    expect(at([], 1)).to.be.undefined;
   });
 });
 
