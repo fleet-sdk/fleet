@@ -2,6 +2,7 @@ import {
   _0n,
   _1n,
   Amount,
+  assert,
   Box,
   ensureBigInt,
   hasKey,
@@ -49,13 +50,8 @@ export class AgeUSDBank {
   private _uiFeeParams?: UIFeeCallbackParams;
 
   constructor(bankBox: AgeUSDBankBox, oracleBox: OracleBox, params: AgeUSDBankParameters) {
-    if (!this.validateBankBox(bankBox, params)) {
-      throw new Error("Invalid bank box.");
-    }
-
-    if (!this.validateOracleBox(oracleBox, params)) {
-      throw new Error("Invalid oracle box.");
-    }
+    assert(this.validateBankBox(bankBox, params), "Invalid bank box.");
+    assert(this.validateOracleBox(oracleBox, params), "Invalid oracle box.");
 
     this._bankBox = bankBox;
     this._oracleBox = oracleBox;
@@ -101,9 +97,7 @@ export class AgeUSDBank {
   }
 
   get liabilities(): bigint {
-    if (this.circulatingStableCoins === _0n) {
-      return _0n;
-    }
+    if (this.circulatingStableCoins === _0n) return _0n;
 
     const baseReservesNeeded = this.circulatingStableCoins * this._oracleRate;
     const baseReserve = this.baseReserves;
@@ -159,9 +153,7 @@ export class AgeUSDBank {
   }
 
   get reserveCoinAvailableAmount(): bigint {
-    if (!this.canMintReserveCoinAmount(_1n)) {
-      return _0n;
-    }
+    if (!this.canMintReserveCoinAmount(_1n)) return _0n;
 
     const maxReserveRatio = this._params.maxReserveRatio;
     let low = _0n;
@@ -187,9 +179,7 @@ export class AgeUSDBank {
 
   get reserveCoinRedeemableAmount(): bigint {
     const minReserveRatio = this._params.minReserveRatio;
-    if (this.getRedeemReserveCoinReserveRatioFor(_1n) <= minReserveRatio) {
-      return _0n;
-    }
+    if (this.getRedeemReserveCoinReserveRatioFor(_1n) <= minReserveRatio) return _0n;
 
     let low = _0n;
     let mid = _0n;
@@ -263,9 +253,7 @@ export class AgeUSDBank {
   }
 
   getUIFee(amount: bigint): bigint {
-    if (!this._uiFeeParams || !this._uiFeeParams.callback) {
-      return _0n;
-    }
+    if (!this._uiFeeParams || !this._uiFeeParams.callback) return _0n;
 
     return this._uiFeeParams.callback(amount);
   }
@@ -279,9 +267,7 @@ export class AgeUSDBank {
     circulatingStableCoins: bigint,
     oracleRate: bigint
   ): bigint {
-    if (baseReserves === _0n || oracleRate === _0n) {
-      return _0n;
-    }
+    if (baseReserves === _0n || oracleRate === _0n) return _0n;
 
     if (circulatingStableCoins === _0n) {
       return (baseReserves * _100n) / oracleRate;

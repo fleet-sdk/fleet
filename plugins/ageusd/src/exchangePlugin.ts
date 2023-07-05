@@ -1,4 +1,4 @@
-import { _0n, ensureBigInt } from "@fleet-sdk/common";
+import { _0n, assert, ensureBigInt } from "@fleet-sdk/common";
 import {
   Amount,
   ErgoAddress,
@@ -50,16 +50,12 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
     circulationDelta = amount;
 
     if (action.mint === "stable") {
-      if (!bank.canMintStableCoin(amount)) {
-        throw new Error(`Can't mint Stable Coin.`);
-      }
+      assert(bank.canMintStableCoin(amount), "Can't mint Stable Coin.");
 
       nanoergsDelta += bank.getStableCoinMintingBaseCost(amount);
       stableDelta -= amount;
     } else if (action.mint === "reserve") {
-      if (!bank.canMintReserveCoinAmount(amount)) {
-        throw new Error(`Can't mint Reserve Coin.`);
-      }
+      assert(bank.canMintReserveCoinAmount(amount), "Can't mint Reserve Coin.");
 
       nanoergsDelta += bank.getReserveCoinMintingBaseCost(amount);
       reserveDelta -= amount;
@@ -68,25 +64,19 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
     circulationDelta -= amount;
 
     if (action.redeem === "stable") {
-      if (!bank.canRedeemStableCoinAmount(amount)) {
-        throw new Error(`Can't redeem Stable Coin.`);
-      }
+      assert(bank.canRedeemStableCoinAmount(amount), "Can't redeem Stable Coin.");
 
       nanoergsDelta -= bank.getStableCoinRedeemingBaseAmount(amount);
       stableDelta += amount;
     } else if (action.redeem === "reserve") {
-      if (!bank.canRedeemReserveCoinAmount(amount)) {
-        throw new Error(`Can't redeem Reserve Coin.`);
-      }
+      assert(bank.canRedeemReserveCoinAmount(amount), "Can't redeem Reserve Coin.");
 
       nanoergsDelta -= bank.getReserveCoinRedeemingBaseAmount(amount);
       reserveDelta += amount;
     }
   }
 
-  if (nanoergsDelta === _0n) {
-    throw new Error(`Invalid params.`);
-  }
+  assert(nanoergsDelta !== _0n, "Invalid params.");
 
   return ({ addInputs, addDataInputs, addOutputs, setFee }) => {
     const big = ensureBigInt;
