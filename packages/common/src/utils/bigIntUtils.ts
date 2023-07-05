@@ -1,5 +1,6 @@
 import { Amount } from "../types";
-import { first, isEmpty } from "./arrayUtils";
+import { first } from "./arrayUtils";
+import { isEmpty } from "./assertions";
 import { _0n, _10n } from "./bigIntLiterals";
 import { isUndefined } from "./objectUtils";
 

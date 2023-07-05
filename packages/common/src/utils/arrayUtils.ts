@@ -1,36 +1,37 @@
 import { SortingDirection, SortingSelector } from "../types";
+import { assert, isEmpty } from "./assertions";
 
 type ObjectSelector<T> = (item: T) => T[keyof T];
 
-export function isEmpty<T extends object>(obj?: T): obj is undefined;
-export function isEmpty<T>(array?: T[]): array is undefined;
-export function isEmpty<T>(obj?: T[] | object): obj is undefined {
-  if (!obj) {
-    return true;
-  }
-
-  return Array.isArray(obj) ? obj.length === 0 : Object.keys(obj).length === 0;
-}
-
-export function some<T extends object>(obj?: T): obj is T;
-export function some<T>(array?: T[]): array is T[];
-export function some<T>(obj?: T[] | object): boolean {
-  return !isEmpty(obj);
-}
-
 export function first(array: undefined): undefined;
-export function first(array: Uint8Array): number;
 export function first<T>(array: ArrayLike<T>): T;
-export function first<T>(array?: ArrayLike<T> | Uint8Array): T | number | undefined {
-  if (!array) {
-    return;
-  }
-
-  if (array.length < 1) {
-    throw Error("Empty array.");
-  }
+export function first<T>(array: ArrayLike<T> | undefined): T | number | undefined {
+  if (!array) return undefined;
+  assert(array.length > 0, "Empty array.");
 
   return array[0];
+}
+
+export function last(array: undefined): undefined;
+export function last<T>(array: ArrayLike<T>): T;
+export function last<T>(array: ArrayLike<T> | undefined): T | undefined {
+  if (!array) return undefined;
+  assert(array.length > 0, "Empty array.");
+
+  return at(array, -1);
+}
+
+export function at(array: undefined, index: number): undefined;
+export function at<T>(array: ArrayLike<T>, index: number): T;
+export function at<T>(array: ArrayLike<T> | undefined, index: number): T | undefined {
+  const len = array?.length;
+  if (!len) return undefined;
+
+  if (index < 0) {
+    index += len;
+  }
+
+  return array[index];
 }
 
 /**
