@@ -10,7 +10,7 @@ import {
   SConstant,
   TransactionBuilder
 } from "@fleet-sdk/core";
-import pc from "picocolors";
+import { bgRed, bold, red } from "picocolors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MockChain } from "./mockChain";
 
@@ -325,21 +325,26 @@ describe("Contract execution and chain mocking", () => {
       .payFee(fee)
       .build();
 
-    // fail but not throw
-    expect(chain.execute(unsignedTransaction, { signers: [alice] })).to.be.false;
+    // should throw by default
+    expect(() => chain.execute(unsignedTransaction, { signers: [alice] })).to.throw();
 
-    // throw if { throw: true }
+    // should throw if { throw: true }
     expect(() => chain.execute(unsignedTransaction, { signers: [alice], throw: true })).to.throw();
+
+    // should not throw if { throw: false }
+    expect(() =>
+      chain.execute(unsignedTransaction, { signers: [alice], throw: false })
+    ).not.to.throw();
 
     // log error message if { log: true }
     expect(() =>
-      chain.execute(unsignedTransaction, { signers: [alice], log: true })
+      chain.execute(unsignedTransaction, { signers: [alice], log: true, throw: false })
     ).not.to.throw();
 
     expect(consoleMock).toHaveBeenCalledWith(
-      pc.red(
-        `${pc.bgRed(
-          "Error:"
+      red(
+        `${bgRed(
+          bold(" Error ")
         )} Transaction signing error: Prover error (tx input index 0): Failed on step2(prover does not have enough witnesses to perform the proof)`
       )
     );
