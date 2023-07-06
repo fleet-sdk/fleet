@@ -47,6 +47,10 @@ export class MockUTxOCollection extends Collection<Box<bigint>, MockUTxOInput> {
     return super._addOne(utxo);
   }
 
+  public clear() {
+    this._items.length = 0;
+  }
+
   public remove(boxId: BoxId): number;
   public remove(index: number): number;
   public remove(boxIdOrIndex: BoxId | number): number {
