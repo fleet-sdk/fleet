@@ -9,7 +9,7 @@ import { SIGMA_USD_PARAMETERS } from "./sigmaUsdParameters";
 describe("AgeUSD exchange plugin", () => {
   const height = 1036535;
 
-  it("Should mint reserve", () => {
+  it("Should mint reserve coin", () => {
     const bank = new SigmaUSDBank(
       mockBankBox({
         reserveNanoergs: 1477201069508651n,
@@ -17,15 +17,19 @@ describe("AgeUSD exchange plugin", () => {
         circulatingReserveCoin: 1375438973n
       }),
       mockOracleBox(210526315n)
-    );
+    ).setImplementorFee({
+      percentage: 3n,
+      precision: 4n,
+      address: "9fB6AxKB8fLaSZzCRrcVmojkYnS3noq7kxcgd3oRqdTpL3FrmpD"
+    });
 
     const chain = new MockChain(height);
 
-    const sigTokens = SIGMA_USD_PARAMETERS.tokens;
+    const tokens = SIGMA_USD_PARAMETERS.tokens;
     chain.assetsMetadata.set("nanoerg", { name: "ERG", decimals: 9 });
-    chain.assetsMetadata.set(sigTokens.stableCoinId, { name: "SigUSD", decimals: 2 });
-    chain.assetsMetadata.set(sigTokens.reserveCoinId, { name: "SigRSV" });
-    chain.assetsMetadata.set(sigTokens.nftId, { name: "SUSD Bank V2 NFT" });
+    chain.assetsMetadata.set(tokens.stableCoinId, { name: "SigUSD", decimals: 2 });
+    chain.assetsMetadata.set(tokens.reserveCoinId, { name: "SigRSV" });
+    chain.assetsMetadata.set(tokens.nftId, { name: "SUSD Bank V2 NFT" });
 
     const bob = chain.newParty("Bob").withBalance({ nanoergs: 100000000000n });
     const bankParty = chain
@@ -60,15 +64,15 @@ describe("AgeUSD exchange plugin", () => {
 
     const chain = new MockChain(height);
 
-    const sigTokens = SIGMA_USD_PARAMETERS.tokens;
+    const tokens = SIGMA_USD_PARAMETERS.tokens;
     chain.assetsMetadata.set("nanoerg", { name: "ERG", decimals: 9 });
-    chain.assetsMetadata.set(sigTokens.stableCoinId, { name: "SigUSD", decimals: 2 });
-    chain.assetsMetadata.set(sigTokens.reserveCoinId, { name: "SigRSV" });
-    chain.assetsMetadata.set(sigTokens.nftId, { name: "SUSD Bank V2 NFT" });
+    chain.assetsMetadata.set(tokens.stableCoinId, { name: "SigUSD", decimals: 2 });
+    chain.assetsMetadata.set(tokens.reserveCoinId, { name: "SigRSV" });
+    chain.assetsMetadata.set(tokens.nftId, { name: "SUSD Bank V2 NFT" });
 
     const bob = chain.newParty("Bob").withBalance({
       nanoergs: 100000000000n,
-      tokens: [{ tokenId: sigTokens.stableCoinId, amount: 100n }]
+      tokens: [{ tokenId: tokens.stableCoinId, amount: 100n }]
     });
     const bankParty = chain
       .newParty({ name: "SigmaUSD Bank", ergoTree: SIGMA_USD_PARAMETERS.contract })
@@ -87,6 +91,6 @@ describe("AgeUSD exchange plugin", () => {
       .sendChangeTo(bob.address)
       .build();
 
-    expect(chain.execute(transaction, { log: true })).to.be.true;
+    expect(chain.execute(transaction)).to.be.true;
   });
 });

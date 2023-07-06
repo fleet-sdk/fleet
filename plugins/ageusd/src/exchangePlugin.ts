@@ -1,4 +1,4 @@
-import { _0n, assert, ensureBigInt } from "@fleet-sdk/common";
+import { _0n, assert, ensureBigInt as big } from "@fleet-sdk/common";
 import {
   Amount,
   ErgoAddress,
@@ -40,7 +40,7 @@ function redeeming(params: AgeUSDExchangeAction): params is AgeUSDRedeemAction {
 export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDMintAction): FleetPlugin;
 export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDRedeemAction): FleetPlugin;
 export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAction): FleetPlugin {
-  const amount = ensureBigInt(action.amount);
+  const amount = big(action.amount);
   let stableDelta = _0n;
   let reserveDelta = _0n;
   let nanoergsDelta = _0n;
@@ -79,7 +79,6 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
   assert(nanoergsDelta !== _0n, "Invalid params.");
 
   return ({ addInputs, addDataInputs, addOutputs, setFee }) => {
-    const big = ensureBigInt;
     const box = bank.bankBox;
     const stable = box.assets[0];
     const reserve = box.assets[1];
@@ -122,11 +121,13 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
       addOutputs(recipient, { index: 1 });
     }
 
-    if (bank.uiFeeAddress) {
-      const uiFeeAmount = bank.getUIFee(nanoergsDelta > _0n ? nanoergsDelta : -nanoergsDelta);
+    if (bank.implementorFeeAddress) {
+      const uiFeeAmount = bank.getImplementorFee(
+        nanoergsDelta > _0n ? nanoergsDelta : -nanoergsDelta
+      );
 
       if (uiFeeAmount > _0n) {
-        addOutputs(new OutputBuilder(uiFeeAmount, bank.uiFeeAddress), { index: 1 });
+        addOutputs(new OutputBuilder(uiFeeAmount, bank.implementorFeeAddress), { index: 2 });
       }
     }
   };
