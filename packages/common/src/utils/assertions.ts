@@ -17,6 +17,7 @@ export function assert(condition: boolean, errorMsg: AssertErrorMessageInput): a
 
     throw error;
   }
+}
 
 export function isEmpty<T extends object>(obj?: T): obj is undefined;
 export function isEmpty<T>(array?: T[]): array is undefined;
