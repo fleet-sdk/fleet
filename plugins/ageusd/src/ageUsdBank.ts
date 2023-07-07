@@ -3,8 +3,8 @@ import {
   _1n,
   Amount,
   assert,
+  ensureBigInt as big,
   Box,
-  ensureBigInt,
   isDefined,
   max,
   min,
@@ -23,23 +23,26 @@ export type AgeUSDBankBox<T extends Amount = Amount> = Box<T, R4ToR5Registers>;
 export type OracleBox = Box<Amount, OnlyR4Register>;
 export type ImplementorFeeAmountCallback = (amount: bigint) => bigint;
 
-export type ImplementorFeeCallbackParams = {
+export type CoinType = "stable" | "reserve";
+export type ReturnType = "base" | "total";
+export type FeeType = "protocol" | "implementor" | "all";
+export type ActionType = "minting" | "redeeming";
+
+export type ImplementorFeeCallbackOptions = {
   callback: ImplementorFeeAmountCallback;
   address: string;
 };
 
-export type ImplementorFeePercentageParams = {
+export type ImplementorFeePercentageOptions = {
   percentage: bigint;
   precision?: bigint;
   address: string;
 };
 
-type ImplementorFeeParams = ImplementorFeeCallbackParams | ImplementorFeePercentageParams;
+type ImplementorFeeOptions = ImplementorFeeCallbackOptions | ImplementorFeePercentageOptions;
 
-function isImplementorFeeCallbackParams(
-  params: ImplementorFeeParams
-): params is ImplementorFeeCallbackParams {
-  return isDefined((params as ImplementorFeeCallbackParams).callback);
+function isImplementorFeeCallbackParams(params: unknown): params is ImplementorFeeCallbackOptions {
+  return isDefined((params as ImplementorFeeCallbackOptions).callback);
 }
 
 export class AgeUSDBank {
@@ -48,7 +51,7 @@ export class AgeUSDBank {
   private readonly _oracleRate: bigint;
   private readonly _params: AgeUSDBankParameters;
 
-  private _implementorFeeParams?: ImplementorFeeCallbackParams;
+  private _implementorFeeOptions?: ImplementorFeeCallbackOptions;
 
   constructor(bankBox: AgeUSDBankBox, oracleBox: OracleBox, params: AgeUSDBankParameters) {
     assert(this.validateBankBox(bankBox, params), "Invalid bank box.");
@@ -92,29 +95,24 @@ export class AgeUSDBank {
   }
 
   get reserveRatio(): bigint {
-    return this.getReserveRatio(this.baseReserves, this.circulatingStableCoins, this._oracleRate);
+    return this.getReserveRatio(this.baseReserves, this.circulatingStableCoins);
   }
 
   get baseReserves(): bigint {
-    const value = ensureBigInt(this._bankBox.value);
+    const value = big(this._bankBox.value);
 
     return value < this._params.minBoxValue ? _0n : value;
   }
 
   get liabilities(): bigint {
     if (this.circulatingStableCoins === _0n) return _0n;
+    const neededReserves = this.circulatingStableCoins * this._oracleRate;
 
-    const baseReservesNeeded = this.circulatingStableCoins * this._oracleRate;
-    const baseReserve = this.baseReserves;
-
-    return min(baseReserve, baseReservesNeeded);
+    return max(min(this.baseReserves, neededReserves), _0n);
   }
 
   get equity() {
-    const baseReserves = this.baseReserves;
-    const liabilities = this.liabilities;
-
-    return liabilities < baseReserves ? baseReserves - liabilities : _0n;
+    return max(this.baseReserves - this.liabilities, _0n);
   }
 
   get circulatingStableCoins(): bigint {
@@ -125,7 +123,7 @@ export class AgeUSDBank {
     return SParse(this._bankBox.additionalRegisters.R5);
   }
 
-  get stableCoinNominalPrice(): bigint {
+  get stableCoinPrice(): bigint {
     const oracleRate = this._oracleRate;
     const liabilities = this.liabilities;
     const numStableCoins = this.circulatingStableCoins;
@@ -135,18 +133,18 @@ export class AgeUSDBank {
       : liabilities / numStableCoins;
   }
 
-  get reserveCoinNominalPrice(): bigint {
-    const circulatingReserveCoins = this.circulatingReserveCoins;
+  get reserveCoinPrice(): bigint {
+    const circulating = this.circulatingReserveCoins;
     const equity = this.equity;
 
-    if (circulatingReserveCoins <= _1n || equity === _0n) {
+    if (circulating <= _1n || equity === _0n) {
       return this._params.defaultReserveCoinPrice;
     }
 
-    return equity / circulatingReserveCoins;
+    return equity / circulating;
   }
 
-  get stableCoinAvailableAmount(): bigint {
+  get availableStableCoins(): bigint {
     const minReserveRatio = this._params.minReserveRatio;
 
     const base =
@@ -157,18 +155,18 @@ export class AgeUSDBank {
     return max(available, _0n);
   }
 
-  get reserveCoinAvailableAmount(): bigint {
-    if (!this.canMintReserveCoinAmount(_1n)) return _0n;
+  get availableReserveCoins(): bigint {
+    if (!this.canMint(_1n, "reserve")) return _0n;
 
     const maxReserveRatio = this._params.maxReserveRatio;
     let low = _0n;
     let mid = _0n;
-    let high = ensureBigInt(this.reserveCoin.amount);
+    let high = big(this.reserveCoin.amount);
     let newReserveRatio = _0n;
 
     while (low <= high && newReserveRatio !== maxReserveRatio) {
       mid = (high - low) / _2n + low;
-      newReserveRatio = this.getMintReserveCoinReserveRatioFor(mid);
+      newReserveRatio = this.getReserveRatioFor("minting", mid, "reserve");
 
       if (newReserveRatio === maxReserveRatio) {
         low = mid;
@@ -182,7 +180,7 @@ export class AgeUSDBank {
     return low;
   }
 
-  get reserveCoinRedeemableAmount(): bigint {
+  get redeemableReserveCoins(): bigint {
     const minReserveRatio = this._params.minReserveRatio;
     if (this.getRedeemReserveCoinReserveRatioFor(_1n) <= minReserveRatio) return _0n;
 
@@ -207,16 +205,20 @@ export class AgeUSDBank {
     return low;
   }
 
-  get ergPriceInStableCoin(): bigint {
-    return _1000000000n / this.stableCoinNominalPrice;
+  get redeemableStableCoins(): bigint {
+    return this.circulatingStableCoins;
   }
 
-  get ergPriceInReserveCoin(): bigint {
-    return _1000000000n / this.reserveCoinNominalPrice;
+  get implementorAddress(): string | undefined {
+    return this._implementorFeeOptions?.address;
   }
 
-  get implementorFeeAddress(): string | undefined {
-    return this._implementorFeeParams?.address;
+  get stableCoinErgRate(): bigint {
+    return _1000000000n / this.stableCoinPrice;
+  }
+
+  get reserveCoinErgRate(): bigint {
+    return _1000000000n / this.reserveCoinPrice;
   }
 
   protected validateBankBox(bankBox: AgeUSDBankBox, params: AgeUSDBankParameters): boolean {
@@ -237,185 +239,137 @@ export class AgeUSDBank {
     );
   }
 
-  setImplementorFee(params: ImplementorFeeCallbackParams): AgeUSDBank;
-  setImplementorFee(params: ImplementorFeePercentageParams): AgeUSDBank;
-  setImplementorFee(params: ImplementorFeeParams): AgeUSDBank {
-    if (isImplementorFeeCallbackParams(params)) {
-      this._implementorFeeParams = params;
+  setImplementorFee(options: ImplementorFeeCallbackOptions): AgeUSDBank;
+  setImplementorFee(options: ImplementorFeePercentageOptions): AgeUSDBank;
+  setImplementorFee(options: ImplementorFeeOptions): AgeUSDBank {
+    if (isImplementorFeeCallbackParams(options)) {
+      this._implementorFeeOptions = options;
 
       return this;
     }
 
-    this._implementorFeeParams = {
-      address: params.address,
+    this._implementorFeeOptions = {
+      address: options.address,
       callback:
-        params.percentage > _0n
-          ? (amount) => percent(amount, params.percentage, params.precision || _3n)
+        options.percentage > _0n
+          ? (amount) => percent(amount, options.percentage, options.precision || _3n)
           : () => _0n
     };
 
     return this;
   }
 
-  getImplementorFee(amount: bigint): bigint {
-    if (!this._implementorFeeParams || !this._implementorFeeParams.callback) return _0n;
+  getImplementorFee(nanoergs: bigint): bigint {
+    if (!this._implementorFeeOptions || !this._implementorFeeOptions.callback) return _0n;
 
-    return this._implementorFeeParams.callback(amount);
+    return this._implementorFeeOptions.callback(nanoergs);
   }
 
-  getProtocolFee(amount: bigint): bigint {
-    return percent(amount, _2n);
+  getProtocolFee(nanoergs: bigint): bigint {
+    return percent(nanoergs, _2n);
   }
 
-  protected getReserveRatio(
-    baseReserves: bigint,
-    circulatingStableCoins: bigint,
-    oracleRate: bigint
-  ): bigint {
-    if (baseReserves === _0n || oracleRate === _0n) return _0n;
+  protected getReserveRatio(baseReserves: bigint, circulatingStableCoins: bigint): bigint {
+    if (baseReserves === _0n || this._oracleRate === _0n) return _0n;
 
-    if (circulatingStableCoins === _0n) {
-      return (baseReserves * _100n) / oracleRate;
+    let rate = baseReserves * _100n;
+    if (circulatingStableCoins > _0n) {
+      rate /= circulatingStableCoins;
     }
 
-    const perStableCoinRate = (baseReserves * _100n) / circulatingStableCoins;
-
-    return perStableCoinRate / oracleRate;
+    return rate / this._oracleRate;
   }
 
-  canMintStableCoin(amount: bigint): boolean {
-    const newReserve = this.getMintStableCoinReserveRatioFor(amount);
+  canMint(amount: Amount, coin: CoinType): boolean {
+    amount = big(amount);
+    const newReserveRatio = this.getReserveRatioFor("minting", amount, coin);
 
-    return newReserve >= this._params.minReserveRatio;
+    if (coin === "stable") {
+      return newReserveRatio >= this._params.minReserveRatio;
+    } else {
+      return newReserveRatio <= this._params.maxReserveRatio;
+    }
   }
 
-  getMintStableCoinReserveRatioFor(amount: bigint): bigint {
-    const newBaseReserve = this.baseReserves + this.getStableCoinMintingBaseCost(amount);
+  canRedeem(amount: Amount, coin: CoinType): boolean {
+    amount = big(amount);
 
-    return this.getReserveRatio(
-      newBaseReserve,
-      this.circulatingStableCoins + amount,
-      this._oracleRate
-    );
+    if (coin === "stable") {
+      return amount <= this.circulatingStableCoins;
+    } else {
+      return this.getRedeemReserveCoinReserveRatioFor(amount) >= this._params.minReserveRatio;
+    }
   }
 
-  canMintReserveCoinAmount(amount: bigint): boolean {
-    const newReserveRatio = this.getMintReserveCoinReserveRatioFor(amount);
+  getReserveRatioFor(action: ActionType, amount: Amount, coin: CoinType): bigint {
+    amount = big(amount);
+    let newReserve = _0n;
+    let newCirculatingStable = this.circulatingStableCoins;
 
-    return newReserveRatio <= this._params.maxReserveRatio;
-  }
+    if (action === "minting") {
+      newReserve = this.baseReserves + this.getMintingCostFor(amount, coin);
 
-  getMintReserveCoinReserveRatioFor(amount: bigint) {
-    const newBaseReserve = this.baseReserves + this.getReserveCoinMintingBaseCost(amount);
+      if (coin === "stable") {
+        newCirculatingStable += amount;
+      }
+    } else {
+      newReserve = max(this.baseReserves - this.getRedeemingAmountFor(amount, coin), _0n); // it's previously using minting
 
-    return this.getReserveRatio(newBaseReserve, this.circulatingStableCoins, this._oracleRate);
-  }
+      if (coin === "stable") {
+        newCirculatingStable -= amount;
+      }
+    }
 
-  canRedeemReserveCoinAmount(amount: bigint): boolean {
-    return this.getRedeemReserveCoinReserveRatioFor(amount) >= this._params.minReserveRatio;
+    return this.getReserveRatio(newReserve, newCirculatingStable);
   }
 
   getRedeemReserveCoinReserveRatioFor(amount: bigint) {
-    const redeemAmount = this.getReserveCoinMintingBaseCost(amount);
-    const baseReserve = this.baseReserves;
-    let newBaseReserve = _0n;
+    return this.getReserveRatioFor("redeeming", amount, "reserve");
+  }
 
-    if (redeemAmount < baseReserve) {
-      newBaseReserve = baseReserve - redeemAmount;
+  getFeeAmountFor(amount: Amount, coin: CoinType, type?: FeeType, txFee?: Amount): bigint {
+    amount = big(amount);
+    const price = coin === "stable" ? this.stableCoinPrice : this.reserveCoinPrice;
+    const base = price * amount;
+    let fee = this.getProtocolFee(base);
+
+    if (type === "implementor") {
+      fee = this.getImplementorFee(base + fee);
+    } else if (type === "all") {
+      txFee = isDefined(txFee) ? big(txFee) : _0n;
+      fee += this.getImplementorFee(base + fee) + txFee;
     }
 
-    return this.getReserveRatio(newBaseReserve, this.circulatingStableCoins, this._oracleRate);
+    return fee;
   }
 
-  canRedeemStableCoinAmount(amount: bigint): boolean {
-    return amount <= this.circulatingStableCoins;
+  getMintingCostFor(amount: Amount, coin: CoinType, type?: ReturnType, txFee?: Amount): bigint {
+    amount = big(amount);
+    const price = coin === "stable" ? this.stableCoinPrice : this.reserveCoinPrice;
+    const baseAmount = price * amount;
+    let cost = baseAmount + this.getProtocolFee(baseAmount);
+
+    if (type === "total") {
+      const minBoxValues = this._params.minBoxValue * _2n;
+      txFee = isDefined(txFee) ? big(txFee) : _0n;
+      cost += this.getImplementorFee(cost) + minBoxValues + txFee;
+    }
+
+    return cost;
   }
 
-  getTotalStableCoinMintingCost(amount: bigint, transactionFee: bigint): bigint {
-    const baseCost = this.getStableCoinMintingBaseCost(amount);
-    const minBoxValue = this._params.minBoxValue;
+  getRedeemingAmountFor(amount: Amount, coin: CoinType, type?: ReturnType, txFee?: Amount) {
+    amount = big(amount);
+    const price = coin === "stable" ? this.stableCoinPrice : this.reserveCoinPrice;
+    const baseAmount = price * amount;
+    let redeemAmount = baseAmount - this.getProtocolFee(baseAmount);
 
-    return baseCost + transactionFee + minBoxValue * _2n + this.getImplementorFee(baseCost);
-  }
+    if (type === "total") {
+      txFee = isDefined(txFee) ? big(txFee) : _0n;
+      const fees = txFee + this.getImplementorFee(redeemAmount);
+      redeemAmount = max(redeemAmount - fees, _0n);
+    }
 
-  getStableCoinMintingFees(amount: bigint, transactionFee: bigint): bigint {
-    const baseAmount = this.stableCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(baseAmount);
-    const implementorFee = this.getImplementorFee(baseAmount + protocolFee);
-
-    return transactionFee + protocolFee + implementorFee;
-  }
-
-  getStableCoinMintingBaseCost(amount: bigint): bigint {
-    const baseAmount = this.stableCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(baseAmount);
-
-    return baseAmount + protocolFee;
-  }
-
-  getTotalReserveCoinMintingCost(amount: bigint, transactionFee: bigint): bigint {
-    const baseCost = this.getReserveCoinMintingBaseCost(amount);
-    const minBoxValue = this._params.minBoxValue;
-
-    return baseCost + transactionFee + minBoxValue * _2n + this.getImplementorFee(baseCost);
-  }
-
-  getReserveCoinMintingFees(amount: bigint, transactionFee: bigint): bigint {
-    const baseAmount = this.reserveCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(baseAmount);
-    const implementorFee = this.getImplementorFee(baseAmount + protocolFee);
-
-    return transactionFee + protocolFee + implementorFee;
-  }
-
-  getReserveCoinMintingBaseCost(amount: bigint): bigint {
-    const baseAmount = this.reserveCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(baseAmount);
-
-    return baseAmount + protocolFee;
-  }
-
-  getTotalReserveCoinRedeemingAmount(amount: bigint, transactionFee: bigint): bigint {
-    const baseAmount = this.getReserveCoinRedeemingBaseAmount(amount);
-    const fees = transactionFee + this.getImplementorFee(baseAmount);
-
-    return max(baseAmount - fees, _0n);
-  }
-
-  getReserveCoinRedeemingFees(amount: bigint, transactionFee: bigint): bigint {
-    const baseAmount = this.reserveCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(baseAmount);
-    const implementorFee = this.getImplementorFee(this.getReserveCoinRedeemingBaseAmount(amount));
-
-    return transactionFee + protocolFee + implementorFee;
-  }
-
-  getReserveCoinRedeemingBaseAmount(amount: bigint): bigint {
-    const baseAmount = this.reserveCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(baseAmount);
-
-    return baseAmount - protocolFee;
-  }
-
-  getTotalStableCoinRedeemingAmount(amount: bigint, transactionFee: bigint): bigint {
-    const baseAmount = this.getStableCoinRedeemingBaseAmount(amount);
-    const fees = transactionFee + this.getImplementorFee(baseAmount);
-
-    return max(baseAmount - fees, _0n);
-  }
-
-  getRedeemingStableCoinFees(amount: bigint, transactionFee: bigint): bigint {
-    const baseAmount = this.stableCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(baseAmount);
-    const implementorFee = this.getImplementorFee(baseAmount + protocolFee);
-
-    return protocolFee + transactionFee + implementorFee;
-  }
-
-  getStableCoinRedeemingBaseAmount(amount: bigint): bigint {
-    const baseAmount = this.stableCoinNominalPrice * amount;
-    const protocolFee = this.getProtocolFee(baseAmount);
-
-    return baseAmount - protocolFee;
+    return redeemAmount;
   }
 }

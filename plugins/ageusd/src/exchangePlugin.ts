@@ -1,4 +1,4 @@
-import { _0n, assert, ensureBigInt as big } from "@fleet-sdk/common";
+import { _0n, assert, ensureBigInt as big, isDefined } from "@fleet-sdk/common";
 import {
   Amount,
   ErgoAddress,
@@ -9,9 +9,7 @@ import {
   SLong,
   SParse
 } from "@fleet-sdk/core";
-import { AgeUSDBank } from "./ageUsdBank";
-
-export type CoinType = "stable" | "reserve";
+import { AgeUSDBank, CoinType } from "./ageUsdBank";
 
 export type AgeUSDActionBase = {
   amount: Amount;
@@ -29,12 +27,8 @@ export type AgeUSDRedeemAction = AgeUSDActionBase & {
 
 export type AgeUSDExchangeAction = AgeUSDMintAction | AgeUSDRedeemAction;
 
-function minting(params: AgeUSDExchangeAction): params is AgeUSDMintAction {
-  return !!(params as AgeUSDMintAction).mint;
-}
-
-function redeeming(params: AgeUSDExchangeAction): params is AgeUSDRedeemAction {
-  return !!(params as AgeUSDRedeemAction).redeem;
+function minting(params: unknown): params is AgeUSDMintAction {
+  return isDefined((params as AgeUSDMintAction).mint);
 }
 
 export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDMintAction): FleetPlugin;
@@ -48,35 +42,31 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
 
   if (minting(action)) {
     circulationDelta = amount;
+    nanoergsDelta += bank.getMintingCostFor(amount, action.mint, "base");
 
     if (action.mint === "stable") {
-      assert(bank.canMintStableCoin(amount), "Can't mint Stable Coin.");
+      assert(bank.canMint(amount, "stable"), "Can't mint Stable Coin.");
 
-      nanoergsDelta += bank.getStableCoinMintingBaseCost(amount);
       stableDelta -= amount;
-    } else if (action.mint === "reserve") {
-      assert(bank.canMintReserveCoinAmount(amount), "Can't mint Reserve Coin.");
+    } else {
+      assert(bank.canMint(amount, "reserve"), "Can't mint Reserve Coin.");
 
-      nanoergsDelta += bank.getReserveCoinMintingBaseCost(amount);
       reserveDelta -= amount;
     }
-  } else if (redeeming(action)) {
+  } else {
     circulationDelta -= amount;
+    nanoergsDelta -= bank.getRedeemingAmountFor(amount, action.redeem, "base");
 
     if (action.redeem === "stable") {
-      assert(bank.canRedeemStableCoinAmount(amount), "Can't redeem Stable Coin.");
+      assert(bank.canRedeem(amount, "stable"), "Can't redeem Stable Coin.");
 
-      nanoergsDelta -= bank.getStableCoinRedeemingBaseAmount(amount);
       stableDelta += amount;
-    } else if (action.redeem === "reserve") {
-      assert(bank.canRedeemReserveCoinAmount(amount), "Can't redeem Reserve Coin.");
+    } else {
+      assert(bank.canRedeem(amount, "reserve"), "Can't redeem Reserve Coin.");
 
-      nanoergsDelta -= bank.getReserveCoinRedeemingBaseAmount(amount);
       reserveDelta += amount;
     }
   }
-
-  assert(nanoergsDelta !== _0n, "Invalid params.");
 
   return ({ addInputs, addDataInputs, addOutputs, setFee }) => {
     const box = bank.bankBox;
@@ -88,16 +78,14 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
     addDataInputs(bank.oracleBox, { index: 0 });
     setFee(action.fee);
     addOutputs(
-      [
-        new OutputBuilder(big(box.value) + nanoergsDelta, box.ergoTree)
-          .addTokens({ tokenId: stable.tokenId, amount: big(stable.amount) + stableDelta })
-          .addTokens({ tokenId: reserve.tokenId, amount: big(reserve.amount) + reserveDelta })
-          .addTokens(nft)
-          .setAdditionalRegisters({
-            R4: SConstant(SLong(SParse<bigint>(box.additionalRegisters.R4) - stableDelta)),
-            R5: SConstant(SLong(SParse<bigint>(box.additionalRegisters.R5) - reserveDelta))
-          })
-      ],
+      new OutputBuilder(big(box.value) + nanoergsDelta, box.ergoTree)
+        .addTokens({ tokenId: stable.tokenId, amount: big(stable.amount) + stableDelta })
+        .addTokens({ tokenId: reserve.tokenId, amount: big(reserve.amount) + reserveDelta })
+        .addTokens(nft)
+        .setAdditionalRegisters({
+          R4: SConstant(SLong(SParse<bigint>(box.additionalRegisters.R4) - stableDelta)),
+          R5: SConstant(SLong(SParse<bigint>(box.additionalRegisters.R5) - reserveDelta))
+        }),
       { index: 0 }
     );
 
@@ -121,13 +109,13 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
       addOutputs(recipient, { index: 1 });
     }
 
-    if (bank.implementorFeeAddress) {
-      const uiFeeAmount = bank.getImplementorFee(
+    if (bank.implementorAddress) {
+      const feeAmount = bank.getImplementorFee(
         nanoergsDelta > _0n ? nanoergsDelta : -nanoergsDelta
       );
 
-      if (uiFeeAmount > _0n) {
-        addOutputs(new OutputBuilder(uiFeeAmount, bank.implementorFeeAddress), { index: 2 });
+      if (feeAmount > _0n) {
+        addOutputs(new OutputBuilder(feeAmount, bank.implementorAddress), { index: 2 });
       }
     }
   };

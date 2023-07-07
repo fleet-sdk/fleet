@@ -44,7 +44,7 @@ describe("Bank construction", () => {
       address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     });
 
-    expect(bank.implementorFeeAddress).to.be.equal(
+    expect(bank.implementorAddress).to.be.equal(
       "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     );
     expect(bank.getImplementorFee(1500n)).to.be.equal(3n);
@@ -54,7 +54,7 @@ describe("Bank construction", () => {
       address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     });
 
-    expect(bank.implementorFeeAddress).to.be.equal(
+    expect(bank.implementorAddress).to.be.equal(
       "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     );
     expect(bank.getImplementorFee(1500n)).to.be.equal(30n);
@@ -64,7 +64,7 @@ describe("Bank construction", () => {
       address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     });
 
-    expect(bank.implementorFeeAddress).to.be.equal(
+    expect(bank.implementorAddress).to.be.equal(
       "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     );
     expect(bank.getImplementorFee(1501232310n)).to.be.equal(0n);
@@ -78,7 +78,7 @@ describe("Bank construction", () => {
       address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     });
 
-    expect(bank.implementorFeeAddress).to.be.equal(
+    expect(bank.implementorAddress).to.be.equal(
       "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     );
     expect(bank.getImplementorFee(1500n)).to.be.equal(30n);
@@ -89,7 +89,7 @@ describe("Bank construction", () => {
       address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     });
 
-    expect(bank.implementorFeeAddress).to.be.equal(
+    expect(bank.implementorAddress).to.be.equal(
       "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     );
     expect(bank.getImplementorFee(1500n)).to.be.equal(100n);
@@ -174,27 +174,27 @@ describe("Bank calculations", () => {
     const oracleBox = mockOracleBox(210526315n);
     const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
 
-    expect(bank.stableCoinNominalPrice).to.be.equal(2105263n);
-    expect(bank.reserveCoinNominalPrice).to.be.equal(828471n);
+    expect(bank.stableCoinPrice).to.be.equal(2105263n);
+    expect(bank.reserveCoinPrice).to.be.equal(828471n);
     expect(bank.reserveRatio).to.be.equal(437n);
 
-    expect(bank.canRedeemStableCoinAmount(bank.circulatingStableCoins)).to.be.true;
-    expect(bank.canRedeemStableCoinAmount(bank.circulatingStableCoins + 1n)).to.be.false;
+    expect(bank.canRedeem(bank.circulatingStableCoins, "stable")).to.be.true;
+    expect(bank.canRedeem(bank.circulatingStableCoins + 1n, "stable")).to.be.false;
 
-    const availableStableCoin = bank.stableCoinAvailableAmount;
-    expect(bank.getMintStableCoinReserveRatioFor(availableStableCoin)).to.be.equal(400n);
-    expect(bank.canMintStableCoin(availableStableCoin)).to.be.true;
-    expect(bank.canMintStableCoin(availableStableCoin * 2n)).to.be.false;
+    const availableStableCoin = bank.availableStableCoins;
+    expect(bank.getReserveRatioFor("minting", availableStableCoin, "stable")).to.be.equal(400n);
+    expect(bank.canMint(availableStableCoin, "stable")).to.be.true;
+    expect(bank.canMint(availableStableCoin * 2n, "stable")).to.be.false;
 
-    const availableReserveCoin = bank.reserveCoinAvailableAmount;
-    expect(bank.getMintReserveCoinReserveRatioFor(availableReserveCoin)).to.be.equal(800n);
-    expect(bank.canMintReserveCoinAmount(availableReserveCoin)).to.be.true;
-    expect(bank.canMintReserveCoinAmount(availableReserveCoin * 2n)).to.be.false;
+    const availableReserveCoin = bank.availableReserveCoins;
+    expect(bank.getReserveRatioFor("minting", availableReserveCoin, "reserve")).to.be.equal(800n);
+    expect(bank.canMint(availableReserveCoin, "reserve")).to.be.true;
+    expect(bank.canMint(availableReserveCoin * 2n, "reserve")).to.be.false;
 
-    const redeemableReserveCoin = bank.reserveCoinRedeemableAmount;
-    expect(bank.canRedeemReserveCoinAmount(redeemableReserveCoin)).to.be.true;
+    const redeemableReserveCoin = bank.redeemableReserveCoins;
+    expect(bank.canRedeem(redeemableReserveCoin, "reserve")).to.be.true;
     expect(bank.getRedeemReserveCoinReserveRatioFor(redeemableReserveCoin)).to.be.equal(400n);
-    expect(bank.canRedeemReserveCoinAmount(redeemableReserveCoin * 2n)).to.be.false;
+    expect(bank.canRedeem(redeemableReserveCoin * 2n, "reserve")).to.be.false;
   });
 
   it("Should be able to mint stable and reserve coins and redeem reserve coin. Reserve == 409", () => {
@@ -208,24 +208,24 @@ describe("Bank calculations", () => {
     const oracleBox = mockOracleBox(229357798n);
     const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
 
-    expect(bank.stableCoinNominalPrice).to.be.equal(2293577n);
-    expect(bank.reserveCoinNominalPrice).to.be.equal(807096n);
+    expect(bank.stableCoinPrice).to.be.equal(2293577n);
+    expect(bank.reserveCoinPrice).to.be.equal(807096n);
     expect(bank.reserveRatio).to.be.equal(409n);
 
-    const availableStableCoin = bank.stableCoinAvailableAmount;
-    expect(bank.getMintStableCoinReserveRatioFor(availableStableCoin)).to.be.equal(400n);
-    expect(bank.canMintStableCoin(availableStableCoin)).to.be.true;
-    expect(bank.canMintStableCoin(availableStableCoin * 2n)).to.be.false;
+    const availableStableCoin = bank.availableStableCoins;
+    expect(bank.getReserveRatioFor("minting", availableStableCoin, "stable")).to.be.equal(400n);
+    expect(bank.canMint(availableStableCoin, "stable")).to.be.true;
+    expect(bank.canMint(availableStableCoin * 2n, "stable")).to.be.false;
 
-    const availableReserveCoin = bank.reserveCoinAvailableAmount;
-    expect(bank.getMintReserveCoinReserveRatioFor(availableReserveCoin)).to.be.equal(800n);
-    expect(bank.canMintReserveCoinAmount(availableReserveCoin)).to.be.true;
-    expect(bank.canMintReserveCoinAmount(availableReserveCoin * 2n)).to.be.false;
+    const availableReserveCoin = bank.availableReserveCoins;
+    expect(bank.getReserveRatioFor("minting", availableReserveCoin, "reserve")).to.be.equal(800n);
+    expect(bank.canMint(availableReserveCoin, "reserve")).to.be.true;
+    expect(bank.canMint(availableReserveCoin * 2n, "reserve")).to.be.false;
 
-    const redeemableReserveCoin = bank.reserveCoinRedeemableAmount;
-    expect(bank.canRedeemReserveCoinAmount(redeemableReserveCoin)).to.be.true;
+    const redeemableReserveCoin = bank.redeemableReserveCoins;
+    expect(bank.canRedeem(redeemableReserveCoin, "reserve")).to.be.true;
     expect(bank.getRedeemReserveCoinReserveRatioFor(redeemableReserveCoin)).to.be.equal(400n);
-    expect(bank.canRedeemReserveCoinAmount(redeemableReserveCoin * 2n)).to.be.false;
+    expect(bank.canRedeem(redeemableReserveCoin * 2n, "reserve")).to.be.false;
   });
 
   test("Low bank reserve", () => {
@@ -239,15 +239,15 @@ describe("Bank calculations", () => {
     const oracleBox = mockOracleBox(229357798n);
     const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
 
-    expect(bank.stableCoinNominalPrice).to.be.equal(938105n); // lower price due to not enough reserve
-    expect(bank.reserveCoinNominalPrice).to.be.equal(SIGMA_USD_PARAMETERS.defaultReserveCoinPrice);
+    expect(bank.stableCoinPrice).to.be.equal(938105n); // lower price due to not enough reserve
+    expect(bank.reserveCoinPrice).to.be.equal(SIGMA_USD_PARAMETERS.defaultReserveCoinPrice);
     expect(bank.reserveRatio).to.be.equal(40n);
-    expect(bank.stableCoinAvailableAmount).to.be.equal(0n);
-    expect(bank.reserveCoinRedeemableAmount).to.be.equal(0n);
+    expect(bank.availableStableCoins).to.be.equal(0n);
+    expect(bank.redeemableReserveCoins).to.be.equal(0n);
 
-    const availableReserveCoin = bank.reserveCoinAvailableAmount;
+    const availableReserveCoin = bank.availableReserveCoins;
     expect(availableReserveCoin).to.be.equal(2648469734n);
-    expect(bank.getMintReserveCoinReserveRatioFor(availableReserveCoin)).to.be.equal(800n);
+    expect(bank.getReserveRatioFor("minting", availableReserveCoin, "reserve")).to.be.equal(800n);
   });
 
   test("High bank reserve", () => {
@@ -261,72 +261,138 @@ describe("Bank calculations", () => {
     const oracleBox = mockOracleBox(229357798n);
     const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
 
-    expect(bank.stableCoinNominalPrice).to.be.equal(2293577n);
-    expect(bank.reserveCoinNominalPrice).to.be.equal(10421622n);
+    expect(bank.stableCoinPrice).to.be.equal(2293577n);
+    expect(bank.reserveCoinPrice).to.be.equal(10421622n);
     expect(bank.reserveRatio).to.be.equal(4090n);
-    expect(bank.stableCoinAvailableAmount).to.be.equal(1920097470n);
-    expect(bank.reserveCoinAvailableAmount).to.be.equal(0n);
+    expect(bank.availableStableCoins).to.be.equal(1920097470n);
+    expect(bank.availableReserveCoins).to.be.equal(0n);
 
-    const availableStableCoin = bank.stableCoinAvailableAmount;
+    const availableStableCoin = bank.availableStableCoins;
     expect(availableStableCoin).to.be.equal(1920097470n);
-    expect(bank.getMintStableCoinReserveRatioFor(availableStableCoin)).to.be.equal(400n);
+    expect(bank.getReserveRatioFor("minting", availableStableCoin, "stable")).to.be.equal(400n);
 
-    const redeemableReserveCoin = bank.reserveCoinRedeemableAmount;
+    const redeemableReserveCoin = bank.redeemableReserveCoins;
     expect(bank.getRedeemReserveCoinReserveRatioFor(redeemableReserveCoin)).to.be.equal(400n);
   });
 
-  it("Should be able to mint reserve coins and redeem stable coin, but not mint stable. Reserve == 341", () => {
+  it("Should be able to mint reserve coins and redeem stable coin, but not mint stable. Reserve == 347, sigmausd.io", () => {
     const bankBox = mockBankBox({
-      reserveNanoergs: 1_503_178_749_566_874n,
-      circulatingStableCoin: SParse("05c4c9b035"),
-      circulatingReserveCoin: SParse("05eac7f1db12")
+      reserveNanoergs: 1_482_462_367_921_576n,
+      circulatingStableCoin: SParse("0584cda232"),
+      circulatingReserveCoin: SParse("05acdac7e612")
     });
-    const oracleBox = mockOracleBox(SParse("05ccadf6ee05"));
+    const oracleBox = mockOracleBox(SParse("05b096ee8406"));
     const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
 
     bank.setImplementorFee({
-      percentage: 2n,
+      percentage: 6n,
       precision: 3n,
       address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
     });
 
-    expect(bank.stableCoinNominalPrice).to.be.equal(7_874_015n);
-    expect(bank.reserveCoinNominalPrice).to.be.equal(422_904n);
-    expect(bank.reserveRatio).to.be.equal(341n);
-    expect(bank.circulatingStableCoins).to.be.equal(55_972_450n);
-    expect(bank.circulatingReserveCoins).to.be.equal(2_512_269_813n);
-    expect(bank.baseReserves).to.be.equal(1_503_178_749_566_874n);
-    expect(bank.ergPriceInStableCoin).to.be.equal(127n);
-    expect(bank.ergPriceInReserveCoin).to.be.equal(2364n);
-    expect(bank.canMintReserveCoinAmount(3381618240n)).to.be.true;
+    expect(bank.stableCoinPrice).to.be.equal(8_104_032n);
+    expect(bank.reserveCoinPrice).to.be.equal(418_187n);
+    expect(bank.reserveRatio).to.be.equal(347n);
+    expect(bank.circulatingStableCoins).to.be.equal(527_122_58n);
+    expect(bank.circulatingReserveCoins).to.be.equal(2_523_461_270n);
+    expect(bank.baseReserves).to.be.equal(1_482_462_367_921_576n);
+    expect(bank.stableCoinErgRate).to.be.equal(123n);
+    expect(bank.reserveCoinErgRate).to.be.equal(2391n);
 
-    expect(bank.canMintReserveCoinAmount(1n)).to.be.true;
-    expect(bank.canRedeemReserveCoinAmount(1n)).to.be.false;
-    expect(bank.canMintStableCoin(1n)).to.be.false;
-    expect(bank.canRedeemStableCoinAmount(bank.circulatingStableCoins)).to.be.true;
+    expect(bank.canMint(3294316566n, "reserve")).to.be.true;
+    expect(bank.canRedeem(1n, "reserve")).to.be.false;
+    expect(bank.canMint(1n, "stable")).to.be.false;
+    expect(bank.canRedeem(527_122_58n, "stable")).to.be.true;
+    expect(bank.getReserveRatioFor("redeeming", 100_000_00n, "stable")).to.be.equal(405n);
 
-    const minerFee = RECOMMENDED_MIN_FEE_VALUE;
-    const scAmount = 15000n;
-    expect(bank.stableCoinNominalPrice * scAmount).to.be.equal(118110225000n);
+    expect(bank.availableReserveCoins).to.be.equal(4538344221n);
+    expect(bank.availableStableCoins).to.be.equal(0n);
+
+    expect(bank.redeemableReserveCoins).to.be.equal(0n);
+    expect(bank.redeemableStableCoins).to.be.equal(527_122_58n);
+
+    const txFee = RECOMMENDED_MIN_FEE_VALUE;
+    const stable = 15000n;
+    expect(bank.stableCoinPrice * stable).to.be.equal(121_560_480_000n);
 
     // mint stable coin
-    expect(bank.getTotalStableCoinMintingCost(scAmount, minerFee)).to.be.equal(120734474359n);
-    expect(bank.getStableCoinMintingFees(scAmount, minerFee)).to.be.equal(2604249359n);
+    expect(bank.getFeeAmountFor(stable, "stable", "all")).to.be.equal(3_175_159_737n);
+    expect(bank.getFeeAmountFor(stable, "stable", "all", txFee)).to.be.equal(3176259737n);
+    expect(bank.getMintingCostFor(stable, "stable", "total", txFee)).to.be.equal(124_756_739_737n);
 
     // redeem stable coin
-    expect(bank.getTotalStableCoinRedeemingAmount(scAmount, minerFee)).to.be.equal(115515424459n);
-    expect(bank.getRedeemingStableCoinFees(scAmount, minerFee)).to.be.equal(2604249359n);
+    expect(bank.getFeeAmountFor(stable, "stable", "all")).to.be.equal(3_175_159_737n);
+    expect(bank.getRedeemingAmountFor(stable, "stable", "total", txFee)).to.be.equal(118413394778n);
 
-    const rsAmount = 40504n;
-    expect(bank.reserveCoinNominalPrice * rsAmount).to.be.equal(17129303616n);
+    const reserve = 40504n;
+    expect(bank.reserveCoinPrice * reserve).to.be.equal(16938246248n);
 
     // mint reserve coin
-    expect(bank.getTotalReserveCoinMintingCost(rsAmount, minerFee)).to.be.equal(17527933467n);
-    expect(bank.getReserveCoinMintingFees(rsAmount, minerFee)).to.be.equal(378629851n);
+    expect(bank.getFeeAmountFor(reserve, "reserve", "all")).to.be.equal(442426991n); // 0.453
+    expect(bank.getMintingCostFor(reserve, "reserve", "total", txFee)).to.be.equal(17_401_773_239n);
 
-    // redeem reserve coin
-    expect(bank.getTotalReserveCoinRedeemingAmount(rsAmount, minerFee)).to.be.equal(16752044109n);
-    expect(bank.getReserveCoinRedeemingFees(rsAmount, minerFee)).to.be.equal(377259507n);
+    // // redeem reserve coin
+    expect(bank.getFeeAmountFor(reserve, "reserve", "all")).to.be.equal(442_426_991n);
+    expect(bank.getRedeemingAmountFor(reserve, "reserve", "total")).to.be.equal(16_499_884_437n);
+  });
+
+  it("Should be able to mint reserve coins and redeem stable coin, but not mint stable. Reserve == 345, tokenjay", () => {
+    const bankBox = mockBankBox({
+      reserveNanoergs: 1_482_462_367_921_576n,
+      circulatingStableCoin: SParse("0584cda232"),
+      circulatingReserveCoin: SParse("05acdac7e612")
+    });
+    const oracleBox = mockOracleBox(SParse("058494ac8706"));
+    const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
+
+    expect(bank.stableCoinPrice).to.be.equal(8130081n);
+    expect(bank.reserveCoinPrice).to.be.equal(417643n);
+    expect(bank.reserveRatio).to.be.equal(345n);
+    expect(bank.circulatingStableCoins).to.be.equal(527_122_58n);
+    expect(bank.circulatingReserveCoins).to.be.equal(2_523_461_270n);
+    expect(bank.baseReserves).to.be.equal(1_482_462_367_921_576n);
+    expect(bank.stableCoinErgRate).to.be.equal(123n);
+    expect(bank.reserveCoinErgRate).to.be.equal(2394n);
+
+    expect(bank.canMint(bank.availableReserveCoins, "reserve")).to.be.true;
+    expect(bank.canRedeem(1n, "reserve")).to.be.false;
+    expect(bank.canMint(1n, "stable")).to.be.false;
+    expect(bank.canRedeem(bank.redeemableStableCoins, "stable")).to.be.true;
+
+    expect(bank.availableReserveCoins).to.be.equal(4_576_481_568n);
+    expect(bank.availableStableCoins).to.be.equal(0n);
+
+    expect(bank.redeemableReserveCoins).to.be.equal(0n);
+    expect(bank.redeemableStableCoins).to.be.equal(527_122_58n);
+
+    const stable = 15000n;
+    expect(bank.stableCoinPrice * stable).to.be.equal(121_951_215_000n);
+
+    bank.setImplementorFee({
+      percentage: 22n,
+      precision: 4n,
+      address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+    });
+
+    // redeem stable coin
+    expect(bank.getFeeAmountFor(stable, "stable", "protocol")).to.be.equal(2_439_024_300n);
+    expect(bank.getFeeAmountFor(stable, "stable", "implementor")).to.be.equal(273_658_526n);
+    expect(bank.getRedeemingAmountFor(stable, "stable", "total")).to.be.equal(11_924_9263_881n);
+    expect(bank.getReserveRatioFor("redeeming", 100_000_00n, "stable")).to.be.equal(403n);
+
+    bank.setImplementorFee({
+      percentage: 11n,
+      precision: 4n,
+      address: "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+    });
+
+    const reserve = 405040n;
+    expect(bank.reserveCoinPrice * reserve).to.be.equal(169162120720n);
+
+    // mint reserve coin
+    expect(bank.getFeeAmountFor(reserve, "reserve", "protocol")).to.be.equal(3383242414n);
+    expect(bank.getFeeAmountFor(reserve, "reserve", "implementor")).to.be.equal(189799899n);
+    expect(bank.getMintingCostFor(reserve, "reserve", "total")).to.be.equal(172755163033n);
   });
 
   it("Should return base reserve and reserve ration equal to zero if bank box value is under min value", () => {
@@ -352,7 +418,7 @@ describe("Bank calculations", () => {
     const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
 
     expect(bank.liabilities).to.be.equal(0n);
-    expect(bank.stableCoinNominalPrice).to.be.equal(229357798n / 100n);
+    expect(bank.stableCoinPrice).to.be.equal(229357798n / 100n);
     expect(Number(bank.reserveRatio)).to.be.greaterThanOrEqual(400);
   });
 });
