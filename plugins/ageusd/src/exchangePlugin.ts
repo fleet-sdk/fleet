@@ -9,12 +9,12 @@ import {
   SLong,
   SParse
 } from "@fleet-sdk/core";
-import { AgeUSDBank, CoinType } from "./ageUsdBank";
+import { ActionType, AgeUSDBank, CoinType } from "./ageUsdBank";
 
 export type AgeUSDActionBase = {
   amount: Amount;
-  recipient: ErgoAddress | string;
-  fee: Amount;
+  recipient?: ErgoAddress | string;
+  fee?: Amount;
 };
 
 export type AgeUSDMintAction = AgeUSDActionBase & {
@@ -31,6 +31,13 @@ function minting(params: unknown): params is AgeUSDMintAction {
   return isDefined((params as AgeUSDMintAction).mint);
 }
 
+function buildErrorMsgFor(action: ActionType, coin: CoinType, bank: AgeUSDBank): string {
+  const amount = action === "minting" ? bank.getAvailable(coin) : bank.getRedeemable(coin);
+  const verb = action === "minting" ? "mint" : "redeem";
+
+  return `Unable to ${verb} more than ${amount} ${coin} coins.`;
+}
+
 export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDMintAction): FleetPlugin;
 export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDRedeemAction): FleetPlugin;
 export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAction): FleetPlugin {
@@ -41,29 +48,25 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
   let circulationDelta = _0n;
 
   if (minting(action)) {
+    assert(bank.canMint(amount, action.mint), () => buildErrorMsgFor("minting", action.mint, bank));
+
     circulationDelta = amount;
-    nanoergsDelta += bank.getMintingCostFor(amount, action.mint, "base");
-
+    nanoergsDelta += bank.getMintingCostFor(amount, action.mint, "base", action.fee);
     if (action.mint === "stable") {
-      assert(bank.canMint(amount, "stable"), "Can't mint Stable Coin.");
-
       stableDelta -= amount;
     } else {
-      assert(bank.canMint(amount, "reserve"), "Can't mint Reserve Coin.");
-
       reserveDelta -= amount;
     }
   } else {
+    assert(bank.canRedeem(amount, action.redeem), () =>
+      buildErrorMsgFor("redeeming", action.redeem, bank)
+    );
+
     circulationDelta -= amount;
     nanoergsDelta -= bank.getRedeemingAmountFor(amount, action.redeem, "base");
-
     if (action.redeem === "stable") {
-      assert(bank.canRedeem(amount, "stable"), "Can't redeem Stable Coin.");
-
       stableDelta += amount;
     } else {
-      assert(bank.canRedeem(amount, "reserve"), "Can't redeem Reserve Coin.");
-
       reserveDelta += amount;
     }
   }
@@ -76,7 +79,6 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
 
     addInputs(box);
     addDataInputs(bank.oracleBox, { index: 0 });
-    setFee(action.fee);
     addOutputs(
       new OutputBuilder(big(box.value) + nanoergsDelta, box.ergoTree)
         .addTokens({ tokenId: stable.tokenId, amount: big(stable.amount) + stableDelta })
@@ -88,6 +90,10 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
         }),
       { index: 0 }
     );
+
+    if (action.fee) {
+      setFee(action.fee);
+    }
 
     if (action.recipient) {
       const recipient = new OutputBuilder(
