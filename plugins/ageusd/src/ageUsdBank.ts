@@ -46,35 +46,43 @@ function isImplementorFeeCallbackParams(params: unknown): params is ImplementorF
 }
 
 export class AgeUSDBank {
-  private readonly _bankBox: AgeUSDBankBox;
-  private readonly _oracleBox: OracleBox;
-  private readonly _oracleRate: bigint;
   private readonly _params: AgeUSDBankParameters;
 
+  private _oracleBox!: OracleBox;
+  private _oracleRate!: bigint;
+  private _bankBox!: AgeUSDBankBox;
   private _implementorFeeOptions?: ImplementorFeeCallbackOptions;
 
-  constructor(bankBox: AgeUSDBankBox, oracleBox: OracleBox, params: AgeUSDBankParameters) {
-    assert(this.validateBankBox(bankBox, params), "Invalid bank box.");
-    assert(this.validateOracleBox(oracleBox, params), "Invalid oracle box.");
-
-    this._bankBox = bankBox;
-    this._oracleBox = oracleBox;
+  constructor(bankBox: Box<Amount>, oracleBox: Box<Amount>, params: AgeUSDBankParameters) {
     this._params = params;
-
-    const datapoint = oracleBox.additionalRegisters.R4;
-    const decimals = params.oracle.decimals ?? 0;
-    this._oracleRate = SParse<bigint>(datapoint) / BigInt(10 ** decimals);
+    this.bankBox = bankBox;
+    this.oracleBox = oracleBox;
   }
 
   get oracleBox(): OracleBox {
     return this._oracleBox;
   }
 
+  set oracleBox(oracleBox: Box<Amount>) {
+    assert(this.validateOracleBox(oracleBox, this._params), "Invalid oracle box.");
+
+    this._oracleBox = oracleBox;
+    const datapoint = oracleBox.additionalRegisters.R4;
+    const decimals = this._params.oracle.decimals ?? 0;
+    this._oracleRate = SParse<bigint>(datapoint) / BigInt(10 ** decimals);
+  }
+
   get oracleRate(): bigint {
     return this._oracleRate;
   }
 
-  get bankBox() {
+  set bankBox(bankBox: Box<Amount>) {
+    assert(this.validateBankBox(bankBox, this._params), "Invalid bank box.");
+
+    this._bankBox = bankBox;
+  }
+
+  get bankBox(): AgeUSDBankBox {
     return this._bankBox;
   }
 
@@ -177,7 +185,10 @@ export class AgeUSDBank {
     return _1000000000n / this.reserveCoinPrice;
   }
 
-  protected validateBankBox(bankBox: AgeUSDBankBox, params: AgeUSDBankParameters): boolean {
+  protected validateBankBox(
+    bankBox: Box<Amount>,
+    params: AgeUSDBankParameters
+  ): bankBox is AgeUSDBankBox {
     return (
       bankBox.assets.length === 3 &&
       params.contract === bankBox.ergoTree &&
@@ -187,7 +198,10 @@ export class AgeUSDBank {
     );
   }
 
-  protected validateOracleBox(oracleBox: OracleBox, params: AgeUSDBankParameters): boolean {
+  protected validateOracleBox(
+    oracleBox: Box<Amount>,
+    params: AgeUSDBankParameters
+  ): oracleBox is OracleBox {
     return (
       oracleBox.assets[0].tokenId === params.oracle.nftId &&
       isDefined(oracleBox.additionalRegisters.R4) &&
