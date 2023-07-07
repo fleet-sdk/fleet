@@ -1,5 +1,22 @@
-export function assert(condition: boolean, message: string): asserts condition {
-  if (!condition) throw new Error(message);
+export type AssertErrorMessageInput = string | Error | (() => string);
+
+export function assert(condition: boolean, errorMsg: AssertErrorMessageInput): asserts condition {
+  if (!condition) {
+    let error: Error | undefined = undefined;
+
+    switch (typeof errorMsg) {
+      case "string":
+        error = new Error(errorMsg);
+        break;
+      case "function":
+        error = new Error(errorMsg());
+        break;
+      default:
+        error = errorMsg;
+    }
+
+    throw error;
+  }
 }
 
 export function isEmpty<T extends object>(obj?: T): obj is undefined;
