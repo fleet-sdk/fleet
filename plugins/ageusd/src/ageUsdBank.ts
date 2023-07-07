@@ -124,13 +124,12 @@ export class AgeUSDBank {
   }
 
   get stableCoinPrice(): bigint {
-    const oracleRate = this._oracleRate;
     const liabilities = this.liabilities;
-    const numStableCoins = this.circulatingStableCoins;
+    const circulating = this.circulatingStableCoins;
 
-    return numStableCoins === _0n || oracleRate < liabilities / numStableCoins
-      ? oracleRate
-      : liabilities / numStableCoins;
+    return circulating === _0n || this._oracleRate < liabilities / circulating
+      ? this._oracleRate
+      : liabilities / circulating;
   }
 
   get reserveCoinPrice(): bigint {
@@ -145,64 +144,21 @@ export class AgeUSDBank {
   }
 
   get availableStableCoins(): bigint {
-    const minReserveRatio = this._params.minReserveRatio;
+    const minRatio = this._params.minReserveRatio;
+    const circulating = this.circulatingStableCoins;
 
-    const base =
-      this.baseReserves * _100n - minReserveRatio * this._oracleRate * this.circulatingStableCoins;
-    const rate = this._oracleRate * (minReserveRatio - _100n - 2n);
-    const available = base / rate;
+    const base = this.baseReserves * _100n - minRatio * this._oracleRate * circulating;
+    const rate = this._oracleRate * (minRatio - _100n - 2n);
 
-    return max(available, _0n);
+    return max(base / rate, _0n);
   }
 
   get availableReserveCoins(): bigint {
-    if (!this.canMint(_1n, "reserve")) return _0n;
-
-    const maxReserveRatio = this._params.maxReserveRatio;
-    let low = _0n;
-    let mid = _0n;
-    let high = big(this.reserveCoin.amount);
-    let newReserveRatio = _0n;
-
-    while (low <= high && newReserveRatio !== maxReserveRatio) {
-      mid = (high - low) / _2n + low;
-      newReserveRatio = this.getReserveRatioFor("minting", mid, "reserve");
-
-      if (newReserveRatio === maxReserveRatio) {
-        low = mid;
-      } else if (newReserveRatio > maxReserveRatio) {
-        high = mid - _1n;
-      } else {
-        low = mid + _1n;
-      }
-    }
-
-    return low;
+    return this._findLimitFor("reserve", "minting");
   }
 
   get redeemableReserveCoins(): bigint {
-    const minReserveRatio = this._params.minReserveRatio;
-    if (this.getRedeemReserveCoinReserveRatioFor(_1n) <= minReserveRatio) return _0n;
-
-    let low = _0n;
-    let mid = _0n;
-    let high = this.circulatingReserveCoins;
-    let newReserveRatio = _0n;
-
-    while (low < high && newReserveRatio !== minReserveRatio) {
-      mid = (high - low) / _2n + low;
-      newReserveRatio = this.getRedeemReserveCoinReserveRatioFor(mid);
-
-      if (newReserveRatio === minReserveRatio) {
-        low = mid;
-      } else if (newReserveRatio < minReserveRatio) {
-        high = mid - _1n;
-      } else {
-        low = mid + _1n;
-      }
-    }
-
-    return low;
+    return this._findLimitFor("reserve", "redeeming");
   }
 
   get redeemableStableCoins(): bigint {
@@ -280,25 +236,29 @@ export class AgeUSDBank {
     return rate / this._oracleRate;
   }
 
+  getAvailable(coin: CoinType): bigint {
+    return coin === "stable" ? this.availableStableCoins : this.availableReserveCoins;
+  }
+
+  getRedeemable(coin: CoinType): bigint {
+    return coin === "stable" ? this.redeemableStableCoins : this.redeemableReserveCoins;
+  }
+
   canMint(amount: Amount, coin: CoinType): boolean {
     amount = big(amount);
     const newReserveRatio = this.getReserveRatioFor("minting", amount, coin);
 
-    if (coin === "stable") {
-      return newReserveRatio >= this._params.minReserveRatio;
-    } else {
-      return newReserveRatio <= this._params.maxReserveRatio;
-    }
+    return coin === "stable"
+      ? newReserveRatio >= this._params.minReserveRatio
+      : newReserveRatio <= this._params.maxReserveRatio;
   }
 
   canRedeem(amount: Amount, coin: CoinType): boolean {
     amount = big(amount);
 
-    if (coin === "stable") {
-      return amount <= this.circulatingStableCoins;
-    } else {
-      return this.getRedeemReserveCoinReserveRatioFor(amount) >= this._params.minReserveRatio;
-    }
+    return coin === "stable"
+      ? amount <= this.circulatingStableCoins
+      : this.getReserveRatioFor("redeeming", amount, "reserve") >= this._params.minReserveRatio;
   }
 
   getReserveRatioFor(action: ActionType, amount: Amount, coin: CoinType): bigint {
@@ -321,10 +281,6 @@ export class AgeUSDBank {
     }
 
     return this.getReserveRatio(newReserve, newCirculatingStable);
-  }
-
-  getRedeemReserveCoinReserveRatioFor(amount: bigint) {
-    return this.getReserveRatioFor("redeeming", amount, "reserve");
   }
 
   getFeeAmountFor(amount: Amount, coin: CoinType, type?: FeeType, txFee?: Amount): bigint {
@@ -350,9 +306,8 @@ export class AgeUSDBank {
     let cost = baseAmount + this.getProtocolFee(baseAmount);
 
     if (type === "total") {
-      const minBoxValues = this._params.minBoxValue * _2n;
       txFee = isDefined(txFee) ? big(txFee) : _0n;
-      cost += this.getImplementorFee(cost) + minBoxValues + txFee;
+      cost += this.getImplementorFee(cost) + txFee;
     }
 
     return cost;
@@ -371,5 +326,33 @@ export class AgeUSDBank {
     }
 
     return redeemAmount;
+  }
+
+  private _findLimitFor(coin: CoinType, action: ActionType) {
+    const minting = action === "minting";
+    const target = minting ? this._params.maxReserveRatio : this._params.minReserveRatio;
+
+    if (minting && !this.canMint(_1n, coin)) return _0n;
+    if (!minting && this.getReserveRatioFor(action, _1n, coin) <= target) return _0n;
+
+    let low = _0n;
+    let mid = _0n;
+    let high = minting ? big(this.reserveCoin.amount) : this.circulatingReserveCoins;
+    let newRatio = _0n;
+
+    while (low <= high && newRatio !== target) {
+      mid = (high - low) / _2n + low;
+      newRatio = this.getReserveRatioFor(action, mid, coin);
+
+      if (newRatio === target) {
+        low = mid;
+      } else if ((minting && newRatio > target) || (!minting && newRatio < target)) {
+        high = mid - _1n;
+      } else {
+        low = mid + _1n;
+      }
+    }
+
+    return low;
   }
 }
