@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { describe, expect, it, vi } from "vitest";
 import { assert, isEmpty, isFalsy, isTruthy, some } from "./assertions";
 
@@ -27,10 +26,6 @@ describe("assert() function", () => {
     expect(mock).toBeCalledTimes(1);
   });
 });
-=======
-import { describe, expect, it } from "vitest";
-import { isEmpty, isFalsy, isTruthy, some } from "./assertions";
->>>>>>> be6364f (common: refactor and add new assertion methods)
 
 describe("Assertions isTruthy and isFalsy assertions", () => {
   const truthy = [true, 1, 1n, [], {}, [1]];

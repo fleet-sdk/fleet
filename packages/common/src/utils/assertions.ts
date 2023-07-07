@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 export type AssertErrorMessageInput = string | Error | (() => string);
 
 export function assert(condition: boolean, errorMsg: AssertErrorMessageInput): asserts condition {
@@ -18,10 +17,6 @@ export function assert(condition: boolean, errorMsg: AssertErrorMessageInput): a
 
     throw error;
   }
-=======
-export function assert(condition: boolean, message: string): asserts condition {
-  if (!condition) throw new Error(message);
->>>>>>> be6364f (common: refactor and add new assertion methods)
 }
 
 export function isEmpty<T extends object>(obj?: T): obj is undefined;
