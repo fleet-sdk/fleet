@@ -5,14 +5,14 @@ import {
   TransactionBuilder
 } from "@fleet-sdk/core";
 import { MockChain } from "@fleet-sdk/mock-chain";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_tests/mocking";
-import { AgeUSDBank, AgeUSDBankBox } from "./ageUsdBank";
+import { AgeUSDBankBox } from "./ageUsdBank";
 import { AgeUSDExchangePlugin } from "./exchangePlugin";
 import { SigmaUSDBank } from "./sigmaUsdBank";
 import { SIGMA_USD_PARAMETERS } from "./sigmaUsdParameters";
 
-describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
+describe("AgeUSD exchange plugin", () => {
   const height = 1036535;
 
   const chain = new MockChain(height);
@@ -21,37 +21,35 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
   chain.assetsMetadata.set(tokens.stableCoinId, { name: "SigUSD", decimals: 2 });
   chain.assetsMetadata.set(tokens.reserveCoinId, { name: "SigRSV" });
   chain.assetsMetadata.set(tokens.nftId, { name: "SUSD Bank V2 NFT" });
+  const bob = chain.newParty("Bob");
   const bankParty = chain.newParty({
     name: "SigmaUSD Bank",
     ergoTree: SIGMA_USD_PARAMETERS.contract
   });
-  const bob = chain.newParty("Bob");
   const implementor = chain.newParty("Implementor");
-  let bank!: AgeUSDBank;
 
-  beforeEach(() => {
+  afterEach(() => {
     bob.utxos.clear();
     bankParty.utxos.clear();
     implementor.utxos.clear();
+  });
 
-    bank = new SigmaUSDBank(
+  it("Should mint reserve coin with reserve at 348%", () => {
+    const bank = new SigmaUSDBank(
       mockBankBox({
         reserveNanoergs: 1_482_462_367921576n,
         circulatingStableCoin: SParse("0584cda232"),
         circulatingReserveCoin: SParse("05acdac7e612")
       }),
       mockOracleBox(SParse("05b8e68b8106"))
-    );
-    bankParty.addUTxOs(bank.bankBox);
-  });
-
-  it("Should mint reserve coin with reserve at 348%", () => {
-    bob.addBalance({ nanoergs: 40_000000000n });
-    bank.setImplementorFee({
+    ).setImplementorFee({
       percentage: 11n,
       precision: 4n,
       address: implementor.address.encode()
     });
+
+    bankParty.addUTxOs(bank.bankBox);
+    bob.addBalance({ nanoergs: 40_000000000n });
 
     const prevBobBalance = bob.balance;
     const prevBankBalance = bankParty.balance;
@@ -100,12 +98,21 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
   });
 
   it("Should mint all available reserve coins with reserve at 348%", () => {
-    bob.addBalance({ nanoergs: 1_921_394_389201462n });
-    bank.setImplementorFee({
+    const bank = new SigmaUSDBank(
+      mockBankBox({
+        reserveNanoergs: 1_482_462_367921576n,
+        circulatingStableCoin: SParse("0584cda232"),
+        circulatingReserveCoin: SParse("05acdac7e612")
+      }),
+      mockOracleBox(SParse("05b8e68b8106"))
+    ).setImplementorFee({
       percentage: 11n,
       precision: 4n,
       address: implementor.address.encode()
     });
+
+    bankParty.addUTxOs(bank.bankBox);
+    bob.addBalance({ nanoergs: 1_921_394_389201462n });
 
     const prevBobBalance = bob.balance;
     const prevBankBalance = bankParty.balance;
@@ -156,14 +163,14 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
   });
 
   it("Should redeem stable coin with reserve at 351%", () => {
-    bankParty.utxos.clear();
-    bank.oracleBox = mockOracleBox(SParse("0580a0f8fa05"));
-    bank.bankBox = mockBankBox({
-      reserveNanoergs: 1_481_754_555029675n,
-      circulatingStableCoin: SParse("05d4d59732"),
-      circulatingReserveCoin: SParse("05acdac7e612")
-    });
-    bank.setImplementorFee({
+    const bank = new SigmaUSDBank(
+      mockBankBox({
+        reserveNanoergs: 1_481_754_555029675n,
+        circulatingStableCoin: SParse("05d4d59732"),
+        circulatingReserveCoin: SParse("05acdac7e612")
+      }),
+      mockOracleBox(SParse("0580a0f8fa05"))
+    ).setImplementorFee({
       percentage: 22n,
       precision: 4n,
       address: implementor.address.encode()
@@ -184,7 +191,6 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const uiFee = 217219200n;
     const protocolFee = 1_936000000n;
     const totalAmount = baseAmount - uiFee;
-    const networkFee = RECOMMENDED_MIN_FEE_VALUE * 3n;
 
     expect(bank.reserveRatio).to.be.equal(reserveRatio);
     expect(bank.getFeeAmountFor(redeemAmount, "stable", "protocol")).to.be.equal(protocolFee);
@@ -199,7 +205,7 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
           redeem: "stable",
           amount: redeemAmount,
           recipient: bob.address,
-          transactionFee: networkFee
+          transactionFee: RECOMMENDED_MIN_FEE_VALUE
         })
       )
       .sendChangeTo(bob.address)
@@ -218,7 +224,7 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     });
 
     expect(bob.balance).to.be.deep.equal({
-      nanoergs: prevBobBalance.nanoergs + totalAmount - networkFee,
+      nanoergs: prevBobBalance.nanoergs + totalAmount - RECOMMENDED_MIN_FEE_VALUE,
       tokens: [
         { tokenId: tokens.stableCoinId, amount: prevBobBalance.tokens[0].amount - redeemAmount }
       ]
@@ -228,16 +234,30 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
   });
 
   it("Should not mint stable coin with reserve at 348%", () => {
-    bob.addBalance({ nanoergs: 40_000000000n });
+    const originalBobBalance = 40_000000000n;
+    const originalBankReserves = 1_482_462_367921576n;
+    const reserveRatio = 348n;
+    const mintingAmount = 83760n;
+    const bank = new SigmaUSDBank(
+      mockBankBox({
+        reserveNanoergs: originalBankReserves,
+        circulatingStableCoin: SParse("0584cda232"),
+        circulatingReserveCoin: SParse("05acdac7e612")
+      }),
+      mockOracleBox(SParse("05b8e68b8106"))
+    );
 
-    expect(bank.reserveRatio).to.be.equal(348n);
+    bankParty.addUTxOs(bank.bankBox);
+    bob.addBalance({ nanoergs: originalBobBalance });
+
+    expect(bank.reserveRatio).to.be.equal(reserveRatio);
     expect(() => {
       new TransactionBuilder(height)
         .from(bob.utxos)
         .extend(
           AgeUSDExchangePlugin(bank, {
             mint: "stable",
-            amount: 83760n,
+            amount: mintingAmount,
             recipient: bob.address
           })
         )
@@ -247,5 +267,3 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     }).to.throw("Unable to mint more than 0 stable coins.");
   });
 });
-
-// describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {});
