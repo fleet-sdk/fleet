@@ -14,8 +14,8 @@
     "test:lint": "eslint ./ --ext .ts",
     "test:prettier": "prettier ./**/*.ts --list-different",
     "test:unit": "vitest run --no-coverage",
-    "cov:check": "vitest run --coverage --isolate",
-    "cov:open": "vitest run --coverage --isolate ; open-cli coverage/index.html",
+    "cov:check": "vitest run --coverage",
+    "cov:open": "vitest run --coverage ; open-cli coverage/index.html",
     "bench": "vitest bench"
   },
   "devDependencies": {
