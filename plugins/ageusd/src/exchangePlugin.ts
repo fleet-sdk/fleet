@@ -14,7 +14,7 @@ import { ActionType, AgeUSDBank, CoinType } from "./ageUsdBank";
 export type AgeUSDActionBase = {
   amount: Amount;
   recipient?: ErgoAddress | string;
-  fee?: Amount;
+  transactionFee?: Amount;
 };
 
 export type AgeUSDMintAction = AgeUSDActionBase & {
@@ -47,11 +47,17 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
   let nanoergsDelta = _0n;
   let circulationDelta = _0n;
 
+  let recipientAmount = _0n;
+  let uiFeeAmount = _0n;
+
   if (minting(action)) {
     assert(bank.canMint(amount, action.mint), () => buildErrorMsgFor("minting", action.mint, bank));
 
     circulationDelta = amount;
-    nanoergsDelta += bank.getMintingCostFor(amount, action.mint, "base", action.fee);
+    nanoergsDelta += bank.getMintingCostFor(amount, action.mint, "base");
+    recipientAmount = SAFE_MIN_BOX_VALUE;
+    uiFeeAmount = bank.getImplementorFee(nanoergsDelta);
+
     if (action.mint === "stable") {
       stableDelta -= amount;
     } else {
@@ -62,8 +68,15 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
       buildErrorMsgFor("redeeming", action.redeem, bank)
     );
 
+    const txFee = isDefined(action.transactionFee) ? big(action.transactionFee) : _0n;
+    const baseAmount = bank.getRedeemingAmountFor(amount, action.redeem, "base");
+
     circulationDelta -= amount;
-    nanoergsDelta -= bank.getRedeemingAmountFor(amount, action.redeem, "base");
+    nanoergsDelta -= baseAmount;
+    recipientAmount = baseAmount;
+    uiFeeAmount = bank.getFeeAmountFor(amount, action.redeem, "implementor");
+    recipientAmount -= uiFeeAmount + txFee;
+
     if (action.redeem === "stable") {
       stableDelta += amount;
     } else {
@@ -91,18 +104,17 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
       { index: 0 }
     );
 
-    if (action.fee) {
-      setFee(action.fee);
+    if (action.transactionFee) {
+      setFee(action.transactionFee);
     }
 
     if (action.recipient) {
-      const recipient = new OutputBuilder(
-        nanoergsDelta > _0n ? SAFE_MIN_BOX_VALUE : -nanoergsDelta,
-        action.recipient
-      ).setAdditionalRegisters({
-        R4: SConstant(SLong(circulationDelta)),
-        R5: SConstant(SLong(nanoergsDelta))
-      });
+      const recipient = new OutputBuilder(recipientAmount, action.recipient).setAdditionalRegisters(
+        {
+          R4: SConstant(SLong(circulationDelta)),
+          R5: SConstant(SLong(nanoergsDelta))
+        }
+      );
 
       if (stableDelta < _0n) {
         recipient.addTokens({ tokenId: box.assets[0].tokenId, amount: -stableDelta });
@@ -115,14 +127,8 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
       addOutputs(recipient, { index: 1 });
     }
 
-    if (bank.implementorAddress) {
-      const feeAmount = bank.getImplementorFee(
-        nanoergsDelta > _0n ? nanoergsDelta : -nanoergsDelta
-      );
-
-      if (feeAmount > _0n) {
-        addOutputs(new OutputBuilder(feeAmount, bank.implementorAddress), { index: 2 });
-      }
+    if (bank.implementorAddress && uiFeeAmount > _0n) {
+      addOutputs(new OutputBuilder(uiFeeAmount, bank.implementorAddress), { index: 2 });
     }
   };
 }
