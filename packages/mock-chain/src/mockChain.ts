@@ -1,11 +1,11 @@
 import { first, isDefined, some } from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction, SParse } from "@fleet-sdk/core";
 import { ErgoHDKey } from "@fleet-sdk/wallet";
-import pc from "picocolors";
+import { bgRed, bold, red } from "picocolors";
 import { printDiff } from "./balancePrinting";
 import { execute } from "./executor";
 import { MockChainParty, MockChainPartyParams } from "./mockChainParty";
-import { mockHeaders } from "./objectMock";
+import { mockHeaders } from "./objectMocking";
 
 const BLOCK_TIME_MS = 120000;
 
@@ -17,7 +17,7 @@ export type AssetMetadata = {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type AssetMetadataMap = Map<"nanoerg" | (string & {}), AssetMetadata>;
 
-export type TransactionExecutionParams = {
+export type TransactionExecutionOptions = {
   signers?: MockChainParty[];
   throw?: boolean;
   log?: boolean;
@@ -84,9 +84,9 @@ export class MockChain {
 
   execute(
     unsignedTransaction: ErgoUnsignedTransaction,
-    params?: TransactionExecutionParams
+    options?: TransactionExecutionOptions
   ): boolean {
-    const keys = (params?.signers || this._parties)
+    const keys = (options?.signers || this._parties)
       .map((party) => party.key)
       .filter((key): key is ErgoHDKey => isDefined(key));
 
@@ -98,18 +98,18 @@ export class MockChain {
     const result = execute(unsignedTransaction, keys, headers);
 
     if (!result.success) {
-      if (params?.log) {
-        log(pc.red(`${pc.bgRed("Error:")} ${result.reason}`));
+      if (options?.log) {
+        log(red(`${bgRed(bold(" Error "))} ${result.reason}`));
       }
 
-      if (params?.throw) {
+      if (options?.throw != false) {
         throw new Error(result.reason);
       }
 
       return false;
     }
 
-    const preExecBalances = params?.log
+    const preExecBalances = options?.log
       ? this._parties.map((party) => party.toString())
       : undefined;
 

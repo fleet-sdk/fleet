@@ -3,6 +3,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     environment: "node",
+    threads: false,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
@@ -11,7 +12,7 @@ export default defineConfig({
       branches: 100,
       functions: 100,
       thresholdAutoUpdate: true,
-      exclude: ["**/tests/**", "**/*.spec.ts"]
+      exclude: ["**/tests/**", "**/_tests/**", "**/*.spec.ts"]
     }
   }
 });

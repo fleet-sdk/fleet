@@ -7,7 +7,7 @@ import {
   TokenAmount,
   TokenId
 } from "../types";
-import { isEmpty } from "./arrayUtils";
+import { isEmpty } from "./assertions";
 import { _0n } from "./bigIntLiterals";
 import { ensureBigInt } from "./bigIntUtils";
 import { isDefined, isUndefined } from "./objectUtils";

@@ -1,5 +1,6 @@
 import { Amount } from "../types";
-import { first, isEmpty } from "./arrayUtils";
+import { first } from "./arrayUtils";
+import { isEmpty } from "./assertions";
 import { _0n, _10n } from "./bigIntLiterals";
 import { isUndefined } from "./objectUtils";
 
@@ -90,6 +91,10 @@ export function decimalize(value: Amount, options?: FormattingOptions | number):
   const decimal = value - integer * pow;
 
   return _buildFormattedDecimal(integer.toString(10), decimal.toString(10), options);
+}
+
+export function percent(value: bigint, percentage: bigint, precision = 2n) {
+  return (value * percentage) / 10n ** precision;
 }
 
 function _buildFormattedDecimal(

@@ -21,8 +21,8 @@ export type AddBalance = {
 };
 
 export type PartyBalance = {
-  nanoergs: Amount;
-  tokens: TokenAmount<Amount>[];
+  nanoergs: bigint;
+  tokens: TokenAmount<bigint>[];
 };
 
 export type MockChainPartyParams = {

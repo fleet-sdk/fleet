@@ -6,6 +6,7 @@ import {
   hexToBigInt,
   max,
   min,
+  percent,
   sumBy,
   undecimalize
 } from "./bigIntUtils";
@@ -226,5 +227,23 @@ describe("min and max functions", () => {
     expect(max(1, 2, 3, 4, 56)).to.be.equal(56);
     expect(max(0, 1, 2, 3)).to.be.equal(3);
     expect(max(5, 6, 2, 3, 6, -1)).to.be.equal(6);
+  });
+});
+
+describe("percent()", () => {
+  it("Should return default precision amount percentage", () => {
+    expect(percent(3498n, 1n)).to.be.equal(34n); // 1%
+    expect(percent(3498n, 2n)).to.be.equal(69n); // 2%
+    expect(percent(3498n, 10n)).to.be.equal(349n); // 10%
+    expect(percent(3492312328n, 50n)).to.be.equal(3492312328n / 2n); // 50%
+    expect(percent(3492312328n, 100n)).to.be.equal(3492312328n); // 100%
+  });
+
+  it("Should return arbitrary precision amount percentage", () => {
+    expect(percent(3498n, 1n, 3n)).to.be.equal(3n); // 0.1%
+    expect(percent(3498n, 20n, 3n)).to.be.equal(69n); // 2%
+    expect(percent(3498n, 100000n, 6n)).to.be.equal(349n); // 10%
+    expect(percent(3492312328n, 500n, 3n)).to.be.equal(3492312328n / 2n); // 50%
+    expect(percent(3492312328n, 10000n, 4n)).to.be.equal(3492312328n); // 100%
   });
 });

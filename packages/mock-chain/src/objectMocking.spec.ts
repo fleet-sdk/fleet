@@ -2,7 +2,7 @@ import { BoxCandidate, hasDuplicatesBy } from "@fleet-sdk/common";
 import { ErgoBox } from "@fleet-sdk/core";
 import { bytesToHex, randomBytes } from "@noble/hashes/utils";
 import { describe, expect, it } from "vitest";
-import { candidateToUTxO, mockHeaders } from "./objectMock";
+import { mockHeaders, mockUTxO } from "./objectMocking";
 
 describe("candidateToUTxO()", () => {
   it("Should transform a candidate in a valid UTxO", () => {
@@ -19,7 +19,7 @@ describe("candidateToUTxO()", () => {
       additionalRegisters: {}
     };
 
-    const utxo = candidateToUTxO(candidate);
+    const utxo = mockUTxO(candidate);
 
     expect(utxo.boxId).not.to.be.undefined;
     expect(utxo.transactionId).not.to.be.undefined;

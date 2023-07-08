@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isDefined, isUndefined, removeUndefined } from "./objectUtils";
+import { hasKey, isDefined, isUndefined, removeUndefined } from "./objectUtils";
 
 describe("Remove undefined fields", () => {
   it("Should remove", () => {
@@ -34,5 +34,28 @@ describe("isDefined()", () => {
     expect(isDefined(undefined)).toBeFalsy();
     expect(isDefined(null)).toBeFalsy();
     expect(isDefined(NaN)).toBeFalsy();
+  });
+});
+
+describe("hasKey()", () => {
+  const obj = {
+    undefinedKey: undefined,
+    complexObjKey: { a: 1, b: 2 },
+    nullKey: null,
+    nanKey: NaN,
+    stringKey: "test",
+    functionKey: () => "test"
+  };
+
+  it("Should return true is key is present, even if it's undefined", () => {
+    expect(hasKey(obj, "undefinedKey")).to.be.true;
+    expect(hasKey(obj, "complexObjKey")).to.be.true;
+    expect(hasKey(obj, "nullKey")).to.be.true;
+    expect(hasKey(obj, "nanKey")).to.be.true;
+    expect(hasKey(obj, "stringKey")).to.be.true;
+  });
+
+  it("Should return false is key is not present", () => {
+    expect(hasKey(obj, "nonPresentKey")).to.be.false;
   });
 });

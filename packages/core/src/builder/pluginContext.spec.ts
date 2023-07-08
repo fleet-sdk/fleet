@@ -3,7 +3,7 @@ import { NotAllowedTokenBurning } from "../errors";
 import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { OutputBuilder } from "./outputBuilder";
 import { createPluginContext, FleetPluginContext } from "./pluginContext";
-import { TransactionBuilder } from "./transactionBuilder";
+import { RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";
 
 describe("Plugin context", () => {
   const creationHeight = 894169;
@@ -120,5 +120,17 @@ describe("Plugin context", () => {
 
     expect(burnTokensMethod).not.toBeCalled();
     expect(builder.burning).toBeUndefined();
+  });
+
+  it("Should set fee amount", () => {
+    builder.from(regularBoxesMock);
+
+    const payFeeMethod = vi.spyOn(builder, "payFee");
+    const fee = RECOMMENDED_MIN_FEE_VALUE * 3n;
+
+    context.setFee(RECOMMENDED_MIN_FEE_VALUE * 3n);
+
+    expect(builder.fee).to.be.equal(fee);
+    expect(payFeeMethod).toBeCalledWith(fee);
   });
 });

@@ -18,6 +18,7 @@ This is a [monorepository](https://monorepo.tools/) which means this contains ma
 | Package                                              | Description                                                     |                                                                                                                             |
 | ---------------------------------------------------- | --------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------: |
 | [@fleet-sdk/babel-fees-plugin](/plugins/babel-fees/) | Fleet SDK plugin and utility functions for Babel Fees protocol. | [![npm](https://badgen.net/npm/v/@fleet-sdk/babel-fees-plugin)](https://www.npmjs.com/package/@fleet-sdk/babel-fees-plugin) |
+| [@fleet-sdk/ageusd-plugin](/plugins/ageusd/)         | Fleet SDK plugin and utility functions for AgeUSD protocol.     |     [![npm](https://badgen.net/npm/v/@fleet-sdk/ageusd-plugin)](https://www.npmjs.com/package/@fleet-sdk/ageusd-plugin)     |
 
 ## Fleet SDK Usage Examples
 

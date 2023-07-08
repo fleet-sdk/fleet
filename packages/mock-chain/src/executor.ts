@@ -11,7 +11,7 @@ import {
   UnsignedTransaction,
   Wallet
 } from "ergo-lib-wasm-nodejs";
-import { Header, mockHeaders } from "./objectMock";
+import { Header, mockHeaders } from "./objectMocking";
 
 export type TransactionExecutionResult = {
   success: boolean;
