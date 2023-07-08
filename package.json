@@ -7,15 +7,15 @@
     "clear": "pnpm -r exec rm -rf dist",
     "fix": "run-s fix:*",
     "test": "run-s test:*",
-    "watch": "vitest",
+    "watch": "vitest --no-coverage --reporter=dot",
     "ci:publish": "pnpm clear && pnpm -r build && changeset publish --provenance",
     "fix:prettier": "prettier ./**/*.ts --write",
     "fix:lint": "eslint ./ --ext .ts --fix",
     "test:lint": "eslint ./ --ext .ts",
     "test:prettier": "prettier ./**/*.ts --list-different",
-    "test:unit": "vitest run",
-    "cov:check": "vitest run --coverage",
-    "cov:open": "vitest run --coverage ; open-cli coverage/index.html",
+    "test:unit": "vitest run --no-coverage",
+    "cov:check": "vitest run --coverage --isolate",
+    "cov:open": "vitest run --coverage --isolate ; open-cli coverage/index.html",
     "bench": "vitest bench"
   },
   "devDependencies": {
@@ -27,7 +27,7 @@
     "@types/diff": "^5.0.3",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
-    "@vitest/coverage-v8": "^0.32.4",
+    "@vitest/coverage-v8": "^0.33.0",
     "diff": "^5.1.0",
     "ergo-lib-wasm-nodejs": "^0.24.0",
     "eslint": "^8.44.0",
@@ -41,8 +41,8 @@
     "prettier": "^3.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
-    "vite": "^4.4.0",
-    "vitest": "^0.32.4"
+    "vite": "^4.4.2",
+    "vitest": "^0.33.0"
   },
   "engines": {
     "node": ">=14",

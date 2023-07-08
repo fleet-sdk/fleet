@@ -5,7 +5,7 @@ import {
   TransactionBuilder
 } from "@fleet-sdk/core";
 import { MockChain } from "@fleet-sdk/mock-chain";
-import { afterEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_tests/mocking";
 import { AgeUSDBankBox } from "./ageUsdBank";
 import { AgeUSDExchangePlugin } from "./exchangePlugin";
@@ -28,7 +28,7 @@ describe("AgeUSD exchange plugin", () => {
   });
   const implementor = chain.newParty("Implementor");
 
-  afterEach(() => {
+  beforeEach(() => {
     bob.utxos.clear();
     bankParty.utxos.clear();
     implementor.utxos.clear();
@@ -212,7 +212,7 @@ describe("AgeUSD exchange plugin", () => {
       .build();
 
     expect(transaction.outputs).to.have.length(5); // "bob_change + bank_change + exchange_output + implementor_fee + network_fee"
-    expect(chain.execute(transaction, { log: true })).to.be.true;
+    expect(chain.execute(transaction)).to.be.true;
 
     expect(bankParty.balance).to.be.deep.equal({
       nanoergs: prevBankBalance.nanoergs - baseAmount,
@@ -228,6 +228,75 @@ describe("AgeUSD exchange plugin", () => {
       tokens: [
         { tokenId: tokens.stableCoinId, amount: prevBobBalance.tokens[0].amount - redeemAmount }
       ]
+    });
+
+    expect(implementor.balance).to.be.deep.equal({ nanoergs: uiFee, tokens: [] });
+  });
+
+  it("Should redeem all redeemable stable coin with reserve at 351%", () => {
+    const bank = new SigmaUSDBank(
+      mockBankBox({
+        reserveNanoergs: 1_481_754_555029675n,
+        circulatingStableCoin: SParse("05d4d59732"),
+        circulatingReserveCoin: SParse("05acdac7e612")
+      }),
+      mockOracleBox(SParse("0580a0f8fa05"))
+    ).setImplementorFee({
+      percentage: 22n,
+      precision: 4n,
+      address: implementor.address.encode()
+    });
+
+    bankParty.addUTxOs(bank.bankBox);
+    bob.addBalance({
+      nanoergs: SAFE_MIN_BOX_VALUE,
+      tokens: [{ tokenId: tokens.stableCoinId, amount: bank.redeemableStableCoins }]
+    });
+
+    const prevBobBalance = bob.balance;
+    const prevBankBalance = bankParty.balance;
+
+    const reserveRatio = 351n;
+    const redeemAmount = bank.redeemableStableCoins;
+    const baseAmount = 412_561_952320000n;
+    const uiFee = 944_682674496n;
+    const protocolFee = 8_419_631680000n;
+    const totalAmount = baseAmount - uiFee;
+
+    expect(bank.reserveRatio).to.be.equal(reserveRatio);
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "protocol")).to.be.equal(protocolFee);
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "implementor")).to.be.equal(uiFee);
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "base")).to.be.equal(baseAmount);
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "total")).to.be.equal(totalAmount);
+
+    const transaction = new TransactionBuilder(height)
+      .from(bob.utxos)
+      .extend(
+        AgeUSDExchangePlugin(bank, {
+          redeem: "stable",
+          amount: redeemAmount,
+          recipient: bob.address,
+          transactionFee: RECOMMENDED_MIN_FEE_VALUE
+        })
+      )
+      .sendChangeTo(bob.address)
+      .build();
+
+    expect(transaction.outputs).to.have.length(5); // "bob_change + bank_change + exchange_output + implementor_fee + network_fee"
+    expect(chain.execute(transaction)).to.be.true;
+
+    expect(bankParty.balance).to.be.deep.equal({
+      nanoergs: prevBankBalance.nanoergs - baseAmount,
+      tokens: [
+        { tokenId: tokens.stableCoinId, amount: prevBankBalance.tokens[0].amount + redeemAmount },
+        { tokenId: tokens.reserveCoinId, amount: prevBankBalance.tokens[1].amount },
+        { tokenId: tokens.nftId, amount: prevBankBalance.tokens[2].amount }
+      ]
+    });
+
+    expect(bob.balance).to.be.deep.equal({
+      nanoergs: prevBobBalance.nanoergs + totalAmount - RECOMMENDED_MIN_FEE_VALUE,
+      tokens: []
     });
 
     expect(implementor.balance).to.be.deep.equal({ nanoergs: uiFee, tokens: [] });
