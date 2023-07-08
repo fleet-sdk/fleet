@@ -1,6 +1,6 @@
 import { Amount, decimalize, some } from "@fleet-sdk/common";
 import { ArrayChange, diffArrays } from "diff";
-import pc from "picocolors";
+import { gray, green, red } from "picocolors";
 import { AssetMetadataMap } from "./mockChain";
 import { PartyBalance } from "./mockChainParty";
 
@@ -78,11 +78,11 @@ export function printDiff(oldVal: string, newVal: string) {
 
 function log<T>(value: string, part: ArrayChange<T>) {
   if (part.added) {
-    value = pc.green("+ " + value);
+    value = green("+ " + value);
   } else if (part.removed) {
-    value = pc.red("- " + value);
+    value = red("- " + value);
   } else {
-    value = pc.gray("  " + value);
+    value = gray("  " + value);
   }
 
   // eslint-disable-next-line no-console

@@ -17,3 +17,7 @@ export function isUndefined(value: unknown): value is undefined {
 export function isDefined<T>(value: T | undefined): value is T {
   return !isUndefined(value);
 }
+
+export function hasKey(o: unknown, key: PropertyKey): boolean {
+  return Object.prototype.hasOwnProperty.call(o, key);
+}

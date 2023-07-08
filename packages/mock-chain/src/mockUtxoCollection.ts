@@ -11,7 +11,7 @@ import {
 import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "@fleet-sdk/core";
 import { MockUTxOInput } from "./mockChainParty";
-import { candidateToUTxO } from "./objectMock";
+import { mockUTxO } from "./objectMocking";
 
 function isUTxOCandidate(
   candidate: BoxCandidate<Amount> | Box<Amount>
@@ -33,7 +33,7 @@ export class MockUTxOCollection extends Collection<Box<bigint>, MockUTxOInput> {
 
   protected override _map(utxo: BoxCandidate<Amount> | Box<Amount>): Box<bigint> {
     if (isUTxOCandidate(utxo)) {
-      return candidateToUTxO(ensureUTxOBigInt(utxo));
+      return mockUTxO(ensureUTxOBigInt(utxo));
     }
 
     return ensureUTxOBigInt(utxo);
@@ -45,6 +45,10 @@ export class MockUTxOCollection extends Collection<Box<bigint>, MockUTxOInput> {
     }
 
     return super._addOne(utxo);
+  }
+
+  public clear() {
+    this._items.length = 0;
   }
 
   public remove(boxId: BoxId): number;

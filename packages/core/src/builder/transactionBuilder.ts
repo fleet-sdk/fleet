@@ -40,6 +40,7 @@ type SelectorSettings = Omit<BoxSelector<Box<bigint>>, "select">;
 export type ConfigureCallback = (settings: TransactionBuilderSettings) => void;
 export type SelectorCallback = (selector: SelectorSettings) => void;
 export type FleetPlugin = (context: FleetPluginContext) => void;
+export type CollectionLike<T> = { toArray(): T[] };
 
 export const RECOMMENDED_MIN_FEE_VALUE = BigInt(1100000);
 export const FEE_CONTRACT =
@@ -121,7 +122,11 @@ export class TransactionBuilder {
     return this;
   }
 
-  public from(inputs: OneOrMore<Box<Amount>>): TransactionBuilder {
+  public from(inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>): TransactionBuilder {
+    if (isCollectionLike(inputs)) {
+      inputs = inputs.toArray();
+    }
+
     this._inputs.add(inputs);
 
     return this;
@@ -402,6 +407,10 @@ export class TransactionBuilder {
 
     return tokenId;
   }
+}
+
+function isCollectionLike<T>(obj: unknown): obj is CollectionLike<T> {
+  return (obj as CollectionLike<T>).toArray !== undefined;
 }
 
 type ChangeEstimationParams = {

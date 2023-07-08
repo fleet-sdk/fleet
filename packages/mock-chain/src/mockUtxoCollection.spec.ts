@@ -16,6 +16,14 @@ describe("UTxO Collection", () => {
     expect(collection.some((x) => x.boxId === regularBoxesMock[0].boxId));
   });
 
+  it("Should clear a collection", () => {
+    const collection = new MockUTxOCollection(regularBoxesMock);
+    expect(collection).toHaveLength(regularBoxesMock.length);
+
+    collection.clear();
+    expect(collection).to.have.length(0);
+  });
+
   it("Should add a single item", () => {
     const collection = new MockUTxOCollection();
     const box = first(regularBoxesMock);

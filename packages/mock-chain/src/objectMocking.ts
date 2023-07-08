@@ -3,7 +3,7 @@ import { serializeBox } from "@fleet-sdk/core";
 import { blake2b } from "@noble/hashes/blake2b";
 import { bytesToHex, randomBytes } from "@noble/hashes/utils";
 
-export function candidateToUTxO(candidate: BoxCandidate<bigint>): Box<bigint> {
+export function mockUTxO(candidate: BoxCandidate<bigint>): Box<bigint> {
   const box: Box<bigint> = {
     boxId: "",
     transactionId: bytesToHex(randomBytes(32)),

@@ -6,7 +6,7 @@ import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
-import { ErgoAddress, ErgoUnsignedInput, MAX_TOKENS_PER_BOX } from "../models";
+import { ErgoAddress, ErgoUnsignedInput, InputsCollection, MAX_TOKENS_PER_BOX } from "../models";
 import { SByte, SColl, SConstant } from "../serializer";
 import { estimateBoxSize } from "../serializer/sigma/boxSerializer";
 import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../tests/mocks/mockBoxes";
@@ -47,6 +47,20 @@ describe("basic construction", () => {
 
   it("Should create a transaction builder with inputs", () => {
     const builder = new TransactionBuilder(height).from(regularBoxesMock);
+
+    expect(builder.inputs).toHaveLength(regularBoxesMock.length);
+    expect(builder.dataInputs).toHaveLength(0);
+    expect(builder.outputs).toHaveLength(0);
+    expect(builder.changeAddress).toBeFalsy();
+    expect(builder.fee).toBeFalsy();
+    expect(builder.burning).toBeFalsy();
+    expect(builder.settings).toBeTruthy();
+    expect(builder.creationHeight).toBe(height);
+  });
+
+  it("Should create a transaction builder with inputs from collection", () => {
+    const inputsCollection = new InputsCollection(regularBoxesMock);
+    const builder = new TransactionBuilder(height).from(inputsCollection);
 
     expect(builder.inputs).toHaveLength(regularBoxesMock.length);
     expect(builder.dataInputs).toHaveLength(0);
