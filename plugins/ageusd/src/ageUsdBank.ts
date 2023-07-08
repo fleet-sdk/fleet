@@ -331,11 +331,12 @@ export class AgeUSDBank {
     amount = big(amount);
     const price = coin === "stable" ? this.stableCoinPrice : this.reserveCoinPrice;
     const baseAmount = price * amount;
-    let redeemAmount = baseAmount - this.getProtocolFee(baseAmount);
+    const protocolFee = this.getProtocolFee(baseAmount);
+    let redeemAmount = baseAmount - protocolFee;
 
     if (type === "total") {
       txFee = isDefined(txFee) ? big(txFee) : _0n;
-      const fees = txFee + this.getImplementorFee(redeemAmount);
+      const fees = this.getImplementorFee(baseAmount + protocolFee) + txFee;
       redeemAmount = max(redeemAmount - fees, _0n);
     }
 

@@ -327,7 +327,7 @@ describe("Bank calculations", () => {
 
     // redeem stable coin
     expect(bank.getFeeAmountFor(stable, "stable", "all")).to.be.equal(3_175_159_737n);
-    expect(bank.getRedeemingAmountFor(stable, "stable", "total", txFee)).to.be.equal(118413394778n);
+    expect(bank.getRedeemingAmountFor(stable, "stable", "total", txFee)).to.be.equal(118384220263n);
 
     const reserve = 40504n;
     expect(bank.reserveCoinPrice * reserve).to.be.equal(16938246248n);
@@ -338,12 +338,12 @@ describe("Bank calculations", () => {
 
     // redeem reserve coin
     expect(bank.getFeeAmountFor(reserve, "reserve", "all")).to.be.equal(442_426_991n);
-    expect(bank.getRedeemingAmountFor(reserve, "reserve", "total")).to.be.equal(16_499_884_437n);
+    expect(bank.getRedeemingAmountFor(reserve, "reserve", "total")).to.be.equal(16495819257n);
   });
 
   it("Should be able to mint reserve coins and redeem stable coin, but not mint stable. Reserve == 345, tokenjay", () => {
     const bankBox = mockBankBox({
-      reserveNanoergs: 1_482_462_367_921_576n,
+      reserveNanoergs: 1_482_462_367921576n,
       circulatingStableCoin: SParse("0584cda232"),
       circulatingReserveCoin: SParse("05acdac7e612")
     });
@@ -354,8 +354,8 @@ describe("Bank calculations", () => {
     expect(bank.reserveCoinPrice).to.be.equal(417643n);
     expect(bank.reserveRatio).to.be.equal(345n);
     expect(bank.circulatingStableCoins).to.be.equal(527_122_58n);
-    expect(bank.circulatingReserveCoins).to.be.equal(2_523_461_270n);
-    expect(bank.baseReserves).to.be.equal(1_482_462_367_921_576n);
+    expect(bank.circulatingReserveCoins).to.be.equal(2_523461270n);
+    expect(bank.baseReserves).to.be.equal(1_482_462_367921576n);
     expect(bank.stableCoinErgRate).to.be.equal(123n);
     expect(bank.reserveCoinErgRate).to.be.equal(2394n);
 
@@ -364,14 +364,14 @@ describe("Bank calculations", () => {
     expect(bank.canMint(1n, "stable")).to.be.false;
     expect(bank.canRedeem(bank.redeemableStableCoins, "stable")).to.be.true;
 
-    expect(bank.availableReserveCoins).to.be.equal(4_576_481_568n);
+    expect(bank.availableReserveCoins).to.be.equal(4_576481568n);
     expect(bank.availableStableCoins).to.be.equal(0n);
 
     expect(bank.redeemableReserveCoins).to.be.equal(0n);
-    expect(bank.redeemableStableCoins).to.be.equal(527_122_58n);
+    expect(bank.redeemableStableCoins).to.be.equal(52712258n);
 
     const stable = 15000n;
-    expect(bank.stableCoinPrice * stable).to.be.equal(121_951_215_000n);
+    expect(bank.stableCoinPrice * stable).to.be.equal(121_951215000n);
 
     bank.setImplementorFee({
       percentage: 22n,
@@ -380,9 +380,9 @@ describe("Bank calculations", () => {
     });
 
     // redeem stable coin
-    expect(bank.getFeeAmountFor(stable, "stable", "protocol")).to.be.equal(2_439_024_300n);
-    expect(bank.getFeeAmountFor(stable, "stable", "implementor")).to.be.equal(273_658_526n);
-    expect(bank.getRedeemingAmountFor(stable, "stable", "total")).to.be.equal(11_924_9263_881n);
+    expect(bank.getFeeAmountFor(stable, "stable", "protocol")).to.be.equal(2_439024300n);
+    expect(bank.getFeeAmountFor(stable, "stable", "implementor")).to.be.equal(273658526n);
+    expect(bank.getRedeemingAmountFor(stable, "stable", "total")).to.be.equal(119_238532174n);
     expect(bank.getReserveRatioFor("redeeming", 100_000_00n, "stable")).to.be.equal(403n);
 
     bank.setImplementorFee({
