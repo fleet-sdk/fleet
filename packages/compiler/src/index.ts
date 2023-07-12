@@ -1,1 +1,2 @@
-export * from "./compiler";
+export { compile } from "./compiler";
+export * from "./compilerOutput";

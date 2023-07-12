@@ -1,73 +1,112 @@
-import { describe, expect, it } from "vitest";
-import { compile } from "./compiler";
+import { Network } from "@fleet-sdk/common";
+import { SInt } from "@fleet-sdk/core";
+import { HexString, Value, ValueObj } from "sigmastate-js/main";
+import { describe, expect, it, test } from "vitest";
+import { compile, parseNamedConstantsMap } from "./compiler";
 
-describe("Compiler", () => {
-  const segregatedTree = "100104c801d191a37300";
-  const embeddedTree = "00d191a304c801";
+const compilerTestVectors = [
+  {
+    name: "Segregated constants",
+    script: "sigmaProp(HEIGHT > 100)",
+    tree: "100104c801d191a37300",
+    options: { segregateConstants: true, includeSize: false, map: undefined }
+  },
+  {
+    name: "Embedded constants",
+    script: "sigmaProp(HEIGHT > 100)",
+    tree: "00d191a304c801",
+    options: { segregateConstants: false, includeSize: false, map: undefined }
+  },
+  {
+    name: "Tree size included",
+    script: "sigmaProp(HEIGHT > 100)",
+    tree: "0806d191a304c801",
+    options: { segregateConstants: false, includeSize: true, map: undefined }
+  },
+  {
+    name: "Tree size included and constant segregated",
+    script: "sigmaProp(HEIGHT > 100)",
+    tree: "18090104c801d191a37300",
+    options: { segregateConstants: true, includeSize: true, map: undefined }
+  },
+  {
+    name: "Named constants",
+    script: "sigmaProp(HEIGHT > deadline)",
+    tree: "100104c801d191a37300",
+    options: { segregateConstants: true, includeSize: false, map: { deadline: SInt(100) } }
+  }
+];
 
-  it("Should compile", () => {
-    const segregatedTree = compile("sigmaProp(HEIGHT > 100)").toHex();
-    expect(segregatedTree).to.be.equal(segregatedTree);
+describe("ErgoScript Compiler", () => {
+  test.each(compilerTestVectors)("Script compilation: '$name'", (tv) => {
+    const tree = compile(tv.script, tv.options);
 
-    const nonSegregatedTree = compile("sigmaProp(HEIGHT > 100)", { segregateConstants: false });
-    expect(nonSegregatedTree.toHex()).to.be.equal(embeddedTree);
+    expect(tree.toHex()).to.be.equal(tv.tree);
+    expect(tree.hasSegregatedConstants).to.be.equal(tv.options.segregateConstants);
+    expect(tree.hasSize).to.be.equal(tv.options.includeSize);
+
+    if (tv.options.segregateConstants) {
+      expect(tree.constants).not.to.be.empty;
+    } else {
+      expect(tree.constants).to.be.empty;
+    }
   });
 
-  it("Should compile with named constants", () => {
-    const tree = compile("sigmaProp(HEIGHT > deadline)", { map: { deadline: 100 } });
-    expect(tree.toHex()).to.be.equal(segregatedTree);
+  it("Should use default if not compiler options is set", () => {
+    const tree = compile("sigmaProp(HEIGHT > 100)");
+
+    expect(tree.toHex()).to.be.equal("18090104c801d191a37300");
+    expect(tree.hasSegregatedConstants).to.be.equal(true);
+    expect(tree.hasSize).to.be.equal(true);
+  });
+
+  it("Should compile for testnet", () => {
+    const tree = compile("sigmaProp(HEIGHT > 100)", { network: Network.Testnet });
+
+    expect(tree.toHex()).to.be.equal("18090104c801d191a37300");
+    expect(tree.hasSegregatedConstants).to.be.equal(true);
+    expect(tree.hasSize).to.be.equal(true);
   });
 });
 
-function bench(name: string, callback: () => void, executions = 1) {
-  let id = name;
-  for (let i = 0; i < executions; i++) {
-    if (executions > 1) {
-      id = `${name}_${i}`;
-    }
-
-    // eslint-disable-next-line no-console
-    console.time(id);
-
-    callback();
-
-    // eslint-disable-next-line no-console
-    console.timeEnd(id);
-  }
-}
-
-function keysOf(obj: object) {
-  if (typeof obj !== "object") {
-    return [Object.prototype.toString.call(obj)];
-  }
-
-  return [
-    ...Object.getOwnPropertyNames(Object.getPrototypeOf(obj)),
-    ...Object.getOwnPropertyNames(obj)
-  ]
-    .filter((key) => key && "constructor" !== key)
-    .map((key): string => {
-      const prop = obj[key as keyof object] as object;
-      const type = typeof prop;
-      let typeStr = String(type);
-
-      if (type === "function") {
-        // eslint-disable-next-line @typescript-eslint/ban-types
-        typeStr += `(${[...Array((prop as Function).length)]
-          .map((v, i) => `arg_${i}`)
-          .join(", ")})`;
-      } else if (type === "object") {
-        if (ArrayBuffer.isView(prop)) {
-          typeStr = String(Object.prototype.toString.call(prop))
-            .replace("[object ", "")
-            .replace("]", "");
-        } else if (Array.isArray(prop)) {
-          typeStr = "[]";
-        } else {
-          typeStr = `{ ${keysOf(prop).join(", ")} }`;
-        }
-      }
-
-      return `${key}: ${typeStr}`;
+describe("Compiler constants map parsing", () => {
+  it("Should convert types if needed", () => {
+    const parsedMap = parseNamedConstantsMap({
+      fleetConst: SInt(1),
+      sigmaConst: ValueObj.ofByte(1),
+      hex: "0e0102" // SConstant(SColl(SByte, [0x2]))
     });
-}
+
+    expect(parsedMap.fleetConst).to.be.instanceOf(Value);
+    expect(parsedMap.fleetConst.data).to.be.equal(1);
+    expect(parsedMap.fleetConst.tpe.name).to.be.equal("Int");
+
+    expect(parsedMap.sigmaConst).to.be.instanceOf(Value);
+    expect(parsedMap.sigmaConst.data).to.be.equal(1);
+    expect(parsedMap.sigmaConst.tpe.name).to.be.equal("Byte");
+
+    expect(parsedMap.hex).to.be.instanceOf(Value);
+    expect(parsedMap.hex.data).to.be.deep.equal([0x2]);
+    expect(parsedMap.hex.tpe.name).to.be.equal("Coll[Byte]");
+  });
+
+  it("Should not mutate input object", () => {
+    const originalMap = { test: SInt(100) };
+    const parsedMap = parseNamedConstantsMap(originalMap);
+
+    expect(originalMap).not.to.be.equal(parsedMap);
+    expect(originalMap.test).to.be.deep.equal({ type: 4, value: 100 });
+  });
+
+  it("Should throw is an invalid hex string is passed", () => {
+    expect(() => parseNamedConstantsMap({ invalidHex: "non-hex string" })).to.throw(
+      "'non-hex string' is not a valid hex string."
+    );
+  });
+
+  it("Should throw is unsupported type is passed", () => {
+    expect(() => parseNamedConstantsMap({ invalidHex: 23 as unknown as HexString })).to.throw(
+      "Unsupported constant object mapping."
+    );
+  });
+});

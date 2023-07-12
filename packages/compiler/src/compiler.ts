@@ -1,64 +1,41 @@
-import { HexString, isEmpty, Network } from "@fleet-sdk/common";
-import { ISigmaType, SBool, SColl, SConstant } from "@fleet-sdk/core";
+import { assert, ergoTreeHeaderFlags, isEmpty, isHex, Network } from "@fleet-sdk/common";
+import { ISigmaType, SConstant } from "@fleet-sdk/core";
 import {
-  ErgoTreeValue,
-  SigmaCompilerConstantMap,
+  SigmaCompilerNamedConstantsMap,
   SigmaCompilerObj,
   Value as SigmaValue,
-  TypeObj,
   ValueObj
 } from "sigmastate-js/main";
+import { CompilerOutput } from "./compilerOutput";
 
 export type CompilerOptions = {
-  map?: CompilerConstantMap;
+  map?: NamedConstantsMap;
   segregateConstants?: boolean;
+  includeSize?: boolean;
   network?: Network;
-  additionalHeaderFlags?: number;
 };
 
-type CompilerConstantMapInput =
-  | string
-  | number
-  | bigint
-  | boolean
-  | ArrayLike<number>
-  | ArrayLike<boolean>
-  | ISigmaType
-  | SigmaValue;
-
-export type CompilerConstantMap = {
-  [key: string]: CompilerConstantMapInput;
+export type NamedConstantsMap = {
+  [key: string]: string | ISigmaType | SigmaValue;
 };
 
-export class ErgoTree {
-  private readonly _tree: ErgoTreeValue;
-
-  constructor(tree: ErgoTreeValue) {
-    this._tree = tree;
-  }
-
-  toBytes(): Uint8Array {
-    return Uint8Array.from(this._tree.toBytes().u);
-  }
-
-  toHex(): HexString {
-    return this._tree.toHex();
-  }
-}
-
-export function compile(script: string, options: CompilerOptions = {}): ErgoTree {
+export function compile(script: string, options: CompilerOptions = {}): CompilerOutput {
   const {
     map = options.map ?? {},
     segregateConstants = options.segregateConstants ?? true,
     network = options.network ?? Network.Mainnet,
-    additionalHeaderFlags = options.additionalHeaderFlags ?? 0x0
+    includeSize = options.includeSize ?? true
   } = options;
 
-  const compiler = constructCompiler(network);
-
-  return new ErgoTree(
-    compiler.compile(parseMap(map), segregateConstants, additionalHeaderFlags, script)
+  const headerFlags = includeSize ? ergoTreeHeaderFlags.sizeInclusion : 0x00;
+  const tree = constructCompiler(network).compile(
+    parseNamedConstantsMap(map),
+    segregateConstants,
+    headerFlags,
+    script
   );
+
+  return new CompilerOutput(tree);
 }
 
 function constructCompiler(network: Network) {
@@ -67,50 +44,33 @@ function constructCompiler(network: Network) {
     : SigmaCompilerObj.forTestnet();
 }
 
-function parseMap(map: CompilerConstantMap) {
+export function parseNamedConstantsMap(map: NamedConstantsMap): SigmaCompilerNamedConstantsMap {
   if (isEmpty(map)) {
     return map;
   }
 
-  const sigmaMap: SigmaCompilerConstantMap = {};
+  const sigmaMap: SigmaCompilerNamedConstantsMap = {};
   for (const key in map) {
-    sigmaMap[key] = parseConstant(map[key]);
+    sigmaMap[key] = toSigmaConstant(map[key]);
   }
 
   return sigmaMap;
 }
 
-function parseConstant(value: CompilerConstantMapInput): SigmaValue {
-  switch (typeof value) {
-    case "string":
-      // todo: add hex validation
-      return ValueObj.fromHex(value);
-    case "number":
-      // todo: check proper sigma type
-      return ValueObj.ofInt(value);
-    case "bigint":
-      // todo: check proper sigma type
-      return ValueObj.ofLong(value);
-    case "boolean":
-      return ValueObj.fromHex(SConstant(SBool(value)));
-    default: {
-      if (Array.isArray(value)) {
-        if (value.every((x): x is number => typeof x === "number")) {
-          return ValueObj.collOf(value, TypeObj.Int);
-        } else if (value.every((x): x is boolean => typeof x === "boolean")) {
-          return ValueObj.fromHex(SConstant(SColl(SBool, value)));
-        }
-      } else if (value instanceof SigmaValue) {
-        return value;
-      } else if (isSigmaType(value)) {
-        return ValueObj.fromHex(SConstant(value));
-      }
-    }
+export function toSigmaConstant(constant: string | ISigmaType | SigmaValue): SigmaValue {
+  if (typeof constant === "string") {
+    assert(isHex(constant), `'${constant}' is not a valid hex string.`);
+
+    return ValueObj.fromHex(constant);
+  } else if (isFleetSigmaConstant(constant)) {
+    return ValueObj.fromHex(SConstant(constant));
+  } else if (constant instanceof SigmaValue) {
+    return constant;
   }
 
-  throw new Error("Unsupported constant mapping.");
+  throw new Error("Unsupported constant object mapping.");
 }
 
-function isSigmaType(constant: unknown): constant is ISigmaType {
+function isFleetSigmaConstant(constant: unknown): constant is ISigmaType {
   return typeof (constant as ISigmaType).type === "number";
 }

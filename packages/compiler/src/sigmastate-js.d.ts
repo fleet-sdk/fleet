@@ -1,10 +1,21 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 declare module "sigmastate-js/main" {
-  type SigmaCompilerConstantMap = { [key: string]: Value };
+  type SigmaCompilerNamedConstantsMap = { [key: string]: Value };
+  type HexString = string;
 
-  class ErgoTreeValue {
-    toHex(): string;
-    toBytes(): { u: Uint8Array };
+  class ErgoTree {
+    toHex(): HexString;
+    bytes(): { u: Uint8Array };
+    header(): number;
+    version(): number;
+    isConstantSegregation(): boolean;
+    hasSize(): boolean;
+    constants(): Value[];
+    toString(): string;
+  }
+
+  class ErgoTreeObj {
+    static fromHex(value: HexString): ErgoTree;
   }
 
   class Type {
@@ -17,6 +28,15 @@ declare module "sigmastate-js/main" {
     static Short: Type;
     static Int: Type;
     static Long: Type;
+    static BigInt: Type;
+    static GroupElement: Type;
+    static SigmaProp: Type;
+    static Box: Type;
+    static AvlTree: Type;
+    static Context: Type;
+    static Header: Type;
+    static PreHeader: Type;
+    static SigmaDslBuilder: Type;
     static pairType(left: Type, right: Type): Type;
     static collType(elemType: Type): Type;
   }
@@ -24,26 +44,27 @@ declare module "sigmastate-js/main" {
   class Value<T = unknown> {
     data: T;
     tpe: Type;
-    toHex(): string;
+    toHex(): HexString;
   }
 
-  class ValueObj<T = unknown> {
-    static ofByte(value: number): Value<T>;
-    static ofShort(value: number): Value<T>;
-    static ofInt(value: number): Value<T>;
-    static ofLong(value: bigint): Value<T>;
-    static pairOf(left: Value, right: Value): Value<T>;
-    static collOf(items: T[], type: Type): Value<T>;
-    static fromHex(hex: string): Value<T>;
+  class ValueObj {
+    static ofByte(value: number): Value<number>;
+    static ofShort(value: number): Value<number>;
+    static ofInt(value: number): Value<number>;
+    static ofLong(value: bigint): Value<bigint>;
+    static ofBigInt(value: bigint): Value<bigint>;
+    static pairOf<T>(left: Value, right: Value): Value<T>;
+    static collOf<T>(items: T[], type: Type): Value<T[]>;
+    static fromHex<T>(hex: HexString): Value<T>;
   }
 
   class SigmaCompiler {
     compile(
-      namedConstants: SigmaCompilerConstantMap,
+      namedConstants: SigmaCompilerNamedConstantsMap,
       segregateConstants: boolean,
       additionalHeaderFlags: number,
       ergoScript: string
-    ): ErgoTreeValue;
+    ): ErgoTree;
   }
 
   class SigmaCompilerObj {
