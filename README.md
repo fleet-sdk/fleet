@@ -12,6 +12,7 @@ This is a [monorepository](https://monorepo.tools/) which means this contains ma
 | [@fleet-sdk/wallet](/packages/wallet)         | Wallet related library, with mnemonic and keys creation and derivation.              |     [![npm](https://badgen.net/npm/v/@fleet-sdk/wallet)](https://www.npmjs.com/package/@fleet-sdk/wallet)     |
 | [@fleet-sdk/common](/packages/common)         | Internal utility functions, constants and types shared across `@fleet-sdk` packages. |     [![npm](https://badgen.net/npm/v/@fleet-sdk/common)](https://www.npmjs.com/package/@fleet-sdk/common)     |
 | [@fleet-sdk/mock-chain](/packages/mock-chain) | Mock chain and testing utilities for Ergo Smart Contracts.                           | [![npm](https://badgen.net/npm/v/@fleet-sdk/mock-chain)](https://www.npmjs.com/package/@fleet-sdk/mock-chain) |
+| [@fleet-sdk/compiler](/packages/compiler)     | Sigma.JS powered ErgoScript compiler.                                                |   [![npm](https://badgen.net/npm/v/@fleet-sdk/compiler)](https://www.npmjs.com/package/@fleet-sdk/compiler)   |
 
 ## Plugins
 
