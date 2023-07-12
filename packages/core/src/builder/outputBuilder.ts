@@ -6,7 +6,7 @@ import {
   Box,
   BoxCandidate,
   ensureBigInt,
-  ErgoTree,
+  ErgoTreeHex,
   first,
   HexString,
   isDefined,
@@ -60,7 +60,7 @@ export class OutputBuilder {
 
   constructor(
     value: Amount | BoxValueEstimationCallback,
-    recipient: Base58String | ErgoTree | ErgoAddress,
+    recipient: Base58String | ErgoTreeHex | ErgoAddress,
     creationHeight?: number
   ) {
     this.setValue(value);
@@ -86,7 +86,7 @@ export class OutputBuilder {
     return this._address;
   }
 
-  public get ergoTree(): ErgoTree {
+  public get ergoTree(): ErgoTreeHex {
     return this._address.ergoTree;
   }
 
