@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
-import { ErgoAddress, TokensCollection } from "../models";
+import { ErgoAddress, ErgoTree, TokensCollection } from "../models";
 import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { estimateMinBoxValue, OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 
 const address = "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c";
-const ergoTree = "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7";
+const ergoTreeHex = "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7";
 const height = 816992;
 
 describe("Constructor", () => {
@@ -17,7 +17,7 @@ describe("Constructor", () => {
 
     expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
     expect(builder.address.toString()).toBe(address);
-    expect(builder.ergoTree).toBe(ergoTree);
+    expect(builder.ergoTree).toBe(ergoTreeHex);
     expect(builder.creationHeight).toBe(height);
   });
 
@@ -26,16 +26,26 @@ describe("Constructor", () => {
 
     expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
     expect(builder.address.toString()).toBe(address);
-    expect(builder.ergoTree).toBe(ergoTree);
+    expect(builder.ergoTree).toBe(ergoTreeHex);
     expect(builder.creationHeight).toBeUndefined();
   });
 
-  it("Should construct using 'recipient' param as ErgoTree", () => {
-    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTree, height);
+  it("Should construct using 'recipient' param as ErgoTree hex string", () => {
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeHex, height);
 
     expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
     expect(builder.address.toString()).toBe(address);
-    expect(builder.ergoTree).toBe(ergoTree);
+    expect(builder.ergoTree).toBe(ergoTreeHex);
+    expect(builder.creationHeight).toBe(height);
+  });
+
+  it("Should construct using 'recipient' param as ErgoTree instance", () => {
+    const ergoTreeInstance = new ErgoTree(ergoTreeHex);
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeInstance, height);
+
+    expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
+    expect(builder.address.toString()).toBe(address);
+    expect(builder.ergoTree).toBe(ergoTreeInstance.toHex());
     expect(builder.creationHeight).toBe(height);
   });
 
@@ -109,7 +119,7 @@ describe("Token handling", () => {
   let builder!: OutputBuilder;
 
   beforeEach(() => {
-    builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTree, height);
+    builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeHex, height);
   });
 
   it("Should add distinct tokens", () => {
@@ -212,7 +222,7 @@ describe("Token minting", () => {
   let builder!: OutputBuilder;
 
   beforeEach(() => {
-    builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTree, height);
+    builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeHex, height);
   });
 
   it("Should convert amount to bigint", () => {
@@ -236,7 +246,7 @@ describe("Additional registers", () => {
   let builder!: OutputBuilder;
 
   beforeEach(() => {
-    builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTree, height);
+    builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeHex, height);
   });
 
   it("Should bind registers properly", () => {
