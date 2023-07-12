@@ -1,5 +1,5 @@
 import { BoxId } from "./boxes";
-import { ErgoTree } from "./common";
+import { ErgoTreeHex } from "./common";
 import { ContextExtension } from "./contextExtension";
 import { ProverResult } from "./proverResult";
 import { NonMandatoryRegisters } from "./registers";
@@ -19,7 +19,7 @@ export type UnsignedInput = {
 export type EIP12UnsignedInput = UnsignedInput & {
   transactionId: TransactionId;
   index: number;
-  ergoTree: ErgoTree;
+  ergoTree: ErgoTreeHex;
   creationHeight: number;
   value: string;
   assets: TokenAmount<string>[];
@@ -30,7 +30,7 @@ export type EIP12UnsignedDataInput = {
   boxId: BoxId;
   transactionId: TransactionId;
   index: number;
-  ergoTree: ErgoTree;
+  ergoTree: ErgoTreeHex;
   creationHeight: number;
   value: string;
   assets: TokenAmount<string>[];

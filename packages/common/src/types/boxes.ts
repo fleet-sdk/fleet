@@ -1,4 +1,4 @@
-import { ErgoTree } from "./common";
+import { ErgoTreeHex } from "./common";
 import { NonMandatoryRegisters } from "./registers";
 import { TokenAmount } from "./token";
 import { TransactionId } from "./transactions";
@@ -7,7 +7,7 @@ export type BoxId = string;
 export type AmountType = string | bigint;
 
 type BoxBaseType<T extends AmountType, R extends NonMandatoryRegisters> = {
-  ergoTree: ErgoTree;
+  ergoTree: ErgoTreeHex;
   creationHeight: number;
   value: T;
   assets: TokenAmount<T>[];

@@ -2,11 +2,10 @@ import {
   _0n,
   Amount,
   areRegistersDenselyPacked,
-  Base58String,
   Box,
   BoxCandidate,
   ensureBigInt,
-  ErgoTree,
+  ErgoTreeHex,
   first,
   HexString,
   isDefined,
@@ -26,6 +25,7 @@ import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import {
   ErgoAddress,
+  ErgoTree,
   OnlyR4Register,
   R4ToR5Registers,
   R4ToR6Registers,
@@ -60,7 +60,7 @@ export class OutputBuilder {
 
   constructor(
     value: Amount | BoxValueEstimationCallback,
-    recipient: Base58String | ErgoTree | ErgoAddress,
+    recipient: ErgoAddress | ErgoTree | string,
     creationHeight?: number
   ) {
     this.setValue(value);
@@ -73,6 +73,8 @@ export class OutputBuilder {
       this._address = isHex(recipient)
         ? ErgoAddress.fromErgoTree(recipient)
         : ErgoAddress.fromBase58(recipient);
+    } else if (recipient instanceof ErgoTree) {
+      this._address = recipient.toAddress();
     } else {
       this._address = recipient;
     }
@@ -86,7 +88,7 @@ export class OutputBuilder {
     return this._address;
   }
 
-  public get ergoTree(): ErgoTree {
+  public get ergoTree(): ErgoTreeHex {
     return this._address.ergoTree;
   }
 
