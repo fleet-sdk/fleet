@@ -2,4 +2,4 @@
 "@fleet-sdk/ageusd-plugin": minor
 ---
 
-Add `@fleet-sdk/age-usd-plugin`.
+Introduce `@fleet-sdk/age-usd-plugin`.

@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/compiler",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.0",
   "description": "Sigma.JS powered ErgoScript compiler.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
