@@ -6,6 +6,5 @@
   "linked": [],
   "access": "public",
   "baseBranch": "master",
-  "updateInternalDependencies": "patch",
-  "ignore": ["@fleet-sdk/compiler"]
+  "updateInternalDependencies": "patch"
 }
