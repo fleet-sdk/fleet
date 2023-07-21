@@ -29,9 +29,7 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
   const implementor = chain.newParty("Implementor");
 
   beforeEach(() => {
-    bob.utxos.clear();
-    bankParty.utxos.clear();
-    implementor.utxos.clear();
+    chain.clearUTxOSet();
   });
 
   it("Should mint reserve coin with reserve at 348%", () => {
@@ -415,9 +413,7 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
   const implementor = chain.newParty("Implementor");
 
   beforeEach(() => {
-    bob.utxos.clear();
-    bankParty.utxos.clear();
-    implementor.utxos.clear();
+    chain.clearUTxOSet();
   });
 
   it("Should mint reserve coin with reserve at 437%", () => {
@@ -924,9 +920,7 @@ describe("AgeUSD exchange plugin, reserve rate over 800%", () => {
   const implementor = chain.newParty("Implementor");
 
   beforeEach(() => {
-    bob.utxos.clear();
-    bankParty.utxos.clear();
-    implementor.utxos.clear();
+    chain.clearUTxOSet();
   });
 
   it("Should not mint reserve coin with reserve at 918%", () => {

@@ -77,6 +77,12 @@ export class MockChain {
     this.newBlocks(newHeight - this._height);
   }
 
+  clearUTxOSet() {
+    for (const party of this._parties) {
+      party.utxos.clear();
+    }
+  }
+
   newParty(name?: string): MockChainParty;
   newParty(params?: MockChainPartyParams): MockChainParty;
   newParty(nameOrParams?: string | MockChainPartyParams): MockChainParty {

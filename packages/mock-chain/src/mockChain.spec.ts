@@ -46,6 +46,23 @@ describe("Mock chain instantiation", () => {
     expect(chain.parties[1]).to.be.equal(alice);
   });
 
+  it("Should clear UTxO set", () => {
+    const chain = new MockChain();
+    const bob = chain
+      .newParty()
+      .withBalance({ nanoergs: 1000000n })
+      .withBalance({ nanoergs: 19827398237n });
+    const alice = chain.newParty().withBalance({ nanoergs: 6000000n });
+
+    expect(bob.utxos).to.have.length(2);
+    expect(alice.utxos).to.have.length(1);
+
+    chain.clearUTxOSet();
+
+    expect(bob.utxos).to.have.length(0);
+    expect(alice.utxos).to.have.length(0);
+  });
+
   it("Should simulate new blocks", () => {
     const blockTime = 120_000;
     const height = 100;
