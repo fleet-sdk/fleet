@@ -2,4 +2,4 @@
 "@fleet-sdk/mock-chain": minor
 ---
 
-Introduce `mock-chain` package.
+Introduce `@fleet-sdk/mock-chain` package.
