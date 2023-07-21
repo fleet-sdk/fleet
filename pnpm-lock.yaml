@@ -69,8 +69,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
       sigmastate-js:
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.2.1
+        version: 0.2.1
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.2.0)(typescript@5.1.6)
@@ -95,8 +95,8 @@ importers:
         specifier: workspace:^
         version: link:../core
       sigmastate-js:
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.2.1
+        version: 0.2.1
 
   packages/core:
     dependencies:
@@ -3610,8 +3610,8 @@ packages:
     dependencies:
       '@noble/hashes': 1.3.1
 
-  /sigmastate-js@0.2.0:
-    resolution: {integrity: sha512-nE65AH7IZzro0h7BA4GF+rAIZeXDivLygkuhRKrzLNfOxb3YxuzkPKdvXvA68anN+3uUiE+hHFBLXb5jO08Krw==}
+  /sigmastate-js@0.2.1:
+    resolution: {integrity: sha512-JU/vDIlxdVYc5C4Q/J9ztccSseFcBvy4D3XSYq4jExDAqii1r3umJup83MKha4bVEzz/9hVoIMbhX4Ogi+Cj5w==}
     dependencies:
       '@fleet-sdk/common': 0.1.0-alpha.14
       '@noble/hashes': 1.1.4

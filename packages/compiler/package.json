@@ -20,7 +20,7 @@
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/core": "workspace:^",
-    "sigmastate-js": "^0.2.0"
+    "sigmastate-js": "^0.2.1"
   },
   "scripts": {
     "build": "run-p build:*",
