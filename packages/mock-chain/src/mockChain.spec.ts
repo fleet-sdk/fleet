@@ -45,6 +45,28 @@ describe("Mock chain instantiation", () => {
     expect(chain.parties).to.have.length(2);
     expect(chain.parties[1]).to.be.equal(alice);
   });
+
+  it("Should simulate new blocks", () => {
+    const blockTime = 120_000;
+    const height = 100;
+    const timestamp = new Date().getTime();
+
+    const chain = new MockChain({ height, timestamp });
+    expect(chain.height).to.be.equal(height);
+    expect(chain.timestamp).to.be.equal(timestamp);
+
+    chain.newBlock(); // +1 block
+    expect(chain.height).to.be.equal(height + 1);
+    expect(chain.timestamp).to.be.equal(timestamp + 1 * blockTime);
+
+    chain.newBlocks(10); // +10 blocks
+    expect(chain.height).to.be.equal(111);
+    expect(chain.timestamp).to.be.equal(timestamp + 11 * blockTime);
+
+    chain.jumpTo(250); // jump to block 250
+    expect(chain.height).to.be.equal(250);
+    expect(chain.timestamp).to.be.equal(timestamp + 150 * blockTime);
+  });
 });
 
 describe("Contract execution and chain mocking", () => {

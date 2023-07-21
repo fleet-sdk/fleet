@@ -73,6 +73,10 @@ export class MockChain {
     this._timeStamp += BLOCK_TIME_MS * count;
   }
 
+  jumpTo(newHeight: number) {
+    this.newBlocks(newHeight - this._height);
+  }
+
   newParty(name?: string): MockChainParty;
   newParty(params?: MockChainPartyParams): MockChainParty;
   newParty(nameOrParams?: string | MockChainPartyParams): MockChainParty {
