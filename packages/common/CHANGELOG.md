@@ -1,5 +1,17 @@
 # @fleet-sdk/common
 
+## 0.1.3
+
+### Patch Changes
+
+- 92d8477: Move `Collection` model from core to common package.
+- 280308a: Add `hasKey()` function.
+- e9f4d74: Add `ensureUTxOBigInt()` function.
+- 40a23b2: Add `percent()` function.
+- be6364f: Refactored and added new assertion functions.
+- d59dc22: Fix `first()` function when the first item is equal to zero.
+- 452f97d: Add `min()` and `max()` utility functions.
+
 ## 0.1.2
 
 ### Patch Changes

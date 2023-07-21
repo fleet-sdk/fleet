@@ -1,5 +1,21 @@
 # @fleet-sdk/core
 
+## 0.1.3
+
+### Patch Changes
+
+- 92d8477: Move `Collection` model from core to common package.
+- b51587f: **Transaction Builder**: add `setFee` method to the plugin context.
+- f91cccd: Add `ErgoTree` model.
+- Updated dependencies [92d8477]
+- Updated dependencies [280308a]
+- Updated dependencies [e9f4d74]
+- Updated dependencies [40a23b2]
+- Updated dependencies [be6364f]
+- Updated dependencies [d59dc22]
+- Updated dependencies [452f97d]
+  - @fleet-sdk/common@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
