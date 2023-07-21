@@ -917,7 +917,7 @@ describe("AgeUSD exchange plugin, reserve rate over 800%", () => {
     name: "SigmaUSD Bank",
     ergoTree: SIGMA_USD_PARAMETERS.contract
   });
-  const implementor = chain.newParty("Implementor");
+  chain.newParty("Implementor");
 
   beforeEach(() => {
     chain.clearUTxOSet();
