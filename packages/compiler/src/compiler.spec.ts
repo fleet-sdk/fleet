@@ -1,39 +1,66 @@
-import { Network } from "@fleet-sdk/common";
 import { SInt } from "@fleet-sdk/core";
 import { HexString, Value, ValueObj } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
-import { compile, parseNamedConstantsMap } from "./compiler";
+import { compile, compilerDefaults, CompilerOptions, parseNamedConstantsMap } from "./compiler";
 
-const compilerTestVectors = [
+const compilerTestVectors: {
+  name: string;
+  script: string;
+  tree: string;
+  options: CompilerOptions;
+}[] = [
   {
-    name: "Segregated constants",
+    name: "v0 - Segregated constants",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "100104c801d191a37300",
-    options: { segregateConstants: true, includeSize: false, map: undefined }
+    options: { version: 0, segregateConstants: true, includeSize: false }
   },
   {
-    name: "Embedded constants",
+    name: "v0 - Embedded constants",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "00d191a304c801",
-    options: { segregateConstants: false, includeSize: false, map: undefined }
+    options: { version: 0, segregateConstants: false, includeSize: false }
   },
   {
-    name: "Tree size included",
+    name: "v0 - Tree size included",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "0806d191a304c801",
-    options: { segregateConstants: false, includeSize: true, map: undefined }
+    options: { version: 0, segregateConstants: false, includeSize: true }
   },
   {
-    name: "Tree size included and constant segregated",
+    name: "v0 - Tree size included and constant segregated",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "18090104c801d191a37300",
-    options: { segregateConstants: true, includeSize: true, map: undefined }
+    options: { version: 0, segregateConstants: true, includeSize: true }
   },
   {
-    name: "Named constants",
+    name: "v0 - Named constants",
     script: "sigmaProp(HEIGHT > deadline)",
     tree: "100104c801d191a37300",
-    options: { segregateConstants: true, includeSize: false, map: { deadline: SInt(100) } }
+    options: {
+      version: 0,
+      segregateConstants: true,
+      includeSize: false,
+      map: { deadline: SInt(100) }
+    }
+  },
+  {
+    name: "v1 - Segregated constants",
+    script: "sigmaProp(HEIGHT > 100)",
+    tree: "19090104c801d191a37300",
+    options: { version: 1, segregateConstants: true }
+  },
+  {
+    name: "v1 - Embedded constants",
+    script: "sigmaProp(HEIGHT > 100)",
+    tree: "0906d191a304c801",
+    options: { version: 1, segregateConstants: false }
+  },
+  {
+    name: "v1 - Named constants",
+    script: "sigmaProp(HEIGHT > deadline)",
+    tree: "19090104c801d191a37300",
+    options: { version: 1, segregateConstants: true, map: { deadline: SInt(100) } }
   }
 ];
 
@@ -43,7 +70,13 @@ describe("ErgoScript Compiler", () => {
 
     expect(tree.toHex()).to.be.equal(tv.tree);
     expect(tree.hasSegregatedConstants).to.be.equal(tv.options.segregateConstants);
-    expect(tree.hasSize).to.be.equal(tv.options.includeSize);
+    expect(tree.version).to.be.equal(tv.options.version);
+
+    if (tv.options.version === 1) {
+      expect(tree.hasSize).to.be.true;
+    } else if (tv.options.version === 0) {
+      expect(tree.hasSize).to.be.equal(tv.options.includeSize);
+    }
 
     if (tv.options.segregateConstants) {
       expect(tree.constants).not.to.be.empty;
@@ -53,19 +86,23 @@ describe("ErgoScript Compiler", () => {
   });
 
   it("Should use default if not compiler options is set", () => {
-    const tree = compile("sigmaProp(HEIGHT > 100)");
+    const { version, segregateConstants } = compilerDefaults;
 
-    expect(tree.toHex()).to.be.equal("18090104c801d191a37300");
-    expect(tree.hasSegregatedConstants).to.be.equal(true);
-    expect(tree.hasSize).to.be.equal(true);
+    const tree = compile("sigmaProp(HEIGHT > 100)");
+    expect(tree.toHex()).to.be.equal("19090104c801d191a37300");
+    expect(tree.hasSegregatedConstants).to.be.equal(segregateConstants);
+    expect(tree.version).to.be.equal(version);
+    expect(tree.hasSize).to.be.equal(
+      version > 0 || (version === 0 && compilerDefaults.includeSize)
+    );
   });
 
-  it("Should compile for testnet", () => {
-    const tree = compile("sigmaProp(HEIGHT > 100)", { network: Network.Testnet });
-
-    expect(tree.toHex()).to.be.equal("18090104c801d191a37300");
-    expect(tree.hasSegregatedConstants).to.be.equal(true);
-    expect(tree.hasSize).to.be.equal(true);
+  it("Should throw if version is greater than max supported", () => {
+    expect(() =>
+      compile("sigmaProp(HEIGHT > 100)", {
+        version: 10
+      } as unknown as CompilerOptions)
+    ).to.throw("Version should be lower than 8, got 10");
   });
 });
 
