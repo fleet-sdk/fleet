@@ -65,7 +65,7 @@ const compilerTestVectors: {
 ];
 
 describe("ErgoScript Compiler", () => {
-  test.each(compilerTestVectors)("Script compilation: '$name'", (tv) => {
+  test.each(compilerTestVectors)("Script compilation: $name", (tv) => {
     const tree = compile(tv.script, tv.options);
 
     expect(tree.toHex()).to.be.equal(tv.tree);

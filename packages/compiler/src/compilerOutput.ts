@@ -9,6 +9,10 @@ export class CompilerOutput extends ErgoTree {
     this._tree = tree;
   }
 
+  get template(): Uint8Array {
+    return Uint8Array.from(this._tree.template().u);
+  }
+
   get constants(): SigmaValue[] {
     return this._tree.constants();
   }
