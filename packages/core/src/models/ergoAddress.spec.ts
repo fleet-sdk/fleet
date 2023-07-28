@@ -1,6 +1,5 @@
-import { AddressType, Network } from "@fleet-sdk/common";
+import { AddressType, bytesToHex, hexToBytes, Network } from "@fleet-sdk/common";
 import { blake2b } from "@noble/hashes/blake2b";
-import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { describe, expect, it, test } from "vitest";
 import { FEE_CONTRACT } from "../builder";
 import {

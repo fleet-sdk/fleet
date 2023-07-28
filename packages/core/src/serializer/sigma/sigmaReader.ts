@@ -1,5 +1,4 @@
-import { HexString, hexToBigInt, isEmpty } from "@fleet-sdk/common";
-import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { bytesToHex, HexString, hexToBigInt, hexToBytes, isEmpty } from "@fleet-sdk/common";
 import { readBigVLQ, readVLQ } from "../vlq";
 import { zigZagDecode, zigZagDecodeBigInt } from "../zigZag";
 import { SigmaTypeCode } from "./sigmaTypeCode";

@@ -1,6 +1,5 @@
-import { first } from "@fleet-sdk/common";
+import { first, hexToBytes } from "@fleet-sdk/common";
 import { sha256 } from "@noble/hashes/sha256";
-import { hexToBytes } from "@noble/hashes/utils";
 import { base58check as base58Checker } from "@scure/base";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import SigmaRust from "ergo-lib-wasm-nodejs";

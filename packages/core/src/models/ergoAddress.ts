@@ -1,6 +1,14 @@
 import { AddressType, Base58String, HexString, isEmpty, Network } from "@fleet-sdk/common";
-import { areEqual, endsWith, first, isDefined, startsWith } from "@fleet-sdk/common";
-import { bytesToHex, concatBytes, hexToBytes } from "@noble/hashes/utils";
+import {
+  areEqual,
+  bytesToHex,
+  concatBytes,
+  endsWith,
+  first,
+  hexToBytes,
+  isDefined,
+  startsWith
+} from "@fleet-sdk/common";
 import { base58 } from "@scure/base";
 import { InvalidAddress } from "../errors/invalidAddress";
 import { blake2b256, BLAKE_256_HASH_LENGTH } from "../serializer/utils";

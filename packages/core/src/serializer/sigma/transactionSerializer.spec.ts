@@ -1,6 +1,5 @@
-import { BoxCandidate, DataInput, UnsignedInput } from "@fleet-sdk/common";
+import { BoxCandidate, bytesToHex, DataInput, UnsignedInput } from "@fleet-sdk/common";
 import { blake2b } from "@noble/hashes/blake2b";
-import { bytesToHex } from "@noble/hashes/utils";
 import { describe, expect, it } from "vitest";
 import { serializeTransaction } from "./transactionSerializer";
 
