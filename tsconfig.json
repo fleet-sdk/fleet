@@ -2,7 +2,7 @@
   "compilerOptions": {
     "incremental": true,
     "target": "ESNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Node",
     "module": "CommonJS",
     "declaration": true,
     "inlineSourceMap": false,
