@@ -31,7 +31,7 @@ export function assert(condition: boolean, error: AssertErrorMessageInput): asse
   throw err;
 }
 
-export function assertTypeOf<T>(obj: T, expected: JSPrimitiveTypes): asserts obj is T {
+export function assertTypeOf<T>(obj: T, expected: JSPrimitiveTypes): asserts obj {
   const type = typeof obj;
 
   if (type !== expected) {
@@ -47,7 +47,7 @@ function getTypeName(value: unknown): string {
   return type === "object" || type === "function" ? toString(value).slice(8, -1) : type;
 }
 
-export function assertInstanceOf<T>(obj: T, expected: Constructable): asserts obj is T {
+export function assertInstanceOf<T>(obj: T, expected: Constructable): asserts obj {
   const condition = obj instanceof expected;
   Object;
   if (!condition) {
