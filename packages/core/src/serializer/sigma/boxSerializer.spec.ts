@@ -1,4 +1,4 @@
-import { Box, ensureBigInt, hexByteSize } from "@fleet-sdk/common";
+import { Box, byteSizeOf, ensureBigInt } from "@fleet-sdk/common";
 import { describe, expect, it } from "vitest";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "../../builder";
 import { manyTokensBoxesMock, regularBoxesMock, validBoxesMock } from "../../tests/mocks/mockBoxes";
@@ -258,7 +258,7 @@ describe("Serialize ErgoBox", () => {
 
   it("Should estimate the box size in bytes", () => {
     for (const tv of testVectors) {
-      expect(estimateBoxSize(tv.json)).toBe(hexByteSize(tv.serialized));
+      expect(estimateBoxSize(tv.json)).toBe(byteSizeOf(tv.serialized));
     }
 
     for (const box of regularBoxesMock) {
@@ -277,7 +277,7 @@ describe("Serialize ErgoBox", () => {
   it("Should estimate the box size in bytes with custom value", () => {
     for (const tv of testVectors) {
       expect(estimateBoxSize(tv.json, ensureBigInt(tv.json.value) * 4n)).toBeGreaterThan(
-        hexByteSize(tv.serialized)
+        byteSizeOf(tv.serialized)
       );
     }
   });
@@ -289,7 +289,7 @@ describe("Serialize ErgoBox", () => {
         .setAdditionalRegisters(tv.json.additionalRegisters)
         .setCreationHeight(tv.json.creationHeight);
 
-      expect(estimateBoxSize(output)).toBeGreaterThanOrEqual(hexByteSize(tv.serialized));
+      expect(estimateBoxSize(output)).toBeGreaterThanOrEqual(byteSizeOf(tv.serialized));
     }
   });
 

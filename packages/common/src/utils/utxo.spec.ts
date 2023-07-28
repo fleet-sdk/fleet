@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { Box } from "../types";
-import { hasDuplicatesBy, uniq } from "./arrayUtils";
+import { hasDuplicatesBy, uniq } from "./array";
 import { isEmpty } from "./assertions";
-import { sumBy } from "./bigIntUtils";
+import { sumBy } from "./bigInt";
 import {
   areRegistersDenselyPacked,
   BoxSummary,
@@ -10,7 +10,7 @@ import {
   utxoDiff,
   utxoFilter,
   utxoSum
-} from "./boxUtils";
+} from "./utxo";
 
 export const regularBoxesMock: Box<bigint>[] = [
   {

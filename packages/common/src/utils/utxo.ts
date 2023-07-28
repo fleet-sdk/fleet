@@ -7,10 +7,9 @@ import {
   TokenAmount,
   TokenId
 } from "../types";
-import { isEmpty } from "./assertions";
-import { _0n } from "./bigIntLiterals";
-import { ensureBigInt } from "./bigIntUtils";
-import { isDefined, isUndefined } from "./objectUtils";
+import { isDefined, isEmpty, isUndefined } from "./assertions";
+import { ensureBigInt } from "./bigInt";
+import { _0n } from "./bigInt";
 
 const NANOERGS_TOKEN_ID = "nanoErgs";
 

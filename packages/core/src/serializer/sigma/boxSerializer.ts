@@ -2,8 +2,8 @@ import {
   Amount,
   Box,
   BoxCandidate,
+  byteSizeOf,
   ensureBigInt,
-  hexByteSize,
   isDefined,
   isEmpty,
   isUndefined,
@@ -119,12 +119,12 @@ export function estimateBoxSize(
   let size = 0;
 
   size += estimateVLQSize(isDefined(withValue) ? withValue : box.value);
-  size += hexByteSize(box.ergoTree);
+  size += byteSizeOf(box.ergoTree);
   size += estimateVLQSize(box.creationHeight);
 
   size += estimateVLQSize(box.assets.length);
   size += box.assets.reduce(
-    (acc: number, curr) => (acc += hexByteSize(curr.tokenId) + estimateVLQSize(curr.amount)),
+    (acc: number, curr) => (acc += byteSizeOf(curr.tokenId) + estimateVLQSize(curr.amount)),
     0
   );
 
@@ -132,7 +132,7 @@ export function estimateBoxSize(
   for (const key in box.additionalRegisters) {
     const register = box.additionalRegisters[key as keyof NonMandatoryRegisters];
     if (register) {
-      size += hexByteSize(register);
+      size += byteSizeOf(register);
       registersLength++;
     }
   }

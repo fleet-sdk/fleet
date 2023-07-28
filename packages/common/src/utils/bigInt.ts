@@ -1,10 +1,16 @@
 import { Amount } from "../types";
-import { first } from "./arrayUtils";
-import { isEmpty } from "./assertions";
-import { _0n, _10n } from "./bigIntLiterals";
-import { isUndefined } from "./objectUtils";
+import { first } from "./array";
+import { isEmpty, isUndefined } from "./assertions";
 
 type NumberLike = string | number | bigint | boolean;
+
+export const _0n = BigInt(0);
+export const _1n = BigInt(1);
+export const _7n = BigInt(7);
+export const _10n = BigInt(10);
+export const _63n = BigInt(63);
+export const _127n = BigInt(127);
+export const _128n = BigInt(128);
 
 export function ensureBigInt(number: NumberLike): bigint {
   return typeof number === "bigint" ? number : BigInt(number);

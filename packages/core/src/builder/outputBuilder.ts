@@ -4,6 +4,7 @@ import {
   areRegistersDenselyPacked,
   Box,
   BoxCandidate,
+  clearUndefined,
   ensureBigInt,
   ErgoTreeHex,
   first,
@@ -15,7 +16,6 @@ import {
   NewToken,
   NonMandatoryRegisters,
   OneOrMore,
-  removeUndefined,
   TokenAmount,
   UnsignedInput
 } from "@fleet-sdk/common";
@@ -157,7 +157,7 @@ export class OutputBuilder {
   public setAdditionalRegisters<T extends NonMandatoryRegisters>(
     registers: SequentialNonMandatoryRegisters<T>
   ): OutputBuilder {
-    this._registers = removeUndefined(registers);
+    this._registers = clearUndefined(registers);
 
     if (!areRegistersDenselyPacked(registers)) {
       throw new InvalidRegistersPacking();

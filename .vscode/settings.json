@@ -1,7 +1,7 @@
 {
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
-    "*.ts": "${capture}.spec.ts, ${capture}.js"
+    "*.ts": "${capture}.*.ts, ${capture}.js"
   },
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {

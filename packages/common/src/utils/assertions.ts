@@ -76,3 +76,15 @@ export function isTruthy<T>(value?: T): value is NonNullable<T> {
 export function isFalsy<T>(value?: T): value is undefined {
   return !value;
 }
+
+export function isUndefined(v: unknown): v is undefined {
+  return v === undefined || v === null || Number.isNaN(v);
+}
+
+export function isDefined<T>(v: T | undefined): v is T {
+  return !isUndefined(v);
+}
+
+export function hasKey(o: unknown, key: PropertyKey): boolean {
+  return Object.prototype.hasOwnProperty.call(o, key);
+}
