@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/compiler",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sigma.JS powered ErgoScript compiler.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -20,7 +20,7 @@
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/core": "workspace:^",
-    "sigmastate-js": "^0.2.1"
+    "sigmastate-js": "0.2.1-snapshot.8a862d393"
   },
   "scripts": {
     "build": "run-p build:*",

@@ -1,5 +1,4 @@
-import { bigIntToHex } from "@fleet-sdk/common";
-import { bytesToHex } from "@noble/hashes/utils";
+import { bigIntToHex, bytesToHex } from "@fleet-sdk/common";
 import { writeBigVLQ, writeVLQ } from "../vlq";
 import { zigZagEncode, zigZagEncodeBigInt } from "../zigZag";
 

@@ -1,6 +1,6 @@
-import { BoxCandidate, hasDuplicatesBy } from "@fleet-sdk/common";
+import { BoxCandidate, bytesToHex, hasDuplicatesBy } from "@fleet-sdk/common";
 import { ErgoBox } from "@fleet-sdk/core";
-import { bytesToHex, randomBytes } from "@noble/hashes/utils";
+import { randomBytes } from "@noble/hashes/utils";
 import { describe, expect, it } from "vitest";
 import { mockHeaders, mockUTxO } from "./objectMocking";
 

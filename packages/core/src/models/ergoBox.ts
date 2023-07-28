@@ -1,7 +1,13 @@
-import { Amount, Box, HexString, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
+import {
+  Amount,
+  Box,
+  bytesToHex,
+  HexString,
+  NonMandatoryRegisters,
+  TokenAmount
+} from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import { blake2b } from "@noble/hashes/blake2b";
-import { bytesToHex } from "@noble/hashes/utils";
 import { serializeBox } from "../serializer/sigma/boxSerializer";
 
 export type OnlyR4Register = {

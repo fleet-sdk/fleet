@@ -3,11 +3,11 @@ import {
   Amount,
   Base58String,
   Box,
+  byteSizeOf,
   chunk,
   CollectionAddOptions,
   ensureBigInt,
   first,
-  hexByteSize,
   HexString,
   isDefined,
   isHex,
@@ -437,7 +437,7 @@ function estimateChangeSize({
   const neededBoxes = Math.ceil(tokens.length / maxTokensPerBox);
   let size = 0;
   size += estimateVLQSize(SAFE_MIN_BOX_VALUE);
-  size += hexByteSize(changeAddress.ergoTree);
+  size += byteSizeOf(changeAddress.ergoTree);
   size += estimateVLQSize(creationHeight);
   size += estimateVLQSize(0); // empty registers length
   size += BLAKE_256_HASH_LENGTH;
@@ -448,7 +448,7 @@ function estimateChangeSize({
   }
 
   size += tokens.reduce(
-    (acc: number, curr) => (acc += hexByteSize(curr.tokenId) + estimateVLQSize(curr.amount)),
+    (acc: number, curr) => (acc += byteSizeOf(curr.tokenId) + estimateVLQSize(curr.amount)),
     0
   );
 

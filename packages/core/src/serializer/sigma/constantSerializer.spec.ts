@@ -1,5 +1,5 @@
-import { bytesToHex, hexToBytes, randomBytes } from "@noble/hashes/utils";
-import { bytesToString, stringToBytes } from "@scure/base";
+import { bytesToHex, bytesToUtf8, hexToBytes, utf8ToBytes } from "@fleet-sdk/common";
+import { randomBytes } from "@noble/hashes/utils";
 import { describe, expect, it } from "vitest";
 import {
   collBoolTestVectors,
@@ -106,7 +106,7 @@ describe("SColl serialization", () => {
 
   it("Should serialize 'Coll[SByte]'", () => {
     for (const tv of collByteTestVectors) {
-      const bytes = stringToBytes("utf8", tv.string);
+      const bytes = utf8ToBytes(tv.string);
       expect(SConstant(SColl(SByte, bytes))).toBe(tv.hex);
       expect(SConstant(SColl(SByte, bytesToHex(bytes)))).toBe(tv.hex);
     }
@@ -195,7 +195,7 @@ describe("SColl deserialization", () => {
 
   it("Should deserialize 'Coll[SByte]'", () => {
     for (const tv of collByteTestVectors) {
-      expect(bytesToString("utf8", SParse(tv.hex))).toBe(tv.string);
+      expect(bytesToUtf8(SParse(tv.hex))).toBe(tv.string);
     }
   });
 

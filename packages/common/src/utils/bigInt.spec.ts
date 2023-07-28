@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest";
 import {
-  bigIntToHex,
+  _0n,
+  _10n,
+  _127n,
+  _128n,
+  _1n,
+  _63n,
+  _7n,
   decimalize,
   ensureBigInt,
-  hexToBigInt,
   max,
   min,
   percent,
   sumBy,
   undecimalize
-} from "./bigIntUtils";
+} from "./bigInt";
 
 describe("decimalize()", () => {
   it("Should decimalize", () => {
@@ -178,34 +183,6 @@ describe("BigInt sumBy()", () => {
       )
     ).toBe(13158n);
   });
-
-  it("Should convert a bigint value to a hex string", () => {
-    expect(bigIntToHex(-54417895017443177n)).toBe("ff3eab367a0f9097");
-
-    expect(bigIntToHex(170892133397465074381480318756786823280n)).toBe(
-      "008090a0b0c0d0e0f00010203040506070"
-    );
-    expect(bigIntToHex(-169390233523473389081894288674981388176n)).toBe(
-      "8090a0b0c0d0e0f00010203040506070"
-    );
-
-    expect(bigIntToHex(1207883114728849269100423775319436127n)).toBe(
-      "00e8a13c46cdde58d442c8e45b9f2b5f"
-    );
-    expect(bigIntToHex(-518499127179672366370132270668500813n)).toBe(
-      "9c2404f2634ef40afccc320eed30b3"
-    );
-    expect(bigIntToHex(4n)).toBe("04");
-  });
-
-  it("Should convert a hex string to a bigint value", () => {
-    expect(hexToBigInt("0e8a13c46cdde58d442c8e45b9f2b5f")).toBe(
-      1207883114728849269100423775319436127n
-    );
-    expect(hexToBigInt("9c2404f2634ef40afccc320eed30b3")).toBe(
-      -518499127179672366370132270668500813n
-    );
-  });
 });
 
 describe("min and max functions", () => {
@@ -245,5 +222,17 @@ describe("percent()", () => {
     expect(percent(3498n, 100000n, 6n)).to.be.equal(349n); // 10%
     expect(percent(3492312328n, 500n, 3n)).to.be.equal(3492312328n / 2n); // 50%
     expect(percent(3492312328n, 10000n, 4n)).to.be.equal(3492312328n); // 100%
+  });
+});
+
+describe("BigInt literals", () => {
+  it("Should export BigInt literals", () => {
+    expect(_0n).to.equal(0n);
+    expect(_1n).to.equal(1n);
+    expect(_7n).to.equal(7n);
+    expect(_10n).to.equal(10n);
+    expect(_63n).to.equal(63n);
+    expect(_127n).to.equal(127n);
+    expect(_128n).to.equal(128n);
   });
 });

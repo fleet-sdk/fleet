@@ -1,4 +1,4 @@
-import { hexToBytes } from "@noble/hashes/utils";
+import { hexToBytes } from "@fleet-sdk/common";
 import { describe, expect, it, test } from "vitest";
 import { ErgoTree } from "./ergoTree";
 

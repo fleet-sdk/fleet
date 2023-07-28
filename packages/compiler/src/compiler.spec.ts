@@ -1,3 +1,4 @@
+import { bytesToHex } from "@fleet-sdk/common";
 import { SInt } from "@fleet-sdk/core";
 import { HexString, Value, ValueObj } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
@@ -7,36 +8,42 @@ const compilerTestVectors: {
   name: string;
   script: string;
   tree: string;
+  template: string;
   options: CompilerOptions;
 }[] = [
   {
     name: "v0 - Segregated constants",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "100104c801d191a37300",
+    template: "d191a37300",
     options: { version: 0, segregateConstants: true, includeSize: false }
   },
   {
     name: "v0 - Embedded constants",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "00d191a304c801",
+    template: "d191a304c801",
     options: { version: 0, segregateConstants: false, includeSize: false }
   },
   {
     name: "v0 - Tree size included",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "0806d191a304c801",
+    template: "d191a304c801",
     options: { version: 0, segregateConstants: false, includeSize: true }
   },
   {
     name: "v0 - Tree size included and constant segregated",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "18090104c801d191a37300",
+    template: "d191a37300",
     options: { version: 0, segregateConstants: true, includeSize: true }
   },
   {
     name: "v0 - Named constants",
     script: "sigmaProp(HEIGHT > deadline)",
     tree: "100104c801d191a37300",
+    template: "d191a37300",
     options: {
       version: 0,
       segregateConstants: true,
@@ -48,27 +55,33 @@ const compilerTestVectors: {
     name: "v1 - Segregated constants",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "19090104c801d191a37300",
+    template: "d191a37300",
     options: { version: 1, segregateConstants: true }
   },
   {
     name: "v1 - Embedded constants",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "0906d191a304c801",
+    template: "d191a304c801",
     options: { version: 1, segregateConstants: false }
   },
   {
     name: "v1 - Named constants",
     script: "sigmaProp(HEIGHT > deadline)",
     tree: "19090104c801d191a37300",
+    template: "d191a37300",
     options: { version: 1, segregateConstants: true, map: { deadline: SInt(100) } }
   }
 ];
 
 describe("ErgoScript Compiler", () => {
-  test.each(compilerTestVectors)("Script compilation: '$name'", (tv) => {
+  test.each(compilerTestVectors)("Script compilation: $name", (tv) => {
     const tree = compile(tv.script, tv.options);
 
     expect(tree.toHex()).to.be.equal(tv.tree);
+    expect(tree.template.toHex()).to.be.equal(tv.template);
+    expect(bytesToHex(tree.template.toBytes())).to.be.equal(tv.template);
+
     expect(tree.hasSegregatedConstants).to.be.equal(tv.options.segregateConstants);
     expect(tree.version).to.be.equal(tv.options.version);
 

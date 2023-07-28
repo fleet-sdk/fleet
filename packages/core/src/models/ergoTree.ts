@@ -1,5 +1,4 @@
-import { ergoTreeHeaderFlags, HexString, Network } from "@fleet-sdk/common";
-import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { bytesToHex, ergoTreeHeaderFlags, HexString, hexToBytes, Network } from "@fleet-sdk/common";
 import { ErgoAddress } from "./ergoAddress";
 
 const VERSION_MASK = 0x07;

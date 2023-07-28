@@ -2,12 +2,12 @@ import {
   BoxCandidate,
   BoxSummary,
   BuildOutputType,
+  bytesToHex,
   EIP12UnsignedTransaction,
   UnsignedTransaction,
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
-import { bytesToHex } from "@noble/hashes/utils";
 import { serializeTransaction } from "../serializer/sigma/transactionSerializer";
 import { blake2b256 } from "../serializer/utils";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";

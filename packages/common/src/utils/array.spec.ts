@@ -13,7 +13,7 @@ import {
   startsWith,
   uniq,
   uniqBy
-} from "./arrayUtils";
+} from "./array";
 
 describe("fist()", () => {
   it("Should return first element of the array", () => {
