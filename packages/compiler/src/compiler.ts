@@ -1,4 +1,4 @@
-import { assert, ergoTreeHeaderFlags, isEmpty, isHex } from "@fleet-sdk/common";
+import { assert, ensureDefaults, ergoTreeHeaderFlags, isEmpty, isHex } from "@fleet-sdk/common";
 import { ISigmaType, SConstant } from "@fleet-sdk/core";
 import {
   SigmaCompilerNamedConstantsMap,
@@ -53,20 +53,6 @@ export function compile(script: string, options?: CompilerOptions): CompilerOutp
   );
 
   return new CompilerOutput(tree);
-}
-
-function ensureDefaults<T extends object>(
-  options: T | undefined,
-  defaults: Required<T>
-): Required<T> {
-  if (isEmpty(options)) return defaults;
-
-  const newObj: Required<T> = { ...defaults, ...options };
-  for (const key in newObj) {
-    newObj[key] = options[key] ?? defaults[key];
-  }
-
-  return newObj;
 }
 
 export function parseNamedConstantsMap(map: NamedConstantsMap): SigmaCompilerNamedConstantsMap {

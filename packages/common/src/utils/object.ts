@@ -1,4 +1,4 @@
-import { isUndefined } from "./assertions";
+import { isEmpty, isUndefined } from "./assertions";
 
 export function clearUndefined(value: Record<string, unknown>) {
   const result: Record<string, unknown> = {};
@@ -10,4 +10,19 @@ export function clearUndefined(value: Record<string, unknown>) {
   }
 
   return result;
+}
+
+export function ensureDefaults<T extends Partial<R>, R extends object = Required<T>>(
+  options: T | undefined,
+  defaults: R
+): R & T {
+  if (isEmpty(options)) return defaults as R & T;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const newObj: any = { ...defaults, ...options };
+  for (const key in newObj) {
+    newObj[key as keyof object] = options[key as keyof R] ?? defaults[key as keyof R];
+  }
+
+  return newObj;
 }
