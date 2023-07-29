@@ -1,11 +1,17 @@
-import { first, isDefined, some } from "@fleet-sdk/common";
+import {
+  bytesToUtf8,
+  ensureDefaults,
+  first,
+  HexString,
+  isUndefined,
+  some
+} from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction, SParse } from "@fleet-sdk/core";
-import { ErgoHDKey } from "@fleet-sdk/wallet";
 import { bgRed, bold, red } from "picocolors";
 import { printDiff } from "./balancePrinting";
 import { execute } from "./executor";
-import { MockChainParty, MockChainPartyParams } from "./mockChainParty";
 import { mockHeaders } from "./objectMocking";
+import { KeyedMockChainParty, MockChainParty, NonKeyedMockChainParty } from "./party";
 
 const BLOCK_TIME_MS = 120000;
 
@@ -17,8 +23,13 @@ export type AssetMetadata = {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type AssetMetadataMap = Map<"nanoerg" | (string & {}), AssetMetadata>;
 
+export type NonKeyedMockChainPartyOptions = {
+  name?: string;
+  ergoTree: string;
+};
+
 export type TransactionExecutionOptions = {
-  signers?: MockChainParty[];
+  signers?: KeyedMockChainParty[];
   throw?: boolean;
   log?: boolean;
 };
@@ -28,22 +39,25 @@ export type MockChainParams = {
   timestamp?: number;
 };
 
+export type BlockState = Required<MockChainParams>;
+
 export class MockChain {
   private readonly _parties: MockChainParty[];
-  private _height: number;
-  private _timeStamp: number;
+  private readonly _tip: BlockState;
+  private readonly _bottom: BlockState;
   private _assetsMetadata: AssetMetadataMap;
 
+  constructor();
   constructor(height?: number);
   constructor(params?: MockChainParams);
   constructor(heightOrParams?: number | MockChainParams) {
-    const params =
+    const state =
       !heightOrParams || typeof heightOrParams === "number"
-        ? { height: heightOrParams || 0 }
-        : heightOrParams;
+        ? { height: heightOrParams ?? 0, timestamp: new Date().getTime() }
+        : ensureDefaults(heightOrParams, { height: 0, timestamp: new Date().getTime() });
 
-    this._height = params.height || 0;
-    this._timeStamp = params.timestamp || new Date().getTime();
+    this._tip = state;
+    this._bottom = { ...state };
     this._parties = [];
     this._assetsMetadata = new Map();
   }
@@ -53,11 +67,11 @@ export class MockChain {
   }
 
   get height(): number {
-    return this._height;
+    return this._tip.height;
   }
 
   get timestamp(): number {
-    return this._timeStamp;
+    return this._tip.timestamp;
   }
 
   get parties(): MockChainParty[] {
@@ -69,12 +83,12 @@ export class MockChain {
   }
 
   newBlocks(count: number) {
-    this._height += count;
-    this._timeStamp += BLOCK_TIME_MS * count;
+    this._tip.height += count;
+    this._tip.timestamp += BLOCK_TIME_MS * count;
   }
 
   jumpTo(newHeight: number) {
-    this.newBlocks(newHeight - this._height);
+    this.newBlocks(newHeight - this._tip.height);
   }
 
   clearUTxOSet() {
@@ -83,10 +97,27 @@ export class MockChain {
     }
   }
 
-  newParty(name?: string): MockChainParty;
-  newParty(params?: MockChainPartyParams): MockChainParty;
-  newParty(nameOrParams?: string | MockChainPartyParams): MockChainParty {
-    const party = new MockChainParty(this, nameOrParams);
+  reset() {
+    this.clearUTxOSet();
+    this._tip.height = this._bottom.height;
+    this._tip.timestamp = this._bottom.timestamp;
+  }
+
+  newParty(name?: string): KeyedMockChainParty;
+  newParty(nonKeyedOptions?: NonKeyedMockChainPartyOptions): NonKeyedMockChainParty;
+  newParty(optOrName?: string | NonKeyedMockChainPartyOptions): MockChainParty {
+    return this._pushParty(
+      typeof optOrName === "string" || isUndefined(optOrName)
+        ? new KeyedMockChainParty(this, optOrName)
+        : new NonKeyedMockChainParty(this, optOrName.ergoTree, optOrName.name)
+    );
+  }
+
+  addParty(ergoTree: HexString, name?: string): NonKeyedMockChainParty {
+    return this._pushParty(new NonKeyedMockChainParty(this, ergoTree, name));
+  }
+
+  private _pushParty<T extends MockChainParty>(party: T): T {
     this._parties.push(party);
 
     return party;
@@ -97,12 +128,12 @@ export class MockChain {
     options?: TransactionExecutionOptions
   ): boolean {
     const keys = (options?.signers || this._parties)
-      .map((party) => party.key)
-      .filter((key): key is ErgoHDKey => isDefined(key));
+      .filter((party): party is KeyedMockChainParty => party instanceof KeyedMockChainParty)
+      .map((party) => party.key);
 
     const headers = mockHeaders(10, {
-      fromHeight: this._height,
-      fromTimeStamp: this._timeStamp
+      fromHeight: this._tip.height,
+      fromTimestamp: this._tip.timestamp
     });
 
     const result = execute(unsignedTransaction, keys, headers);
@@ -166,8 +197,8 @@ export class MockChain {
     );
 
     if (box) {
-      const name = safeEIP4Parse(box.additionalRegisters.R4);
-      const decimals = safeEIP4Parse(box.additionalRegisters.R6);
+      const name = safeParseSColl(box.additionalRegisters.R4);
+      const decimals = safeParseSColl(box.additionalRegisters.R6);
       if (name) {
         this._assetsMetadata.set(firstInputId, {
           name,
@@ -185,14 +216,12 @@ function log(str: string) {
   console.log(str);
 }
 
-function safeEIP4Parse(register: string | undefined): string | undefined {
-  if (!register) {
-    return undefined;
-  }
-
-  const bytes = SParse<Uint8Array>(register);
-  if (bytes instanceof Uint8Array) {
-    return new TextDecoder().decode(bytes);
+function safeParseSColl(register: string | undefined): string | undefined {
+  if (register) {
+    const bytes = SParse<Uint8Array>(register);
+    if (bytes instanceof Uint8Array) {
+      return bytesToUtf8(bytes);
+    }
   }
 
   return undefined;

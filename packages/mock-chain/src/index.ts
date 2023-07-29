@@ -1,4 +1,4 @@
 export * from "./executor";
 export * from "./mockChain";
-export * from "./mockChainParty";
+export * from "./party";
 export * from "./objectMocking";

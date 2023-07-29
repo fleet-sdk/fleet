@@ -34,7 +34,7 @@ describe("Mock chain instantiation", () => {
     expect(customParamsChain.timestamp).to.be.equal(params.timestamp);
   });
 
-  it("Should add party", () => {
+  it("Should create new party", () => {
     const chain = new MockChain();
     const bob = chain.newParty();
 
@@ -44,6 +44,18 @@ describe("Mock chain instantiation", () => {
     const alice = chain.newParty();
     expect(chain.parties).to.have.length(2);
     expect(chain.parties[1]).to.be.equal(alice);
+  });
+
+  it("Should add non-keyed party", () => {
+    const chain = new MockChain();
+    const miner = chain.addParty(FEE_CONTRACT, "Miner Fee");
+
+    expect(chain.parties).to.have.length(1);
+    expect(chain.parties[0]).to.be.equal(miner);
+
+    const bob = chain.newParty();
+    expect(chain.parties).to.have.length(2);
+    expect(chain.parties[1]).to.be.equal(bob);
   });
 
   it("Should clear UTxO set", () => {
@@ -59,6 +71,35 @@ describe("Mock chain instantiation", () => {
 
     chain.clearUTxOSet();
 
+    expect(bob.utxos).to.have.length(0);
+    expect(alice.utxos).to.have.length(0);
+  });
+
+  it("Should reset the chain", () => {
+    const chain = new MockChain(234897);
+    const creationHeight = chain.height;
+    const creationTimestamp = chain.timestamp;
+
+    const bob = chain
+      .newParty()
+      .withBalance({ nanoergs: 1000000n })
+      .withBalance({ nanoergs: 19827398237n });
+    const alice = chain.newParty().withBalance({ nanoergs: 6000000n });
+
+    expect(bob.utxos).to.have.length(2);
+    expect(alice.utxos).to.have.length(1);
+
+    chain.newBlocks(100);
+
+    expect(chain.height).to.be.greaterThan(creationHeight);
+    expect(chain.timestamp).to.be.greaterThan(creationTimestamp);
+
+    // reset the chain
+    chain.reset();
+
+    // should clear and reset state to original values
+    expect(chain.height).to.be.equal(creationHeight);
+    expect(chain.timestamp).to.be.equal(creationTimestamp);
     expect(bob.utxos).to.have.length(0);
     expect(alice.utxos).to.have.length(0);
   });

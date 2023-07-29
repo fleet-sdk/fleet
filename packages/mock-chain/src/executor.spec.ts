@@ -3,15 +3,15 @@ import { ErgoHDKey } from "@fleet-sdk/wallet";
 import { describe, expect, it } from "vitest";
 import { execute } from "./executor";
 import { MockChain } from "./mockChain";
-import { MockChainParty } from "./mockChainParty";
 import { mockUTxO } from "./objectMocking";
+import { KeyedMockChainParty } from "./party";
 import { regularBoxesMock } from "./tests/regularBoxesMock";
 
 describe("Transaction executor", () => {
   const chain = new MockChain();
 
   it("Should not execute transaction, invalid private key", () => {
-    const bob = new MockChainParty(chain, "bob");
+    const bob = new KeyedMockChainParty(chain, "bob");
     const unsigned = new TransactionBuilder(1032850)
       .from(regularBoxesMock)
       .sendChangeTo("9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga")
@@ -19,13 +19,13 @@ describe("Transaction executor", () => {
       .build();
 
     expect(bob.key).not.to.be.undefined;
-    const bobKey = bob.key as ErgoHDKey;
+    const bobKey = bob.key;
     expect(() => execute(unsigned, [bobKey])).not.to.throw();
     expect(execute(unsigned, [bobKey])).to.contain({ success: false });
   });
 
   it("Should not execute transaction", () => {
-    const bob = new MockChainParty(chain, "bob");
+    const bob = new KeyedMockChainParty(chain, "bob");
     const input = mockUTxO({
       ergoTree: bob.address.ergoTree,
       value: 10000000n,

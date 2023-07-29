@@ -27,7 +27,7 @@ export type HeaderMockingParams = {
   parentId?: string;
   version?: number;
   fromHeight?: number;
-  fromTimeStamp?: number;
+  fromTimestamp?: number;
 };
 
 export type Header = {
@@ -52,9 +52,9 @@ export type Header = {
 
 export function mockHeaders(count: number, params?: HeaderMockingParams) {
   const headers = new Array<Header>(count);
-  const height = (params?.fromHeight || 0) + count;
-  const timestamp = params?.fromTimeStamp ? new Date(params.fromTimeStamp) : new Date();
-  const version = params?.version || 3;
+  const height = (params?.fromHeight ?? 0) + count;
+  const timestamp = params?.fromTimestamp ? new Date(params.fromTimestamp) : new Date();
+  const version = params?.version ?? 3;
 
   let parentId = params?.parentId || getRandomId();
 

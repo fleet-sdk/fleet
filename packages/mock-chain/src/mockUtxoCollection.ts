@@ -10,8 +10,8 @@ import {
 } from "@fleet-sdk/common";
 import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "@fleet-sdk/core";
-import { MockUTxOInput } from "./mockChainParty";
 import { mockUTxO } from "./objectMocking";
+import { MockUTxOInput } from "./party/mockChainParty";
 
 function isUTxOCandidate(
   candidate: BoxCandidate<Amount> | Box<Amount>
