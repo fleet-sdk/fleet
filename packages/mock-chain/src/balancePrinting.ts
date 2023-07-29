@@ -2,7 +2,7 @@ import { Amount, decimalize, some } from "@fleet-sdk/common";
 import { ArrayChange, diffArrays } from "diff";
 import { gray, green, red } from "picocolors";
 import { AssetMetadataMap } from "./mockChain";
-import { PartyBalance } from "./mockChainParty";
+import { PartyBalance } from "./party/mockChainParty";
 
 const ELLIPSIS = "...";
 

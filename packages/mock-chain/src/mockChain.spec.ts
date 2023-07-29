@@ -34,7 +34,7 @@ describe("Mock chain instantiation", () => {
     expect(customParamsChain.timestamp).to.be.equal(params.timestamp);
   });
 
-  it("Should add party", () => {
+  it("Should create new party", () => {
     const chain = new MockChain();
     const bob = chain.newParty();
 
@@ -44,6 +44,18 @@ describe("Mock chain instantiation", () => {
     const alice = chain.newParty();
     expect(chain.parties).to.have.length(2);
     expect(chain.parties[1]).to.be.equal(alice);
+  });
+
+  it("Should add non-keyed party", () => {
+    const chain = new MockChain();
+    const miner = chain.addParty(FEE_CONTRACT, "Miner Fee");
+
+    expect(chain.parties).to.have.length(1);
+    expect(chain.parties[0]).to.be.equal(miner);
+
+    const bob = chain.newParty();
+    expect(chain.parties).to.have.length(2);
+    expect(chain.parties[1]).to.be.equal(bob);
   });
 
   it("Should clear UTxO set", () => {
