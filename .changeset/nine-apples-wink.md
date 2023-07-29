@@ -2,4 +2,4 @@
 "@fleet-sdk/mock-chain": minor
 ---
 
-Add `reset()` method.
+Add `MockChain.reset()` method.

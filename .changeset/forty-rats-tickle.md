@@ -2,4 +2,4 @@
 "@fleet-sdk/compiler": minor
 ---
 
-Add `ContractTemplate` model
+Add `ContractTemplate` model.
