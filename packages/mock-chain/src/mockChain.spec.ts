@@ -75,6 +75,35 @@ describe("Mock chain instantiation", () => {
     expect(alice.utxos).to.have.length(0);
   });
 
+  it("Should reset the chain", () => {
+    const chain = new MockChain(234897);
+    const creationHeight = chain.height;
+    const creationTimestamp = chain.timestamp;
+
+    const bob = chain
+      .newParty()
+      .withBalance({ nanoergs: 1000000n })
+      .withBalance({ nanoergs: 19827398237n });
+    const alice = chain.newParty().withBalance({ nanoergs: 6000000n });
+
+    expect(bob.utxos).to.have.length(2);
+    expect(alice.utxos).to.have.length(1);
+
+    chain.newBlocks(100);
+
+    expect(chain.height).to.be.greaterThan(creationHeight);
+    expect(chain.timestamp).to.be.greaterThan(creationTimestamp);
+
+    // reset the chain
+    chain.reset();
+
+    // should clear and reset state to original values
+    expect(chain.height).to.be.equal(creationHeight);
+    expect(chain.timestamp).to.be.equal(creationTimestamp);
+    expect(bob.utxos).to.have.length(0);
+    expect(alice.utxos).to.have.length(0);
+  });
+
   it("Should simulate new blocks", () => {
     const blockTime = 120_000;
     const height = 100;

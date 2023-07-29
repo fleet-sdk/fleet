@@ -1,4 +1,11 @@
-import { bytesToUtf8, first, HexString, isUndefined, some } from "@fleet-sdk/common";
+import {
+  bytesToUtf8,
+  ensureDefaults,
+  first,
+  HexString,
+  isUndefined,
+  some
+} from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction, SParse } from "@fleet-sdk/core";
 import { bgRed, bold, red } from "picocolors";
 import { printDiff } from "./balancePrinting";
@@ -32,22 +39,25 @@ export type MockChainParams = {
   timestamp?: number;
 };
 
+export type BlockState = Required<MockChainParams>;
+
 export class MockChain {
   private readonly _parties: MockChainParty[];
-  private _height: number;
-  private _timeStamp: number;
+  private readonly _tip: BlockState;
+  private readonly _bottom: BlockState;
   private _assetsMetadata: AssetMetadataMap;
 
+  constructor();
   constructor(height?: number);
   constructor(params?: MockChainParams);
   constructor(heightOrParams?: number | MockChainParams) {
-    const params =
+    const state =
       !heightOrParams || typeof heightOrParams === "number"
-        ? { height: heightOrParams || 0 }
-        : heightOrParams;
+        ? { height: heightOrParams ?? 0, timestamp: new Date().getTime() }
+        : ensureDefaults(heightOrParams, { height: 0, timestamp: new Date().getTime() });
 
-    this._height = params.height || 0;
-    this._timeStamp = params.timestamp || new Date().getTime();
+    this._tip = state;
+    this._bottom = { ...state };
     this._parties = [];
     this._assetsMetadata = new Map();
   }
@@ -57,11 +67,11 @@ export class MockChain {
   }
 
   get height(): number {
-    return this._height;
+    return this._tip.height;
   }
 
   get timestamp(): number {
-    return this._timeStamp;
+    return this._tip.timestamp;
   }
 
   get parties(): MockChainParty[] {
@@ -73,18 +83,24 @@ export class MockChain {
   }
 
   newBlocks(count: number) {
-    this._height += count;
-    this._timeStamp += BLOCK_TIME_MS * count;
+    this._tip.height += count;
+    this._tip.timestamp += BLOCK_TIME_MS * count;
   }
 
   jumpTo(newHeight: number) {
-    this.newBlocks(newHeight - this._height);
+    this.newBlocks(newHeight - this._tip.height);
   }
 
   clearUTxOSet() {
     for (const party of this._parties) {
       party.utxos.clear();
     }
+  }
+
+  reset() {
+    this.clearUTxOSet();
+    this._tip.height = this._bottom.height;
+    this._tip.timestamp = this._bottom.timestamp;
   }
 
   newParty(name?: string): KeyedMockChainParty;
@@ -116,8 +132,8 @@ export class MockChain {
       .map((party) => party.key);
 
     const headers = mockHeaders(10, {
-      fromHeight: this._height,
-      fromTimeStamp: this._timeStamp
+      fromHeight: this._tip.height,
+      fromTimestamp: this._tip.timestamp
     });
 
     const result = execute(unsignedTransaction, keys, headers);
