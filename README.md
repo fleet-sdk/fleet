@@ -1,4 +1,4 @@
-# Fleet SDK [![Checks](https://badgen.net/github/checks/fleet-sdk/fleet/master)](https://github.com/fleet-sdk/fleet/actions) [![Coverage](https://codecov.io/gh/fleet-sdk/fleet/branch/master/graph/badge.svg)](https://app.codecov.io/gh/fleet-sdk/fleet)
+# Fleet SDK [![Checks](https://img.shields.io/github/actions/workflow/status/fleet-sdk/fleet/ci.yml)](https://github.com/fleet-sdk/fleet/actions) [![Coverage](https://img.shields.io/codecov/c/gh/fleet-sdk/fleet?logo=codecov)](https://app.codecov.io/gh/fleet-sdk/fleet)
 
 Fleet (Fluent Ergo Toolset) is a pure JavaScript SDK for Ergo Platform. Fleet provides an easy, fluent and flexible way to write off chain-code for Ergo Platform.
 
@@ -8,19 +8,19 @@ This is a [monorepository](https://monorepo.tools/) which means this contains ma
 
 | Package                                       | Description                                                    |                                                                                                               |
 | --------------------------------------------- | -------------------------------------------------------------- | :-----------------------------------------------------------------------------------------------------------: |
-| [@fleet-sdk/core](/packages/core/)            | Core library with transaction builder and basic serialization. |       [![npm](https://badgen.net/npm/v/@fleet-sdk/core)](https://www.npmjs.com/package/@fleet-sdk/core)       |
-| [@fleet-sdk/wallet](/packages/wallet)         | Wallet related library, with mnemonic and keys management.     |     [![npm](https://badgen.net/npm/v/@fleet-sdk/wallet)](https://www.npmjs.com/package/@fleet-sdk/wallet)     |
-| [@fleet-sdk/common](/packages/common)         | Internal types and utility functions shared across packages.   |     [![npm](https://badgen.net/npm/v/@fleet-sdk/common)](https://www.npmjs.com/package/@fleet-sdk/common)     |
-| [@fleet-sdk/crypto](/packages/crypto)         | Ergo blockchain crypto primitives.                             |     [![npm](https://badgen.net/npm/v/@fleet-sdk/crypto)](https://www.npmjs.com/package/@fleet-sdk/crypto)     |
-| [@fleet-sdk/mock-chain](/packages/mock-chain) | Mock chain and testing utilities for Ergo Smart Contracts.     | [![npm](https://badgen.net/npm/v/@fleet-sdk/mock-chain)](https://www.npmjs.com/package/@fleet-sdk/mock-chain) |
-| [@fleet-sdk/compiler](/packages/compiler)     | Sigma.JS powered ErgoScript compiler.                          |   [![npm](https://badgen.net/npm/v/@fleet-sdk/compiler)](https://www.npmjs.com/package/@fleet-sdk/compiler)   |
+| [@fleet-sdk/core](/packages/core/)            | Core library with transaction builder and basic serialization. |       [![npm](https://img.shields.io/npm/v/@fleet-sdk/core?logo=npm)](https://www.npmjs.com/package/@fleet-sdk/core) [![bundle size](https://img.shields.io/bundlephobia/minzip/@fleet-sdk/core?label=minzip)](https://bundlephobia.com/package/@fleet-sdk/core)      |
+| [@fleet-sdk/wallet](/packages/wallet)         | Wallet related library, with mnemonic and keys management.     |     [![npm](https://img.shields.io/npm/v/@fleet-sdk/wallet?logo=npm)](https://www.npmjs.com/package/@fleet-sdk/wallet) [![bundle size](https://img.shields.io/bundlephobia/minzip/@fleet-sdk/wallet?label=minzip)](https://bundlephobia.com/package/@fleet-sdk/wallet)     |
+| [@fleet-sdk/common](/packages/common)         | Internal types and utility functions shared across `@fleet-sdk` packages.   |     [![npm](https://img.shields.io/npm/v/@fleet-sdk/common?logo=npm)](https://www.npmjs.com/package/@fleet-sdk/common) [![bundle size](https://img.shields.io/bundlephobia/minzip/@fleet-sdk/common?label=minzip)](https://bundlephobia.com/package/@fleet-sdk/common)     |
+| [@fleet-sdk/crypto](/packages/crypto)         | Ergo blockchain crypto primitives.                             |         |
+| [@fleet-sdk/mock-chain](/packages/mock-chain) | Mock chain and testing utilities for Ergo Smart Contracts.     | [![npm](https://img.shields.io/npm/v/@fleet-sdk/mock-chain?logo=npm)](https://www.npmjs.com/package/@fleet-sdk/mock-chain) [![bundle size](https://img.shields.io/bundlephobia/minzip/@fleet-sdk/mock-chain?label=minzip)](https://bundlephobia.com/package/@fleet-sdk/mock-chain) |
+| [@fleet-sdk/compiler](/packages/compiler)     | Sigma.JS powered ErgoScript compiler.                          |   [![npm](https://img.shields.io/npm/v/@fleet-sdk/compiler?logo=npm)](https://www.npmjs.com/package/@fleet-sdk/compiler) [![bundle size](https://img.shields.io/bundlephobia/minzip/@fleet-sdk/compiler?label=minzip)](https://bundlephobia.com/package/@fleet-sdk/compiler)  |
 
 ## Plugins
 
 | Package                                              | Description                                                     |                                                                                                                             |
 | ---------------------------------------------------- | --------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------: |
-| [@fleet-sdk/babel-fees-plugin](/plugins/babel-fees/) | Fleet SDK plugin and utility functions for Babel Fees protocol. | [![npm](https://badgen.net/npm/v/@fleet-sdk/babel-fees-plugin)](https://www.npmjs.com/package/@fleet-sdk/babel-fees-plugin) |
-| [@fleet-sdk/ageusd-plugin](/plugins/ageusd/)         | Fleet SDK plugin and utility functions for AgeUSD protocol.     |     [![npm](https://badgen.net/npm/v/@fleet-sdk/ageusd-plugin)](https://www.npmjs.com/package/@fleet-sdk/ageusd-plugin)     |
+| [@fleet-sdk/babel-fees-plugin](/plugins/babel-fees/) | Fleet SDK plugin and utility functions for Babel Fees protocol. | [![npm](https://img.shields.io/npm/v/@fleet-sdk/babel-fees-plugin?logo=npm)](https://www.npmjs.com/package/@fleet-sdk/babel-fees-plugin) [![bundle size](https://img.shields.io/bundlephobia/minzip/@fleet-sdk/babel-fees-plugin?label=minzip)](https://bundlephobia.com/package/@fleet-sdk/babel-fees-plugin) |
+| [@fleet-sdk/ageusd-plugin](/plugins/ageusd/)         | Fleet SDK plugin and utility functions for AgeUSD protocol.     |     [![npm](https://img.shields.io/npm/v/@fleet-sdk/ageusd-plugin?logo=npm)](https://www.npmjs.com/package/@fleet-sdk/ageusd-plugin) [![bundle size](https://img.shields.io/bundlephobia/minzip/@fleet-sdk/ageusd-plugin?label=minzip)](https://bundlephobia.com/package/@fleet-sdk/ageusd-plugin)     |
 
 ## Fleet SDK Usage Examples
 
