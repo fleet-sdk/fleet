@@ -13,7 +13,6 @@ import {
 } from "@fleet-sdk/common";
 import { OutputBuilder } from "../../builder";
 import { ErgoBox } from "../../models/ergoBox";
-import { BLAKE_256_HASH_LENGTH } from "../utils";
 import { estimateVLQSize } from "../vlq";
 import { SigmaWriter } from "./sigmaWriter";
 
@@ -138,7 +137,7 @@ export function estimateBoxSize(
   }
   size += estimateVLQSize(registersLength);
 
-  size += BLAKE_256_HASH_LENGTH; // transaction id
+  size += 32; // transaction id (BLAKE2b 256 hash)
   size += estimateVLQSize(isBox(box) ? box.index : MAX_UINT16_VALUE);
 
   return size;

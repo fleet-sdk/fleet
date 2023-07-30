@@ -1,4 +1,5 @@
-import { bigIntToHex, bytesToHex } from "@fleet-sdk/common";
+import { bigIntToHex } from "@fleet-sdk/common";
+import { hex } from "@fleet-sdk/crypto";
 import { writeBigVLQ, writeVLQ } from "../vlq";
 import { zigZagEncode, zigZagEncodeBigInt } from "../zigZag";
 
@@ -111,7 +112,7 @@ export class SigmaWriter {
   }
 
   public toHex(): string {
-    return bytesToHex(this._bytes.subarray(0, this._cursor));
+    return hex.encode(this._bytes.subarray(0, this._cursor));
   }
 
   public toBytes(): Uint8Array {

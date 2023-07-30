@@ -1,4 +1,4 @@
-import { hexToBytes } from "@fleet-sdk/common";
+import { hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
 import { ErgoTree } from "./ergoTree";
 
@@ -21,7 +21,7 @@ describe("ErgoTree model", () => {
 
   it("Should construct from bytes", () => {
     const treeHex = "100104c801d191a37300";
-    const tree = new ErgoTree(hexToBytes(treeHex));
+    const tree = new ErgoTree(hex.decode(treeHex));
     expect(tree.toHex()).to.be.equal(treeHex);
   });
 

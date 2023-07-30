@@ -1,4 +1,5 @@
-import { bytesToHex, HexString, hexToBigInt, hexToBytes, isEmpty } from "@fleet-sdk/common";
+import { HexString, hexToBigInt, isEmpty } from "@fleet-sdk/common";
+import { hex } from "@fleet-sdk/crypto";
 import { readBigVLQ, readVLQ } from "../vlq";
 import { zigZagDecode, zigZagDecodeBigInt } from "../zigZag";
 import { SigmaTypeCode } from "./sigmaTypeCode";
@@ -13,7 +14,7 @@ export class SigmaReader {
 
   constructor(bytes: HexString | Uint8Array) {
     if (typeof bytes === "string") {
-      this._bytes = hexToBytes(bytes);
+      this._bytes = hex.decode(bytes);
     } else {
       this._bytes = bytes;
     }
@@ -78,8 +79,7 @@ export class SigmaReader {
 
   public readBigInt(): bigint {
     const len = readVLQ(this);
-    const hex = bytesToHex(this.readBytes(len));
 
-    return hexToBigInt(hex);
+    return hexToBigInt(hex.encode(this.readBytes(len)));
   }
 }

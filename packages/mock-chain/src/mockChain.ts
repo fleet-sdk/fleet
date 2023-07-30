@@ -1,12 +1,6 @@
-import {
-  bytesToUtf8,
-  ensureDefaults,
-  first,
-  HexString,
-  isUndefined,
-  some
-} from "@fleet-sdk/common";
+import { ensureDefaults, first, HexString, isUndefined, some } from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction, SParse } from "@fleet-sdk/core";
+import { utf8 } from "@fleet-sdk/crypto";
 import { bgRed, bold, red } from "picocolors";
 import { printDiff } from "./balancePrinting";
 import { execute } from "./executor";
@@ -220,7 +214,7 @@ function safeParseSColl(register: string | undefined): string | undefined {
   if (register) {
     const bytes = SParse<Uint8Array>(register);
     if (bytes instanceof Uint8Array) {
-      return bytesToUtf8(bytes);
+      return utf8.encode(bytes);
     }
   }
 

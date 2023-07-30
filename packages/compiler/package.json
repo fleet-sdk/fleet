@@ -20,6 +20,7 @@
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/core": "workspace:^",
+    "@fleet-sdk/crypto": "workspace:^",
     "sigmastate-js": "0.2.1-snapshot.8a862d393"
   },
   "scripts": {

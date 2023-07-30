@@ -1,5 +1,5 @@
-import { bytesToHex } from "@fleet-sdk/common";
 import { SInt } from "@fleet-sdk/core";
+import { hex } from "@fleet-sdk/crypto";
 import { HexString, Value, ValueObj } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import { compile, compilerDefaults, CompilerOptions, parseNamedConstantsMap } from "./compiler";
@@ -80,7 +80,7 @@ describe("ErgoScript Compiler", () => {
 
     expect(tree.toHex()).to.be.equal(tv.tree);
     expect(tree.template.toHex()).to.be.equal(tv.template);
-    expect(bytesToHex(tree.template.toBytes())).to.be.equal(tv.template);
+    expect(hex.encode(tree.template.toBytes())).to.be.equal(tv.template);
 
     expect(tree.hasSegregatedConstants).to.be.equal(tv.options.segregateConstants);
     expect(tree.version).to.be.equal(tv.options.version);

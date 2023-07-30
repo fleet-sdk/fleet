@@ -1,24 +1,24 @@
-import { Box, BoxCandidate, bytesToHex } from "@fleet-sdk/common";
+import { Box, BoxCandidate } from "@fleet-sdk/common";
 import { serializeBox } from "@fleet-sdk/core";
-import { blake2b } from "@noble/hashes/blake2b";
-import { randomBytes } from "@noble/hashes/utils";
+import { hex } from "@fleet-sdk/crypto";
+import { blake2b256, randomBytes } from "@fleet-sdk/crypto";
 
 export function mockUTxO(candidate: BoxCandidate<bigint>): Box<bigint> {
   const box: Box<bigint> = {
     boxId: "",
-    transactionId: bytesToHex(randomBytes(32)),
+    transactionId: hex.encode(randomBytes(32)),
     index: 0,
     ...candidate
   };
 
   const bytes = serializeBox(box).toBytes();
-  box.boxId = bytesToHex(blake2b(bytes, { dkLen: 32 }));
+  box.boxId = hex.encode(blake2b256(bytes));
 
   return box;
 }
 
 function getRandomId() {
-  return bytesToHex(randomBytes(32));
+  return hex.encode(randomBytes(32));
 }
 
 const BLOCK_TIME = 2;

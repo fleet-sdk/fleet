@@ -2,14 +2,13 @@ import {
   BoxCandidate,
   BoxSummary,
   BuildOutputType,
-  bytesToHex,
   EIP12UnsignedTransaction,
   UnsignedTransaction,
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
+import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeTransaction } from "../serializer/sigma/transactionSerializer";
-import { blake2b256 } from "../serializer/utils";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 
 type Input = ErgoUnsignedInput;
@@ -31,7 +30,7 @@ export class ErgoUnsignedTransaction {
   }
 
   get id(): string {
-    return bytesToHex(blake2b256(this.toBytes()));
+    return hex.encode(blake2b256(this.toBytes()));
   }
 
   get inputs(): ReadOnlyInputs {

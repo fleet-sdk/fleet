@@ -1,4 +1,4 @@
-import { bytesToHex } from "@fleet-sdk/common";
+import { hex } from "@fleet-sdk/crypto";
 
 export class ContractTemplate {
   private _bytes: Uint8Array;
@@ -12,6 +12,6 @@ export class ContractTemplate {
   }
 
   toHex() {
-    return bytesToHex(this._bytes);
+    return hex.encode(this._bytes);
   }
 }

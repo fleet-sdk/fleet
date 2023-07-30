@@ -1,25 +1,16 @@
 import { AddressType, Base58String, HexString, isEmpty, Network } from "@fleet-sdk/common";
-import {
-  areEqual,
-  bytesToHex,
-  concatBytes,
-  endsWith,
-  first,
-  hexToBytes,
-  isDefined,
-  startsWith
-} from "@fleet-sdk/common";
-import { base58 } from "@scure/base";
+import { areEqual, concatBytes, endsWith, first, isDefined, startsWith } from "@fleet-sdk/common";
+import { base58, blake2b256, hex } from "@fleet-sdk/crypto";
 import { InvalidAddress } from "../errors/invalidAddress";
-import { blake2b256, BLAKE_256_HASH_LENGTH } from "../serializer/utils";
 
 const CHECKSUM_LENGTH = 4;
+const BLAKE_256_HASH_LENGTH = 32;
 
-const P2PK_ERGOTREE_PREFIX = hexToBytes("0008cd");
+const P2PK_ERGOTREE_PREFIX = hex.decode("0008cd");
 const P2PK_ERGOTREE_LENGTH = 36;
 
-const P2SH_ERGOTREE_SUFFIX = hexToBytes("d40801");
-const P2SH_ERGOTREE_PREFIX = hexToBytes("00ea02d193b4cbe4e3010e040004300e18");
+const P2SH_ERGOTREE_SUFFIX = hex.decode("d40801");
+const P2SH_ERGOTREE_PREFIX = hex.decode("00ea02d193b4cbe4e3010e040004300e18");
 const P2SH_ERGOTREE_LENGTH = 44;
 const P2SH_HASH_LENGTH = 24;
 
@@ -33,7 +24,7 @@ function _getEncodedAddressType(addressBytes: Uint8Array): AddressType {
 
 function _ensureBytes(content: HexString | Uint8Array): Uint8Array {
   if (typeof content === "string") {
-    return hexToBytes(content);
+    return hex.decode(content);
   }
 
   return content;
@@ -101,7 +92,7 @@ export class ErgoAddress {
    * ErgoTree hex string
    */
   public get ergoTree(): HexString {
-    return bytesToHex(this._ergoTree);
+    return hex.encode(this._ergoTree);
   }
 
   public get type(): AddressType {
@@ -123,7 +114,7 @@ export class ErgoAddress {
    * @param ergoTree ErgoTree hex string
    */
   public static fromErgoTree(ergoTree: HexString, network?: Network): ErgoAddress {
-    return new ErgoAddress(hexToBytes(ergoTree), network);
+    return new ErgoAddress(hex.decode(ergoTree), network);
   }
 
   /**

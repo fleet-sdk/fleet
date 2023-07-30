@@ -1,5 +1,5 @@
-import { BoxCandidate, bytesToHex, DataInput, UnsignedInput } from "@fleet-sdk/common";
-import { blake2b } from "@noble/hashes/blake2b";
+import { BoxCandidate, DataInput, UnsignedInput } from "@fleet-sdk/common";
+import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
 import { serializeTransaction } from "./transactionSerializer";
 
@@ -602,8 +602,8 @@ describe("Transaction serializer", () => {
     it(`Should serialize [${tv.name}]`, () => {
       const bytes = serializeTransaction(tv.json).toBytes();
 
-      expect(bytesToHex(bytes)).toBe(tv.serialized);
-      expect(bytesToHex(blake2b(bytes, { dkLen: 32 }))).toBe(tv.txId);
+      expect(hex.encode(bytes)).toBe(tv.serialized);
+      expect(hex.encode(blake2b256(bytes))).toBe(tv.txId);
     });
   });
 });

@@ -1,5 +1,4 @@
-import { bytesToHex, bytesToUtf8, hexToBytes, utf8ToBytes } from "@fleet-sdk/common";
-import { randomBytes } from "@noble/hashes/utils";
+import { hex, randomBytes, utf8 } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
 import {
   collBoolTestVectors,
@@ -70,13 +69,13 @@ describe("Primary types serialization", () => {
 
   it("Should serialize SGroupElement", () => {
     for (const tv of sGroupElementTestVectors) {
-      expect(SConstant(SGroupElement(hexToBytes(tv.value)))).toBe(tv.hex);
+      expect(SConstant(SGroupElement(hex.decode(tv.value)))).toBe(tv.hex);
     }
   });
 
   it("Should serialize SSigmaProp", () => {
     for (const tv of sSigmaPropTestVectors) {
-      expect(SConstant(SSigmaProp(SGroupElement(hexToBytes(tv.value))))).toBe(tv.hex);
+      expect(SConstant(SSigmaProp(SGroupElement(hex.decode(tv.value))))).toBe(tv.hex);
     }
   });
 
@@ -106,9 +105,9 @@ describe("SColl serialization", () => {
 
   it("Should serialize 'Coll[SByte]'", () => {
     for (const tv of collByteTestVectors) {
-      const bytes = utf8ToBytes(tv.string);
+      const bytes = utf8.decode(tv.string);
       expect(SConstant(SColl(SByte, bytes))).toBe(tv.hex);
-      expect(SConstant(SColl(SByte, bytesToHex(bytes)))).toBe(tv.hex);
+      expect(SConstant(SColl(SByte, hex.encode(bytes)))).toBe(tv.hex);
     }
   });
 
@@ -163,13 +162,13 @@ describe("Deserialization", () => {
 
   it("Should deserialize SGroupElement", () => {
     for (const tv of sGroupElementTestVectors) {
-      expect(bytesToHex(SParse(tv.hex))).toBe(tv.value);
+      expect(hex.encode(SParse(tv.hex))).toBe(tv.value);
     }
   });
 
   it("Should deserialize SSigmaProp", () => {
     for (const tv of sSigmaPropTestVectors) {
-      expect(bytesToHex(SParse(tv.hex))).toBe(tv.value);
+      expect(hex.encode(SParse(tv.hex))).toBe(tv.value);
     }
   });
 
@@ -195,7 +194,7 @@ describe("SColl deserialization", () => {
 
   it("Should deserialize 'Coll[SByte]'", () => {
     for (const tv of collByteTestVectors) {
-      expect(bytesToUtf8(SParse(tv.hex))).toBe(tv.string);
+      expect(utf8.encode(SParse(tv.hex))).toBe(tv.string);
     }
   });
 
@@ -224,7 +223,7 @@ describe("SColl deserialization", () => {
   });
 
   it("Should deserialize 'Coll[Coll[Byte]]'", () => {
-    const hex =
+    const register =
       "1a0c4065653430323366366564303963313332326234363630376538633163663737653733653030353039613334343838306232663339616332643430623433376463046572676f0763617264616e6f3339666965744263636a48774c774b4c5339573131453641766d565a6e4e6938347042487854317a3946723978314b6b79424a686761646472317179733577356d76796665783572646c75683039393273766d3074747834643439346336767979346a3933336573707a6d776e6c343277633833763837736b6c71773979387266766a6366743973616433376c61747778677170637132747a36347a08000000003b9aca00080000000002faf080080000000000013880036572672c6173736574316a7935713561307670737475747135713664386367646d72643471753579656663646e6a677a40366331346131353637363364613936303962383065386638326363613436663630363330346630613864306363363665356565323234306336333165666166640800000000000ee48c";
     const expected = [
       "65653430323366366564303963313332326234363630376538633163663737653733653030353039613334343838306232663339616332643430623433376463",
@@ -239,9 +238,9 @@ describe("SColl deserialization", () => {
       "6173736574316a7935713561307670737475747135713664386367646d72643471753579656663646e6a677a",
       "36633134613135363736336461393630396238306538663832636361343666363036333034663061386430636336366535656532323430633633316566616664",
       "00000000000ee48c"
-    ].map((x) => hexToBytes(x));
+    ].map((x) => hex.decode(x));
 
-    expect(SParse(hex)).toStrictEqual(expected);
+    expect(SParse(register)).toStrictEqual(expected);
   });
 });
 
@@ -254,7 +253,7 @@ describe("Serialize -> Parse roundtrip", () => {
   }
 
   function getRandomBigInt(bytes: number) {
-    return BigInt(`0x${bytesToHex(randomBytes(bytes))}`);
+    return BigInt(`0x${hex.encode(randomBytes(bytes))}`);
   }
 
   function randomBigInt(min: bigint, max: bigint) {
@@ -308,14 +307,14 @@ describe("Serialize -> Parse roundtrip", () => {
 
   it("Should roundtrip SGroupElement", () => {
     for (const tv of sGroupElementTestVectors) {
-      expect(SParse(SConstant(SGroupElement(hexToBytes(tv.value))))).toEqual(hexToBytes(tv.value));
+      expect(SParse(SConstant(SGroupElement(hex.decode(tv.value))))).toEqual(hex.decode(tv.value));
     }
   });
 
   it("Should roundtrip SSigmaProp", () => {
     for (const tv of sSigmaPropTestVectors) {
-      expect(SParse(SConstant(SSigmaProp(SGroupElement(hexToBytes(tv.value)))))).toEqual(
-        hexToBytes(tv.value)
+      expect(SParse(SConstant(SSigmaProp(SGroupElement(hex.decode(tv.value)))))).toEqual(
+        hex.decode(tv.value)
       );
     }
   });
