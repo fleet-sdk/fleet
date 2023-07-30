@@ -1,6 +1,6 @@
 import { Amount, BoxCandidate, Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
-import { stringToBytes } from "@scure/base";
+import { utf8 } from "@fleet-sdk/crypto";
 import { describe, expect, it, vi } from "vitest";
 import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
@@ -997,9 +997,9 @@ describe("Non-standardized token minting", () => {
             amount: 1n
           })
           .setAdditionalRegisters({
-            R4: SConstant(SColl(SByte, stringToBytes("utf8", "TestToken"))), //         name
-            R5: SConstant(SColl(SByte, stringToBytes("utf8", "Description test"))), //  description
-            R6: SConstant(SColl(SByte, stringToBytes("utf8", "4"))) //                  decimals
+            R4: SConstant(SColl(SByte, utf8.decode("TestToken"))), //         name
+            R5: SConstant(SColl(SByte, utf8.decode("Description test"))), //  description
+            R6: SConstant(SColl(SByte, utf8.decode("4"))) //                  decimals
           })
       )
       .and.to(

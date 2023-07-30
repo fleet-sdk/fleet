@@ -23,7 +23,6 @@ import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../e
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
-import { BLAKE_256_HASH_LENGTH } from "../serializer/utils";
 import { estimateVLQSize } from "../serializer/vlq";
 import {
   BOX_VALUE_PER_BYTE,
@@ -440,7 +439,7 @@ function estimateChangeSize({
   size += byteSizeOf(changeAddress.ergoTree);
   size += estimateVLQSize(creationHeight);
   size += estimateVLQSize(0); // empty registers length
-  size += BLAKE_256_HASH_LENGTH;
+  size += 32; // BLAKE 256 hash length
 
   size = size * neededBoxes;
   for (let i = 0; i < neededBoxes; i++) {

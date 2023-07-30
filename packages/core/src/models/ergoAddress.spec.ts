@@ -1,5 +1,5 @@
-import { AddressType, bytesToHex, hexToBytes, Network } from "@fleet-sdk/common";
-import { blake2b } from "@noble/hashes/blake2b";
+import { AddressType, Network } from "@fleet-sdk/common";
+import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
 import { FEE_CONTRACT } from "../builder";
 import {
@@ -55,11 +55,11 @@ describe("Construction", () => {
 
     expect(address.type).toBe(AddressType.P2PK);
     expect(address.network).toBeUndefined();
-    expect(bytesToHex(address.getPublicKeys()[0])).toBe(publicKey);
+    expect(hex.encode(address.getPublicKeys()[0])).toBe(publicKey);
   });
 
   it("Should construct P2PK from public key bytes", () => {
-    const publicKey = hexToBytes(
+    const publicKey = hex.decode(
       "038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63"
     );
     const address = ErgoAddress.fromPublicKey(publicKey);
@@ -70,7 +70,7 @@ describe("Construction", () => {
   });
 
   it("Should construct from full hash bytes", () => {
-    const hash = bytesToHex(blake2b(hexToBytes(FEE_CONTRACT), { dkLen: 32 }));
+    const hash = hex.encode(blake2b256(hex.decode(FEE_CONTRACT)));
     const address = ErgoAddress.fromHash(hash);
 
     expect(address.type).toBe(AddressType.P2SH);
@@ -79,7 +79,7 @@ describe("Construction", () => {
   });
 
   it("Should construct from truncated hash bytes", () => {
-    const hash = blake2b(hexToBytes(FEE_CONTRACT), { dkLen: 32 }).subarray(0, 24);
+    const hash = blake2b256(hex.decode(FEE_CONTRACT)).subarray(0, 24);
     const address = ErgoAddress.fromHash(hash);
 
     expect(address.type).toBe(AddressType.P2SH);
@@ -90,17 +90,17 @@ describe("Construction", () => {
   it("Should fail to construct from invalid hash bytes", () => {
     expect(() => {
       const hash = new Uint8Array(33);
-      hash.set(blake2b(FEE_CONTRACT, { dkLen: 32 }));
+      hash.set(blake2b256(FEE_CONTRACT));
 
       ErgoAddress.fromHash(hash);
     }).toThrow();
 
     expect(() => {
-      ErgoAddress.fromHash(blake2b(FEE_CONTRACT, { dkLen: 32 }).subarray(0, 25));
+      ErgoAddress.fromHash(blake2b256(FEE_CONTRACT).subarray(0, 25));
     }).toThrow();
 
     expect(() => {
-      ErgoAddress.fromHash(blake2b(FEE_CONTRACT, { dkLen: 32 }).subarray(0, 10));
+      ErgoAddress.fromHash(blake2b256(FEE_CONTRACT).subarray(0, 10));
     }).toThrow();
   });
 
@@ -277,7 +277,7 @@ describe("Public key", () => {
 
   it("Should create from public key bytes", () => {
     for (const testVector of publicKeyTestVectors) {
-      expect(ErgoAddress.fromPublicKey(hexToBytes(testVector.publicKey)).toString()).toBe(
+      expect(ErgoAddress.fromPublicKey(hex.decode(testVector.publicKey)).toString()).toBe(
         testVector.base58
       );
     }
@@ -299,7 +299,7 @@ describe("Public key", () => {
 
   it("Should generate the right public key from base58 encoded string", () => {
     for (const testVector of publicKeyTestVectors) {
-      expect(bytesToHex(ErgoAddress.fromBase58(testVector.base58).getPublicKeys()[0])).toBe(
+      expect(hex.encode(ErgoAddress.fromBase58(testVector.base58).getPublicKeys()[0])).toBe(
         testVector.publicKey
       );
     }

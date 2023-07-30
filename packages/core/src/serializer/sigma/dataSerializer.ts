@@ -1,4 +1,4 @@
-import { hexToBytes } from "@fleet-sdk/common";
+import { hex } from "@fleet-sdk/crypto";
 import { SigmaReader } from "./sigmaReader";
 import { SigmaTypeCode } from "./sigmaTypeCode";
 import { IPrimitiveSigmaType, ISigmaType } from "./sigmaTypes";
@@ -65,7 +65,7 @@ export class DataSerializer {
         case SigmaTypeCode.Byte: {
           let bytes!: Uint8Array;
           if (typeof data.value === "string") {
-            bytes = hexToBytes(data.value);
+            bytes = hex.decode(data.value);
           } else {
             bytes = Uint8Array.from(data.value as number[]);
           }

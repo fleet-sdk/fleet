@@ -1,6 +1,6 @@
-import { BoxCandidate, bytesToHex, hasDuplicatesBy } from "@fleet-sdk/common";
+import { BoxCandidate, hasDuplicatesBy } from "@fleet-sdk/common";
 import { ErgoBox } from "@fleet-sdk/core";
-import { randomBytes } from "@noble/hashes/utils";
+import { hex, randomBytes } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
 import { mockHeaders, mockUTxO } from "./objectMocking";
 
@@ -51,7 +51,7 @@ describe("mockHeaders()", () => {
       version: 10,
       fromHeight: 55,
       fromTimeStamp: new Date().getTime(),
-      parentId: bytesToHex(randomBytes(32))
+      parentId: hex.encode(randomBytes(32))
     };
     const headers = mockHeaders(10, params);
 

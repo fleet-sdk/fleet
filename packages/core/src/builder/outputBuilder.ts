@@ -19,7 +19,7 @@ import {
   TokenAmount,
   UnsignedInput
 } from "@fleet-sdk/common";
-import { stringToBytes } from "@scure/base";
+import { utf8 } from "@fleet-sdk/crypto";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
@@ -182,11 +182,9 @@ export class OutputBuilder {
 
       if (isEmpty(this.additionalRegisters)) {
         this.setAdditionalRegisters({
-          R4: SConstant(SColl(SByte, stringToBytes("utf8", this.minting.name || ""))),
-          R5: SConstant(SColl(SByte, stringToBytes("utf8", this.minting.description || ""))),
-          R6: SConstant(
-            SColl(SByte, stringToBytes("utf8", this.minting.decimals?.toString() || "0"))
-          )
+          R4: SConstant(SColl(SByte, utf8.decode(this.minting.name || ""))),
+          R5: SConstant(SColl(SByte, utf8.decode(this.minting.description || ""))),
+          R6: SConstant(SColl(SByte, utf8.decode(this.minting.decimals?.toString() || "0")))
         });
       }
 

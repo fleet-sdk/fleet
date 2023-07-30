@@ -1,13 +1,6 @@
-import {
-  Amount,
-  Box,
-  bytesToHex,
-  HexString,
-  NonMandatoryRegisters,
-  TokenAmount
-} from "@fleet-sdk/common";
+import { Amount, Box, HexString, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
-import { blake2b } from "@noble/hashes/blake2b";
+import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeBox } from "../serializer/sigma/boxSerializer";
 
 export type OnlyR4Register = {
@@ -94,7 +87,7 @@ export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
 
   static validate(box: Box<Amount> | ErgoBox): boolean {
     const bytes = serializeBox(box).toBytes();
-    const hash = bytesToHex(blake2b(bytes, { dkLen: 32 }));
+    const hash = hex.encode(blake2b256(bytes));
 
     return box.boxId === hash;
   }

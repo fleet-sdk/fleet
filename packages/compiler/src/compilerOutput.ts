@@ -1,5 +1,5 @@
-import { hexToBytes } from "@fleet-sdk/common";
 import { ErgoTree } from "@fleet-sdk/core";
+import { hex } from "@fleet-sdk/crypto";
 import { ErgoTree as SigmaErgoTree, Value as SigmaValue } from "sigmastate-js/main";
 import { ContractTemplate } from "./contractTemplate";
 
@@ -8,13 +8,13 @@ export class CompilerOutput extends ErgoTree {
   private _template?: ContractTemplate;
 
   constructor(tree: SigmaErgoTree) {
-    super(hexToBytes(tree.toHex()));
+    super(hex.decode(tree.toHex()));
     this._tree = tree;
   }
 
   get template(): ContractTemplate {
     if (!this._template) {
-      const templateBytes = hexToBytes(this._tree.templateHex());
+      const templateBytes = hex.decode(this._tree.templateHex());
       this._template = new ContractTemplate(templateBytes);
     }
 

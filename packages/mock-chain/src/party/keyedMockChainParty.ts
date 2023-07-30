@@ -1,5 +1,5 @@
+import { randomBytes } from "@fleet-sdk/crypto";
 import { ErgoHDKey } from "@fleet-sdk/wallet";
-import { randomBytes } from "@noble/hashes/utils";
 import { MockChain } from "../mockChain";
 import { MockChainParty } from "./mockChainParty";
 
