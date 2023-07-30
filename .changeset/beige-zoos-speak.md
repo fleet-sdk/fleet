@@ -2,4 +2,4 @@
 "@fleet-sdk/common": minor
 ---
 
-Add `concatBytes()` function:
+Add `concatBytes()` function.
