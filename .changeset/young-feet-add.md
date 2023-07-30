@@ -3,6 +3,5 @@
 ---
 
 Add hashing functions:
-
 - `blake2b256()`
 - `sha256()`
