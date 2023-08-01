@@ -1,10 +1,10 @@
-import { collType, ISCollValue, ISigmaValue, ISTupleValue, tupleType } from "./sigmaTypes";
+import { collType, ISColl, ISigmaValue, ISTuple, tupleType } from "./sigmaTypes";
 
-export function isColl<T>(data: ISigmaValue): data is ISCollValue<T> {
+export function isColl<T>(data: ISigmaValue): data is ISColl<T> {
   return collType.test(data.type.code);
 }
 
-export function isTuple(data: ISigmaValue): data is ISTupleValue {
+export function isTuple(data: ISigmaValue): data is ISTuple {
   return tupleType.test(data.type.code);
 }
 

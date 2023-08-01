@@ -1,4 +1,5 @@
 import { hex, randomBytes, utf8 } from "@fleet-sdk/crypto";
+// import { TypeObj, Value, ValueObj } from "sigmastate-js/main";
 import { describe, expect, it } from "vitest";
 import {
   collBoolTestVectors,
@@ -14,6 +15,7 @@ import {
 } from "../../tests/testVectors/constantsTestVectors";
 import { SConstant, SParse } from "./constantSerializer";
 import {
+  intType,
   ISigmaType,
   SBigInt,
   SBool,
@@ -158,6 +160,24 @@ describe("Tuple serialization", () => {
     expect(
       SConstant(STuple(SColl(SByte, "505250"), SColl(SByte, "596f7572206c6f616e204a616e75617279")))
     ).to.be.equal("3c0e0e0350525011596f7572206c6f616e204a616e75617279");
+
+    expect(SConstant(STuple(SColl(SByte, "0a0c"), SBool(true), SByte(2)))).to.be.equal(
+      "480e0102020a0c0102"
+    );
+
+    // console.log(ValueObj.fromHex("480e0102020a0c0102").toHex());
+  });
+
+  it("Should fail with tuples with items out of the 2 - 255 range", () => {
+    const _1item = STuple(SInt(1));
+    expect(() => SConstant(_1item)).to.throw(
+      "Invalid type: tuples must have between 2 and 255 items."
+    );
+
+    const _256Items = STuple(...new Array(256).map((_, i) => ({ type: intType, value: i })));
+    expect(() => SConstant(_256Items)).to.throw(
+      "Invalid type: tuples must have between 2 and 255 items."
+    );
   });
 });
 

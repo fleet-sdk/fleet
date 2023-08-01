@@ -9,7 +9,7 @@ import {
   groupElementType,
   intType,
   ISigmaValue,
-  ISPrimitiveValue,
+  ISPrimitive,
   longType,
   shortType,
   sigmaPropType,
@@ -25,29 +25,29 @@ export class DataSerializer {
     if (data.type.primitive) {
       switch (data.type.code) {
         case boolType.code:
-          writer.writeBoolean((data as ISPrimitiveValue<boolean>).value);
+          writer.writeBoolean((data as ISPrimitive<boolean>).value);
           break;
         case byteType.code:
-          writer.write((data as ISPrimitiveValue<number>).value);
+          writer.write((data as ISPrimitive<number>).value);
           break;
         case shortType.code:
-          writer.writeShort((data as ISPrimitiveValue<number>).value);
+          writer.writeShort((data as ISPrimitive<number>).value);
           break;
         case intType.code:
-          writer.writeInt((data as ISPrimitiveValue<number>).value);
+          writer.writeInt((data as ISPrimitive<number>).value);
           break;
         case longType.code:
-          writer.writeLong((data as ISPrimitiveValue<bigint>).value);
+          writer.writeLong((data as ISPrimitive<bigint>).value);
           break;
         case bigIntType.code: {
-          writer.writeBigInt((data as ISPrimitiveValue<bigint>).value);
+          writer.writeBigInt((data as ISPrimitive<bigint>).value);
           break;
         }
         case groupElementType.code:
-          writer.writeBytes((data as ISPrimitiveValue<Uint8Array>).value);
+          writer.writeBytes((data as ISPrimitive<Uint8Array>).value);
           break;
         case sigmaPropType.code: {
-          const node = (data as ISPrimitiveValue<ISigmaValue>).value;
+          const node = (data as ISPrimitive<ISigmaValue>).value;
           if (node.type.code === groupElementType.code) {
             writer.write(PROVE_DLOG_OP);
             DataSerializer.serialize(node, writer);
