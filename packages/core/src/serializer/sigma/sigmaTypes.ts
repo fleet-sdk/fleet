@@ -132,99 +132,83 @@ export interface ISigmaValue {
   readonly type: ISigmaType;
 }
 
-export interface ISigmaPrimitiveValue<T> extends ISigmaValue {
+export interface ISPrimitiveValue<T> extends ISigmaValue {
   value: T;
 }
 
-export interface ISigmaCollValue<T> extends ISigmaValue {
+export interface ISCollValue<T> extends ISigmaValue {
   items: ArrayLike<T>;
   itemsType: ISigmaType;
 }
 
-export interface ISigmaTupleValue extends ISigmaValue {
+export interface ISTupleValue extends ISigmaValue {
   items: ArrayLike<ISigmaValue>;
 }
 
-export function SByte(value: number): ISigmaPrimitiveValue<number>;
+export function SByte(value: number): ISPrimitiveValue<number>;
 export function SByte(): ISigmaType;
-export function SByte(value?: number): ISigmaPrimitiveValue<number> | ISigmaType {
-  return _createPrimitiveType(byteType, value);
+export function SByte(value?: number): ISPrimitiveValue<number> | ISigmaType {
+  return createPrimitiveValue(byteType, value);
 }
 
-export function SBool(value: boolean): ISigmaPrimitiveValue<boolean>;
+export function SBool(value: boolean): ISPrimitiveValue<boolean>;
 export function SBool(): ISigmaType;
-export function SBool(value?: boolean): ISigmaPrimitiveValue<boolean> | ISigmaType {
-  return _createPrimitiveType(boolType, value);
+export function SBool(value?: boolean): ISPrimitiveValue<boolean> | ISigmaType {
+  return createPrimitiveValue(boolType, value);
 }
 
-export function SShort(value: number): ISigmaPrimitiveValue<number>;
+export function SShort(value: number): ISPrimitiveValue<number>;
 export function SShort(): ISigmaType;
-export function SShort(value?: number): ISigmaPrimitiveValue<number> | ISigmaType {
-  return _createPrimitiveType(shortType, value);
+export function SShort(value?: number): ISPrimitiveValue<number> | ISigmaType {
+  return createPrimitiveValue(shortType, value);
 }
 
-export function SInt(value: number): ISigmaPrimitiveValue<number>;
+export function SInt(value: number): ISPrimitiveValue<number>;
 export function SInt(): ISigmaType;
-export function SInt(value?: number): ISigmaPrimitiveValue<number> | ISigmaType {
-  return _createPrimitiveType(intType, value);
+export function SInt(value?: number): ISPrimitiveValue<number> | ISigmaType {
+  return createPrimitiveValue(intType, value);
 }
 
-export function SLong(value: number | string | bigint): ISigmaPrimitiveValue<bigint>;
+export function SLong(value: number | string | bigint): ISPrimitiveValue<bigint>;
 export function SLong(): ISigmaType;
-export function SLong(value?: number | string | bigint): ISigmaPrimitiveValue<bigint> | ISigmaType {
-  return _createPrimitiveType(longType, isDefined(value) ? ensureBigInt(value) : undefined);
+export function SLong(value?: number | string | bigint): ISPrimitiveValue<bigint> | ISigmaType {
+  return createPrimitiveValue(longType, isDefined(value) ? ensureBigInt(value) : undefined);
 }
 
-export function SBigInt(value: string | bigint): ISigmaPrimitiveValue<bigint>;
+export function SBigInt(value: string | bigint): ISPrimitiveValue<bigint>;
 export function SBigInt(): ISigmaType;
-export function SBigInt(value?: string | bigint): ISigmaPrimitiveValue<bigint> | ISigmaType {
-  return _createPrimitiveType(bigIntType, isDefined(value) ? ensureBigInt(value) : undefined);
+export function SBigInt(value?: string | bigint): ISPrimitiveValue<bigint> | ISigmaType {
+  return createPrimitiveValue(bigIntType, isDefined(value) ? ensureBigInt(value) : undefined);
 }
 
-export function SUnit(): ISigmaPrimitiveValue<null>;
+export function SUnit(): ISPrimitiveValue<null>;
 export function SUnit(): ISigmaType;
-export function SUnit(): ISigmaPrimitiveValue<null> | ISigmaType {
-  return _createPrimitiveType(unitType, null);
+export function SUnit(): ISPrimitiveValue<null> | ISigmaType {
+  return createPrimitiveValue(unitType, null);
 }
 
-export function SGroupElement(value: Uint8Array): ISigmaPrimitiveValue<Uint8Array>;
+export function SGroupElement(value: Uint8Array): ISPrimitiveValue<Uint8Array>;
 export function SGroupElement(): ISigmaType;
-export function SGroupElement(value?: Uint8Array): ISigmaPrimitiveValue<Uint8Array> | ISigmaType {
-  return _createPrimitiveType(groupElementType, value);
+export function SGroupElement(value?: Uint8Array): ISPrimitiveValue<Uint8Array> | ISigmaType {
+  return createPrimitiveValue(groupElementType, value);
 }
 
-export function SSigmaProp(
-  value: ISigmaPrimitiveValue<Uint8Array>
-): ISigmaPrimitiveValue<ISigmaValue>;
+export function SSigmaProp(value: ISPrimitiveValue<Uint8Array>): ISPrimitiveValue<ISigmaValue>;
 export function SSigmaProp(): ISigmaType;
 export function SSigmaProp(
-  value?: ISigmaPrimitiveValue<Uint8Array>
-): ISigmaPrimitiveValue<ISigmaValue> | ISigmaType {
-  return _createPrimitiveType(sigmaPropType, value);
+  value?: ISPrimitiveValue<Uint8Array>
+): ISPrimitiveValue<ISigmaValue> | ISigmaType {
+  return createPrimitiveValue(sigmaPropType, value);
 }
 
-function _createPrimitiveType<T>(
-  type: ISigmaType,
-  value?: T
-): ISigmaPrimitiveValue<T> | ISigmaType {
-  if (value !== undefined) {
-    return { type, value };
-  } else {
-    return type;
-  }
+function createPrimitiveValue<T>(type: ISigmaType, value?: T): ISPrimitiveValue<T> | ISigmaType {
+  return isDefined(value) ? { type, value } : type;
 }
 
-export function SColl<T>(type: () => ISigmaType, elements: ArrayLike<T>): ISigmaCollValue<T> {
-  return {
-    type: collType,
-    itemsType: type(),
-    items: elements
-  };
+export function SColl<T>(typeConstructor: () => ISigmaType, items: ArrayLike<T>): ISCollValue<T> {
+  return { type: collType, itemsType: typeConstructor(), items };
 }
 
-export function STuple(...items: ISigmaValue[]): ISigmaTupleValue {
-  return {
-    type: tupleType,
-    items
-  };
+export function STuple(...items: ISigmaValue[]): ISTupleValue {
+  return { type: tupleType, items };
 }
