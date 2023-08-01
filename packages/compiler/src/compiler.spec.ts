@@ -1,4 +1,4 @@
-import { SInt } from "@fleet-sdk/core";
+import { intType, SInt } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { HexString, Value, ValueObj } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
@@ -145,7 +145,7 @@ describe("Compiler constants map parsing", () => {
     const parsedMap = parseNamedConstantsMap(originalMap);
 
     expect(originalMap).not.to.be.equal(parsedMap);
-    expect(originalMap.test).to.be.deep.equal({ type: 4, value: 100 });
+    expect(originalMap.test).to.be.deep.equal({ type: intType, value: 100 });
   });
 
   it("Should throw is an invalid hex string is passed", () => {
