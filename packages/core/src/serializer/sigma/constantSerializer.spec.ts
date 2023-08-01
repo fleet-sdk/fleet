@@ -13,8 +13,8 @@ import {
   sSigmaPropTestVectors
 } from "../../tests/testVectors/constantsTestVectors";
 import { SConstant, SParse } from "./constantSerializer";
-import { SigmaTypeCode } from "./sigmaTypeCode";
 import {
+  ISigmaType,
   SBigInt,
   SBool,
   SByte,
@@ -24,6 +24,7 @@ import {
   SLong,
   SShort,
   SSigmaProp,
+  STuple,
   SUnit
 } from "./sigmaTypes";
 
@@ -79,19 +80,21 @@ describe("Primary types serialization", () => {
     }
   });
 
-  it("Should fail for not implemented SSigmaProp expression", () => {
-    expect(() => {
-      SConstant(SSigmaProp({ type: SigmaTypeCode.AvlTree, value: Uint8Array.from([]) }));
-    }).toThrow();
-  });
-
   it("Should throw for not implemented type", () => {
-    expect(() => {
-      SConstant({ type: SigmaTypeCode.AvlTree });
-    }).toThrow();
+    const unimplementedType: ISigmaType = {
+      code: 0x64, // AvlTree type code
+      embeddable: false,
+      primitive: false,
+      name: "AVLTree"
+    };
 
     expect(() => {
-      SConstant({ type: SigmaTypeCode.Tuple2 });
+      SConstant({ type: unimplementedType });
+    }).toThrow();
+
+    // not implemented SSigmaProp expression
+    expect(() => {
+      SConstant(SSigmaProp({ type: unimplementedType, value: Uint8Array.from([]) }));
     }).toThrow();
   });
 });
@@ -127,6 +130,34 @@ describe("SColl serialization", () => {
     for (const tv of collLongTestVectors) {
       expect(SConstant(SColl(SLong, tv.coll))).toBe(tv.hex);
     }
+  });
+});
+
+describe("Tuple serialization", () => {
+  it("Should serialize embeddable symmetric pairs", () => {
+    expect(SConstant(STuple(SInt(2), SInt(2)))).to.be.equal("580404");
+    expect(SConstant(STuple(SInt(1), SInt(9)))).to.be.equal("580212");
+
+    expect(SConstant(STuple(SInt(0), SLong(1)))).to.be.equal("40050002");
+    expect(SConstant(STuple(SInt(7), SByte(1)))).to.be.equal("40020e01");
+    expect(SConstant(STuple(SInt(1), SColl(SByte, "0a0c")))).to.be.equal("400e02020a0c");
+
+    expect(
+      SConstant(
+        STuple(
+          SColl(SByte, "8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"),
+          SGroupElement(
+            hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
+          )
+        )
+      )
+    ).to.be.equal(
+      "4f0e208743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607"
+    );
+
+    expect(
+      SConstant(STuple(SColl(SByte, "505250"), SColl(SByte, "596f7572206c6f616e204a616e75617279")))
+    ).to.be.equal("3c0e0e0350525011596f7572206c6f616e204a616e75617279");
   });
 });
 
