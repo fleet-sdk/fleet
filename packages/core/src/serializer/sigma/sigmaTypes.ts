@@ -202,7 +202,7 @@ export function SSigmaProp(
 }
 
 function createPrimitiveValue<T>(type: ISigmaType, value?: T): ISPrimitiveValue<T> | ISigmaType {
-  return isDefined(value) ? { type, value } : type;
+  return value !== undefined ? { type, value } : type;
 }
 
 export function SColl<T>(typeConstructor: () => ISigmaType, items: ArrayLike<T>): ISCollValue<T> {
