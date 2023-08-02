@@ -1,5 +1,4 @@
 import { hex, randomBytes, utf8 } from "@fleet-sdk/crypto";
-// import { TypeObj, Value, ValueObj } from "sigmastate-js/main";
 import { describe, expect, it } from "vitest";
 import {
   collBoolTestVectors,
@@ -16,6 +15,7 @@ import {
 import { SConstant, SParse } from "./constantSerializer";
 import {
   IPrimitiveType,
+  ITuple,
   SBigInt,
   SBool,
   SByte,
@@ -135,37 +135,81 @@ describe("SColl serialization", () => {
   });
 });
 
-describe("Tuple serialization", () => {
-  it("Should serialize embeddable symmetric pairs", () => {
-    expect(SConstant(STuple(SInt(2), SInt(2)))).to.be.equal("580404");
-    expect(SConstant(STuple(SInt(1), SInt(9)))).to.be.equal("580212");
-
-    expect(SConstant(STuple(SInt(0), SLong(1)))).to.be.equal("40050002");
-    expect(SConstant(STuple(SInt(7), SByte(1)))).to.be.equal("40020e01");
-    expect(SConstant(STuple(SInt(1), SColl(SByte, "0a0c")))).to.be.equal("400e02020a0c");
-
-    expect(
-      SConstant(
-        STuple(
-          SColl(SByte, "8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"),
-          SGroupElement(
-            hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
-          )
-        )
+const tupleTestVectors: { sigmaObject: ITuple; jsObject: unknown[]; hex: string }[] = [
+  {
+    sigmaObject: STuple(SInt(2), SInt(2)),
+    jsObject: [2, 2],
+    hex: "580404"
+  },
+  {
+    sigmaObject: STuple(SInt(1), SInt(9)),
+    jsObject: [1, 9],
+    hex: "580212"
+  },
+  {
+    sigmaObject: STuple(SInt(0), SLong(1)),
+    jsObject: [0, 1n],
+    hex: "40050002"
+  },
+  {
+    sigmaObject: STuple(SInt(7), SByte(1)),
+    jsObject: [7, 1],
+    hex: "40020e01"
+  },
+  {
+    sigmaObject: STuple(SInt(1), SColl(SByte, "0a0c")),
+    jsObject: [1, Uint8Array.from([10, 12])],
+    hex: "400e02020a0c"
+  },
+  {
+    sigmaObject: STuple(SColl(SByte, "505250"), SColl(SByte, "596f7572206c6f616e204a616e75617279")),
+    jsObject: [hex.decode("505250"), hex.decode("596f7572206c6f616e204a616e75617279")],
+    hex: "3c0e0e0350525011596f7572206c6f616e204a616e75617279"
+  },
+  {
+    sigmaObject: STuple(SColl(SByte, [10, 12]), SBool(true), SByte(2)),
+    jsObject: [Uint8Array.from([10, 12]), true, 2],
+    hex: "480e0102020a0c0102"
+  },
+  {
+    sigmaObject: STuple(
+      SColl(SByte, "8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"),
+      SGroupElement(
+        hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
       )
-    ).to.be.equal(
-      "4f0e208743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607"
-    );
+    ),
+    jsObject: [
+      hex.decode("8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"),
+      hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
+    ],
+    hex: "4f0e208743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607"
+  }
+];
 
+describe("Tuple serialization", () => {
+  it.each(tupleTestVectors)("Should serialize", (tv) => {
+    expect(SConstant(tv.sigmaObject)).to.be.equal(tv.hex);
+  });
+
+  it.each(tupleTestVectors)("Should parse $hex", (tv) => {
+    expect(SParse(tv.hex)).to.be.deep.equal(tv.jsObject);
+  });
+
+  it("Should road trip", () => {
+    // quadruple
     expect(
-      SConstant(STuple(SColl(SByte, "505250"), SColl(SByte, "596f7572206c6f616e204a616e75617279")))
-    ).to.be.equal("3c0e0e0350525011596f7572206c6f616e204a616e75617279");
+      SParse(
+        SConstant(STuple(SColl(SBool, [true, false, true]), SBigInt(10n), SBool(false), SShort(2)))
+      )
+    ).to.be.deep.equal([[true, false, true], 10n, false, 2]);
 
-    expect(SConstant(STuple(SColl(SByte, "0a0c"), SBool(true), SByte(2)))).to.be.equal(
-      "480e0102020a0c0102"
-    );
-
-    // console.log(ValueObj.fromHex("480e0102020a0c0102").toHex());
+    // generic tuple with 4+ items
+    expect(
+      SParse(SConstant(STuple(SBool(false), SBigInt(10n), SBool(false), SShort(2), SLong(1232n))))
+    ).to.be.deep.equal([false, 10n, false, 2, 1232n]);
+    expect(
+      SParse(SConstant(STuple(SInt(1), SInt(2), SInt(3), SInt(2), SInt(4), SInt(5), SInt(6))))
+    ).to.be.deep.equal([1, 2, 3, 2, 4, 5, 6]);
   });
 
   it("Should fail with tuples with items out of the 2 - 255 range", () => {

@@ -14,6 +14,7 @@ import {
   SLongType,
   SShortType,
   SSigmaPropType,
+  STupleType,
   SUnitType,
   TypeDescriptor
 } from "./sigmaTypes";
@@ -156,6 +157,9 @@ export class DataSerializer {
               return elements;
             }
           }
+        }
+        case STupleType: {
+          return type.wrapped.map((t) => this.deserialize(t, reader));
         }
       }
     }

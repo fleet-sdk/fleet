@@ -67,7 +67,7 @@ export class TypeSerializer {
           assert(len >= 2 && len <= 255, "Invalid type: tuples must have between 2 and 255 items.");
 
           // Generic tuple
-          buffer.write(STupleType.tupleTypeCode);
+          buffer.write(STupleType.genericTupleTypeCode);
           buffer.writeVLQ(len);
         }
       }
@@ -84,7 +84,7 @@ export class TypeSerializer {
     const currentByte = r.readByte();
     assert(currentByte > 0, `Parsing Error: Unexpected type code '0x${currentByte.toString(16)}'`);
 
-    if (currentByte < STupleType.tupleTypeCode) {
+    if (currentByte < STupleType.genericTupleTypeCode) {
       const ctorCode = Math.floor(currentByte / PRIMITIVE_TYPE_RANGE);
       const embdCode = Math.floor(currentByte % PRIMITIVE_TYPE_RANGE);
 
@@ -116,7 +116,7 @@ export class TypeSerializer {
               ? [this.deserialize(r), this.deserialize(r), this.deserialize(r)] // Triple of types
               : [this.deserialize(r), getEmbeddableType(embdCode)];
 
-          return { ctor: SCollType, wrapped };
+          return { ctor: STupleType, wrapped };
         }
         case ConstructorCode.SymmetricPair: {
           const wrapped =
@@ -124,12 +124,12 @@ export class TypeSerializer {
               ? [this.deserialize(r), this.deserialize(r), this.deserialize(r), this.deserialize(r)] // Quadruple of types
               : [getEmbeddableType(embdCode), getEmbeddableType(embdCode)]; // Symmetric pair of primitive types (`(Int, Int)`, `(Byte,Byte)`, etc.)
 
-          return { ctor: SCollType, wrapped };
+          return { ctor: STupleType, wrapped };
         }
       }
     } else {
       switch (currentByte) {
-        case ConstructorCode.GenericTuple: {
+        case STupleType.genericTupleTypeCode: {
           const len = r.readVlq();
           const wrapped = new Array<TypeDescriptor>(len);
           for (let i = 0; i < len; i++) {

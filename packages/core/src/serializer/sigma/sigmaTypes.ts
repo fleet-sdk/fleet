@@ -133,7 +133,7 @@ interface ITupleType extends IConstructorType {
   tripleTypeCode: number;
   symmetricPairTypeCode: number;
   quadrupleTypeCode: number;
-  tupleTypeCode: number;
+  genericTupleTypeCode: number;
 }
 
 export const STupleType = Object.freeze<ITupleType>({
@@ -143,11 +143,11 @@ export const STupleType = Object.freeze<ITupleType>({
   tripleTypeCode: typeCodeOf(ConstructorCode.PairTwo),
   symmetricPairTypeCode: typeCodeOf(ConstructorCode.SymmetricPair),
   quadrupleTypeCode: typeCodeOf(ConstructorCode.SymmetricPair),
-  tupleTypeCode: typeCodeOf(ConstructorCode.GenericTuple),
+  genericTupleTypeCode: typeCodeOf(ConstructorCode.GenericTuple),
   embeddable: false,
   primitive: false,
   isConstructorOf(typeCode) {
-    return typeCode >= this.pairOneTypeCode && typeCode <= this.tupleTypeCode;
+    return typeCode >= this.pairOneTypeCode && typeCode <= this.genericTupleTypeCode;
   }
 });
 
