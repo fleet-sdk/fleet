@@ -1,11 +1,11 @@
-import { collType, ISColl, ISigmaValue, ISTuple, tupleType } from "./sigmaTypes";
+import { ISColl, ISigmaValue, ISTuple, SCollType, tupleType } from "./sigmaTypes";
 
 export function isColl<T>(data: ISigmaValue): data is ISColl<T> {
-  return collType.test(data.type.code);
+  return SCollType.isConstructorOf(data.type.code);
 }
 
 export function isTuple(data: ISigmaValue): data is ISTuple {
-  return tupleType.test(data.type.code);
+  return tupleType.isConstructorOf(data.type.code);
 }
 
 export function isPrimitiveTypeCode(typeCode: number): boolean {
@@ -13,5 +13,5 @@ export function isPrimitiveTypeCode(typeCode: number): boolean {
 }
 
 export function isConstructorTypeCode(type: number): boolean {
-  return type >= collType.code && type <= tupleType.tupleTypeCode;
+  return type >= SCollType.code && type <= tupleType.tupleTypeCode;
 }

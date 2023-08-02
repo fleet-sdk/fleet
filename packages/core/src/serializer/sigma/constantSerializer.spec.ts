@@ -15,14 +15,14 @@ import {
 } from "../../tests/testVectors/constantsTestVectors";
 import { SConstant, SParse } from "./constantSerializer";
 import {
-  intType,
-  ISigmaType,
+  IPrimitiveSigmaType,
   SBigInt,
   SBool,
   SByte,
   SColl,
   SGroupElement,
   SInt,
+  SIntType,
   SLong,
   SShort,
   SSigmaProp,
@@ -83,11 +83,11 @@ describe("Primary types serialization", () => {
   });
 
   it("Should throw for not implemented type", () => {
-    const unimplementedType: ISigmaType = {
+    const unimplementedType: IPrimitiveSigmaType = {
       code: 0x64, // AvlTree type code
       embeddable: false,
-      primitive: false,
-      name: "AVLTree"
+      primitive: true,
+      name: "AvlTree"
     };
 
     expect(() => {
@@ -174,7 +174,7 @@ describe("Tuple serialization", () => {
       "Invalid type: tuples must have between 2 and 255 items."
     );
 
-    const _256Items = STuple(...new Array(256).map((_, i) => ({ type: intType, value: i })));
+    const _256Items = STuple(...new Array(256).map((_, i) => ({ type: SIntType, value: i })));
     expect(() => SConstant(_256Items)).to.throw(
       "Invalid type: tuples must have between 2 and 255 items."
     );

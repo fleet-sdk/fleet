@@ -2,18 +2,18 @@ import { hex } from "@fleet-sdk/crypto";
 import { isColl, isPrimitiveTypeCode, isTuple } from "./assertions";
 import { SigmaReader } from "./sigmaReader";
 import {
-  bigIntType,
-  boolType,
-  byteType,
-  collType,
-  groupElementType,
-  intType,
   ISigmaValue,
   ISPrimitive,
-  longType,
-  shortType,
-  sigmaPropType,
-  unitType
+  SBigIntType,
+  SBoolType,
+  SByteType,
+  SCollType,
+  SGroupElementType,
+  SIntType,
+  SLongType,
+  SShortType,
+  SSigmaPropType,
+  SUnitType
 } from "./sigmaTypes";
 import { SigmaWriter } from "./sigmaWriter";
 
@@ -23,32 +23,33 @@ const PROVE_DLOG_OP = 0xcd;
 export class DataSerializer {
   public static serialize(data: ISigmaValue, writer: SigmaWriter) {
     if (data.type.primitive) {
-      switch (data.type.code) {
-        case boolType.code:
+      switch (data.type) {
+        case SBoolType:
           writer.writeBoolean((data as ISPrimitive<boolean>).value);
           break;
-        case byteType.code:
+        case SByteType:
           writer.write((data as ISPrimitive<number>).value);
           break;
-        case shortType.code:
+        case SShortType:
           writer.writeShort((data as ISPrimitive<number>).value);
           break;
-        case intType.code:
+        case SIntType:
           writer.writeInt((data as ISPrimitive<number>).value);
           break;
-        case longType.code:
+        case SLongType:
           writer.writeLong((data as ISPrimitive<bigint>).value);
           break;
-        case bigIntType.code: {
+        case SBigIntType: {
           writer.writeBigInt((data as ISPrimitive<bigint>).value);
           break;
         }
-        case groupElementType.code:
+        case SGroupElementType:
           writer.writeBytes((data as ISPrimitive<Uint8Array>).value);
           break;
-        case sigmaPropType.code: {
-          const node = (data as ISPrimitive<ISigmaValue>).value;
-          if (node.type.code === groupElementType.code) {
+        case SSigmaPropType: {
+          const node = (data as ISPrimitive<ISPrimitive<Uint8Array>>).value;
+
+          if (node.type === SGroupElementType) {
             writer.write(PROVE_DLOG_OP);
             DataSerializer.serialize(node, writer);
           } else {
@@ -56,7 +57,7 @@ export class DataSerializer {
           }
           break;
         }
-        case unitType.code: // same as void, don't need to save anything
+        case SUnitType: // same as void, don't need to save anything
           break;
         // case PrimitiveTypeCode.Box:
         default:
@@ -69,12 +70,12 @@ export class DataSerializer {
         writer.writeVLQ(data.items.length);
       }
 
-      switch (data.itemsType.code) {
-        case boolType.code: {
+      switch (data.itemsType) {
+        case SBoolType: {
           writer.writeBits(data.items as boolean[]);
           break;
         }
-        case byteType.code: {
+        case SByteType: {
           let bytes!: Uint8Array;
           if (typeof data.items === "string") {
             bytes = hex.decode(data.items);
@@ -107,23 +108,23 @@ export class DataSerializer {
   static deserialize(typeCode: number, reader: SigmaReader): unknown {
     if (isPrimitiveTypeCode(typeCode)) {
       switch (typeCode) {
-        case boolType.code:
+        case SBoolType.code:
           return reader.readBoolean();
-        case byteType.code:
+        case SByteType.code:
           return reader.readByte();
-        case shortType.code:
+        case SShortType.code:
           return reader.readShort();
-        case intType.code:
+        case SIntType.code:
           return reader.readInt();
-        case longType.code:
+        case SLongType.code:
           return reader.readLong();
-        case bigIntType.code:
+        case SBigIntType.code:
           return reader.readBigInt();
-        case groupElementType.code:
+        case SGroupElementType.code:
           return reader.readBytes(GROUP_ELEMENT_LENGTH);
-        case sigmaPropType.code: {
+        case SSigmaPropType.code: {
           if (reader.readByte() === PROVE_DLOG_OP) {
-            return this.deserialize(groupElementType.code, reader);
+            return this.deserialize(SGroupElementType.code, reader);
           }
 
           break;
@@ -133,15 +134,15 @@ export class DataSerializer {
         default:
           break;
       }
-    } else if (collType.test(typeCode)) {
-      const embeddedType = typeCode - collType.code;
+    } else if (SCollType.isConstructorOf(typeCode)) {
+      const embeddedType = typeCode - SCollType.simpleCollTypeCode;
       const length = reader.readVlq();
 
       switch (embeddedType) {
-        case boolType.code: {
+        case SBoolType.code: {
           return reader.readBits(length);
         }
-        case byteType.code: {
+        case SByteType.code: {
           return reader.readBytes(length);
         }
         default: {
