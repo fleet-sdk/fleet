@@ -15,7 +15,7 @@ import {
 } from "../../tests/testVectors/constantsTestVectors";
 import { SConstant, SParse } from "./constantSerializer";
 import {
-  IPrimitiveSigmaType,
+  IPrimitiveType,
   SBigInt,
   SBool,
   SByte,
@@ -83,7 +83,7 @@ describe("Primary types serialization", () => {
   });
 
   it("Should throw for not implemented type", () => {
-    const unimplementedType: IPrimitiveSigmaType = {
+    const unimplementedType: IPrimitiveType = {
       code: 0x64, // AvlTree type code
       embeddable: false,
       primitive: true,
@@ -291,7 +291,7 @@ describe("SColl deserialization", () => {
       "00000000000ee48c"
     ].map((x) => hex.decode(x));
 
-    expect(SParse(register)).toStrictEqual(expected);
+    expect(SParse(register)).to.be.deep.equal(expected);
   });
 });
 

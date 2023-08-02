@@ -20,7 +20,7 @@ export function SConstant(value: ISigmaValue): HexString {
 
 export function SParse<T>(content: HexString | Uint8Array): T {
   const reader = new SigmaReader(content);
-  const type = reader.readByte();
+  const typeDescriptor = TypeSerializer.deserialize(reader);
 
-  return DataSerializer.deserialize(type, reader) as T;
+  return DataSerializer.deserialize(typeDescriptor, reader) as T;
 }

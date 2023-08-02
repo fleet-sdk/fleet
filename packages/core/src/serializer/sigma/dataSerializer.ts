@@ -1,9 +1,10 @@
+import { first } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
-import { isColl, isPrimitiveTypeCode, isTuple } from "./assertions";
+import { isColl, isPrimitiveType, isTuple } from "./assertions";
 import { SigmaReader } from "./sigmaReader";
 import {
+  IPrimitive,
   ISigmaValue,
-  ISPrimitive,
   SBigIntType,
   SBoolType,
   SByteType,
@@ -13,7 +14,8 @@ import {
   SLongType,
   SShortType,
   SSigmaPropType,
-  SUnitType
+  SUnitType,
+  TypeDescriptor
 } from "./sigmaTypes";
 import { SigmaWriter } from "./sigmaWriter";
 
@@ -25,29 +27,29 @@ export class DataSerializer {
     if (data.type.primitive) {
       switch (data.type) {
         case SBoolType:
-          writer.writeBoolean((data as ISPrimitive<boolean>).value);
+          writer.writeBoolean((data as IPrimitive<boolean>).value);
           break;
         case SByteType:
-          writer.write((data as ISPrimitive<number>).value);
+          writer.write((data as IPrimitive<number>).value);
           break;
         case SShortType:
-          writer.writeShort((data as ISPrimitive<number>).value);
+          writer.writeShort((data as IPrimitive<number>).value);
           break;
         case SIntType:
-          writer.writeInt((data as ISPrimitive<number>).value);
+          writer.writeInt((data as IPrimitive<number>).value);
           break;
         case SLongType:
-          writer.writeLong((data as ISPrimitive<bigint>).value);
+          writer.writeLong((data as IPrimitive<bigint>).value);
           break;
         case SBigIntType: {
-          writer.writeBigInt((data as ISPrimitive<bigint>).value);
+          writer.writeBigInt((data as IPrimitive<bigint>).value);
           break;
         }
         case SGroupElementType:
-          writer.writeBytes((data as ISPrimitive<Uint8Array>).value);
+          writer.writeBytes((data as IPrimitive<Uint8Array>).value);
           break;
         case SSigmaPropType: {
-          const node = (data as ISPrimitive<ISPrimitive<Uint8Array>>).value;
+          const node = (data as IPrimitive<IPrimitive<Uint8Array>>).value;
 
           if (node.type === SGroupElementType) {
             writer.write(PROVE_DLOG_OP);
@@ -105,26 +107,26 @@ export class DataSerializer {
     }
   }
 
-  static deserialize(typeCode: number, reader: SigmaReader): unknown {
-    if (isPrimitiveTypeCode(typeCode)) {
-      switch (typeCode) {
-        case SBoolType.code:
+  static deserialize(type: TypeDescriptor, reader: SigmaReader): unknown {
+    if (isPrimitiveType(type)) {
+      switch (type) {
+        case SBoolType:
           return reader.readBoolean();
-        case SByteType.code:
+        case SByteType:
           return reader.readByte();
-        case SShortType.code:
+        case SShortType:
           return reader.readShort();
-        case SIntType.code:
+        case SIntType:
           return reader.readInt();
-        case SLongType.code:
+        case SLongType:
           return reader.readLong();
-        case SBigIntType.code:
+        case SBigIntType:
           return reader.readBigInt();
-        case SGroupElementType.code:
+        case SGroupElementType:
           return reader.readBytes(GROUP_ELEMENT_LENGTH);
-        case SSigmaPropType.code: {
+        case SSigmaPropType: {
           if (reader.readByte() === PROVE_DLOG_OP) {
-            return this.deserialize(SGroupElementType.code, reader);
+            return this.deserialize(SGroupElementType, reader);
           }
 
           break;
@@ -134,25 +136,26 @@ export class DataSerializer {
         default:
           break;
       }
-    } else if (SCollType.isConstructorOf(typeCode)) {
-      const embeddedType = typeCode - SCollType.simpleCollTypeCode;
-      const length = reader.readVlq();
+    } else {
+      switch (type.ctor) {
+        case SCollType: {
+          const length = reader.readVlq();
+          const embeddedType = first(type.wrapped);
 
-      switch (embeddedType) {
-        case SBoolType.code: {
-          return reader.readBits(length);
-        }
-        case SByteType.code: {
-          return reader.readBytes(length);
-        }
-        default: {
-          const elements = new Array(length);
+          switch (embeddedType) {
+            case SBoolType:
+              return reader.readBits(length);
+            case SByteType:
+              return reader.readBytes(length);
+            default: {
+              const elements = new Array(length);
+              for (let i = 0; i < length; i++) {
+                elements[i] = this.deserialize(embeddedType, reader);
+              }
 
-          for (let i = 0; i < length; i++) {
-            elements[i] = this.deserialize(embeddedType, reader);
+              return elements;
+            }
           }
-
-          return elements;
         }
       }
     }

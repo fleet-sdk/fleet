@@ -1,10 +1,13 @@
 import { ensureBigInt, isDefined } from "@fleet-sdk/common";
 
 export const enum ConstructorCode {
-  Primitive = 0,
+  Embeddable = 0,
 
   SimpleColl = 1,
   NestedColl = 2,
+
+  Option = 3,
+  OptionCollection = 4,
 
   PairOne = 5,
   PairTwo = 6,
@@ -12,9 +15,10 @@ export const enum ConstructorCode {
   GenericTuple = 8
 }
 
-const typeCodeOf = (constructor: ConstructorCode) => (MAX_PRIMITIVE_TYPE_CODE + 1) * constructor;
-
 const MAX_PRIMITIVE_TYPE_CODE = 0x0b;
+export const PRIMITIVE_TYPE_RANGE = MAX_PRIMITIVE_TYPE_CODE + 0x01;
+
+const typeCodeOf = (constructor: ConstructorCode) => PRIMITIVE_TYPE_RANGE * constructor;
 
 export interface ISigmaTypeBase {
   readonly code: number;
@@ -23,82 +27,88 @@ export interface ISigmaTypeBase {
   readonly primitive: boolean;
 }
 
-export interface ISigmaConstructorType extends ISigmaTypeBase {
+export interface IConstructorType extends ISigmaTypeBase {
   readonly primitive: false;
+  readonly embeddable: false;
   isConstructorOf(typeCode: number): boolean;
 }
 
-export interface IPrimitiveSigmaType extends ISigmaTypeBase {
+export interface IPrimitiveType extends ISigmaTypeBase {
   readonly primitive: true;
   readonly name: string;
 }
 
-export type ISigmaType = ISigmaConstructorType | IPrimitiveSigmaType;
+export interface IEmbeddableType extends IPrimitiveType {
+  readonly embeddable: true;
+}
 
-export const SBoolType = Object.freeze<IPrimitiveSigmaType>({
+export type SigmaType = IConstructorType | IPrimitiveType | IEmbeddableType;
+export type TypeDescriptor = IPrimitiveType | { ctor: IConstructorType; wrapped: TypeDescriptor[] };
+
+export const SBoolType = Object.freeze<IEmbeddableType>({
   code: 0x01,
   embeddable: true,
   primitive: true,
   name: "SBoolean"
 });
 
-export const SByteType = Object.freeze<IPrimitiveSigmaType>({
+export const SByteType = Object.freeze<IEmbeddableType>({
   code: 0x02,
   embeddable: true,
   primitive: true,
   name: "SByte"
 });
 
-export const SShortType = Object.freeze<IPrimitiveSigmaType>({
+export const SShortType = Object.freeze<IEmbeddableType>({
   code: 0x03,
   embeddable: true,
   primitive: true,
   name: "SShort"
 });
 
-export const SIntType = Object.freeze<IPrimitiveSigmaType>({
+export const SIntType = Object.freeze<IEmbeddableType>({
   code: 0x04,
   embeddable: true,
   primitive: true,
   name: "SInt"
 });
 
-export const SLongType = Object.freeze<IPrimitiveSigmaType>({
+export const SLongType = Object.freeze<IEmbeddableType>({
   code: 0x05,
   embeddable: true,
   primitive: true,
   name: "SLong"
 });
 
-export const SBigIntType = Object.freeze<IPrimitiveSigmaType>({
+export const SBigIntType = Object.freeze<IEmbeddableType>({
   code: 0x06,
   embeddable: true,
   primitive: true,
   name: "SBigInt"
 });
 
-export const SGroupElementType = Object.freeze<IPrimitiveSigmaType>({
+export const SGroupElementType = Object.freeze<IEmbeddableType>({
   code: 0x07,
   embeddable: true,
   primitive: true,
   name: "SGroupElement"
 });
 
-export const SSigmaPropType = Object.freeze<IPrimitiveSigmaType>({
+export const SSigmaPropType = Object.freeze<IEmbeddableType>({
   code: 0x08,
   embeddable: true,
   primitive: true,
   name: "SSigmaProp"
 });
 
-export const SUnitType = Object.freeze<IPrimitiveSigmaType>({
+export const SUnitType = Object.freeze<IPrimitiveType>({
   code: 0x62,
   embeddable: false,
   primitive: true,
   name: "SUnit"
 });
 
-interface ISCollType extends ISigmaConstructorType {
+interface ISCollType extends IConstructorType {
   simpleCollTypeCode: number;
   nestedCollTypeCode: number;
 }
@@ -117,7 +127,7 @@ export const SCollType = Object.freeze<ISCollType>({
   }
 });
 
-interface ITupleType extends ISigmaConstructorType {
+interface ITupleType extends IConstructorType {
   pairOneTypeCode: number;
   pairTwoTypeCode: number;
   tripleTypeCode: number;
@@ -126,7 +136,7 @@ interface ITupleType extends ISigmaConstructorType {
   tupleTypeCode: number;
 }
 
-export const tupleType = Object.freeze<ITupleType>({
+export const STupleType = Object.freeze<ITupleType>({
   code: typeCodeOf(ConstructorCode.PairOne),
   pairOneTypeCode: typeCodeOf(ConstructorCode.PairOne),
   pairTwoTypeCode: typeCodeOf(ConstructorCode.PairTwo),
@@ -141,88 +151,85 @@ export const tupleType = Object.freeze<ITupleType>({
   }
 });
 
-export interface ISigmaValue<T extends ISigmaType = ISigmaType> {
+export interface ISigmaValue<T extends SigmaType = SigmaType> {
   readonly type: T;
 }
 
-export interface ISPrimitive<T> extends ISigmaValue<IPrimitiveSigmaType> {
+export interface IPrimitive<T> extends ISigmaValue<IPrimitiveType> {
   value: T;
 }
 
-export interface ISColl<T> extends ISigmaValue {
+export interface IColl<T> extends ISigmaValue {
   items: ArrayLike<T>;
-  itemsType: ISigmaType;
+  itemsType: SigmaType;
 }
 
-export interface ISTuple extends ISigmaValue {
+export interface ITuple extends ISigmaValue {
   items: ISigmaValue[];
 }
 
-export function SByte(value: number): ISPrimitive<number>;
-export function SByte(): ISigmaType;
-export function SByte(value?: number): ISPrimitive<number> | ISigmaType {
+export function SByte(value: number): IPrimitive<number>;
+export function SByte(): SigmaType;
+export function SByte(value?: number): IPrimitive<number> | SigmaType {
   return createPrimitiveValue(SByteType, value);
 }
 
-export function SBool(value: boolean): ISPrimitive<boolean>;
-export function SBool(): ISigmaType;
-export function SBool(value?: boolean): ISPrimitive<boolean> | ISigmaType {
+export function SBool(value: boolean): IPrimitive<boolean>;
+export function SBool(): SigmaType;
+export function SBool(value?: boolean): IPrimitive<boolean> | SigmaType {
   return createPrimitiveValue(SBoolType, value);
 }
 
-export function SShort(value: number): ISPrimitive<number>;
-export function SShort(): ISigmaType;
-export function SShort(value?: number): ISPrimitive<number> | ISigmaType {
+export function SShort(value: number): IPrimitive<number>;
+export function SShort(): SigmaType;
+export function SShort(value?: number): IPrimitive<number> | SigmaType {
   return createPrimitiveValue(SShortType, value);
 }
 
-export function SInt(value: number): ISPrimitive<number>;
-export function SInt(): ISigmaType;
-export function SInt(value?: number): ISPrimitive<number> | ISigmaType {
+export function SInt(value: number): IPrimitive<number>;
+export function SInt(): SigmaType;
+export function SInt(value?: number): IPrimitive<number> | SigmaType {
   return createPrimitiveValue(SIntType, value);
 }
 
-export function SLong(value: number | string | bigint): ISPrimitive<bigint>;
-export function SLong(): ISigmaType;
-export function SLong(value?: number | string | bigint): ISPrimitive<bigint> | ISigmaType {
+export function SLong(value: number | string | bigint): IPrimitive<bigint>;
+export function SLong(): SigmaType;
+export function SLong(value?: number | string | bigint): IPrimitive<bigint> | SigmaType {
   return createPrimitiveValue(SLongType, isDefined(value) ? ensureBigInt(value) : undefined);
 }
 
-export function SBigInt(value: string | bigint): ISPrimitive<bigint>;
-export function SBigInt(): ISigmaType;
-export function SBigInt(value?: string | bigint): ISPrimitive<bigint> | ISigmaType {
+export function SBigInt(value: string | bigint): IPrimitive<bigint>;
+export function SBigInt(): SigmaType;
+export function SBigInt(value?: string | bigint): IPrimitive<bigint> | SigmaType {
   return createPrimitiveValue(SBigIntType, isDefined(value) ? ensureBigInt(value) : undefined);
 }
 
-export function SUnit(): ISPrimitive<null>;
-export function SUnit(): ISigmaType;
-export function SUnit(): ISPrimitive<null> | ISigmaType {
+export function SUnit(): IPrimitive<null>;
+export function SUnit(): SigmaType;
+export function SUnit(): IPrimitive<null> | SigmaType {
   return createPrimitiveValue(SUnitType, null);
 }
 
-export function SGroupElement(value: Uint8Array): ISPrimitive<Uint8Array>;
-export function SGroupElement(): ISigmaType;
-export function SGroupElement(value?: Uint8Array): ISPrimitive<Uint8Array> | ISigmaType {
+export function SGroupElement(value: Uint8Array): IPrimitive<Uint8Array>;
+export function SGroupElement(): SigmaType;
+export function SGroupElement(value?: Uint8Array): IPrimitive<Uint8Array> | SigmaType {
   return createPrimitiveValue(SGroupElementType, value);
 }
 
-export function SSigmaProp(value: ISPrimitive<Uint8Array>): ISPrimitive<ISigmaValue>;
-export function SSigmaProp(): ISigmaType;
-export function SSigmaProp(value?: ISPrimitive<Uint8Array>): ISPrimitive<ISigmaValue> | ISigmaType {
+export function SSigmaProp(value: IPrimitive<Uint8Array>): IPrimitive<ISigmaValue>;
+export function SSigmaProp(): SigmaType;
+export function SSigmaProp(value?: IPrimitive<Uint8Array>): IPrimitive<ISigmaValue> | SigmaType {
   return createPrimitiveValue(SSigmaPropType, value);
 }
 
-function createPrimitiveValue<T>(
-  type: IPrimitiveSigmaType,
-  value?: T
-): ISPrimitive<T> | ISigmaType {
+function createPrimitiveValue<T>(type: IPrimitiveType, value?: T): IPrimitive<T> | SigmaType {
   return value !== undefined ? { type, value } : type;
 }
 
-export function SColl<T>(typeConstructor: () => ISigmaType, items: ArrayLike<T>): ISColl<T> {
+export function SColl<T>(typeConstructor: () => SigmaType, items: ArrayLike<T>): IColl<T> {
   return { type: SCollType, itemsType: typeConstructor(), items };
 }
 
-export function STuple(...items: ISigmaValue[]): ISTuple {
-  return { type: tupleType, items };
+export function STuple(...items: ISigmaValue[]): ITuple {
+  return { type: STupleType, items };
 }
