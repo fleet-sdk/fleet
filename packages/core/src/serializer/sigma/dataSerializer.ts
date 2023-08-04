@@ -1,5 +1,4 @@
 import { first } from "@fleet-sdk/common";
-import { hex } from "@fleet-sdk/crypto";
 import { isColl, isPrimitiveType, isTuple } from "./assertions";
 import { SigmaReader } from "./sigmaReader";
 import {
@@ -67,41 +66,32 @@ export class DataSerializer {
           throw Error("Not implemented");
       }
     } else if (isColl(data)) {
-      if (typeof data.items === "string") {
-        writer.writeVLQ(data.items.length / 2);
-      } else {
-        writer.writeVLQ(data.items.length);
-      }
+      writer.writeVLQ(data.value.length);
 
-      switch (data.itemsType) {
+      switch (data.wrappedType) {
         case SBoolType: {
-          writer.writeBits(data.items as boolean[]);
+          writer.writeBits(data.value as boolean[]);
           break;
         }
         case SByteType: {
-          let bytes!: Uint8Array;
-          if (typeof data.items === "string") {
-            bytes = hex.decode(data.items);
-          } else {
-            bytes = Uint8Array.from(data.items as number[]);
-          }
-
-          writer.writeBytes(bytes);
+          writer.writeBytes(data.value as Uint8Array);
           break;
         }
         default: {
-          for (let i = 0; i < data.items.length; i++) {
+          for (let i = 0; i < data.value.length; i++) {
             DataSerializer.serialize(
-              { type: data.itemsType, value: data.items[i] } as ISigmaValue,
+              data.wrappedType.primitive
+                ? ({ type: data.wrappedType ?? data.type, value: data.value[i] } as ISigmaValue)
+                : (data.value[i] as ISigmaValue),
               writer
             );
           }
         }
       }
     } else if (isTuple(data)) {
-      const len = data.items.length;
+      const len = data.value.length;
       for (let i = 0; i < len; i++) {
-        DataSerializer.serialize(data.items[i], writer);
+        DataSerializer.serialize(data.value[i], writer);
       }
     } else {
       throw Error("Not implemented");

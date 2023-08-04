@@ -9,7 +9,7 @@ import {
   TypeDescriptor
 } from "./sigmaTypes";
 
-export function isColl<T>(data: ISigmaValue): data is IColl<T> {
+export function isColl(data: ISigmaValue): data is IColl {
   return SCollType.isConstructorOf(data.type.code);
 }
 

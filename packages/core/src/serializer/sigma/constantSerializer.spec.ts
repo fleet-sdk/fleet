@@ -132,53 +132,61 @@ describe("SColl serialization", () => {
     for (const tv of collLongTestVectors) {
       expect(SConstant(SColl(SLong, tv.coll))).toBe(tv.hex);
     }
+
+    // const bytes1 = new Uint8Array([1, 2, 3]);
+    // const bytes2 = new Uint8Array([3, 2, 1]);
+    // const hex = SConstant(SColl(() => SCollType, [SColl(SByte, bytes1), SColl(SByte, bytes2)]));
+    // console.log(hex);
+    // , SParse(hex)
   });
 });
 
-const tupleTestVectors: { sigmaObject: ITuple; jsObject: unknown[]; hex: string }[] = [
+const tupleTestVectors: { name: string; sconst: ITuple; value: unknown[]; hex: string }[] = [
   {
-    sigmaObject: STuple(SInt(2), SInt(2)),
-    jsObject: [2, 2],
+    name: "(SInt, SInt)",
+    sconst: STuple(SInt(2), SInt(2)),
+    value: [2, 2],
     hex: "580404"
   },
   {
-    sigmaObject: STuple(SInt(1), SInt(9)),
-    jsObject: [1, 9],
-    hex: "580212"
-  },
-  {
-    sigmaObject: STuple(SInt(0), SLong(1)),
-    jsObject: [0, 1n],
+    name: "(SInt, SLong)",
+    sconst: STuple(SInt(0), SLong(1)),
+    value: [0, 1n],
     hex: "40050002"
   },
   {
-    sigmaObject: STuple(SInt(7), SByte(1)),
-    jsObject: [7, 1],
+    name: "(SInt, SByte)",
+    sconst: STuple(SInt(7), SByte(1)),
+    value: [7, 1],
     hex: "40020e01"
   },
   {
-    sigmaObject: STuple(SInt(1), SColl(SByte, "0a0c")),
-    jsObject: [1, Uint8Array.from([10, 12])],
+    name: "(SInt, [SByte])",
+    sconst: STuple(SInt(1), SColl(SByte, "0a0c")),
+    value: [1, Uint8Array.from([10, 12])],
     hex: "400e02020a0c"
   },
   {
-    sigmaObject: STuple(SColl(SByte, "505250"), SColl(SByte, "596f7572206c6f616e204a616e75617279")),
-    jsObject: [hex.decode("505250"), hex.decode("596f7572206c6f616e204a616e75617279")],
+    name: "([SByte], [SByte])",
+    sconst: STuple(SColl(SByte, "505250"), SColl(SByte, "596f7572206c6f616e204a616e75617279")),
+    value: [hex.decode("505250"), hex.decode("596f7572206c6f616e204a616e75617279")],
     hex: "3c0e0e0350525011596f7572206c6f616e204a616e75617279"
   },
   {
-    sigmaObject: STuple(SColl(SByte, [10, 12]), SBool(true), SByte(2)),
-    jsObject: [Uint8Array.from([10, 12]), true, 2],
+    name: "([SByte], SBool, SByte)",
+    sconst: STuple(SColl(SByte, [10, 12]), SBool(true), SByte(2)),
+    value: [Uint8Array.from([10, 12]), true, 2],
     hex: "480e0102020a0c0102"
   },
   {
-    sigmaObject: STuple(
+    name: "([SByte], SGroupElement)",
+    sconst: STuple(
       SColl(SByte, "8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"),
       SGroupElement(
         hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
       )
     ),
-    jsObject: [
+    value: [
       hex.decode("8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"),
       hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
     ],
@@ -187,12 +195,12 @@ const tupleTestVectors: { sigmaObject: ITuple; jsObject: unknown[]; hex: string 
 ];
 
 describe("Tuple serialization", () => {
-  it.each(tupleTestVectors)("Should serialize", (tv) => {
-    expect(SConstant(tv.sigmaObject)).to.be.equal(tv.hex);
+  it.each(tupleTestVectors)("Should serialize $name", (tv) => {
+    expect(SConstant(tv.sconst)).to.be.equal(tv.hex);
   });
 
-  it.each(tupleTestVectors)("Should parse $hex", (tv) => {
-    expect(SParse(tv.hex)).to.be.deep.equal(tv.jsObject);
+  it.each(tupleTestVectors)("Should parse $name", (tv) => {
+    expect(SParse(tv.hex)).to.be.deep.equal(tv.value);
   });
 
   it("Should road trip", () => {

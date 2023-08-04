@@ -25,14 +25,17 @@ export class TypeSerializer {
     if (value.type.primitive) {
       buffer.write(value.type.code);
     } else if (isColl(value)) {
-      if (value.itemsType.embeddable) {
-        buffer.write(value.type.code + value.itemsType.code);
+      if (value.wrappedType.embeddable) {
+        buffer.write(SCollType.simpleCollTypeCode + value.wrappedType.code);
       }
+      // else if (value.itemsType == SCollType) {
+      //   buffer.write(SCollType.nestedCollTypeCode + value.itemsType.code);
+      // }
     } else if (isTuple(value)) {
-      switch (value.items.length) {
+      switch (value.value.length) {
         case 2: {
-          const left = first(value.items);
-          const right = last(value.items);
+          const left = first(value.value);
+          const right = last(value.value);
 
           if (left.type.embeddable) {
             if (left.type.code === right.type.code) {
@@ -63,7 +66,7 @@ export class TypeSerializer {
           buffer.write(STupleType.quadrupleTypeCode);
           break;
         default: {
-          const len = value.items.length;
+          const len = value.value.length;
           assert(len >= 2 && len <= 255, "Invalid type: tuples must have between 2 and 255 items.");
 
           // Generic tuple
@@ -72,8 +75,8 @@ export class TypeSerializer {
         }
       }
 
-      for (let i = 0; i < value.items.length; i++) {
-        this.serialize(value.items[i], buffer);
+      for (let i = 0; i < value.value.length; i++) {
+        this.serialize(value.value[i], buffer);
       }
     } else {
       throw new Error("Serialization error: type not implemented.");
