@@ -2,7 +2,6 @@ import { HexString, hexToBigInt, isEmpty } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { readBigVLQ, readVLQ } from "../vlq";
 import { zigZagDecode, zigZagDecodeBigInt } from "../zigZag";
-import { SigmaTypeCode } from "./sigmaTypeCode";
 
 export class SigmaReader {
   private _bytes!: Uint8Array;
@@ -53,10 +52,6 @@ export class SigmaReader {
 
   public readBytes(length: number): Uint8Array {
     return this._bytes.subarray(this._cursor, (this._cursor += length));
-  }
-
-  public readType(): SigmaTypeCode {
-    return this.readByte();
   }
 
   public readVlq(): number {

@@ -49,7 +49,7 @@ function getTypeName(value: unknown): string {
 
 export function assertInstanceOf<T>(obj: T, expected: Constructable): asserts obj {
   const condition = obj instanceof expected;
-  Object;
+
   if (!condition) {
     throw new Error(`Expected an instance of '${expected.name}', got '${getTypeName(obj)}'.`);
   }

@@ -85,6 +85,9 @@ importers:
       '@fleet-sdk/crypto':
         specifier: workspace:^
         version: link:../crypto
+      '@fleet-sdk/serializer':
+        specifier: workspace:^
+        version: link:../serializer
       sigmastate-js:
         specifier: 0.2.1-snapshot.8a862d393
         version: 0.2.1-snapshot.8a862d393
@@ -97,6 +100,9 @@ importers:
       '@fleet-sdk/crypto':
         specifier: workspace:^
         version: link:../crypto
+      '@fleet-sdk/serializer':
+        specifier: workspace:^
+        version: link:../serializer
 
   packages/crypto:
     dependencies:
@@ -121,6 +127,9 @@ importers:
       '@fleet-sdk/crypto':
         specifier: workspace:^
         version: link:../crypto
+      '@fleet-sdk/serializer':
+        specifier: workspace:^
+        version: link:../serializer
       '@fleet-sdk/wallet':
         specifier: workspace:^
         version: link:../wallet
@@ -133,6 +142,12 @@ importers:
       picocolors:
         specifier: ^1.0.0
         version: 1.0.0
+
+  packages/serializer:
+    dependencies:
+      '@fleet-sdk/common':
+        specifier: workspace:^
+        version: link:../common
 
   packages/wallet:
     dependencies:

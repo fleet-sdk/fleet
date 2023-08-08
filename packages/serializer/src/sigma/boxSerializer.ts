@@ -11,22 +11,20 @@ import {
   some,
   TokenAmount
 } from "@fleet-sdk/common";
-import { OutputBuilder } from "../../builder";
-import { ErgoBox } from "../../models/ergoBox";
 import { estimateVLQSize } from "../vlq";
 import { SigmaWriter } from "./sigmaWriter";
 
 const MAX_UINT16_VALUE = 65535;
 
-export function serializeBox(box: Box<Amount> | ErgoBox): SigmaWriter;
-export function serializeBox(box: Box<Amount> | ErgoBox, writer: SigmaWriter): SigmaWriter;
+export function serializeBox(box: Box<Amount>): SigmaWriter;
+export function serializeBox(box: Box<Amount>, writer: SigmaWriter): SigmaWriter;
 export function serializeBox(
   box: BoxCandidate<Amount>,
   writer: SigmaWriter,
   distinctTokenIds: string[]
 ): SigmaWriter;
 export function serializeBox(
-  box: Box<Amount> | ErgoBox | BoxCandidate<Amount>,
+  box: Box<Amount> | BoxCandidate<Amount>,
   writer?: SigmaWriter,
   distinctTokenIds?: string[]
 ): SigmaWriter {
@@ -51,9 +49,7 @@ export function serializeBox(
   }
 }
 
-function isBox<T extends Amount>(
-  box: Box<Amount> | ErgoBox | BoxCandidate<Amount> | OutputBuilder
-): box is Box<T> {
+function isBox<T extends Amount>(box: Box<Amount> | BoxCandidate<Amount>): box is Box<T> {
   const castedBox = box as Box<T>;
 
   return isDefined(castedBox.transactionId) && isDefined(castedBox.index);
@@ -108,7 +104,7 @@ function writeRegisters(writer: SigmaWriter, registers: NonMandatoryRegisters): 
  * @returns byte size of the box.
  */
 export function estimateBoxSize(
-  box: Box<Amount> | BoxCandidate<Amount> | OutputBuilder,
+  box: Box<Amount> | BoxCandidate<Amount>,
   withValue?: Amount
 ): number {
   if (isUndefined(box.creationHeight)) {

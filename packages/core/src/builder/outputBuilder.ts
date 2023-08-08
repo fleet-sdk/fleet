@@ -2,6 +2,7 @@ import {
   _0n,
   Amount,
   areRegistersDenselyPacked,
+  assert,
   Box,
   BoxCandidate,
   clearUndefined,
@@ -20,6 +21,8 @@ import {
   UnsignedInput
 } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
+import { estimateBoxSize, SByte, SColl } from "@fleet-sdk/serializer";
+import { SConstant } from "../constantSerializer";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
@@ -34,9 +37,6 @@ import {
   R4ToR9Registers
 } from "../models";
 import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
-import { estimateBoxSize } from "../serializer/sigma/boxSerializer";
-import { SConstant } from "../serializer/sigma/constantSerializer";
-import { SByte, SColl } from "../serializer/sigma/sigmaTypes";
 
 export const BOX_VALUE_PER_BYTE = BigInt(360);
 export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
@@ -44,8 +44,8 @@ export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 export type BoxValueEstimationCallback = (outputBuilder: OutputBuilder) => bigint;
 
 export function estimateMinBoxValue(valuePerByte = BOX_VALUE_PER_BYTE): BoxValueEstimationCallback {
-  return (output: OutputBuilder) => {
-    return BigInt(estimateBoxSize(output, SAFE_MIN_BOX_VALUE)) * valuePerByte;
+  return (output) => {
+    return BigInt(output.estimateSize()) * valuePerByte;
   };
 }
 
@@ -211,6 +211,24 @@ export class OutputBuilder {
       })),
       additionalRegisters: this.additionalRegisters
     };
+  }
+
+  estimateSize(value = SAFE_MIN_BOX_VALUE): number {
+    assert(!!this.creationHeight, "Creation height must be set");
+
+    const tokens = this._tokens.toArray();
+    const plainBoxObject: BoxCandidate<bigint> = {
+      value,
+      ergoTree: this.ergoTree,
+      creationHeight: this.creationHeight,
+      assets: tokens.map((token) => ({
+        tokenId: token.tokenId,
+        amount: token.amount
+      })),
+      additionalRegisters: this.additionalRegisters
+    };
+
+    return estimateBoxSize(plainBoxObject);
   }
 }
 

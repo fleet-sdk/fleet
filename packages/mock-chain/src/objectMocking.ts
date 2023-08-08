@@ -1,7 +1,7 @@
 import { Box, BoxCandidate } from "@fleet-sdk/common";
-import { serializeBox } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { blake2b256, randomBytes } from "@fleet-sdk/crypto";
+import { serializeBox } from "@fleet-sdk/serializer";
 
 export function mockUTxO(candidate: BoxCandidate<bigint>): Box<bigint> {
   const box: Box<bigint> = {

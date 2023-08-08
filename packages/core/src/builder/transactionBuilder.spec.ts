@@ -1,14 +1,13 @@
 import { Amount, BoxCandidate, Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
+import { estimateBoxSize, SByte, SColl, SConstant } from "@fleet-sdk/serializer";
 import { describe, expect, it, vi } from "vitest";
 import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
 import { ErgoAddress, ErgoUnsignedInput, InputsCollection, MAX_TOKENS_PER_BOX } from "../models";
-import { SByte, SColl, SConstant } from "../serializer";
-import { estimateBoxSize } from "../serializer/sigma/boxSerializer";
 import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../tests/mocks/mockBoxes";
 import {
   BOX_VALUE_PER_BYTE,

@@ -31,6 +31,7 @@
     "@fleet-sdk/core": "workspace:^",
     "@fleet-sdk/wallet": "workspace:^",
     "@fleet-sdk/crypto": "workspace:^",
+    "@fleet-sdk/serializer": "workspace:^",
     "diff": "^5.1.0",
     "ergo-lib-wasm-nodejs": "^0.24.0",
     "picocolors": "^1.0.0"

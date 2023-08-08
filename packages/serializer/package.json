@@ -1,7 +1,7 @@
 {
-  "name": "@fleet-sdk/compiler",
-  "version": "0.1.1",
-  "description": "Sigma.JS powered ErgoScript compiler.",
+  "name": "@fleet-sdk/serializer",
+  "version": "0.0.0",
+  "description": "Ergo constant serializer and parser.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "typings": "dist/esm/index.d.ts",
@@ -15,21 +15,18 @@
   "keywords": [
     "ergo",
     "blockchain",
-    "compiler"
+    "transactions",
+    "serialization"
   ],
-  "dependencies": {
-    "@fleet-sdk/common": "workspace:^",
-    "@fleet-sdk/core": "workspace:^",
-    "@fleet-sdk/crypto": "workspace:^",
-    "@fleet-sdk/serializer": "workspace:^",
-    "sigmastate-js": "0.2.1-snapshot.8a862d393"
-  },
   "scripts": {
     "build": "run-p build:*",
     "build:cjs": "tsc -p tsconfig.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "watch:build": "tsc -p tsconfig.json -w",
     "watch:unit": "vitest"
+  },
+  "dependencies": {
+    "@fleet-sdk/common": "workspace:^"
   },
   "engines": {
     "node": ">=14"

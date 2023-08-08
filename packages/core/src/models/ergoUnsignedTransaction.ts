@@ -8,7 +8,7 @@ import {
   utxoSum
 } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
-import { serializeTransaction } from "../serializer/sigma/transactionSerializer";
+import { serializeTransaction } from "@fleet-sdk/serializer";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 
 type Input = ErgoUnsignedInput;

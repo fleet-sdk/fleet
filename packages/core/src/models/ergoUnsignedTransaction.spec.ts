@@ -1,6 +1,6 @@
+import { serializeTransaction } from "@fleet-sdk/serializer";
 import { describe, expect, it } from "vitest";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "../builder";
-import { serializeTransaction } from "../serializer/sigma/transactionSerializer";
 import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { mockTransactions } from "../tests/mocks/mockTransactions";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";

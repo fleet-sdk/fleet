@@ -145,7 +145,7 @@ describe("Compiler constants map parsing", () => {
     const parsedMap = parseNamedConstantsMap(originalMap);
 
     expect(originalMap).not.to.be.equal(parsedMap);
-    expect(originalMap.test).to.be.deep.equal({ type: 4, value: 100 });
+    expect(originalMap.test).to.be.deep.equal(SInt(100));
   });
 
   it("Should throw is an invalid hex string is passed", () => {
