@@ -17,9 +17,6 @@ importers:
       '@fleet-sdk/crypto':
         specifier: workspace:^
         version: link:packages/crypto
-      '@fleet-sdk/mock-chain':
-        specifier: workspace:^
-        version: link:packages/mock-chain
       '@types/diff':
         specifier: ^5.0.3
         version: 5.0.3
