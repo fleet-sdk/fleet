@@ -22,6 +22,7 @@
     "@changesets/cli": "^2.26.2",
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/crypto": "workspace:^",
+    "@fleet-sdk/mock-chain": "workspace:^",
     "@types/diff": "^5.0.3",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",

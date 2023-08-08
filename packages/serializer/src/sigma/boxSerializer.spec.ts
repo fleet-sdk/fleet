@@ -1,6 +1,6 @@
 import { Box, byteSizeOf, ensureBigInt } from "@fleet-sdk/common";
+import { mockUTxO } from "@fleet-sdk/mock-chain";
 import { describe, expect, it } from "vitest";
-// import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "../../builder";
 import { manyTokensBoxesMock, regularBoxesMock, validBoxesMock } from "../tests/mockBoxes";
 import { estimateBoxSize, serializeBox } from "./boxSerializer";
 
@@ -282,23 +282,28 @@ describe("Serialize ErgoBox", () => {
     }
   });
 
-  // it("Should estimate output builder size in bytes", () => {
-  //   for (const tv of testVectors) {
-  //     const output = new OutputBuilder(tv.json.value, tv.json.address)
-  //       .addTokens(tv.json.assets)
-  //       .setAdditionalRegisters(tv.json.additionalRegisters)
-  //       .setCreationHeight(tv.json.creationHeight);
+  it("Should estimate box candidate", () => {
+    const output = {
+      ergoTree: "deadbeef",
+      assets: [],
+      creationHeight: 1,
+      additionalRegisters: {},
+      value: 100000000n
+    };
 
-  //     expect(estimateBoxSize(output)).toBeGreaterThanOrEqual(byteSizeOf(tv.serialized));
-  //   }
-  // });
+    expect(estimateBoxSize(output)).to.be.equal(46);
+  });
 
-  // it("Should fail if creation height is undefined", () => {
-  //   const output = new OutputBuilder(
-  //     SAFE_MIN_BOX_VALUE,
-  //     "9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ"
-  //   );
+  it("Should fail if creation height is undefined", () => {
+    const output = mockUTxO({
+      ergoTree: "deadbeef",
+      assets: [],
+      creationHeight: 1,
+      additionalRegisters: {},
+      value: 100000000n
+    });
 
-  //   expect(() => estimateBoxSize(output)).toThrow();
-  // });
+    output.creationHeight = undefined as unknown as number;
+    expect(() => estimateBoxSize(output)).toThrow();
+  });
 });
