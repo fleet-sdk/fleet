@@ -4,5 +4,5 @@
     "rootDir": "./src",
     "outDir": "dist/cjs"
   },
-  "include": ["src/**/*.ts", "src/constantSerializer.ts"]
+  "include": ["src/**/*.ts"]
 }
