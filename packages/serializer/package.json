@@ -26,7 +26,8 @@
     "watch:unit": "vitest"
   },
   "dependencies": {
-    "@fleet-sdk/common": "workspace:^"
+    "@fleet-sdk/common": "workspace:^",
+    "@fleet-sdk/crypto": "workspace:^"
   },
   "engines": {
     "node": ">=14"

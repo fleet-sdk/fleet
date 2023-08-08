@@ -148,6 +148,9 @@ importers:
       '@fleet-sdk/common':
         specifier: workspace:^
         version: link:../common
+      '@fleet-sdk/crypto':
+        specifier: workspace:^
+        version: link:../crypto
 
   packages/wallet:
     dependencies:
