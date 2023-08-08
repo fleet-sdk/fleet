@@ -1,57 +1,42 @@
-import { first } from "@fleet-sdk/common";
-import { isColl, isPrimitiveType, isTuple } from "./assertions";
+import { hex } from "@fleet-sdk/crypto";
 import { SigmaReader } from "./sigmaReader";
-import {
-  IPrimitive,
-  ISigmaValue,
-  SBigIntType,
-  SBoolType,
-  SByteType,
-  SCollType,
-  SGroupElementType,
-  SIntType,
-  SLongType,
-  SShortType,
-  SSigmaPropType,
-  STupleType,
-  SUnitType,
-  TypeDescriptor
-} from "./sigmaTypes";
+import { SigmaTypeCode } from "./sigmaTypeCode";
+import { IPrimitiveSigmaType, ISigmaType } from "./sigmaTypes";
 import { SigmaWriter } from "./sigmaWriter";
+import { isColl, isCollTypeCode, isPrimitiveType, isPrimitiveTypeCode } from "./utils";
 
 const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
 
 export class DataSerializer {
-  public static serialize(data: ISigmaValue, writer: SigmaWriter) {
-    if (data.type.primitive) {
+  public static serialize(data: ISigmaType, writer: SigmaWriter) {
+    if (isPrimitiveType(data)) {
       switch (data.type) {
-        case SBoolType:
-          writer.writeBoolean((data as IPrimitive<boolean>).value);
+        case SigmaTypeCode.Boolean:
+          writer.writeBoolean((data as IPrimitiveSigmaType<boolean>).value);
           break;
-        case SByteType:
-          writer.write((data as IPrimitive<number>).value);
+        case SigmaTypeCode.Byte:
+          writer.write((data as IPrimitiveSigmaType<number>).value);
           break;
-        case SShortType:
-          writer.writeShort((data as IPrimitive<number>).value);
+        case SigmaTypeCode.Short:
+          writer.writeShort((data as IPrimitiveSigmaType<number>).value);
           break;
-        case SIntType:
-          writer.writeInt((data as IPrimitive<number>).value);
+        case SigmaTypeCode.Int:
+          writer.writeInt((data as IPrimitiveSigmaType<number>).value);
           break;
-        case SLongType:
-          writer.writeLong((data as IPrimitive<bigint>).value);
+        case SigmaTypeCode.Long:
+          writer.writeLong((data as IPrimitiveSigmaType<bigint>).value);
           break;
-        case SBigIntType: {
-          writer.writeBigInt((data as IPrimitive<bigint>).value);
+        case SigmaTypeCode.BigInt: {
+          writer.writeBigInt((data as IPrimitiveSigmaType<bigint>).value);
           break;
         }
-        case SGroupElementType:
-          writer.writeBytes((data as IPrimitive<Uint8Array>).value);
+        case SigmaTypeCode.GroupElement:
+          writer.writeBytes((data as IPrimitiveSigmaType<Uint8Array>).value);
           break;
-        case SSigmaPropType: {
-          const node = (data as IPrimitive<IPrimitive<Uint8Array>>).value;
-
-          if (node.type === SGroupElementType) {
+        case SigmaTypeCode.SigmaProp: {
+          const node = (data as IPrimitiveSigmaType<ISigmaType>).value;
+          if (node.type === SigmaTypeCode.GroupElement) {
             writer.write(PROVE_DLOG_OP);
             DataSerializer.serialize(node, writer);
           } else {
@@ -59,97 +44,97 @@ export class DataSerializer {
           }
           break;
         }
-        case SUnitType: // same as void, don't need to save anything
+        case SigmaTypeCode.Unit: // same as void, don't need to save anything
           break;
-        // case PrimitiveTypeCode.Box:
+        // case SigmaTypeCode.Box:
         default:
           throw Error("Not implemented");
       }
     } else if (isColl(data)) {
-      writer.writeVLQ(data.value.length);
+      if (typeof data.value === "string") {
+        writer.writeVLQ(data.value.length / 2);
+      } else {
+        writer.writeVLQ(data.value.length);
+      }
 
-      switch (data.wrappedType) {
-        case SBoolType: {
+      switch (data.elementsType) {
+        case SigmaTypeCode.Boolean: {
           writer.writeBits(data.value as boolean[]);
           break;
         }
-        case SByteType: {
-          writer.writeBytes(data.value as Uint8Array);
+        case SigmaTypeCode.Byte: {
+          let bytes!: Uint8Array;
+          if (typeof data.value === "string") {
+            bytes = hex.decode(data.value);
+          } else {
+            bytes = Uint8Array.from(data.value as number[]);
+          }
+
+          writer.writeBytes(bytes);
           break;
         }
         default: {
           for (let i = 0; i < data.value.length; i++) {
             DataSerializer.serialize(
-              data.wrappedType.primitive
-                ? ({ type: data.wrappedType ?? data.type, value: data.value[i] } as ISigmaValue)
-                : (data.value[i] as ISigmaValue),
+              { type: data.elementsType, value: data.value[i] } as ISigmaType,
               writer
             );
           }
         }
-      }
-    } else if (isTuple(data)) {
-      const len = data.value.length;
-      for (let i = 0; i < len; i++) {
-        DataSerializer.serialize(data.value[i], writer);
       }
     } else {
       throw Error("Not implemented");
     }
   }
 
-  static deserialize(type: TypeDescriptor, reader: SigmaReader): unknown {
-    if (isPrimitiveType(type)) {
-      switch (type) {
-        case SBoolType:
+  static deserialize(typeCode: SigmaTypeCode, reader: SigmaReader): unknown {
+    if (isPrimitiveTypeCode(typeCode)) {
+      switch (typeCode) {
+        case SigmaTypeCode.Boolean:
           return reader.readBoolean();
-        case SByteType:
+        case SigmaTypeCode.Byte:
           return reader.readByte();
-        case SShortType:
+        case SigmaTypeCode.Short:
           return reader.readShort();
-        case SIntType:
+        case SigmaTypeCode.Int:
           return reader.readInt();
-        case SLongType:
+        case SigmaTypeCode.Long:
           return reader.readLong();
-        case SBigIntType:
+        case SigmaTypeCode.BigInt:
           return reader.readBigInt();
-        case SGroupElementType:
+        case SigmaTypeCode.GroupElement:
           return reader.readBytes(GROUP_ELEMENT_LENGTH);
-        case SSigmaPropType: {
+        case SigmaTypeCode.SigmaProp: {
           if (reader.readByte() === PROVE_DLOG_OP) {
-            return this.deserialize(SGroupElementType, reader);
+            return this.deserialize(SigmaTypeCode.GroupElement, reader);
           }
 
           break;
         }
-        // case PrimitiveTypeCode.Unit:
-        // case PrimitiveTypeCode.Box:
+        // case SigmaTypeCode.Unit:
+        // case SigmaTypeCode.Box:
         default:
           break;
       }
-    } else {
-      switch (type.ctor) {
-        case SCollType: {
-          const length = reader.readVlq();
-          const embeddedType = first(type.wrapped);
+    } else if (isCollTypeCode(typeCode)) {
+      const embeddedType = typeCode - SigmaTypeCode.Coll;
+      const length = reader.readVlq();
 
-          switch (embeddedType) {
-            case SBoolType:
-              return reader.readBits(length);
-            case SByteType:
-              return reader.readBytes(length);
-            default: {
-              const elements = new Array(length);
-              for (let i = 0; i < length; i++) {
-                elements[i] = this.deserialize(embeddedType, reader);
-              }
-
-              return elements;
-            }
-          }
+      switch (embeddedType) {
+        case SigmaTypeCode.Boolean: {
+          return reader.readBits(length);
         }
-        case STupleType: {
-          return type.wrapped.map((t) => this.deserialize(t, reader));
+        case SigmaTypeCode.Byte: {
+          return reader.readBytes(length);
+        }
+        default: {
+          const elements = new Array(length);
+
+          for (let i = 0; i < length; i++) {
+            elements[i] = this.deserialize(embeddedType, reader);
+          }
+
+          return elements;
         }
       }
     }

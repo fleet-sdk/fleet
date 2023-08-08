@@ -1,5 +1,5 @@
 import { assert, ensureDefaults, ergoTreeHeaderFlags, isEmpty, isHex } from "@fleet-sdk/common";
-import { ISigmaValue, SConstant } from "@fleet-sdk/core";
+import { ISigmaType, SConstant } from "@fleet-sdk/core";
 import {
   SigmaCompilerNamedConstantsMap,
   SigmaCompilerObj,
@@ -26,7 +26,7 @@ export type CompilerOptionsForErgoTreeV1 = CompilerOptionsBase & {
 export type CompilerOptions = CompilerOptionsForErgoTreeV0 | CompilerOptionsForErgoTreeV1;
 
 export type NamedConstantsMap = {
-  [key: string]: string | ISigmaValue | SigmaValue;
+  [key: string]: string | ISigmaType | SigmaValue;
 };
 
 export const compilerDefaults: Required<CompilerOptions> = {
@@ -68,7 +68,7 @@ export function parseNamedConstantsMap(map: NamedConstantsMap): SigmaCompilerNam
   return sigmaMap;
 }
 
-export function toSigmaConstant(constant: string | ISigmaValue | SigmaValue): SigmaValue {
+export function toSigmaConstant(constant: string | ISigmaType | SigmaValue): SigmaValue {
   if (typeof constant === "string") {
     assert(isHex(constant), `'${constant}' is not a valid hex string.`);
 
@@ -82,6 +82,6 @@ export function toSigmaConstant(constant: string | ISigmaValue | SigmaValue): Si
   throw new Error("Unsupported constant object mapping.");
 }
 
-function isFleetSigmaConstant(constant: unknown): constant is ISigmaValue {
-  return (constant as ISigmaValue).type !== undefined;
+function isFleetSigmaConstant(constant: unknown): constant is ISigmaType {
+  return typeof (constant as ISigmaType).type === "number";
 }

@@ -27,7 +27,8 @@
   },
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
-    "@fleet-sdk/crypto": "workspace:^"
+    "@fleet-sdk/crypto": "workspace:^",
+    "@fleet-sdk/serializer": "workspace:^"
   },
   "engines": {
     "node": ">=14"

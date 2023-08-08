@@ -13,20 +13,17 @@ import {
   sSigmaPropTestVectors
 } from "../../tests/testVectors/constantsTestVectors";
 import { SConstant, SParse } from "./constantSerializer";
+import { SigmaTypeCode } from "./sigmaTypeCode";
 import {
-  IPrimitiveType,
-  ITuple,
   SBigInt,
   SBool,
   SByte,
   SColl,
   SGroupElement,
   SInt,
-  SIntType,
   SLong,
   SShort,
   SSigmaProp,
-  STuple,
   SUnit
 } from "./sigmaTypes";
 
@@ -82,21 +79,19 @@ describe("Primary types serialization", () => {
     }
   });
 
-  it("Should throw for not implemented type", () => {
-    const unimplementedType: IPrimitiveType = {
-      code: 0x64, // AvlTree type code
-      embeddable: false,
-      primitive: true,
-      name: "AvlTree"
-    };
-
+  it("Should fail for not implemented SSigmaProp expression", () => {
     expect(() => {
-      SConstant({ type: unimplementedType });
+      SConstant(SSigmaProp({ type: SigmaTypeCode.AvlTree, value: Uint8Array.from([]) }));
+    }).toThrow();
+  });
+
+  it("Should throw for not implemented type", () => {
+    expect(() => {
+      SConstant({ type: SigmaTypeCode.AvlTree });
     }).toThrow();
 
-    // not implemented SSigmaProp expression
     expect(() => {
-      SConstant(SSigmaProp({ type: unimplementedType, value: Uint8Array.from([]) }));
+      SConstant({ type: SigmaTypeCode.Tuple2 });
     }).toThrow();
   });
 });
@@ -132,104 +127,6 @@ describe("SColl serialization", () => {
     for (const tv of collLongTestVectors) {
       expect(SConstant(SColl(SLong, tv.coll))).toBe(tv.hex);
     }
-
-    // const bytes1 = new Uint8Array([1, 2, 3]);
-    // const bytes2 = new Uint8Array([3, 2, 1]);
-    // const hex = SConstant(SColl(() => SCollType, [SColl(SByte, bytes1), SColl(SByte, bytes2)]));
-    // console.log(hex);
-    // , SParse(hex)
-  });
-});
-
-const tupleTestVectors: { name: string; sconst: ITuple; value: unknown[]; hex: string }[] = [
-  {
-    name: "(SInt, SInt)",
-    sconst: STuple(SInt(2), SInt(2)),
-    value: [2, 2],
-    hex: "580404"
-  },
-  {
-    name: "(SInt, SLong)",
-    sconst: STuple(SInt(0), SLong(1)),
-    value: [0, 1n],
-    hex: "40050002"
-  },
-  {
-    name: "(SInt, SByte)",
-    sconst: STuple(SInt(7), SByte(1)),
-    value: [7, 1],
-    hex: "40020e01"
-  },
-  {
-    name: "(SInt, [SByte])",
-    sconst: STuple(SInt(1), SColl(SByte, "0a0c")),
-    value: [1, Uint8Array.from([10, 12])],
-    hex: "400e02020a0c"
-  },
-  {
-    name: "([SByte], [SByte])",
-    sconst: STuple(SColl(SByte, "505250"), SColl(SByte, "596f7572206c6f616e204a616e75617279")),
-    value: [hex.decode("505250"), hex.decode("596f7572206c6f616e204a616e75617279")],
-    hex: "3c0e0e0350525011596f7572206c6f616e204a616e75617279"
-  },
-  {
-    name: "([SByte], SBool, SByte)",
-    sconst: STuple(SColl(SByte, [10, 12]), SBool(true), SByte(2)),
-    value: [Uint8Array.from([10, 12]), true, 2],
-    hex: "480e0102020a0c0102"
-  },
-  {
-    name: "([SByte], SGroupElement)",
-    sconst: STuple(
-      SColl(SByte, "8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"),
-      SGroupElement(
-        hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
-      )
-    ),
-    value: [
-      hex.decode("8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"),
-      hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
-    ],
-    hex: "4f0e208743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607"
-  }
-];
-
-describe("Tuple serialization", () => {
-  it.each(tupleTestVectors)("Should serialize $name", (tv) => {
-    expect(SConstant(tv.sconst)).to.be.equal(tv.hex);
-  });
-
-  it.each(tupleTestVectors)("Should parse $name", (tv) => {
-    expect(SParse(tv.hex)).to.be.deep.equal(tv.value);
-  });
-
-  it("Should road trip", () => {
-    // quadruple
-    expect(
-      SParse(
-        SConstant(STuple(SColl(SBool, [true, false, true]), SBigInt(10n), SBool(false), SShort(2)))
-      )
-    ).to.be.deep.equal([[true, false, true], 10n, false, 2]);
-
-    // generic tuple with 4+ items
-    expect(
-      SParse(SConstant(STuple(SBool(false), SBigInt(10n), SBool(false), SShort(2), SLong(1232n))))
-    ).to.be.deep.equal([false, 10n, false, 2, 1232n]);
-    expect(
-      SParse(SConstant(STuple(SInt(1), SInt(2), SInt(3), SInt(2), SInt(4), SInt(5), SInt(6))))
-    ).to.be.deep.equal([1, 2, 3, 2, 4, 5, 6]);
-  });
-
-  it("Should fail with tuples with items out of the 2 - 255 range", () => {
-    const _1item = STuple(SInt(1));
-    expect(() => SConstant(_1item)).to.throw(
-      "Invalid type: tuples must have between 2 and 255 items."
-    );
-
-    const _256Items = STuple(...new Array(256).map((_, i) => ({ type: SIntType, value: i })));
-    expect(() => SConstant(_256Items)).to.throw(
-      "Invalid type: tuples must have between 2 and 255 items."
-    );
   });
 });
 
@@ -343,7 +240,7 @@ describe("SColl deserialization", () => {
       "00000000000ee48c"
     ].map((x) => hex.decode(x));
 
-    expect(SParse(register)).to.be.deep.equal(expected);
+    expect(SParse(register)).toStrictEqual(expected);
   });
 });
 
