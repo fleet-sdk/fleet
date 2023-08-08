@@ -217,6 +217,13 @@ export class OutputBuilder {
     assert(!!this.creationHeight, "Creation height must be set");
 
     const tokens = this._tokens.toArray();
+    if (this.minting) {
+      tokens.push({
+        tokenId: "0000000000000000000000000000000000000000000000000000000000000000",
+        amount: this.minting.amount
+      });
+    }
+
     const plainBoxObject: BoxCandidate<bigint> = {
       value,
       ergoTree: this.ergoTree,

@@ -464,6 +464,9 @@ describe("Building", () => {
 
     output.addTokens({ tokenId: tokenB, amount: 90n });
     expect(output.value).toBe(52200n);
+
+    output.mintToken({ amount: 100n });
+    expect(output.value).toBe(64080n);
   });
 
   it("Should estimate min box value with custom value per byte", () => {
