@@ -1,10 +1,10 @@
 import { NonMandatoryRegisters } from "@fleet-sdk/common";
+import { regularBoxesMock } from "_test-vectors";
 import { beforeEach, describe, expect, it } from "vitest";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import { ErgoAddress, ErgoTree, TokensCollection } from "../models";
-import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { estimateMinBoxValue, OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 
 const address = "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c";

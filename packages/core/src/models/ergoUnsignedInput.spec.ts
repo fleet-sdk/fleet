@@ -1,5 +1,5 @@
+import { regularBoxesMock } from "_test-vectors";
 import { describe, expect, it } from "vitest";
-import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 
 describe("Construction", () => {

@@ -18,8 +18,12 @@
     "listFiles": false,
     "pretty": true,
     "lib": ["ESNext", "DOM"],
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "_test-vectors": ["./packages/_test-vectors/src/"]
+    }
   },
   "compileOnSave": false,
-  "exclude": ["**/node_modules"]
+  "exclude": ["**/node_modules", "**/*.spec.ts"]
 }

@@ -1,6 +1,6 @@
 import { sumBy, utxoSum } from "@fleet-sdk/common";
+import { regularBoxesMock } from "_test-vectors";
 import { describe, expect, it } from "vitest";
-import { regularBoxesMock } from "../../../tests/mocks/mockBoxes";
 import { AccumulativeSelectionStrategy } from "./accumulativeSelectionStrategy";
 
 describe("Accumulative selection strategy", () => {

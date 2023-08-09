@@ -1,6 +1,6 @@
 import { Box, byteSizeOf, ensureBigInt, first } from "@fleet-sdk/common";
+import { manyTokensBoxesMock, regularBoxesMock, validBoxesMock } from "_test-vectors";
 import { describe, expect, it } from "vitest";
-import { manyTokensBoxesMock, regularBoxesMock, validBoxesMock } from "../tests/mockBoxes";
 import { estimateBoxSize, serializeBox } from "./boxSerializer";
 
 const testVectors = [

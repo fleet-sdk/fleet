@@ -1,9 +1,9 @@
 import { Box } from "@fleet-sdk/common";
 import { first, sumBy, utxoSum } from "@fleet-sdk/common";
+import { regularBoxesMock } from "_test-vectors";
 import { describe, expect, it, vi } from "vitest";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientInputs } from "../../errors/insufficientInputs";
-import { regularBoxesMock } from "../../tests/mocks/mockBoxes";
 import { SAFE_MIN_BOX_VALUE } from "../outputBuilder";
 import { BoxSelector } from "./boxSelector";
 import { ISelectionStrategy } from "./strategies/ISelectionStrategy";

@@ -4,5 +4,6 @@
     "rootDir": "./src",
     "outDir": "dist/cjs"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "references": [{ "path": "../_test-vectors/" }]
 }

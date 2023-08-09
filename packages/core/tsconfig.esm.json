@@ -4,5 +4,6 @@
     "target": "ESNext",
     "module": "ESNext",
     "outDir": "dist/esm"
-  }
+  },
+  "references": [{ "path": "../_test-vectors/" }]
 }

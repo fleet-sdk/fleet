@@ -1,6 +1,11 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "_test-vectors": "./packages/_test-vectors/src"
+    }
+  },
   test: {
     environment: "node",
     threads: false,
@@ -12,7 +17,7 @@ export default defineConfig({
       branches: 100,
       functions: 100,
       thresholdAutoUpdate: true,
-      exclude: ["**/tests/**", "**/_tests/**", "**/*.spec.ts"]
+      exclude: ["**/tests/**", "**/_tests/**", "**/_test-vectors/**", "**/*.spec.ts"]
     }
   }
 });

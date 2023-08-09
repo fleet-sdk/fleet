@@ -1,12 +1,12 @@
 import { NonMandatoryRegisters } from "@fleet-sdk/common";
-import { describe, expect, it } from "vitest";
 import {
   invalidBoxesMock,
   manyTokensBoxesMock,
   outOfOrderRegistersBox,
   regularBoxesMock,
   validBoxesMock
-} from "../tests/mocks/mockBoxes";
+} from "_test-vectors";
+import { describe, expect, it } from "vitest";
 import { ErgoBox } from "./ergoBox";
 
 describe("Construction", () => {

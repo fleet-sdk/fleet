@@ -1,6 +1,6 @@
+import { regularBoxesMock } from "_test-vectors";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NotAllowedTokenBurning } from "../errors";
-import { regularBoxesMock } from "../tests/mocks/mockBoxes";
 import { OutputBuilder } from "./outputBuilder";
 import { createPluginContext, FleetPluginContext } from "./pluginContext";
 import { RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";

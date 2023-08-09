@@ -282,7 +282,6 @@ export function SColl<T>(
 }
 
 export function STuple(...items: SigmaConstant[]) {
-  // return new SigmaConstant(descriptors.sigmaTuple, items);
   return new SigmaConstant(
     new STupleType(items.map((x) => x.type)),
     items.map((x) => x.value)

@@ -1,7 +1,7 @@
 import { first } from "@fleet-sdk/common";
+import { regularBoxesMock } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { DuplicateInputError, NotFoundError } from "../../errors";
-import { regularBoxesMock } from "../../tests/mocks/mockBoxes";
 import { InputsCollection } from "./inputsCollection";
 
 describe("inputs collection", () => {
