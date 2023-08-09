@@ -1,5 +1,5 @@
-import { SInt } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
+import { SInt } from "@fleet-sdk/serializer";
 import { HexString, Value, ValueObj } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import { compile, compilerDefaults, CompilerOptions, parseNamedConstantsMap } from "./compiler";

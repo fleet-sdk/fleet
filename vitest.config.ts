@@ -3,7 +3,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
-      "_test-vectors": "./packages/_test-vectors/src"
+      "_test-vectors": "./packages/_test-vectors/src",
+      packages: "./packages"
     }
   },
   test: {

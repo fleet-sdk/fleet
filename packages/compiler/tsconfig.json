@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "moduleResolution": "NodeNext",
-    "rootDir": "./src",
-    "outDir": "dist/cjs"
-  },
-  "include": ["src/**/*.ts"]
-}

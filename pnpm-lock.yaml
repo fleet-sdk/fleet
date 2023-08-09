@@ -75,12 +75,6 @@ importers:
         specifier: ^0.34.1
         version: 0.34.1
 
-  packages/_test-vectors:
-    devDependencies:
-      '@fleet-sdk/common':
-        specifier: workspace:^
-        version: link:../common
-
   packages/common: {}
 
   packages/compiler:
