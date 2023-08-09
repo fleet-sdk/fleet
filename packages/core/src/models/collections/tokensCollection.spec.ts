@@ -1,4 +1,4 @@
-import { manyTokensBoxesMock } from "_test-vectors";
+import { manyTokensBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
@@ -66,7 +66,7 @@ describe("Tokens collection", () => {
   });
 
   it("Should throw if too many tokens are batch added", () => {
-    const tokens = manyTokensBoxesMock.flatMap((x) => x.assets);
+    const tokens = manyTokensBoxes.flatMap((x) => x.assets);
 
     expect(() => {
       const collection = new TokensCollection();
@@ -76,7 +76,7 @@ describe("Tokens collection", () => {
   });
 
   it("Should throw if too many tokens are individually added", () => {
-    const tokens = manyTokensBoxesMock.flatMap((x) => x.assets);
+    const tokens = manyTokensBoxes.flatMap((x) => x.assets);
     const collection = new TokensCollection();
 
     expect(() => {

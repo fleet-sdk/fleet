@@ -1,10 +1,10 @@
-import { regularBoxesMock } from "_test-vectors";
+import { regularBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 
 describe("Construction", () => {
   it("Should construct from a vanilla object", () => {
-    for (const box of regularBoxesMock) {
+    for (const box of regularBoxes) {
       const input = new ErgoUnsignedInput(box);
 
       expect(input.boxId).toBe(box.boxId);
@@ -22,7 +22,7 @@ describe("Construction", () => {
 
 describe("Tweaking", () => {
   it("Should set extension", () => {
-    const input = new ErgoUnsignedInput(regularBoxesMock[0]);
+    const input = new ErgoUnsignedInput(regularBoxes[0]);
     input.setContextVars({ 0: "0402", 1: "0580c0fc82aa02" });
 
     expect(input.extension).toEqual({ 0: "0402", 1: "0580c0fc82aa02" });
@@ -31,7 +31,7 @@ describe("Tweaking", () => {
 
 describe("Unsigned input object conversion", () => {
   it("Should convert to default unsigned input object and set empty extension", () => {
-    for (const box of regularBoxesMock) {
+    for (const box of regularBoxes) {
       expect(new ErgoUnsignedInput(box).toUnsignedInputObject("default")).toEqual({
         boxId: box.boxId,
         extension: {}
@@ -40,7 +40,7 @@ describe("Unsigned input object conversion", () => {
   });
 
   it("Should convert to default unsigned input object and set map extension content", () => {
-    for (const box of regularBoxesMock) {
+    for (const box of regularBoxes) {
       expect(
         new ErgoUnsignedInput(box)
           .setContextVars({ 0: "0580c0fc82aa02" })
@@ -53,7 +53,7 @@ describe("Unsigned input object conversion", () => {
   });
 
   it("Should convert to EIP-12 unsigned input object and set map extension content", () => {
-    for (const box of regularBoxesMock) {
+    for (const box of regularBoxes) {
       expect(
         new ErgoUnsignedInput(box)
           .setContextVars({ 0: "0580c0fc82aa02" })
@@ -75,7 +75,7 @@ describe("Unsigned input object conversion", () => {
 
 describe("Unsigned data input object conversion", () => {
   it("Should convert to default data input object and set empty extension", () => {
-    for (const box of regularBoxesMock) {
+    for (const box of regularBoxes) {
       expect(new ErgoUnsignedInput(box).toPlainObject("default")).toEqual({
         boxId: box.boxId
       });
@@ -83,7 +83,7 @@ describe("Unsigned data input object conversion", () => {
   });
 
   it("Should ignore context vars", () => {
-    for (const box of regularBoxesMock) {
+    for (const box of regularBoxes) {
       expect(
         new ErgoUnsignedInput(box).setContextVars({ 0: "0580c0fc82aa02" }).toPlainObject("default")
       ).toEqual({
@@ -93,7 +93,7 @@ describe("Unsigned data input object conversion", () => {
   });
 
   it("Should convert to EIP-12 unsigned input object and ignore extension content", () => {
-    for (const box of regularBoxesMock) {
+    for (const box of regularBoxes) {
       expect(
         new ErgoUnsignedInput(box).setContextVars({ 0: "0580c0fc82aa02" }).toPlainObject("EIP-12")
       ).toEqual({

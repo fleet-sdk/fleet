@@ -1,6 +1,6 @@
 import { Box } from "@fleet-sdk/common";
 import { first, sumBy, utxoSum } from "@fleet-sdk/common";
-import { regularBoxesMock } from "_test-vectors";
+import { regularBoxes } from "_test-vectors";
 import { describe, expect, it, vi } from "vitest";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientInputs } from "../../errors/insufficientInputs";
@@ -10,8 +10,8 @@ import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 
 describe("Construction", () => {
   it("Should construct with an array of inputs", () => {
-    const selector = new BoxSelector(regularBoxesMock);
-    expect(selector.select({ nanoErgs: undefined })).toHaveLength(regularBoxesMock.length);
+    const selector = new BoxSelector(regularBoxes);
+    expect(selector.select({ nanoErgs: undefined })).toHaveLength(regularBoxes.length);
   });
 });
 
@@ -25,9 +25,9 @@ describe("Selection strategies", () => {
 
     const strategy = new CustomStrategy();
     const selectSpy = vi.spyOn(strategy, "select");
-    const selector = new BoxSelector(regularBoxesMock).defineStrategy(strategy);
+    const selector = new BoxSelector(regularBoxes).defineStrategy(strategy);
 
-    expect(selector.select({ nanoErgs: 0n })).toHaveLength(regularBoxesMock.length);
+    expect(selector.select({ nanoErgs: 0n })).toHaveLength(regularBoxes.length);
     expect(selectSpy).toBeCalled();
   });
 
@@ -36,14 +36,14 @@ describe("Selection strategies", () => {
       return inputs;
     });
 
-    const selector = new BoxSelector(regularBoxesMock).defineStrategy(mockSelectorFunction);
+    const selector = new BoxSelector(regularBoxes).defineStrategy(mockSelectorFunction);
 
-    expect(selector.select({ nanoErgs: 0n })).toHaveLength(regularBoxesMock.length);
+    expect(selector.select({ nanoErgs: 0n })).toHaveLength(regularBoxes.length);
     expect(mockSelectorFunction).toBeCalled();
   });
 
   it("Should fallback to a default selection strategy if nothing is specified", () => {
-    const selection = new BoxSelector(regularBoxesMock).select({ nanoErgs: 10000n });
+    const selection = new BoxSelector(regularBoxes).select({ nanoErgs: 10000n });
 
     expect(selection.length).toBe(1);
   });
@@ -51,7 +51,7 @@ describe("Selection strategies", () => {
 
 describe("Overall selection", () => {
   it("Should select all inputs with a given token if no target amount is specified - multiple tokenIds", () => {
-    const selector = new BoxSelector(regularBoxesMock);
+    const selector = new BoxSelector(regularBoxes);
 
     const boxes = selector.select({
       tokens: [
@@ -65,10 +65,10 @@ describe("Overall selection", () => {
   });
 
   it("Should select all inputs with nanoErgs if no target amount is specified", () => {
-    const selector = new BoxSelector(regularBoxesMock);
+    const selector = new BoxSelector(regularBoxes);
     const boxes = selector.select({ nanoErgs: undefined });
 
-    expect(boxes).toHaveLength(regularBoxesMock.length);
+    expect(boxes).toHaveLength(regularBoxes.length);
   });
 
   it("Should not change target object", () => {
@@ -82,7 +82,7 @@ describe("Overall selection", () => {
       ]
     };
 
-    new BoxSelector(regularBoxesMock).select(target);
+    new BoxSelector(regularBoxes).select(target);
 
     expect(target).toEqual({
       nanoErgs: SAFE_MIN_BOX_VALUE,
@@ -96,32 +96,30 @@ describe("Overall selection", () => {
 
 describe("Inputs sorting", () => {
   it("Should order inputs ascending by boxId", () => {
-    const nanoErgs = sumBy(regularBoxesMock, (x) => x.value);
-    const selection = new BoxSelector(regularBoxesMock)
-      .orderBy((x) => x.boxId)
-      .select({ nanoErgs });
+    const nanoErgs = sumBy(regularBoxes, (x) => x.value);
+    const selection = new BoxSelector(regularBoxes).orderBy((x) => x.boxId).select({ nanoErgs });
 
     expect(isAscending(selection.map((x) => x.boxId))).toBe(true);
-    expect(isAscending(regularBoxesMock.map((x) => x.boxId))).not.toBe(true);
-    expect(selection).toHaveLength(regularBoxesMock.length);
+    expect(isAscending(regularBoxes.map((x) => x.boxId))).not.toBe(true);
+    expect(selection).toHaveLength(regularBoxes.length);
   });
 
   it("Should order inputs descending by ergoTree", () => {
-    const nanoErgs = sumBy(regularBoxesMock, (x) => x.value);
-    const selection = new BoxSelector(regularBoxesMock)
+    const nanoErgs = sumBy(regularBoxes, (x) => x.value);
+    const selection = new BoxSelector(regularBoxes)
       .orderBy((x) => x.ergoTree, "desc")
       .select({ nanoErgs });
 
     expect(isDescending(selection.map((x) => x.ergoTree))).toBe(true);
-    expect(isDescending(regularBoxesMock.map((x) => x.ergoTree))).not.toBe(true);
-    expect(selection).toHaveLength(regularBoxesMock.length);
+    expect(isDescending(regularBoxes.map((x) => x.ergoTree))).not.toBe(true);
+    expect(selection).toHaveLength(regularBoxes.length);
   });
 
   it("Should not touch ordering if no orderBy is called", () => {
-    const nanoErgs = sumBy(regularBoxesMock, (x) => x.value);
-    const selection = new BoxSelector(regularBoxesMock).select({ nanoErgs });
+    const nanoErgs = sumBy(regularBoxes, (x) => x.value);
+    const selection = new BoxSelector(regularBoxes).select({ nanoErgs });
 
-    expect(selection).toStrictEqual(regularBoxesMock);
+    expect(selection).toStrictEqual(regularBoxes);
   });
 });
 
@@ -129,7 +127,7 @@ describe("Ensure input inclusion", () => {
   it("Should forcedly include inputs that attends to filter criteria", () => {
     const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
     const target = { nanoErgs: 10000n };
-    const selector = new BoxSelector(regularBoxesMock).ensureInclusion(
+    const selector = new BoxSelector(regularBoxes).ensureInclusion(
       (input) => input.boxId === arbitraryBoxId
     );
     const boxes = selector.select({ nanoErgs: 10000n });
@@ -141,7 +139,7 @@ describe("Ensure input inclusion", () => {
 
   it("Should forcedly include inputs by boxId", () => {
     const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
-    const selector = new BoxSelector(regularBoxesMock).ensureInclusion(arbitraryBoxId);
+    const selector = new BoxSelector(regularBoxes).ensureInclusion(arbitraryBoxId);
     const boxes = selector.select({ nanoErgs: 10000n });
 
     expect(boxes).toHaveLength(1);
@@ -149,14 +147,14 @@ describe("Ensure input inclusion", () => {
   });
 
   it("Should forcedly include all inputs", () => {
-    const selector = new BoxSelector(regularBoxesMock).ensureInclusion("all");
+    const selector = new BoxSelector(regularBoxes).ensureInclusion("all");
     const boxes = selector.select({ nanoErgs: 10000n });
 
-    expect(boxes).to.be.deep.equal(regularBoxesMock);
+    expect(boxes).to.be.deep.equal(regularBoxes);
   });
 
   it("Should forcedly include inputs by multiple boxId", () => {
-    const selector = new BoxSelector(regularBoxesMock).ensureInclusion([
+    const selector = new BoxSelector(regularBoxes).ensureInclusion([
       "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
       "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
     ]);
@@ -173,7 +171,7 @@ describe("Ensure input inclusion", () => {
     const boxId3 = "467b6867c6726cc5484be3cbddbf55c30c0a71594a20c1ac28d35b5049632444";
     const boxId4 = "a2c9821f5c2df9c320f17136f043b33f7716713ab74c84d687885f9dd39d2c8a";
 
-    const selector = new BoxSelector(regularBoxesMock)
+    const selector = new BoxSelector(regularBoxes)
       .ensureInclusion((box) => box.boxId === boxId1 || box.boxId === boxId3)
       .ensureInclusion([boxId1, boxId2, boxId1])
       .ensureInclusion(boxId4);
@@ -188,7 +186,7 @@ describe("Ensure input inclusion", () => {
   });
 
   it("Should forcedly include inputs by boxId and ignore duplicates", () => {
-    const selector = new BoxSelector(regularBoxesMock)
+    const selector = new BoxSelector(regularBoxes)
       .ensureInclusion("e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e")
       .ensureInclusion("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d")
       .ensureInclusion("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d");
@@ -204,7 +202,7 @@ describe("Ensure input inclusion", () => {
     const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
     const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
     const target = { nanoErgs: 10000n, tokens: [{ tokenId, amount: 100n }] };
-    const selector = new BoxSelector(regularBoxesMock).ensureInclusion(
+    const selector = new BoxSelector(regularBoxes).ensureInclusion(
       (input) => input.boxId === arbitraryBoxId
     );
     const boxes = selector.select(target);
@@ -218,7 +216,7 @@ describe("Ensure input inclusion", () => {
 
 describe("Validations", () => {
   it("Should fail if nanoErgs target is unreached", () => {
-    const selector = new BoxSelector(regularBoxesMock);
+    const selector = new BoxSelector(regularBoxes);
 
     expect(() => {
       selector.select({
@@ -229,7 +227,7 @@ describe("Validations", () => {
 
   it("Should fail if tokens target is unreached", () => {
     const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
-    const selector = new BoxSelector(regularBoxesMock);
+    const selector = new BoxSelector(regularBoxes);
 
     expect(() => {
       selector.select({
@@ -241,7 +239,7 @@ describe("Validations", () => {
 
   it("Should fail if any target is unreached", () => {
     const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
-    const selector = new BoxSelector(regularBoxesMock);
+    const selector = new BoxSelector(regularBoxes);
 
     expect(() => {
       selector.select({
@@ -252,7 +250,7 @@ describe("Validations", () => {
   });
 
   it("Should fail if selector duplicates any item", () => {
-    const selector = new BoxSelector(regularBoxesMock).defineStrategy((inputs) => {
+    const selector = new BoxSelector(regularBoxes).defineStrategy((inputs) => {
       return inputs.concat(inputs[0]); // duplicates the fist input;
     });
 
@@ -264,8 +262,8 @@ describe("Validations", () => {
 
 describe("Target builder", () => {
   it("Should sum all boxes values and create a target with no tokens", () => {
-    const target = BoxSelector.buildTargetFrom([first(regularBoxesMock)]);
-    expect(target).toEqual({ nanoErgs: first(regularBoxesMock).value, tokens: [] });
+    const target = BoxSelector.buildTargetFrom([first(regularBoxes)]);
+    expect(target).toEqual({ nanoErgs: first(regularBoxes).value, tokens: [] });
   });
 
   it("Should sum all boxes values and tokens", () => {

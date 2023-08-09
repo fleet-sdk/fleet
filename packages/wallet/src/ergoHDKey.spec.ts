@@ -3,9 +3,9 @@ import { base58check, hex } from "@fleet-sdk/crypto";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import SigmaRust from "ergo-lib-wasm-nodejs";
 import { describe, expect, it } from "vitest";
+import { keyAddressesTestVectors } from "./_test-vectors/keyVectors";
 import { ERGO_HD_CHANGE_PATH, ErgoHDKey } from "./ergoHDKey";
 import { generateMnemonic } from "./mnemonic";
-import { keyAddressesTestVectors } from "./tests/keyTestVectors";
 
 describe("Instantiation", () => {
   it("Should create from mnemonic and auto derive to ergo's default change path by default", async () => {

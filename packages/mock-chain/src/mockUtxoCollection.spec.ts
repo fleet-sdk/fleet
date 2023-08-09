@@ -1,8 +1,8 @@
 import { first } from "@fleet-sdk/common";
 import { DuplicateInputError, ErgoBox, NotFoundError } from "@fleet-sdk/core";
+import { regularBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { MockUTxOCollection } from "./mockUtxoCollection";
-import { regularBoxesMock } from "./tests/regularBoxesMock";
 
 describe("UTxO Collection", () => {
   it("Should create and empty collection", () => {
@@ -11,14 +11,14 @@ describe("UTxO Collection", () => {
   });
 
   it("Should create a filled collection", () => {
-    const collection = new MockUTxOCollection(regularBoxesMock);
-    expect(collection).toHaveLength(regularBoxesMock.length);
-    expect(collection.some((x) => x.boxId === regularBoxesMock[0].boxId));
+    const collection = new MockUTxOCollection(regularBoxes);
+    expect(collection).toHaveLength(regularBoxes.length);
+    expect(collection.some((x) => x.boxId === regularBoxes[0].boxId));
   });
 
   it("Should clear a collection", () => {
-    const collection = new MockUTxOCollection(regularBoxesMock);
-    expect(collection).toHaveLength(regularBoxesMock.length);
+    const collection = new MockUTxOCollection(regularBoxes);
+    expect(collection).toHaveLength(regularBoxes.length);
 
     collection.clear();
     expect(collection).to.have.length(0);
@@ -26,7 +26,7 @@ describe("UTxO Collection", () => {
 
   it("Should add a single item", () => {
     const collection = new MockUTxOCollection();
-    const box = first(regularBoxesMock);
+    const box = first(regularBoxes);
     collection.add(box);
 
     expect(collection).toHaveLength(1);
@@ -35,10 +35,10 @@ describe("UTxO Collection", () => {
 
   it("Should append items", () => {
     const collection = new MockUTxOCollection();
-    collection.add(regularBoxesMock);
+    collection.add(regularBoxes);
 
-    expect(collection).toHaveLength(regularBoxesMock.length);
-    expect(collection.toArray()).toEqual(regularBoxesMock);
+    expect(collection).toHaveLength(regularBoxes.length);
+    expect(collection.toArray()).toEqual(regularBoxes);
   });
 
   it("Should accept BoxCandidate and transform in a complete Box", () => {
@@ -69,33 +69,33 @@ describe("UTxO Collection", () => {
   });
 
   it("Should throw if box is already included", () => {
-    const collection = new MockUTxOCollection(regularBoxesMock);
+    const collection = new MockUTxOCollection(regularBoxes);
     expect(() => {
-      collection.add(first(regularBoxesMock));
+      collection.add(first(regularBoxes));
     }).toThrow(DuplicateInputError);
   });
 
   it("Should remove by boxId", () => {
-    const collection = new MockUTxOCollection(regularBoxesMock);
-    const boxId = first(regularBoxesMock).boxId;
+    const collection = new MockUTxOCollection(regularBoxes);
+    const boxId = first(regularBoxes).boxId;
     collection.remove(boxId);
 
-    expect(collection).toHaveLength(regularBoxesMock.length - 1);
+    expect(collection).toHaveLength(regularBoxes.length - 1);
     expect(collection.toArray().find((x) => x.boxId === boxId)).toBeFalsy();
   });
 
   it("Should remove by index", () => {
-    const collection = new MockUTxOCollection(regularBoxesMock);
-    const boxId = first(regularBoxesMock).boxId;
+    const collection = new MockUTxOCollection(regularBoxes);
+    const boxId = first(regularBoxes).boxId;
     collection.remove(0);
 
-    expect(collection).toHaveLength(regularBoxesMock.length - 1);
+    expect(collection).toHaveLength(regularBoxes.length - 1);
     expect(collection.toArray().find((x) => x.boxId === boxId)).toBeFalsy();
   });
 
   it("Should throw if not found", () => {
-    const collection = new MockUTxOCollection(first(regularBoxesMock));
-    const boxId = regularBoxesMock[1].boxId;
+    const collection = new MockUTxOCollection(first(regularBoxes));
+    const boxId = regularBoxes[1].boxId;
 
     expect(() => {
       collection.remove(boxId);
@@ -103,14 +103,14 @@ describe("UTxO Collection", () => {
   });
 
   it("Should throw if not found", () => {
-    const collection = new MockUTxOCollection(regularBoxesMock);
+    const collection = new MockUTxOCollection(regularBoxes);
 
     expect(() => {
       collection.remove(-1);
     }).toThrow(RangeError);
 
     expect(() => {
-      collection.remove(regularBoxesMock.length);
+      collection.remove(regularBoxes.length);
     }).toThrow(RangeError);
 
     expect(() => {

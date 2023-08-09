@@ -1,10 +1,10 @@
 import { fail } from "assert";
 import { ensureBigInt, first } from "@fleet-sdk/common";
 import { SByte, SColl, SConstant, SParse, TransactionBuilder } from "@fleet-sdk/core";
+import { regularBoxes } from "_test-vectors";
+import { babelBoxesMock } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { BabelSwapPlugin } from "./plugins";
-import { babelBoxesMock } from "./tests/babelBoxesMock";
-import { regularBoxesMock } from "./tests/regularBoxesMock";
 import { getTokenPrice, isValidBabelBox, isValidBabelContract } from "./utils";
 
 describe("Babel Swap Plugin", () => {
@@ -16,7 +16,7 @@ describe("Babel Swap Plugin", () => {
     const payingTokenAmount = 5n;
 
     const tx = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .extend(
         BabelSwapPlugin(babelBox, {
           tokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
@@ -50,11 +50,11 @@ describe("Babel Swap Plugin", () => {
   });
 
   it("Should fail if invalid babel box is added", () => {
-    const nonBabelBox = regularBoxesMock[1];
+    const nonBabelBox = regularBoxes[1];
 
     expect(() => {
       new TransactionBuilder(height)
-        .from(regularBoxesMock[0])
+        .from(regularBoxes[0])
         .extend(
           BabelSwapPlugin(nonBabelBox, {
             tokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
@@ -72,7 +72,7 @@ describe("Babel Swap Plugin", () => {
 
     expect(() => {
       new TransactionBuilder(height)
-        .from(regularBoxesMock)
+        .from(regularBoxes)
         .extend(
           BabelSwapPlugin(babelBox, {
             tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
@@ -90,7 +90,7 @@ describe("Babel Swap Plugin", () => {
 
     expect(() => {
       new TransactionBuilder(height)
-        .from(regularBoxesMock)
+        .from(regularBoxes)
         .extend(
           BabelSwapPlugin(babelBox, {
             tokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",

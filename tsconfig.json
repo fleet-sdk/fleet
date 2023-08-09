@@ -21,7 +21,7 @@
     "typeRoots": ["node_modules/@types"],
     "baseUrl": ".",
     "paths": {
-      "_test-vectors": ["./packages/_test-vectors/src/"],
+      "_test-vectors": ["./packages/_test-vectors/"],
       "packages": ["./packages/"]
     }
   },

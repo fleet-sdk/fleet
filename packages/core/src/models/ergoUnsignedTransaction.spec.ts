@@ -1,14 +1,14 @@
 import { serializeTransaction } from "@fleet-sdk/serializer";
-import { regularBoxesMock } from "_test-vectors";
+import { regularBoxes } from "_test-vectors";
+import { mockedUnsignedTransactions } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "../builder";
-import { mockTransactions } from "../tests/mocks/mockTransactions";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
 
 describe("ErgoUnsignedTransaction model", () => {
   it("Should generate the right transactionId", () => {
-    for (const tx of mockTransactions) {
+    for (const tx of mockedUnsignedTransactions) {
       const unsigned = new ErgoUnsignedTransaction(
         tx.inputs.map((input) => new ErgoUnsignedInput(input)),
         tx.dataInputs.map((dataInput) => new ErgoUnsignedInput(dataInput)),
@@ -27,7 +27,7 @@ describe("ErgoUnsignedTransaction model", () => {
   });
 
   it("Should serialize", () => {
-    for (const tx of mockTransactions) {
+    for (const tx of mockedUnsignedTransactions) {
       const unsigned = new ErgoUnsignedTransaction(
         tx.inputs.map((input) => new ErgoUnsignedInput(input)),
         tx.dataInputs.map((dataInput) => new ErgoUnsignedInput(dataInput)),
@@ -47,8 +47,8 @@ describe("ErgoUnsignedTransaction model", () => {
 
   it("Should convert to plain object", () => {
     const transaction = new TransactionBuilder(1)
-      .from(regularBoxesMock)
-      .withDataFrom(regularBoxesMock[0])
+      .from(regularBoxes)
+      .withDataFrom(regularBoxes[0])
       .to(
         new OutputBuilder(SAFE_MIN_BOX_VALUE, "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin")
       )
@@ -74,7 +74,7 @@ describe("ErgoUnsignedTransaction model", () => {
     ];
 
     const transaction = new TransactionBuilder(1)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .burnTokens(tokensToBurn)
       .payMinFee()
       .sendChangeTo("9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin")

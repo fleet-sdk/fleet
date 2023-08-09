@@ -1,4 +1,4 @@
-import { regularBoxesMock } from "_test-vectors";
+import { regularBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { hasDuplicatesBy, uniq } from "./array";
 import { isEmpty } from "./assertions";
@@ -14,7 +14,7 @@ import {
 
 describe("UTxO sum", () => {
   it("Should sum correctly by token id", () => {
-    const inputs = regularBoxesMock.filter((input) =>
+    const inputs = regularBoxes.filter((input) =>
       [
         "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d",
         "467b6867c6726cc5484be3cbddbf55c30c0a71594a20c1ac28d35b5049632444",
@@ -37,7 +37,7 @@ describe("UTxO sum", () => {
   });
 
   it("Should sum all tokens and nanoErgs", () => {
-    const boxes = regularBoxesMock.filter((input) =>
+    const boxes = regularBoxes.filter((input) =>
       [
         "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
         "a2c9821f5c2df9c320f17136f043b33f7716713ab74c84d687885f9dd39d2c8a",
@@ -62,7 +62,7 @@ describe("UTxO sum", () => {
   });
 
   it("Should sum only nanoErgs", () => {
-    const boxes = regularBoxesMock.filter((input) =>
+    const boxes = regularBoxes.filter((input) =>
       [
         "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
         "a2c9821f5c2df9c320f17136f043b33f7716713ab74c84d687885f9dd39d2c8a",
@@ -75,7 +75,7 @@ describe("UTxO sum", () => {
   });
 
   it("Should sum if box doesn't contains tokens", () => {
-    const boxes = regularBoxesMock.filter((input) =>
+    const boxes = regularBoxes.filter((input) =>
       [
         "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
         "30cb07d93f16f5b052e9f56c1b5dfb83db9ccaeb467dde064933afc23beb6f5f"
@@ -126,22 +126,22 @@ describe("utxoDiff()", () => {
   });
 
   it("Should calculate the difference between two box arrays", () => {
-    const boxes1 = regularBoxesMock;
-    const boxes2 = regularBoxesMock.slice(1);
+    const boxes1 = regularBoxes;
+    const boxes2 = regularBoxes.slice(1);
     const diff = utxoDiff(boxes1, boxes2);
 
-    expect(diff.nanoErgs).to.be.equal(regularBoxesMock[0].value);
-    expect(diff.tokens).to.be.deep.equal(regularBoxesMock[0].assets);
+    expect(diff.nanoErgs).to.be.equal(regularBoxes[0].value);
+    expect(diff.tokens).to.be.deep.equal(regularBoxes[0].assets);
   });
 
   it("Should calculate the difference between a box array and a summary", () => {
-    const summary = utxoSum(regularBoxesMock);
-    const boxes = regularBoxesMock.slice(0, -1);
+    const summary = utxoSum(regularBoxes);
+    const boxes = regularBoxes.slice(0, -1);
     const diff = utxoDiff(summary, boxes);
 
-    expect(diff.nanoErgs).to.be.equal(regularBoxesMock[5].value);
-    expect(diff.tokens).to.be.deep.equal(regularBoxesMock[5].assets);
-    expect(utxoDiff(regularBoxesMock, summary)).to.be.deep.equal({ nanoErgs: 0n, tokens: [] });
+    expect(diff.nanoErgs).to.be.equal(regularBoxes[5].value);
+    expect(diff.tokens).to.be.deep.equal(regularBoxes[5].assets);
+    expect(utxoDiff(regularBoxes, summary)).to.be.deep.equal({ nanoErgs: 0n, tokens: [] });
   });
 });
 
@@ -207,14 +207,14 @@ describe("Densely pack check - areRegistersDenselyPacked()", () => {
 
 describe("UTxO filter", () => {
   it("Should filter by max UTxO count", () => {
-    expect(utxoFilter(regularBoxesMock, { max: { count: 2 } })).to.has.length(2);
-    expect(utxoFilter(regularBoxesMock, { max: { count: regularBoxesMock.length } })).to.has.length(
-      regularBoxesMock.length
+    expect(utxoFilter(regularBoxes, { max: { count: 2 } })).to.has.length(2);
+    expect(utxoFilter(regularBoxes, { max: { count: regularBoxes.length } })).to.has.length(
+      regularBoxes.length
     );
   });
 
   it("Should filter by max distinct tokens count", () => {
-    const filtered = utxoFilter(regularBoxesMock, { max: { aggregatedDistinctTokens: 3 } });
+    const filtered = utxoFilter(regularBoxes, { max: { aggregatedDistinctTokens: 3 } });
 
     expect(filtered).to.have.length(5);
     expect(filtered.some((x) => isEmpty(x.assets))).to.be.true;
@@ -225,7 +225,7 @@ describe("UTxO filter", () => {
   });
 
   it("Should filter by predicate", () => {
-    const filtered = utxoFilter(regularBoxesMock, { by: (box) => isEmpty(box.assets) });
+    const filtered = utxoFilter(regularBoxes, { by: (box) => isEmpty(box.assets) });
 
     expect(filtered).to.have.length(2);
     expect(filtered.every((x) => isEmpty(x.assets))).to.be.true;
@@ -240,7 +240,7 @@ describe("UTxO filter", () => {
       }
     };
 
-    const filtered = utxoFilter(regularBoxesMock, filter);
+    const filtered = utxoFilter(regularBoxes, filter);
 
     expect(filtered).to.have.length(filter.max.count);
     expect(hasDuplicatesBy(filtered, (x) => x.boxId)).to.be.false;
@@ -250,7 +250,7 @@ describe("UTxO filter", () => {
   });
 
   it("Should filter by predicate, max distinct tokens and UTxO count", () => {
-    const filtered = utxoFilter(regularBoxesMock, {
+    const filtered = utxoFilter(regularBoxes, {
       by: (box) => box.value > 1000000n,
       max: {
         count: 10,
@@ -267,7 +267,7 @@ describe("UTxO filter", () => {
   });
 
   it("Should should return empty array for empty inputs and non-matching filters", () => {
-    expect(utxoFilter(regularBoxesMock, { by: (box) => box.value === 0n })).to.be.empty;
+    expect(utxoFilter(regularBoxes, { by: (box) => box.value === 0n })).to.be.empty;
     expect(utxoFilter([], { max: { count: 10 } })).to.be.empty;
   });
 });

@@ -1,4 +1,4 @@
-import { regularBoxesMock } from "_test-vectors";
+import { regularBoxes } from "_test-vectors";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NotAllowedTokenBurning } from "../errors";
 import { OutputBuilder } from "./outputBuilder";
@@ -19,25 +19,25 @@ describe("Plugin context", () => {
     const fromSpy = vi.spyOn(builder, "from");
     const configureSelectorMethod = vi.spyOn(builder, "configureSelector");
 
-    const newLen = context.addInputs(regularBoxesMock);
+    const newLen = context.addInputs(regularBoxes);
 
     expect(fromSpy).toBeCalledTimes(1);
     expect(configureSelectorMethod).toBeCalledTimes(1);
     expect(builder.inputs).toHaveLength(newLen);
-    expect(builder.inputs).toHaveLength(regularBoxesMock.length);
+    expect(builder.inputs).toHaveLength(regularBoxes.length);
   });
 
   it("Should add a single input", () => {
     const fromMethod = vi.spyOn(builder, "from");
     const configureSelectorMethod = vi.spyOn(builder, "configureSelector");
 
-    let newLen = context.addInputs(regularBoxesMock[0]);
+    let newLen = context.addInputs(regularBoxes[0]);
     expect(fromMethod).toBeCalledTimes(1);
     expect(configureSelectorMethod).toBeCalledTimes(1);
     expect(builder.inputs).toHaveLength(newLen);
     expect(builder.inputs).toHaveLength(1);
 
-    newLen = context.addInputs(regularBoxesMock[1]);
+    newLen = context.addInputs(regularBoxes[1]);
     expect(fromMethod).toBeCalledTimes(2);
     expect(configureSelectorMethod).toBeCalledTimes(2);
     expect(builder.inputs).toHaveLength(newLen);
@@ -47,11 +47,11 @@ describe("Plugin context", () => {
   it("Should add data inputs", () => {
     const withDataFromMethod = vi.spyOn(builder, "withDataFrom");
 
-    const newLen = context.addDataInputs(regularBoxesMock);
+    const newLen = context.addDataInputs(regularBoxes);
 
     expect(withDataFromMethod).toBeCalledTimes(1);
     expect(builder.dataInputs).toHaveLength(newLen);
-    expect(builder.dataInputs).toHaveLength(regularBoxesMock.length);
+    expect(builder.dataInputs).toHaveLength(regularBoxes.length);
   });
 
   it("Should add outputs", () => {
@@ -76,9 +76,7 @@ describe("Plugin context", () => {
   it("Should burn tokens, plugin context allowed", () => {
     const burnTokensMethod = vi.spyOn(builder, "burnTokens");
 
-    builder
-      .from(regularBoxesMock)
-      .configure((settings) => settings.allowTokenBurningFromPlugins(true));
+    builder.from(regularBoxes).configure((settings) => settings.allowTokenBurningFromPlugins(true));
 
     context.burnTokens([
       { tokenId: "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2", amount: 1n },
@@ -92,7 +90,7 @@ describe("Plugin context", () => {
   it("Should burn tokens, globally allowed", () => {
     const burnTokensMethod = vi.spyOn(builder, "burnTokens");
 
-    builder.from(regularBoxesMock).configure((settings) => settings.allowTokenBurning(true));
+    builder.from(regularBoxes).configure((settings) => settings.allowTokenBurning(true));
 
     context.burnTokens([
       { tokenId: "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2", amount: 1n },
@@ -106,7 +104,7 @@ describe("Plugin context", () => {
   it("Should fail if token burning is not allowed", () => {
     const burnTokensMethod = vi.spyOn(builder, "burnTokens");
 
-    builder.from(regularBoxesMock);
+    builder.from(regularBoxes);
 
     expect(() => {
       context.burnTokens([
@@ -123,7 +121,7 @@ describe("Plugin context", () => {
   });
 
   it("Should set fee amount", () => {
-    builder.from(regularBoxesMock);
+    builder.from(regularBoxes);
 
     const payFeeMethod = vi.spyOn(builder, "payFee");
     const fee = RECOMMENDED_MIN_FEE_VALUE * 3n;

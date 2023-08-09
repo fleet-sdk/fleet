@@ -1,5 +1,5 @@
 import { NonMandatoryRegisters } from "@fleet-sdk/common";
-import { regularBoxesMock } from "_test-vectors";
+import { regularBoxes } from "_test-vectors";
 import { beforeEach, describe, expect, it } from "vitest";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
@@ -330,7 +330,7 @@ describe("Building", () => {
         decimals: 4,
         description: "Description test"
       })
-      .build(regularBoxesMock);
+      .build(regularBoxes);
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
@@ -338,7 +338,7 @@ describe("Building", () => {
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
-        tokenId: regularBoxesMock[0].boxId, // should be the same as the first input
+        tokenId: regularBoxes[0].boxId, // should be the same as the first input
         amount: 100n
       }
     ]);
@@ -359,7 +359,7 @@ describe("Building", () => {
         amount: 100n,
         name: "TestToken"
       })
-      .build(regularBoxesMock);
+      .build(regularBoxes);
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
@@ -367,7 +367,7 @@ describe("Building", () => {
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
-        tokenId: regularBoxesMock[0].boxId, // should be the same as the first input
+        tokenId: regularBoxes[0].boxId, // should be the same as the first input
         amount: 100n
       },
       { tokenId: tokenA, amount: 15n },
@@ -385,7 +385,7 @@ describe("Building", () => {
       .mintToken({
         amount: 100n
       })
-      .build(regularBoxesMock);
+      .build(regularBoxes);
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
@@ -393,7 +393,7 @@ describe("Building", () => {
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
-        tokenId: regularBoxesMock[0].boxId, // should be the same as the first input
+        tokenId: regularBoxes[0].boxId, // should be the same as the first input
         amount: 100n
       }
     ]);
@@ -411,7 +411,7 @@ describe("Building", () => {
         name: "TestToken"
       })
       .setAdditionalRegisters({ R4: "0e00" })
-      .build(regularBoxesMock);
+      .build(regularBoxes);
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
@@ -419,7 +419,7 @@ describe("Building", () => {
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
-        tokenId: regularBoxesMock[0].boxId, // should be the same as the first input
+        tokenId: regularBoxes[0].boxId, // should be the same as the first input
         amount: 100n
       }
     ]);

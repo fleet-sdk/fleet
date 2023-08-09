@@ -12,7 +12,7 @@ import {
   shortVectors,
   sigmaPropVectors,
   tupleTestVectors
-} from "../_test-vectors/constants";
+} from "../_test-vectors/constantVectors";
 import { SConstant, SParse } from "./constantSerializer";
 import {
   SBigInt,
