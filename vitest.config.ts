@@ -9,6 +9,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    useAtomics: true,
     threads: false,
     coverage: {
       provider: "v8",
