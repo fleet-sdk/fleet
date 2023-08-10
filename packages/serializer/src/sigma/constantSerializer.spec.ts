@@ -82,8 +82,9 @@ describe("Primitive types serialization and parsing", () => {
 
 describe("Monomorphic types serialization and parsing", () => {
   it("Should serialize SUnit", () => {
-    expect(SConstant(SUnit())).toBe("62");
-    // todo: add SUnit deserialization (need to find the best matching type for scala's Unit)
+    const sUnitHex = "62";
+    expect(SConstant(SUnit())).toBe(sUnitHex);
+    expect(SParse(sUnitHex)).to.be.undefined;
   });
 });
 
@@ -121,22 +122,6 @@ describe("Not implemented types", () => {
     expect(() => {
       SParse("deadbeef");
     }).toThrow();
-  });
-});
-
-describe("SColl serialization", () => {
-  it("Should serialize 'Coll[SLong]'", () => {
-    const hex2 = SConstant(
-      SColl(SColl(SByte), [
-        hex.decode("4c657427732063656c656272617465204572676f526166666c652120"),
-        hex.decode("4c657427732063656c656272617465204572676f526166666c652120"),
-        hex.decode("e730bbae0463346f8ce72be23ab8391d1e7a58f48ed857fcf4ee9aecf6915307")
-      ])
-    );
-
-    expect(hex2).to.be.equal(
-      "1a031c4c657427732063656c656272617465204572676f526166666c6521201c4c657427732063656c656272617465204572676f526166666c65212020e730bbae0463346f8ce72be23ab8391d1e7a58f48ed857fcf4ee9aecf6915307"
-    );
   });
 });
 

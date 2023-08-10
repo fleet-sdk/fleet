@@ -139,6 +139,9 @@ export class DataSerializer {
         case sDescriptors.tuple.code: {
           return (type as STupleType).elementsType.map((t) => this.deserialize(t, reader));
         }
+        case sDescriptors.unit.code: {
+          return undefined;
+        }
       }
     }
 

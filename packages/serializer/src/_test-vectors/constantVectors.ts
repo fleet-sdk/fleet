@@ -162,7 +162,7 @@ function buildCollVectors<T>(
 }
 
 export const collVectors: GenericTypeTestVector[] = [
-  ...buildCollVectors("SColl[SBool]", SBool, [
+  ...buildCollVectors("[SBool]", SBool, [
     {
       hex: "0d0c010e",
       value: [true, false, false, false, false, false, false, false, false, true, true, true]
@@ -176,7 +176,7 @@ export const collVectors: GenericTypeTestVector[] = [
       value: [false, true, true, true, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false, false, true, true, false, true, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false, false, false, false] /* prettier-ignore */
     }
   ]),
-  ...buildCollVectors("SColl[SByte]", SByte, [
+  ...buildCollVectors("[SByte]", SByte, [
     { hex: "0e0a46656d616c6520233035", value: utf8.decode("Female #05") },
     { hex: "0e0130", value: utf8.decode("0") },
     { hex: "0e00", value: Uint8Array.from([]) },
@@ -189,7 +189,7 @@ export const collVectors: GenericTypeTestVector[] = [
       value: utf8.decode('{"721":{"ergoat-00346":{"index":346,"generation":1,"background":"Psycho","back_accessory":"Green Parrot","body":"Purple","clothes":"White ERGoat Shirt","mouth":"Gritted Teeth","eyes":"Angry Red","wield":"Spirit Gun","accessory":"Silver Medal","head":"Cowboy Hat","earring":"None"}}}') /* prettier-ignore */
     }
   ]),
-  ...buildCollVectors("SColl[SShort]", SShort, [
+  ...buildCollVectors("[SShort]", SShort, [
     { hex: "0f00", value: [] },
     { hex: "0f0102", value: [1] },
     { hex: "0f020000", value: [0, 0] },
@@ -226,7 +226,7 @@ export const collVectors: GenericTypeTestVector[] = [
       value: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] /* prettier-ignore */
     }
   ]),
-  ...buildCollVectors("SColl[SInt]", SInt, [
+  ...buildCollVectors("[SInt]", SInt, [
     { hex: "1000", value: [] },
     { hex: "100102", value: [1] },
     { hex: "10020000", value: [0, 0] },
@@ -256,7 +256,7 @@ export const collVectors: GenericTypeTestVector[] = [
       value: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] /* prettier-ignore */
     }
   ]),
-  ...buildCollVectors("SColl(SLong)", SLong, [
+  ...buildCollVectors("[SLong]", SLong, [
     { hex: "110100", value: [0n] },
     { hex: "110102", value: [1n] },
     { hex: "110124", value: [18n] },
@@ -264,6 +264,16 @@ export const collVectors: GenericTypeTestVector[] = [
     { hex: "11018081c3b5df03", value: [64346415168n] },
     { hex: "11018081f0e5dd60", value: [1661856514112n] },
     { hex: "110182d2ad9dce60", value: [1659767207041n] }
+  ]),
+  ...buildCollVectors("[[SByte]]", SColl(SByte), [
+    {
+      hex: "1a031c4c657427732063656c656272617465204572676f526166666c6521201c4c657427732063656c656272617465204572676f526166666c65212020e730bbae0463346f8ce72be23ab8391d1e7a58f48ed857fcf4ee9aecf6915307",
+      value: [
+        hex.decode("4c657427732063656c656272617465204572676f526166666c652120"),
+        hex.decode("4c657427732063656c656272617465204572676f526166666c652120"),
+        hex.decode("e730bbae0463346f8ce72be23ab8391d1e7a58f48ed857fcf4ee9aecf6915307")
+      ]
+    }
   ])
 ];
 

@@ -104,7 +104,7 @@ export class TypeSerializer {
         case ConstructorCode.NestedColl: {
           const internal = embdCode === 0 ? this.deserialize(r) : getEmbeddableType(embdCode);
 
-          return new SCollType(new SCollType(internal)); // { ctor: SCollType, wrapped: [{ ctor: SCollType, wrapped: [internal] }] };
+          return new SCollType(new SCollType(internal));
         }
         case ConstructorCode.PairOne: {
           const internal =
@@ -112,7 +112,7 @@ export class TypeSerializer {
               ? [this.deserialize(r), this.deserialize(r)] // Pair of non-primitive types (`((Int, Byte), (Boolean,Box))`, etc.)
               : [getEmbeddableType(embdCode), this.deserialize(r)]; // Pair of types where first is primitive (`(_, Int)`)
 
-          return new STupleType(internal); // { ctor: descriptors.sigmaTuple, wrapped: internal };
+          return new STupleType(internal);
         }
         case ConstructorCode.PairTwo: {
           const internal =
@@ -120,7 +120,7 @@ export class TypeSerializer {
               ? [this.deserialize(r), this.deserialize(r), this.deserialize(r)] // Triple of types
               : [this.deserialize(r), getEmbeddableType(embdCode)];
 
-          return new STupleType(internal); // { ctor: descriptors.sigmaTuple, wrapped: internal };
+          return new STupleType(internal);
         }
         case ConstructorCode.SymmetricPair: {
           const internal =
@@ -128,7 +128,7 @@ export class TypeSerializer {
               ? [this.deserialize(r), this.deserialize(r), this.deserialize(r), this.deserialize(r)] // Quadruple of types
               : [getEmbeddableType(embdCode), getEmbeddableType(embdCode)]; // Symmetric pair of primitive types (`(Int, Int)`, `(Byte,Byte)`, etc.)
 
-          return new STupleType(internal); // { ctor: descriptors.sigmaTuple, wrapped };
+          return new STupleType(internal);
         }
       }
     } else {
@@ -140,11 +140,11 @@ export class TypeSerializer {
             wrapped[i] = this.deserialize(r);
           }
 
-          return new STupleType(wrapped); // { ctor: descriptors.sigmaTuple, wrapped };
+          return new STupleType(wrapped);
         }
-        // case SUnitType.code: {
-        //   return SUnitType;
-        // }
+        case sDescriptors.unit.code: {
+          return sDescriptors.unit;
+        }
       }
     }
 
