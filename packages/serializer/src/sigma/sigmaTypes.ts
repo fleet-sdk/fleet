@@ -1,25 +1,24 @@
 import { ensureBigInt, isDefined } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 
-export const enum ConstructorCode {
-  Embeddable = 0,
+export const constructorCode = Object.freeze({
+  embeddable: 0,
 
-  SimpleColl = 1,
-  NestedColl = 2,
+  simpleColl: 1,
+  nestedColl: 2,
 
-  Option = 3,
-  OptionCollection = 4,
+  option: 3,
+  optionCollection: 4,
 
-  PairOne = 5,
-  PairTwo = 6,
-  SymmetricPair = 7,
-  GenericTuple = 8
-}
+  pairOne: 5,
+  pairTwo: 6,
+  symmetricPair: 7,
+  genericTuple: 8
+});
 
 const MAX_PRIMITIVE_TYPE_CODE = 0x0b;
 export const PRIMITIVE_TYPE_RANGE = MAX_PRIMITIVE_TYPE_CODE + 0x01;
-
-const typeCodeOf = (constructor: ConstructorCode) => PRIMITIVE_TYPE_RANGE * constructor;
+const typeCodeOf = (constructor: number) => PRIMITIVE_TYPE_RANGE * constructor;
 
 export abstract class SType {
   abstract get code(): number;
@@ -126,31 +125,36 @@ type ByteInput = Uint8Array | string;
 const noCoercion = <T>(input: T) => input;
 const ensureBytes = (input: ByteInput) => (typeof input === "string" ? hex.decode(input) : input);
 
+export function isColl(type: SType): type is SCollType {
+  return (
+    type.code >= sDescriptors.coll.simpleCollTypeCode &&
+    type.code <= sDescriptors.coll.nestedCollTypeCode + MAX_PRIMITIVE_TYPE_CODE
+  );
+}
+
+export function isTuple(type: SType): type is STupleType<SType> {
+  return (
+    type.code >= sDescriptors.tuple.pairOneTypeCode &&
+    type.code <= sDescriptors.tuple.genericTupleTypeCode
+  );
+}
+
 const sCollDescriptor = Object.freeze({
-  code: typeCodeOf(ConstructorCode.SimpleColl),
-  simpleCollTypeCode: typeCodeOf(ConstructorCode.SimpleColl),
-  nestedCollTypeCode: typeCodeOf(ConstructorCode.NestedColl),
-  embeddable: false,
-  isConstructorOf(typeCode: number): boolean {
-    return (
-      typeCode >= sDescriptors.coll.simpleCollTypeCode &&
-      typeCode <= sDescriptors.coll.nestedCollTypeCode + MAX_PRIMITIVE_TYPE_CODE
-    );
-  }
+  code: typeCodeOf(constructorCode.simpleColl),
+  simpleCollTypeCode: typeCodeOf(constructorCode.simpleColl),
+  nestedCollTypeCode: typeCodeOf(constructorCode.nestedColl),
+  embeddable: false
 }) satisfies SType;
 
 const sTupleDescriptor = Object.freeze({
-  code: typeCodeOf(ConstructorCode.PairOne),
-  pairOneTypeCode: typeCodeOf(ConstructorCode.PairOne),
-  pairTwoTypeCode: typeCodeOf(ConstructorCode.PairTwo),
-  tripleTypeCode: typeCodeOf(ConstructorCode.PairTwo),
-  symmetricPairTypeCode: typeCodeOf(ConstructorCode.SymmetricPair),
-  quadrupleTypeCode: typeCodeOf(ConstructorCode.SymmetricPair),
-  genericTupleTypeCode: typeCodeOf(ConstructorCode.GenericTuple),
-  embeddable: false,
-  isConstructorOf(typeCode: number) {
-    return typeCode >= this.pairOneTypeCode && typeCode <= this.genericTupleTypeCode;
-  }
+  code: typeCodeOf(constructorCode.pairOne),
+  pairOneTypeCode: typeCodeOf(constructorCode.pairOne),
+  pairTwoTypeCode: typeCodeOf(constructorCode.pairTwo),
+  tripleTypeCode: typeCodeOf(constructorCode.pairTwo),
+  symmetricPairTypeCode: typeCodeOf(constructorCode.symmetricPair),
+  quadrupleTypeCode: typeCodeOf(constructorCode.symmetricPair),
+  genericTupleTypeCode: typeCodeOf(constructorCode.genericTuple),
+  embeddable: false
 }) satisfies SType;
 
 export const sDescriptors = {

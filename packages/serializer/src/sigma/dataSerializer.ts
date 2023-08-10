@@ -1,51 +1,49 @@
 import { assert } from "@fleet-sdk/common";
-import { isColl, isPrimitiveType, isTuple } from "./assertions";
 import { SigmaReader } from "./sigmaReader";
-import { SCollType, sDescriptors, SigmaConstant, STupleType, SType } from "./sigmaTypes";
+import {
+  isColl,
+  isTuple,
+  SCollType,
+  sDescriptors,
+  SigmaConstant,
+  STupleType,
+  SType
+} from "./sigmaTypes";
 import { SigmaWriter } from "./sigmaWriter";
 
 const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
 
 export class DataSerializer {
-  public static serialize(data: unknown, type: SType, writer: SigmaWriter) {
+  public static serialize(data: unknown, type: SType, writer: SigmaWriter): SigmaWriter {
     if (type.embeddable) {
       switch (type.code) {
         case sDescriptors.bool.code:
-          writer.writeBoolean(data as boolean);
-          break;
+          return writer.writeBoolean(data as boolean);
         case sDescriptors.byte.code:
-          writer.write(data as number);
-          break;
+          return writer.write(data as number);
         case sDescriptors.short.code:
-          writer.writeShort(data as number);
-          break;
+          return writer.writeShort(data as number);
         case sDescriptors.int.code:
-          writer.writeInt(data as number);
-          break;
+          return writer.writeInt(data as number);
         case sDescriptors.long.code:
-          writer.writeLong(data as bigint);
-          break;
+          return writer.writeLong(data as bigint);
         case sDescriptors.bigInt.code: {
-          writer.writeBigInt(data as bigint);
-          break;
+          return writer.writeBigInt(data as bigint);
         }
         case sDescriptors.groupElement.code:
-          writer.writeBytes(data as Uint8Array);
-          break;
+          return writer.writeBytes(data as Uint8Array);
         case sDescriptors.sigmaProp.code: {
           const node = data as SigmaConstant<SigmaConstant<Uint8Array>>;
 
           if (node.type === sDescriptors.groupElement) {
             writer.write(PROVE_DLOG_OP);
-            DataSerializer.serialize(node.value, node.type, writer);
+
+            return DataSerializer.serialize(node.value, node.type, writer);
           } else {
-            throw Error("Not implemented");
+            throw Error("Serialization error: SigmaProp operation not implemented.");
           }
-          break;
         }
-        default:
-          throw Error("Not implemented");
       }
     } else if (isColl(type)) {
       if (type.elementsType.code === sDescriptors.byte.code) {
@@ -59,17 +57,17 @@ export class DataSerializer {
 
       switch (type.elementsType.code) {
         case sDescriptors.bool.code: {
-          writer.writeBits(data as boolean[]);
-          break;
+          return writer.writeBits(data as boolean[]);
         }
         case sDescriptors.byte.code: {
-          writer.writeBytes(data as Uint8Array);
-          break;
+          return writer.writeBytes(data as Uint8Array);
         }
         default: {
           for (let i = 0; i < data.length; i++) {
             DataSerializer.serialize(data[i], type.elementsType, writer);
           }
+
+          return writer;
         }
       }
     } else if (isTuple(type)) {
@@ -80,16 +78,19 @@ export class DataSerializer {
 
       const len = type.elementsType.length;
       for (let i = 0; i < len; i++) {
-        // new SigmaConstant(data.type.internalType[i], data.value[i]),
         DataSerializer.serialize(data[i], type.elementsType[i], writer);
       }
-    } else if (type.code !== sDescriptors.unit.code) {
-      throw Error("Not implemented");
+
+      return writer;
+    } else if (type.code === sDescriptors.unit.code) {
+      return writer;
     }
+
+    throw Error(`Serialization error: '0x${type.code}' type not implemented.`);
   }
 
   static deserialize(type: SType, reader: SigmaReader): unknown {
-    if (isPrimitiveType(type)) {
+    if (type.embeddable) {
       switch (type.code) {
         case sDescriptors.bool.code:
           return reader.readBoolean();
@@ -112,8 +113,6 @@ export class DataSerializer {
 
           break;
         }
-        default:
-          break;
       }
     } else {
       switch (type.code) {
@@ -145,6 +144,6 @@ export class DataSerializer {
       }
     }
 
-    throw new Error("Parsing error: type not implemented.");
+    throw new Error(`Parsing error: '0x${type.code}' type not implemented.`);
   }
 }

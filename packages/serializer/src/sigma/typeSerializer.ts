@@ -1,8 +1,9 @@
 import { assert, first, last } from "@fleet-sdk/common";
-import { isColl, isTuple } from "./assertions";
 import { SigmaReader } from "./sigmaReader";
 import {
-  ConstructorCode,
+  constructorCode,
+  isColl,
+  isTuple,
   PRIMITIVE_TYPE_RANGE,
   SCollType,
   sDescriptors,
@@ -93,20 +94,20 @@ export class TypeSerializer {
       const embdCode = Math.floor(byte % PRIMITIVE_TYPE_RANGE);
 
       switch (ctorCode) {
-        case ConstructorCode.Embeddable: {
+        case constructorCode.embeddable: {
           return getEmbeddableType(embdCode);
         }
-        case ConstructorCode.SimpleColl: {
+        case constructorCode.simpleColl: {
           const internal = embdCode === 0 ? this.deserialize(r) : getEmbeddableType(embdCode);
 
           return new SCollType(internal);
         }
-        case ConstructorCode.NestedColl: {
+        case constructorCode.nestedColl: {
           const internal = embdCode === 0 ? this.deserialize(r) : getEmbeddableType(embdCode);
 
           return new SCollType(new SCollType(internal));
         }
-        case ConstructorCode.PairOne: {
+        case constructorCode.pairOne: {
           const internal =
             embdCode === 0
               ? [this.deserialize(r), this.deserialize(r)] // Pair of non-primitive types (`((Int, Byte), (Boolean,Box))`, etc.)
@@ -114,7 +115,7 @@ export class TypeSerializer {
 
           return new STupleType(internal);
         }
-        case ConstructorCode.PairTwo: {
+        case constructorCode.pairTwo: {
           const internal =
             embdCode === 0
               ? [this.deserialize(r), this.deserialize(r), this.deserialize(r)] // Triple of types
@@ -122,7 +123,7 @@ export class TypeSerializer {
 
           return new STupleType(internal);
         }
-        case ConstructorCode.SymmetricPair: {
+        case constructorCode.symmetricPair: {
           const internal =
             embdCode === 0
               ? [this.deserialize(r), this.deserialize(r), this.deserialize(r), this.deserialize(r)] // Quadruple of types
@@ -169,7 +170,8 @@ function getEmbeddableType(typeCode: number) {
     case sDescriptors.groupElement.code:
       return sDescriptors.groupElement;
     case sDescriptors.sigmaProp.code:
-    default:
       return sDescriptors.sigmaProp;
+    default:
+      throw new Error(`The type code '0x${typeCode}' is not a valid primitive type code.`);
   }
 }
