@@ -31,7 +31,7 @@ export class TypeSerializer {
         }
       } else {
         writer.write(sDescriptors.coll.simpleCollTypeCode);
-        this.serialize(type, writer);
+        this.serialize(type.elementsType, writer);
       }
     } else if (isTuple(type)) {
       switch (type.elementsType.length) {
@@ -103,9 +103,7 @@ export class TypeSerializer {
           return new SCollType(internal);
         }
         case constructorCode.nestedColl: {
-          const internal = embdCode === 0 ? this.deserialize(r) : getEmbeddableType(embdCode);
-
-          return new SCollType(new SCollType(internal));
+          return new SCollType(new SCollType(getEmbeddableType(embdCode)));
         }
         case constructorCode.pairOne: {
           const internal =

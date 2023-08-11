@@ -8,6 +8,7 @@ import {
   SigmaConstant,
   SInt,
   SLong,
+  SPair,
   SShort,
   STuple
 } from "../sigma";
@@ -51,17 +52,18 @@ export const intVectors: ConstantTestVector<number>[] = [
   { hex: "04808023", value: 286720 }
 ];
 
-export const longVectors: ConstantTestVector<bigint | number>[] = [
+export const longVectors: ConstantTestVector<bigint | number | string>[] = [
   { hex: "0500", value: 0n },
   { hex: "0500", value: 0 },
   { hex: "0501", value: -1n },
   { hex: "0502", value: 1n },
   { hex: "0503", value: -2n },
   { hex: "0513", value: -10n },
-  { hex: "05800f", value: 960n },
+  { hex: "05800f", value: 960 },
   { hex: "05800f", value: 960 },
   { hex: "05807d", value: 8000n },
   { hex: "05808084af5f", value: 12800000000n },
+  { hex: "05808084af5f", value: "12800000000" },
   { hex: "05808087a70e", value: 1920000000n },
   { hex: "05808087a70e", value: 1920000000 },
   { hex: "058080808ae213", value: 339581337600n },
@@ -274,37 +276,104 @@ export const collVectors: GenericTypeTestVector[] = [
         hex.decode("e730bbae0463346f8ce72be23ab8391d1e7a58f48ed857fcf4ee9aecf6915307")
       ]
     }
+  ]),
+  ...buildCollVectors("[[[[SByte]]]]", SColl(SColl(SColl(SByte))), [
+    { hex: "0c0c1a00", value: [] },
+    { hex: "0c0c1a0101010201ff", value: [[[Uint8Array.from([0x01, 0xff])]]] }
+  ]),
+  ...buildCollVectors("[(SInt, SLong)]", SPair(SInt, SLong), [
+    {
+      hex: "0c400504b40180febe81027880d4d4ab015a80bfdf80013c80aaea55",
+      value: [
+        [90, 270000000n],
+        [60, 180000000n],
+        [45, 135000000n],
+        [30, 90000000n]
+      ]
+    }
+  ]),
+  ...buildCollVectors("Coll[(Coll[SByte], SInt)]", SPair(SColl(SByte), SInt), [
+    {
+      hex: "0c4c0e01240008cd0302122c332fd4e3c901f045ac18f559dcecf8dc61f6f94fbb34d0c7c3aac71fb714",
+      value: [
+        [hex.decode("0008cd0302122c332fd4e3c901f045ac18f559dcecf8dc61f6f94fbb34d0c7c3aac71fb7"), 10]
+      ]
+    },
+    {
+      hex: "0c4c0e03240008cd026d9d81d27185efa93c148f700839183a882aae3a4de1f984faff69eeed37202706240008cd026dd353119c75189796b3fb01c60289399f5fa2e7e115f4d8e3ffcc0a4ba5326906240008cd0287352ce40ff53154c5b3751a661908d3ca99edbb198e7ebb63d1d00e580f2efd06",
+      value: [
+        [hex.decode("0008cd026d9d81d27185efa93c148f700839183a882aae3a4de1f984faff69eeed372027"), 3],
+        [hex.decode("0008cd026dd353119c75189796b3fb01c60289399f5fa2e7e115f4d8e3ffcc0a4ba53269"), 3],
+        [hex.decode("0008cd0287352ce40ff53154c5b3751a661908d3ca99edbb198e7ebb63d1d00e580f2efd"), 3]
+      ]
+    },
+    {
+      hex: "0c4c0e01240008cd0315a5d99a010bf189b1abae2d9f21be6f3438803aca1e6aac739fbee31150d62700",
+      value: [
+        [hex.decode("0008cd0315a5d99a010bf189b1abae2d9f21be6f3438803aca1e6aac739fbee31150d627"), 0]
+      ]
+    }
+  ]),
+  ...buildCollVectors("Coll[(Coll[SByte], SInt)]", SPair(SColl(SByte), SColl(SByte)), [
+    {
+      hex: "0c3c0e0e02240008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf573339694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443240008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59333967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a",
+      value: [
+        [
+          hex.decode("0008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf57"),
+          hex.decode("39694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443") /* prettier-ignore */
+        ],
+        [
+          hex.decode("0008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59"),
+          hex.decode("3967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a") /* prettier-ignore */
+        ]
+      ]
+    }
+  ]),
+  ...buildCollVectors("Coll[Coll[(Int, Int)]]", SColl(SPair(SInt, SInt)), [
+    {
+      hex: "0c0c580202020406080208060402",
+      value: [
+        [
+          [1, 2],
+          [3, 4]
+        ],
+        [
+          [4, 3],
+          [2, 1]
+        ]
+      ]
+    }
   ])
 ];
 
 export const tupleTestVectors: GenericTypeTestVector[] = [
   {
     name: "(SInt, SInt)",
-    sconst: STuple(SInt(2), SInt(2)),
+    sconst: SPair(SInt(2), SInt(2)),
     value: [2, 2],
     hex: "580404"
   },
   {
     name: "(SInt, SLong)",
-    sconst: STuple(SInt(0), SLong(1)),
+    sconst: SPair(SInt(0), SLong(1)),
     value: [0, 1n],
     hex: "40050002"
   },
   {
     name: "(SInt, SByte)",
-    sconst: STuple(SInt(7), SByte(1)),
+    sconst: SPair(SInt(7), SByte(1)),
     value: [7, 1],
     hex: "40020e01"
   },
   {
     name: "(SInt, [SByte])",
-    sconst: STuple(SInt(1), SColl(SByte, hex.decode("0a0c"))),
+    sconst: SPair(SInt(1), SColl(SByte, hex.decode("0a0c"))),
     value: [1, Uint8Array.from([10, 12])],
     hex: "400e02020a0c"
   },
   {
     name: "([SByte], [SByte])",
-    sconst: STuple(
+    sconst: SPair(
       SColl(SByte, hex.decode("505250")),
       SColl(SByte, hex.decode("596f7572206c6f616e204a616e75617279"))
     ),
@@ -319,7 +388,7 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
   },
   {
     name: "([SByte], SGroupElement)",
-    sconst: STuple(
+    sconst: SPair(
       SColl(SByte, hex.decode("8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006")),
       SGroupElement(
         hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
@@ -330,5 +399,75 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
       hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
     ],
     hex: "4f0e208743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607"
+  },
+  {
+    name: "([([Byte], [Byte])], ([([Byte], (Int, Int))], [([Byte], (Int, Int))]))",
+    sconst: SPair(
+      SColl(SPair(SColl(SByte), SColl(SByte)), [
+        [Uint8Array.from([1, 2, 3]), Uint8Array.from([4, 5, 6])]
+      ]),
+      SPair(
+        SColl(SPair(SColl(SByte), SPair(SInt, SInt)), [[Uint8Array.from([1, 2, 3]), [10, 11]]]),
+        SColl(SPair(SColl(SByte), SPair(SInt, SInt)), [[Uint8Array.from([4, 5, 6]), [12, 13]]])
+      )
+    ),
+    value: [
+      [[Uint8Array.from([1, 2, 3]), Uint8Array.from([4, 5, 6])]],
+      [[[Uint8Array.from([1, 2, 3]), [10, 11]]], [[Uint8Array.from([4, 5, 6]), [12, 13]]]]
+    ],
+    hex: "3c0c3c0e0e3c0c3c0e580c3c0e58010301020303040506010301020314160103040506181a"
+  },
+  {
+    name: "([([Byte], [Byte])], ([([Byte], (Int, Int))], [([Byte], (Int, Int))]))",
+    sconst: SPair(
+      SColl(SPair(SColl(SByte), SColl(SByte)), [
+        [
+          Uint8Array.from([98, 97, 99, 107, 103, 114, 111, 117, 110, 100]),
+          Uint8Array.from([98, 108, 117, 101])
+        ],
+        [Uint8Array.from([112, 117, 110, 107, 115]), Uint8Array.from([97, 112, 101])],
+        [
+          Uint8Array.from([98, 101, 97, 114, 100]),
+          Uint8Array.from([98, 105, 103, 32, 98, 101, 97, 114, 100])
+        ],
+        [
+          Uint8Array.from([109, 111, 117, 116, 104]),
+          Uint8Array.from([109, 111, 100, 101, 115, 116])
+        ],
+        [Uint8Array.from([103, 108, 97, 115, 115, 101, 115]), Uint8Array.from([118, 114])],
+        [
+          Uint8Array.from([116, 111, 112]),
+          Uint8Array.from([112, 101, 97, 107, 32, 115, 112, 105, 107, 101])
+        ]
+      ]),
+      SPair(
+        SColl(SPair(SColl(SByte), SPair(SInt, SInt)), []),
+        SColl(SPair(SColl(SByte), SPair(SInt, SInt)), [])
+      )
+    ),
+    value: [
+      [
+        [
+          Uint8Array.from([98, 97, 99, 107, 103, 114, 111, 117, 110, 100]),
+          Uint8Array.from([98, 108, 117, 101])
+        ],
+        [Uint8Array.from([112, 117, 110, 107, 115]), Uint8Array.from([97, 112, 101])],
+        [
+          Uint8Array.from([98, 101, 97, 114, 100]),
+          Uint8Array.from([98, 105, 103, 32, 98, 101, 97, 114, 100])
+        ],
+        [
+          Uint8Array.from([109, 111, 117, 116, 104]),
+          Uint8Array.from([109, 111, 100, 101, 115, 116])
+        ],
+        [Uint8Array.from([103, 108, 97, 115, 115, 101, 115]), Uint8Array.from([118, 114])],
+        [
+          Uint8Array.from([116, 111, 112]),
+          Uint8Array.from([112, 101, 97, 107, 32, 115, 112, 105, 107, 101])
+        ]
+      ],
+      [[], []]
+    ],
+    hex: "3c0c3c0e0e3c0c3c0e580c3c0e58060a6261636b67726f756e6404626c75650570756e6b730361706505626561726409626967206265617264056d6f757468066d6f6465737407676c617373657302767203746f700a7065616b207370696b650000"
   }
 ];

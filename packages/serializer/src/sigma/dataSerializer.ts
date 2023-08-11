@@ -54,7 +54,6 @@ export class DataSerializer {
       }
 
       writer.writeVLQ(data.length);
-
       switch (type.elementsType.code) {
         case sDescriptors.bool.code: {
           return writer.writeBits(data as boolean[]);

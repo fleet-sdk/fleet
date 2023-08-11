@@ -265,25 +265,23 @@ type SCollConstant<T> = SigmaConstant<ArrayLike<T>>;
 export function SColl<T>(type: SConstructor<T>): SConstructor<ArrayLike<T>>;
 export function SColl<T>(
   type: SConstructor<T>,
-  items?: ArrayLike<T> | Uint8Array
+  elements?: ArrayLike<T> | Uint8Array
 ): SCollConstant<T>;
 export function SColl<T>(
   type: SConstructor<T>,
-  items?: ArrayLike<T> | Uint8Array
+  elements?: ArrayLike<T> | Uint8Array
 ): SCollConstant<T> | SConstructor<ArrayLike<T>> {
   const elementsType = type();
-  if (!items) {
-    return () => new SCollType(elementsType);
+  if (!elements) return () => new SCollType(elementsType);
+
+  if (elementsType.code === sDescriptors.byte.code && !(elements instanceof Uint8Array)) {
+    elements = Uint8Array.from(elements as ArrayLike<number>);
   }
 
-  if (elementsType.code === sDescriptors.byte.code) {
-    if (!(items instanceof Uint8Array)) {
-      items = Uint8Array.from(items as ArrayLike<number>);
-    }
-  }
-
-  return new SigmaConstant(new SCollType(elementsType), items as ArrayLike<T>);
+  return new SigmaConstant(new SCollType(elementsType), elements as ArrayLike<T>);
 }
+
+type STupleConstant<T> = SigmaConstant<T, STupleType>;
 
 export function STuple(...items: SigmaConstant[]) {
   return new SigmaConstant(
@@ -291,6 +289,26 @@ export function STuple(...items: SigmaConstant[]) {
     items.map((x) => x.value)
   );
 }
+
+export function SPair<L, R>(
+  left: SigmaConstant<L>,
+  right: SigmaConstant<R>
+): STupleConstant<[L, R]>;
+export function SPair<L, R>(left: SConstructor<L>, right: SConstructor<R>): SConstructor<[L, R]>;
+export function SPair<L, R>(
+  left: SigmaConstant<L> | SConstructor<L>,
+  right: SigmaConstant<R> | SConstructor<R>
+): STupleConstant<[L, R]> | SConstructor<[L, R]> {
+  if (typeof left === "function") {
+    return () => new STupleType([left(), (right as SConstructor<R>)()]);
+  } else {
+    return STuple(left, right as SigmaConstant<R>) as STupleConstant<[L, R]>;
+  }
+}
+
+// STuple(SInt(1), SBool(false)).value;
+
+// type STupleConstant<T> = SigmaConstant<ArrayLike<T>>;
 
 // export function SPair<L extends SigmaConstant, R extends SigmaConstant>(
 //   left: L,
