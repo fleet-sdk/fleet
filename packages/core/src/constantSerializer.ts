@@ -5,8 +5,6 @@ import {
   SBool,
   SByte,
   SCollType,
-  SConstant as serializerConstant,
-  SParse as serializerParse,
   SColl as serializerSColl,
   SGroupElement,
   SigmaConstant,
@@ -22,18 +20,22 @@ import {
  * @deprecated Use {@link @fleet-sdk/serializer} instead.
  * This function will be removed from core package in v1.0.0.
  */
-export function SConstant(content: SigmaConstant): HexString {
-  return serializerConstant(content);
+export function SConstant(constant: SigmaConstant): HexString {
+  return constant.toHex();
 }
 
 /**
  * @deprecated Use {@link @fleet-sdk/serializer} instead.
  * This function will be removed from core package in v1.0.0.
  */
-export function SParse<T>(content: HexString | Uint8Array): T {
-  return serializerParse(content);
+export function SParse<T>(bytes: HexString | Uint8Array): T {
+  return SigmaConstant.from<T>(bytes).data;
 }
 
+/**
+ * @deprecated Use {@link @fleet-sdk/serializer} instead.
+ * This function will be removed from core package in v1.0.0.
+ */
 function SColl<T>(type: () => SType, elements: ArrayLike<T> | Uint8Array) {
   if (typeof elements === "string") {
     elements = hex.decode(elements);
@@ -43,16 +45,16 @@ function SColl<T>(type: () => SType, elements: ArrayLike<T> | Uint8Array) {
 }
 
 export {
-  /** @deprecated */ SBigInt,
-  /** @deprecated */ SBool,
-  /** @deprecated */ SByte,
-  /** @deprecated */ SCollType,
-  /** @deprecated */ SColl,
-  /** @deprecated */ SGroupElement,
-  /** @deprecated */ SInt,
-  /** @deprecated */ SLong,
-  /** @deprecated */ SShort,
-  /** @deprecated */ SSigmaProp,
-  /** @deprecated */ SType,
-  /** @deprecated */ SUnit
+  SBigInt,
+  SBool,
+  SByte,
+  SCollType,
+  SColl,
+  SGroupElement,
+  SInt,
+  SLong,
+  SShort,
+  SSigmaProp,
+  SType,
+  SUnit
 };

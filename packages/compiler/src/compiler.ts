@@ -1,5 +1,5 @@
 import { assert, ensureDefaults, ergoTreeHeaderFlags, isEmpty, isHex } from "@fleet-sdk/common";
-import { SConstant, SigmaConstant } from "@fleet-sdk/serializer";
+import { SigmaConstant } from "@fleet-sdk/serializer";
 import {
   SigmaCompilerNamedConstantsMap,
   SigmaCompilerObj,
@@ -74,7 +74,7 @@ export function toSigmaConstant(constant: string | SigmaValue | SigmaConstant): 
 
     return ValueObj.fromHex(constant);
   } else if (constant instanceof SigmaConstant) {
-    return ValueObj.fromHex(SConstant(constant));
+    return ValueObj.fromHex(constant.toHex());
   } else if (constant instanceof SigmaValue) {
     return constant;
   }

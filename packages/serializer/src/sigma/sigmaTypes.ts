@@ -1,5 +1,9 @@
 import { ensureBigInt, isDefined } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
+import { DataSerializer } from "./dataSerializer";
+import { SigmaReader } from "./sigmaReader";
+import { SigmaWriter } from "./sigmaWriter";
+import { TypeSerializer } from "./typeSerializer";
 
 export const constructorCode = Object.freeze({
   embeddable: 0,
@@ -171,21 +175,68 @@ export const sDescriptors = {
   tuple: sTupleDescriptor
 } satisfies { [key: string]: SType };
 
+export function getEmbeddableType(typeCode: number) {
+  switch (typeCode) {
+    case sDescriptors.bool.code:
+      return sDescriptors.bool;
+    case sDescriptors.byte.code:
+      return sDescriptors.byte;
+    case sDescriptors.short.code:
+      return sDescriptors.short;
+    case sDescriptors.int.code:
+      return sDescriptors.int;
+    case sDescriptors.long.code:
+      return sDescriptors.long;
+    case sDescriptors.bigInt.code:
+      return sDescriptors.bigInt;
+    case sDescriptors.groupElement.code:
+      return sDescriptors.groupElement;
+    case sDescriptors.sigmaProp.code:
+      return sDescriptors.sigmaProp;
+    default:
+      throw new Error(`The type code '0x${typeCode}' is not a valid primitive type code.`);
+  }
+}
+
+export const MAX_CONSTANT_TYPES_LENGTH = 100;
+export const MAX_CONSTANT_CONTENT_LENGTH = 4096;
+export const MAX_CONSTANT_LENGTH = MAX_CONSTANT_TYPES_LENGTH + MAX_CONSTANT_CONTENT_LENGTH;
+
 export class SigmaConstant<V = unknown, T extends SType = SType> {
-  private readonly _type!: T;
-  private readonly _value!: V;
+  readonly #type!: T;
+  readonly #data!: V;
 
   constructor(type: T, value: V) {
-    this._type = type;
-    this._value = value;
+    this.#type = type;
+    this.#data = value;
+  }
+
+  static from<D, T extends SType = SType>(bytes: Uint8Array | string): SigmaConstant<D, T> {
+    const reader = new SigmaReader(bytes);
+    const type = TypeSerializer.deserialize(reader);
+    const data = DataSerializer.deserialize(type, reader);
+
+    return new SigmaConstant(type as T, data as D);
   }
 
   get type(): T {
-    return this._type;
+    return this.#type;
   }
 
-  get value(): V {
-    return this._value;
+  get data(): V {
+    return this.#data;
+  }
+
+  toBytes(): Uint8Array {
+    const writer = new SigmaWriter(MAX_CONSTANT_LENGTH);
+    TypeSerializer.serialize(this.type, writer);
+    DataSerializer.serialize(this.data, this.type, writer);
+
+    return writer.toBytes();
+  }
+
+  toHex(): string {
+    return hex.encode(this.toBytes());
   }
 }
 
@@ -286,7 +337,7 @@ type STupleConstant<T> = SigmaConstant<T, STupleType>;
 export function STuple(...items: SigmaConstant[]) {
   return new SigmaConstant(
     new STupleType(items.map((x) => x.type)),
-    items.map((x) => x.value)
+    items.map((x) => x.data)
   );
 }
 

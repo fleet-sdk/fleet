@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_CONSTANT_LENGTH } from "./constantSerializer";
+import { MAX_CONSTANT_LENGTH } from "./sigmaTypes";
 import { SigmaWriter } from "./sigmaWriter";
 
 describe("Sigma Writer", () => {

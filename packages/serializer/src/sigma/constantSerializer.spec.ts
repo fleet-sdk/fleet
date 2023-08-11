@@ -13,7 +13,6 @@ import {
   sigmaPropVectors,
   tupleTestVectors
 } from "../_test-vectors/constantVectors";
-import { SConstant, SParse } from "./constantSerializer";
 import {
   SBigInt,
   SBool,
@@ -32,66 +31,66 @@ import {
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
-    expect(SConstant(SBool(tv.value))).to.be.equal(tv.hex);
-    expect(SParse(tv.hex)).to.be.equal(tv.value);
+    expect(SBool(tv.value).toHex()).to.be.equal(tv.hex);
+    expect(SigmaConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
   it.each(byteVectors)("Should road-trip SByte($value)", (tv) => {
-    expect(SConstant(SByte(tv.value))).to.be.equal(tv.hex);
-    expect(SParse(tv.hex)).to.be.equal(tv.value);
+    expect(SByte(tv.value).toHex()).to.be.equal(tv.hex);
+    expect(SigmaConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
   it.each(shortVectors)("Should road-trip SShort($value)", (tv) => {
-    expect(SConstant(SShort(tv.value))).to.be.equal(tv.hex);
-    expect(SParse(tv.hex)).to.be.equal(tv.value);
+    expect(SShort(tv.value).toHex()).to.be.equal(tv.hex);
+    expect(SigmaConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
   it.each(intVectors)("Should road-trip SInt($value)", (tv) => {
-    expect(SConstant(SInt(tv.value))).to.be.equal(tv.hex);
-    expect(SParse(tv.hex)).to.be.equal(tv.value);
+    expect(SInt(tv.value).toHex()).to.be.equal(tv.hex);
+    expect(SigmaConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
   it.each(longVectors)("Should road-trip SLong($value)", (tv) => {
-    expect(SConstant(SLong(tv.value))).to.be.equal(tv.hex);
-    expect(SConstant(SLong(String(tv.value)))).to.be.equal(tv.hex);
+    expect(SLong(tv.value).toHex()).to.be.equal(tv.hex);
+    expect(SLong(String(tv.value)).toHex()).to.be.equal(tv.hex);
 
-    expect(SParse(tv.hex)).to.be.equal(ensureBigInt(tv.value));
+    expect(SigmaConstant.from(tv.hex).data).to.be.equal(ensureBigInt(tv.value));
   });
 
   it.each(groupElementVectors)("Should road-trip SGroupElement($value)", (tv) => {
-    expect(SConstant(SGroupElement(tv.value))).to.be.equal(tv.hex);
-    expect(SConstant(SGroupElement(hex.decode(tv.value)))).to.be.equal(tv.hex);
+    expect(SGroupElement(tv.value).toHex()).to.be.equal(tv.hex);
+    expect(SGroupElement(hex.decode(tv.value)).toHex()).to.be.equal(tv.hex);
 
-    expect(SParse(tv.hex)).to.be.deep.equal(hex.decode(tv.value));
+    expect(SigmaConstant.from(tv.hex).data).to.be.deep.equal(hex.decode(tv.value));
   });
 
   it.each(sigmaPropVectors)("Should road-trip SSigmaProp(ProveDlog($value))", (tv) => {
-    expect(SConstant(SSigmaProp(SGroupElement(tv.value)))).to.be.equal(tv.hex);
-    expect(SConstant(SSigmaProp(SGroupElement(hex.decode(tv.value))))).to.be.equal(tv.hex);
+    expect(SSigmaProp(SGroupElement(tv.value)).toHex()).to.be.equal(tv.hex);
+    expect(SSigmaProp(SGroupElement(hex.decode(tv.value))).toHex()).to.be.equal(tv.hex);
 
-    expect(SParse(tv.hex)).to.be.deep.equal(hex.decode(tv.value));
+    expect(SigmaConstant.from(tv.hex).data).to.be.deep.equal(hex.decode(tv.value));
   });
 
   it.each(bigintVectors)("Should road-trip SBigInt($value)", (tv) => {
-    expect(SConstant(SBigInt(tv.value))).to.be.equal(tv.hex);
-    expect(SConstant(SBigInt(BigInt(tv.value)))).to.be.equal(tv.hex);
+    expect(SBigInt(tv.value).toHex()).to.be.equal(tv.hex);
+    expect(SBigInt(BigInt(tv.value)).toHex()).to.be.equal(tv.hex);
 
-    expect(SParse(tv.hex)).to.be.equal(BigInt(tv.value));
+    expect(SigmaConstant.from(tv.hex).data).to.be.equal(BigInt(tv.value));
   });
 });
 
 describe("Monomorphic types serialization and parsing", () => {
   it("Should serialize SUnit", () => {
     const sUnitHex = "62";
-    expect(SConstant(SUnit())).toBe(sUnitHex);
-    expect(SParse(sUnitHex)).to.be.undefined;
+    expect(SUnit().toHex()).toBe(sUnitHex);
+    expect(SigmaConstant.from(sUnitHex).data).to.be.undefined;
   });
 });
 
 describe("SColl serialization and parsing", () => {
   it.each(collVectors)("Should serialize $name", (tv) => {
-    expect(SConstant(tv.sconst)).to.be.equal(tv.hex);
-    expect(SParse(tv.hex)).to.be.deep.equal(tv.value);
+    expect(tv.sconst.toHex()).to.be.equal(tv.hex);
+    expect(SigmaConstant.from(tv.hex).data).to.be.deep.equal(tv.value);
   });
 });
 
@@ -103,59 +102,62 @@ describe("Not implemented types", () => {
     };
 
     expect(() => {
-      SConstant(new SigmaConstant(unimplementedType, ""));
+      new SigmaConstant(unimplementedType, "").toBytes();
     }).toThrow();
 
     // not implemented SSigmaProp expression
     expect(() => {
-      SConstant(SSigmaProp(new SigmaConstant(unimplementedType, Uint8Array.from([0]))));
+      SSigmaProp(new SigmaConstant(unimplementedType, Uint8Array.from([0]))).toBytes();
     }).toThrow();
   });
 
   it("Should fail while trying to deserialize a not implemented SigmaProp expression", () => {
     expect(() => {
-      SParse("08ce");
+      SigmaConstant.from("08ce");
     }).toThrow();
   });
 
   it("Should fail while trying to deserialize a not implemented type", () => {
     expect(() => {
-      SParse("deadbeef");
+      SigmaConstant.from("deadbeef");
     }).toThrow();
   });
 });
 
 describe("Tuple serialization", () => {
   it.each(tupleTestVectors)("Should road-trip $name", (tv) => {
-    expect(SConstant(tv.sconst)).to.be.equal(tv.hex);
-    expect(SParse(tv.hex)).to.be.deep.equal(tv.value);
+    expect(tv.sconst.toHex()).to.be.equal(tv.hex);
+    expect(SigmaConstant.from(tv.hex).data).to.be.deep.equal(tv.value);
   });
 
   it("Should road trip", () => {
     // quadruple
     expect(
-      SParse(
-        SConstant(STuple(SColl(SBool, [true, false, true]), SBigInt(10n), SBool(false), SShort(2)))
-      )
+      SigmaConstant.from(
+        STuple(SColl(SBool, [true, false, true]), SBigInt(10n), SBool(false), SShort(2)).toHex()
+      ).data
     ).to.be.deep.equal([[true, false, true], 10n, false, 2]);
 
     // generic tuple with 4+ items
     expect(
-      SParse(SConstant(STuple(SBool(false), SBigInt(10n), SBool(false), SShort(2), SLong(1232n))))
+      SigmaConstant.from(
+        STuple(SBool(false), SBigInt(10n), SBool(false), SShort(2), SLong(1232n)).toHex()
+      ).data
     ).to.be.deep.equal([false, 10n, false, 2, 1232n]);
     expect(
-      SParse(SConstant(STuple(SInt(1), SInt(2), SInt(3), SInt(2), SInt(4), SInt(5), SInt(6))))
+      SigmaConstant.from(
+        STuple(SInt(1), SInt(2), SInt(3), SInt(2), SInt(4), SInt(5), SInt(6)).toHex()
+      ).data
     ).to.be.deep.equal([1, 2, 3, 2, 4, 5, 6]);
   });
 
   it("Should fail with tuples with items out of the 2 - 255 range", () => {
-    const _1item = STuple(SInt(1));
-    expect(() => SConstant(_1item)).to.throw(
+    expect(() => STuple(SInt(1)).toHex()).to.throw(
       "Invalid type: tuples must have between 2 and 255 items."
     );
 
     const _256Items = STuple(...Array.from({ length: 256 }, (_, i) => SShort(i)));
-    expect(() => SConstant(_256Items)).to.throw(
+    expect(() => _256Items.toHex()).to.throw(
       "Invalid type: tuples must have between 2 and 255 items."
     );
   });
@@ -180,40 +182,40 @@ describe("Positive fuzzy tests", () => {
     return (rand * (max - min + 1n) + min) / 10_000n;
   }
 
-  test("S SByte fuzzing", () => {
+  // https://docs.scala-lang.org/overviews/scala-book/built-in-types.html
+
+  test("SByte fuzzing", () => {
     for (let i = 0; i < 100; i++) {
       const value = randomInt(0, 127);
-      expect(SParse(SConstant(SByte(value)))).toBe(value);
+      expect(SigmaConstant.from(SByte(value).toHex()).data).toBe(value);
     }
   });
 
   test("SShort fuzzing", () => {
     for (let i = 0; i < 100; i++) {
       const value = randomInt(-32_768, 32_767);
-      expect(SParse(SConstant(SShort(value)))).toBe(value);
+      expect(SigmaConstant.from(SShort(value).toHex()).data).toBe(value);
     }
   });
 
   test("SInt fuzzing", () => {
-    // https://docs.scala-lang.org/overviews/scala-book/built-in-types.html
-
     for (let i = 0; i < 100; i++) {
       const value = randomInt(-2_147_483_648, 2_147_483_647);
-      expect(SParse(SConstant(SInt(value)))).toBe(value);
+      expect(SigmaConstant.from(SInt(value).toHex()).data).toBe(value);
     }
   });
 
   test("SLong fuzzing", () => {
     for (let i = 0; i < 100; i++) {
       const value = randomBigInt(-9_223_372_036_854_775_808n, 9_223_372_036_854_775_807n);
-      expect(SParse(SConstant(SLong(value)))).toBe(value);
+      expect(SigmaConstant.from(SLong(value).toHex()).data).toBe(value);
     }
   });
 
   test("SBigInt fuzzing", () => {
     for (let i = 0; i < 1000; i++) {
       const value = randomBigInt(-9_223_372_036_854_775_808_000n, 9_223_372_036_854_775_807_000n);
-      expect(SParse(SConstant(SBigInt(value)))).toBe(value);
+      expect(SigmaConstant.from(SBigInt(value).toHex()).data).toBe(value);
     }
   });
 });

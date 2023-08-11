@@ -39,7 +39,7 @@ export class DataSerializer {
           if (node.type === sDescriptors.groupElement) {
             writer.write(PROVE_DLOG_OP);
 
-            return DataSerializer.serialize(node.value, node.type, writer);
+            return DataSerializer.serialize(node.data, node.type, writer);
           } else {
             throw Error("Serialization error: SigmaProp operation not implemented.");
           }

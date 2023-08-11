@@ -1,7 +1,7 @@
 import { Amount, BoxCandidate, Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
-import { estimateBoxSize, SByte, SColl, SConstant } from "@fleet-sdk/serializer";
+import { estimateBoxSize, SByte, SColl } from "@fleet-sdk/serializer";
 import { invalidBoxes, manyTokensBoxes, regularBoxes } from "_test-vectors";
 import { describe, expect, it, vi } from "vitest";
 import { InvalidInput } from "../errors";
@@ -994,9 +994,9 @@ describe("Non-standardized token minting", () => {
             amount: 1n
           })
           .setAdditionalRegisters({
-            R4: SConstant(SColl(SByte, utf8.decode("TestToken"))), //         name
-            R5: SConstant(SColl(SByte, utf8.decode("Description test"))), //  description
-            R6: SConstant(SColl(SByte, utf8.decode("4"))) //                  decimals
+            R4: SColl(SByte, utf8.decode("TestToken")).toHex(), //         name
+            R5: SColl(SByte, utf8.decode("Description test")).toHex(), //  description
+            R6: SColl(SByte, utf8.decode("4")).toHex() //                  decimals
           })
       )
       .and.to(

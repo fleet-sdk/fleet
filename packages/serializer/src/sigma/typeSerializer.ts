@@ -2,6 +2,7 @@ import { assert, first, last } from "@fleet-sdk/common";
 import { SigmaReader } from "./sigmaReader";
 import {
   constructorCode,
+  getEmbeddableType,
   isColl,
   isTuple,
   PRIMITIVE_TYPE_RANGE,
@@ -148,28 +149,5 @@ export class TypeSerializer {
     }
 
     throw new Error("Not implemented.");
-  }
-}
-
-function getEmbeddableType(typeCode: number) {
-  switch (typeCode) {
-    case sDescriptors.bool.code:
-      return sDescriptors.bool;
-    case sDescriptors.byte.code:
-      return sDescriptors.byte;
-    case sDescriptors.short.code:
-      return sDescriptors.short;
-    case sDescriptors.int.code:
-      return sDescriptors.int;
-    case sDescriptors.long.code:
-      return sDescriptors.long;
-    case sDescriptors.bigInt.code:
-      return sDescriptors.bigInt;
-    case sDescriptors.groupElement.code:
-      return sDescriptors.groupElement;
-    case sDescriptors.sigmaProp.code:
-      return sDescriptors.sigmaProp;
-    default:
-      throw new Error(`The type code '0x${typeCode}' is not a valid primitive type code.`);
   }
 }
