@@ -1,4 +1,4 @@
-import { EIP12UnsignedTransaction } from "@fleet-sdk/common";
+import { EIP12UnsignedTransaction } from "../common/src/types";
 
 export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
   {

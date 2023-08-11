@@ -1,17 +1,18 @@
 import { hex, utf8 } from "@fleet-sdk/crypto";
+import { SigmaConstant } from "../sigmaConstant";
 import {
+  SBigInt,
   SBool,
   SByte,
   SColl,
   SConstructor,
   SGroupElement,
-  SigmaConstant,
   SInt,
   SLong,
   SPair,
   SShort,
   STuple
-} from "../sigma";
+} from "../types";
 
 const u8a = (input: number[]) => Uint8Array.from(input);
 
@@ -54,20 +55,18 @@ export const intVectors: ConstantTestVector<number>[] = [
   { hex: "04808023", value: 286720 }
 ];
 
-export const longVectors: ConstantTestVector<bigint | number | string>[] = [
+export const longVectors: ConstantTestVector<bigint | string>[] = [
   { hex: "0500", value: 0n },
-  { hex: "0500", value: 0 },
   { hex: "0501", value: -1n },
   { hex: "0502", value: 1n },
   { hex: "0503", value: -2n },
   { hex: "0513", value: -10n },
-  { hex: "05800f", value: 960 },
-  { hex: "05800f", value: 960 },
+  { hex: "05800f", value: "960" },
+  { hex: "05800f", value: 960n },
   { hex: "05807d", value: 8000n },
   { hex: "05808084af5f", value: 12800000000n },
   { hex: "05808084af5f", value: "12800000000" },
   { hex: "05808087a70e", value: 1920000000n },
-  { hex: "05808087a70e", value: 1920000000 },
   { hex: "058080808ae213", value: 339581337600n },
   { hex: "0580808ca1fa60", value: 1665676705792n },
   { hex: "05808091f3ad04", value: 74880000000n },
@@ -269,6 +268,15 @@ export const collVectors: GenericTypeTestVector[] = [
     { hex: "11018081f0e5dd60", value: [1661856514112n] },
     { hex: "110182d2ad9dce60", value: [1659767207041n] }
   ]),
+  ...buildCollVectors("[SBigInt]", SBigInt, [
+    { hex: "12010100", value: [0n] },
+    { hex: "1202010106018271d5b481", value: [1n, 1659767207041n] },
+    { hex: "12010112", value: [18n] },
+    { hex: "12020500bebc2000050efb586040", value: [3200000000n, 64346415168n] },
+    { hex: "1202050efb5860400500bebc2000", value: [64346415168n, 3200000000n] },
+    { hex: "1201060182ee5e0040", value: [1661856514112n] },
+    { hex: "120206018271d5b48106018271d5b481", value: [1659767207041n, 1659767207041n] }
+  ]),
   ...buildCollVectors("[[SByte]]", SColl(SByte), [
     {
       hex: "1a031c4c657427732063656c656272617465204572676f526166666c6521201c4c657427732063656c656272617465204572676f526166666c65212020e730bbae0463346f8ce72be23ab8391d1e7a58f48ed857fcf4ee9aecf6915307",
@@ -357,9 +365,15 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
   },
   {
     name: "(SInt, SLong)",
-    sconst: SPair(SInt(0), SLong(1)),
+    sconst: SPair(SInt(0), SLong(1n)),
     value: [0, 1n],
     hex: "40050002"
+  },
+  {
+    name: "(SInt, SBigInt)",
+    sconst: SPair(SInt(1), SBigInt(11231234123n)),
+    value: [1, 11231234123n],
+    hex: "40060205029d6f084b"
   },
   {
     name: "(SInt, SByte)",

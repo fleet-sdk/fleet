@@ -1,15 +1,7 @@
 import { assert } from "@fleet-sdk/common";
-import { SigmaReader } from "./sigmaReader";
-import {
-  isColl,
-  isTuple,
-  SCollType,
-  sDescriptors,
-  SigmaConstant,
-  STupleType,
-  SType
-} from "./sigmaTypes";
-import { SigmaWriter } from "./sigmaWriter";
+import { SigmaReader, SigmaWriter } from "../coders";
+import { SigmaConstant } from "../sigmaConstant";
+import { descriptors, isColl, isTuple, SCollType, STupleType, SType } from "../types";
 
 const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
@@ -18,25 +10,25 @@ export class DataSerializer {
   public static serialize(data: unknown, type: SType, writer: SigmaWriter): SigmaWriter {
     if (type.embeddable) {
       switch (type.code) {
-        case sDescriptors.bool.code:
+        case descriptors.bool.code:
           return writer.writeBoolean(data as boolean);
-        case sDescriptors.byte.code:
+        case descriptors.byte.code:
           return writer.write(data as number);
-        case sDescriptors.short.code:
+        case descriptors.short.code:
           return writer.writeShort(data as number);
-        case sDescriptors.int.code:
+        case descriptors.int.code:
           return writer.writeInt(data as number);
-        case sDescriptors.long.code:
+        case descriptors.long.code:
           return writer.writeLong(data as bigint);
-        case sDescriptors.bigInt.code: {
+        case descriptors.bigInt.code: {
           return writer.writeBigInt(data as bigint);
         }
-        case sDescriptors.groupElement.code:
+        case descriptors.groupElement.code:
           return writer.writeBytes(data as Uint8Array);
-        case sDescriptors.sigmaProp.code: {
+        case descriptors.sigmaProp.code: {
           const node = data as SigmaConstant<SigmaConstant<Uint8Array>>;
 
-          if (node.type === sDescriptors.groupElement) {
+          if (node.type === descriptors.groupElement) {
             writer.write(PROVE_DLOG_OP);
 
             return DataSerializer.serialize(node.data, node.type, writer);
@@ -46,7 +38,7 @@ export class DataSerializer {
         }
       }
     } else if (isColl(type)) {
-      if (type.elementsType.code === sDescriptors.byte.code) {
+      if (type.elementsType.code === descriptors.byte.code) {
         const assertion = data instanceof Uint8Array;
         assert(assertion, `SColl[Byte] expected an UInt8Array, got ${typeof data}.`);
       } else {
@@ -55,10 +47,10 @@ export class DataSerializer {
 
       writer.writeVLQ(data.length);
       switch (type.elementsType.code) {
-        case sDescriptors.bool.code: {
+        case descriptors.bool.code: {
           return writer.writeBits(data as boolean[]);
         }
-        case sDescriptors.byte.code: {
+        case descriptors.byte.code: {
           return writer.writeBytes(data as Uint8Array);
         }
         default: {
@@ -81,7 +73,7 @@ export class DataSerializer {
       }
 
       return writer;
-    } else if (type.code === sDescriptors.unit.code) {
+    } else if (type.code === descriptors.unit.code) {
       return writer;
     }
 
@@ -91,23 +83,23 @@ export class DataSerializer {
   static deserialize(type: SType, reader: SigmaReader): unknown {
     if (type.embeddable) {
       switch (type.code) {
-        case sDescriptors.bool.code:
+        case descriptors.bool.code:
           return reader.readBoolean();
-        case sDescriptors.byte.code:
+        case descriptors.byte.code:
           return reader.readByte();
-        case sDescriptors.short.code:
+        case descriptors.short.code:
           return reader.readShort();
-        case sDescriptors.int.code:
+        case descriptors.int.code:
           return reader.readInt();
-        case sDescriptors.long.code:
+        case descriptors.long.code:
           return reader.readLong();
-        case sDescriptors.bigInt.code:
+        case descriptors.bigInt.code:
           return reader.readBigInt();
-        case sDescriptors.groupElement.code:
+        case descriptors.groupElement.code:
           return reader.readBytes(GROUP_ELEMENT_LENGTH);
-        case sDescriptors.sigmaProp.code: {
+        case descriptors.sigmaProp.code: {
           if (reader.readByte() === PROVE_DLOG_OP) {
-            return this.deserialize(sDescriptors.groupElement, reader);
+            return this.deserialize(descriptors.groupElement, reader);
           }
 
           break;
@@ -115,14 +107,14 @@ export class DataSerializer {
       }
     } else {
       switch (type.code) {
-        case sDescriptors.coll.code: {
+        case descriptors.coll.code: {
           const length = reader.readVlq();
           const embeddedType = (type as SCollType).elementsType;
 
           switch (embeddedType.code) {
-            case sDescriptors.bool.code:
+            case descriptors.bool.code:
               return reader.readBits(length);
-            case sDescriptors.byte.code:
+            case descriptors.byte.code:
               return reader.readBytes(length);
             default: {
               const elements = new Array(length);
@@ -134,10 +126,10 @@ export class DataSerializer {
             }
           }
         }
-        case sDescriptors.tuple.code: {
+        case descriptors.tuple.code: {
           return (type as STupleType).elementsType.map((t) => this.deserialize(t, reader));
         }
-        case sDescriptors.unit.code: {
+        case descriptors.unit.code: {
           return undefined;
         }
       }

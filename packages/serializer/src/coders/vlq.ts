@@ -1,6 +1,6 @@
 import { _0n, _127n, _128n, _7n, ensureBigInt } from "@fleet-sdk/common";
-import { SigmaReader } from "./sigma/sigmaReader";
-import { SigmaWriter } from "./sigma/sigmaWriter";
+import { SigmaReader } from "./sigmaReader";
+import { SigmaWriter } from "./sigmaWriter";
 
 /**
  * A **variable-length quantity (VLQ)** is a universal code that uses an arbitrary number

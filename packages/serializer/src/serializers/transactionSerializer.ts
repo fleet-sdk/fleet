@@ -6,10 +6,10 @@ import {
   isDefined,
   UnsignedInput
 } from "@fleet-sdk/common";
+import { SigmaWriter } from "../coders";
 import { serializeBox } from "./boxSerializer";
-import { SigmaWriter } from "./sigmaWriter";
 
-type MinimalUnsignedTransaction = {
+export type MinimalUnsignedTransaction = {
   inputs: readonly UnsignedInput[];
   dataInputs: readonly DataInput[];
   outputs: readonly BoxCandidate<Amount>[];

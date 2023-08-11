@@ -1,4 +1,4 @@
-import { Amount, Box } from "packages/common/src/";
+import { Amount, Box } from "../common/src/types";
 
 export const regularBoxes: Box<bigint>[] = [
   {

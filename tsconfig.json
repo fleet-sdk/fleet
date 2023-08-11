@@ -21,10 +21,9 @@
     "typeRoots": ["node_modules/@types"],
     "baseUrl": ".",
     "paths": {
-      "_test-vectors": ["./packages/_test-vectors/"],
-      "packages": ["./packages/"]
+      "_test-vectors": ["./packages/_test-vectors/"]
     }
   },
   "compileOnSave": false,
-  "exclude": ["**/node_modules"]
+  "exclude": ["**/node_modules", "**/dist"]
 }

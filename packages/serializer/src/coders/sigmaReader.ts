@@ -1,24 +1,24 @@
 import { HexString, hexToBigInt, isEmpty } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
-import { readBigVLQ, readVLQ } from "../vlq";
-import { zigZagDecode, zigZagDecodeBigInt } from "../zigZag";
+import { readBigVLQ, readVLQ } from "./vlq";
+import { zigZagDecode, zigZagDecodeBigInt } from "./zigZag";
 
 export class SigmaReader {
-  private _bytes!: Uint8Array;
-  private _cursor!: number;
+  readonly #bytes: Uint8Array;
+  #cursor: number;
 
   public get isEmpty(): boolean {
-    return isEmpty(this._bytes);
+    return isEmpty(this.#bytes);
   }
 
   constructor(bytes: HexString | Uint8Array) {
     if (typeof bytes === "string") {
-      this._bytes = hex.decode(bytes);
+      this.#bytes = hex.decode(bytes);
     } else {
-      this._bytes = bytes;
+      this.#bytes = bytes;
     }
 
-    this._cursor = 0;
+    this.#cursor = 0;
   }
 
   public readBoolean(): boolean {
@@ -30,28 +30,28 @@ export class SigmaReader {
     let bitOffset = 0;
 
     for (let i = 0; i < length; i++) {
-      const bit = (this._bytes[this._cursor] >> bitOffset++) & 1;
+      const bit = (this.#bytes[this.#cursor] >> bitOffset++) & 1;
       bits[i] = bit === 1;
 
       if (bitOffset == 8) {
         bitOffset = 0;
-        this._cursor++;
+        this.#cursor++;
       }
     }
 
     if (bitOffset > 0) {
-      this._cursor++;
+      this.#cursor++;
     }
 
     return bits;
   }
 
   public readByte(): number {
-    return this._bytes[this._cursor++];
+    return this.#bytes[this.#cursor++];
   }
 
   public readBytes(length: number): Uint8Array {
-    return this._bytes.subarray(this._cursor, (this._cursor += length));
+    return this.#bytes.subarray(this.#cursor, (this.#cursor += length));
   }
 
   public readVlq(): number {

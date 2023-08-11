@@ -12,22 +12,24 @@ import {
   shortVectors,
   sigmaPropVectors,
   tupleTestVectors
-} from "../_test-vectors/constantVectors";
+} from "./_test-vectors/constantVectors";
+import { SigmaWriter } from "./coders";
+import { DataSerializer } from "./serializers";
+import { SigmaConstant } from "./sigmaConstant";
+import { SType } from "./types";
 import {
   SBigInt,
   SBool,
   SByte,
   SColl,
   SGroupElement,
-  SigmaConstant,
   SInt,
   SLong,
   SShort,
   SSigmaProp,
   STuple,
-  SType,
   SUnit
-} from "./sigmaTypes";
+} from "./types/";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
@@ -48,6 +50,13 @@ describe("Primitive types serialization and parsing", () => {
   it.each(intVectors)("Should road-trip SInt($value)", (tv) => {
     expect(SInt(tv.value).toHex()).to.be.equal(tv.hex);
     expect(SigmaConstant.from(tv.hex).data).to.be.equal(tv.value);
+  });
+
+  it.each(longVectors)("Should road-trip SLong($value)", (tv) => {
+    expect(SLong(tv.value).toHex()).to.be.equal(tv.hex);
+    expect(SLong(String(tv.value)).toHex()).to.be.equal(tv.hex);
+
+    expect(SigmaConstant.from(tv.hex).data).to.be.equal(ensureBigInt(tv.value));
   });
 
   it.each(longVectors)("Should road-trip SLong($value)", (tv) => {
@@ -103,24 +112,29 @@ describe("Not implemented types", () => {
 
     expect(() => {
       new SigmaConstant(unimplementedType, "").toBytes();
-    }).toThrow();
+    }).to.throw();
 
     // not implemented SSigmaProp expression
     expect(() => {
       SSigmaProp(new SigmaConstant(unimplementedType, Uint8Array.from([0]))).toBytes();
-    }).toThrow();
+    }).to.throw();
+
+    // not implemented SSigmaProp expression
+    expect(() => {
+      DataSerializer.serialize("", unimplementedType, new SigmaWriter(1));
+    }).to.throw();
   });
 
   it("Should fail while trying to deserialize a not implemented SigmaProp expression", () => {
     expect(() => {
       SigmaConstant.from("08ce");
-    }).toThrow();
+    }).to.throw();
   });
 
   it("Should fail while trying to deserialize a not implemented type", () => {
     expect(() => {
       SigmaConstant.from("deadbeef");
-    }).toThrow();
+    }).to.throw();
   });
 });
 

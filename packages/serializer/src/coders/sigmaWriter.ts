@@ -1,19 +1,19 @@
 import { bigIntToHex } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
-import { writeBigVLQ, writeVLQ } from "../vlq";
-import { zigZagEncode, zigZagEncodeBigInt } from "../zigZag";
+import { writeBigVLQ, writeVLQ } from "./vlq";
+import { zigZagEncode, zigZagEncodeBigInt } from "./zigZag";
 
 export class SigmaWriter {
-  private _bytes!: Uint8Array;
-  private _cursor!: number;
+  readonly #bytes: Uint8Array;
+  #cursor: number;
 
   public get length() {
-    return this._cursor;
+    return this.#cursor;
   }
 
   constructor(maxLength: number) {
-    this._bytes = new Uint8Array(maxLength);
-    this._cursor = 0;
+    this.#bytes = new Uint8Array(maxLength);
+    this.#cursor = 0;
   }
 
   public writeBoolean(value: boolean): SigmaWriter {
@@ -49,14 +49,14 @@ export class SigmaWriter {
   }
 
   public write(byte: number): SigmaWriter {
-    this._bytes[this._cursor++] = byte;
+    this.#bytes[this.#cursor++] = byte;
 
     return this;
   }
 
   public writeBytes(bytes: Uint8Array): SigmaWriter {
-    this._bytes.set(bytes, this._cursor);
-    this._cursor += bytes.length;
+    this.#bytes.set(bytes, this.#cursor);
+    this.#cursor += bytes.length;
 
     return this;
   }
@@ -85,19 +85,19 @@ export class SigmaWriter {
 
     for (let i = 0; i < bits.length; i++) {
       if (bits[i]) {
-        this._bytes[this._cursor] |= 1 << bitOffset++;
+        this.#bytes[this.#cursor] |= 1 << bitOffset++;
       } else {
-        this._bytes[this._cursor] &= ~(1 << bitOffset++);
+        this.#bytes[this.#cursor] &= ~(1 << bitOffset++);
       }
 
       if (bitOffset == 8) {
         bitOffset = 0;
-        this._cursor++;
+        this.#cursor++;
       }
     }
 
     if (bitOffset > 0) {
-      this._cursor++;
+      this.#cursor++;
     }
 
     return this;
@@ -112,10 +112,10 @@ export class SigmaWriter {
   }
 
   public toHex(): string {
-    return hex.encode(this._bytes.subarray(0, this._cursor));
+    return hex.encode(this.toBytes());
   }
 
   public toBytes(): Uint8Array {
-    return this._bytes.subarray(0, this._cursor);
+    return this.#bytes.subarray(0, this.#cursor);
   }
 }

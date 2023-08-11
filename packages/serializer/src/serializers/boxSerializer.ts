@@ -11,8 +11,7 @@ import {
   some,
   TokenAmount
 } from "@fleet-sdk/common";
-import { estimateVLQSize } from "../vlq";
-import { SigmaWriter } from "./sigmaWriter";
+import { estimateVLQSize, SigmaWriter } from "../coders";
 
 const MAX_UINT16_VALUE = 65535;
 
