@@ -1,5 +1,5 @@
 import { hex, utf8 } from "@fleet-sdk/crypto";
-import { SigmaConstant } from "../sigmaConstant";
+import { SConstant } from "../sigmaConstant";
 import { SBigInt, SBool, SByte, SColl, SGroupElement, SInt, SLong, SPair, SShort } from "../types";
 import { SConstructor, STuple } from "../types/constructors";
 
@@ -12,7 +12,7 @@ type ConstantTestVector<T> = {
 
 type GenericTypeTestVector = ConstantTestVector<ArrayLike<unknown>> & {
   name: string;
-  sconst: SigmaConstant;
+  sconst: SConstant;
 };
 
 export const boolVectors: ConstantTestVector<boolean>[] = [

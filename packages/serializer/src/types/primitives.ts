@@ -1,6 +1,6 @@
 import { ensureBigInt } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
-import { SigmaConstant } from "../sigmaConstant";
+import { SConstant } from "../sigmaConstant";
 import { SPrimitiveType } from "./base";
 import { BigIntInput, ByteInput } from "./constructors";
 
@@ -58,7 +58,7 @@ export class SGroupElementType extends SPrimitiveType<ByteInput, Uint8Array> {
   }
 }
 
-export class SSigmaPropType extends SPrimitiveType<SigmaConstant<Uint8Array>> {
+export class SSigmaPropType extends SPrimitiveType<SConstant<Uint8Array>> {
   get code(): number {
     return 0x08;
   }

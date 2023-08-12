@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { isEmpty } from "@fleet-sdk/common";
-import { SigmaConstant } from "../sigmaConstant";
+import { SConstant } from "../sigmaConstant";
 import { SType } from "./base";
 import { descriptors } from "./descriptors";
 import { SCollType, STupleType } from "./generics";
@@ -21,14 +21,14 @@ export type BigIntInput = string | bigint;
 export type ByteInput = Uint8Array | string;
 
 export type SConstructor<T = unknown> = (arg?: T) => SType | SCollType<SType>;
-type SCollConstant<T> = SigmaConstant<ArrayLike<T>>;
-type STupleConstant<T> = SigmaConstant<T, STupleType>;
+type SCollConstant<T> = SConstant<ArrayLike<T>>;
+type STupleConstant<T> = SConstant<T, STupleType>;
 
 type Constructable<T = any> = { new (...args: any): T };
 type GenericProxyArgs<R> = R extends (...args: any) => unknown ? Parameters<R> : [];
 
 type SProxy<T extends SType, I, O = I> = {
-  (value: I): SigmaConstant<O, T>;
+  (value: I): SConstant<O, T>;
   (value?: I): T;
 };
 
@@ -58,7 +58,7 @@ function monoProxy<I, O = I, T extends SType = SType<I, O>>(
       const instance = cache ?? new target();
       if (!forceConstruction && isEmpty(args)) return instance;
 
-      return new (SigmaConstant as Constructable)(instance, ...args);
+      return new (SConstant as Constructable)(instance, ...args);
     }
   }) as any;
 }
@@ -92,12 +92,9 @@ export const SGroupElement = monoProxy<ByteInput, Uint8Array>(
   descriptors.groupElement
 );
 
-export const SSigmaProp = monoProxy<SigmaConstant<Uint8Array>>(
-  SSigmaPropType,
-  descriptors.sigmaProp
-);
+export const SSigmaProp = monoProxy<SConstant<Uint8Array>>(SSigmaPropType, descriptors.sigmaProp);
 
-type SUnit = (value?: undefined) => SigmaConstant<undefined>;
+type SUnit = (value?: undefined) => SConstant<undefined>;
 export const SUnit: SUnit = monoProxy(SUnitType, undefined, true);
 
 type SColl = {
@@ -114,22 +111,22 @@ export const SColl = genericProxy<SCollType, SColl>(SCollType, (target, _, args)
   const elementsType = type();
   if (!elements) return () => new target(elementsType);
 
-  return new SigmaConstant(new target(elementsType), elements);
+  return new SConstant(new target(elementsType), elements);
 });
 
-export function STuple(...items: SigmaConstant[]) {
-  return new SigmaConstant(
+export function STuple(...items: SConstant[]) {
+  return new SConstant(
     new STupleType(items.map((x) => x.type)),
     items.map((x) => x.data)
   );
 }
 
 type SPair = {
-  <L, R>(left: SigmaConstant<L>, right: SigmaConstant<R>): STupleConstant<[L, R]>;
+  <L, R>(left: SConstant<L>, right: SConstant<R>): STupleConstant<[L, R]>;
   <L, R>(left: SConstructor<L>, right: SConstructor<R>): SConstructor<[L, R]>;
   <L, R>(
-    left: SigmaConstant<L> | SConstructor<L>,
-    right: SigmaConstant<R> | SConstructor<R>
+    left: SConstant<L> | SConstructor<L>,
+    right: SConstant<R> | SConstructor<R>
   ): STupleConstant<[L, R]> | SConstructor<[L, R]>;
 };
 
@@ -138,8 +135,8 @@ export const SPair = genericProxy<STupleType, SPair>(STupleType, (target, _, arg
 
   if (typeof left === "function" && typeof right === "function") {
     return () => new target([left(), right()]);
-  } else if (left instanceof SigmaConstant && right instanceof SigmaConstant) {
-    return new SigmaConstant(new target([left.type, right.type]), [left.data, right.data]);
+  } else if (left instanceof SConstant && right instanceof SConstant) {
+    return new SConstant(new target([left.type, right.type]), [left.data, right.data]);
   }
 
   throw new Error("Invalid tuple declaration.");

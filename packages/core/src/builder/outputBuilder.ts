@@ -22,7 +22,6 @@ import {
 } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
 import { estimateBoxSize, SByte, SColl } from "@fleet-sdk/serializer";
-import { SConstant } from "../constantSerializer";
 import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
@@ -182,9 +181,9 @@ export class OutputBuilder {
 
       if (isEmpty(this.additionalRegisters)) {
         this.setAdditionalRegisters({
-          R4: SConstant(SColl(SByte, utf8.decode(this.minting.name || ""))),
-          R5: SConstant(SColl(SByte, utf8.decode(this.minting.description || ""))),
-          R6: SConstant(SColl(SByte, utf8.decode(this.minting.decimals?.toString() || "0")))
+          R4: SColl(SByte, utf8.decode(this.minting.name || "")).toHex(),
+          R5: SColl(SByte, utf8.decode(this.minting.description || "")).toHex(),
+          R6: SColl(SByte, utf8.decode(this.minting.decimals?.toString() || "0")).toHex()
         });
       }
 

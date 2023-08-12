@@ -1,6 +1,6 @@
 import { assert } from "@fleet-sdk/common";
 import { SigmaReader, SigmaWriter } from "../coders";
-import { SigmaConstant } from "../sigmaConstant";
+import { SConstant } from "../sigmaConstant";
 import { descriptors, isColl, isTuple, SCollType, STupleType, SType } from "../types";
 
 const GROUP_ELEMENT_LENGTH = 33;
@@ -26,7 +26,7 @@ export class DataSerializer {
         case descriptors.groupElement.code:
           return writer.writeBytes(data as Uint8Array);
         case descriptors.sigmaProp.code: {
-          const node = data as SigmaConstant<SigmaConstant<Uint8Array>>;
+          const node = data as SConstant<SConstant<Uint8Array>>;
 
           if (node.type === descriptors.groupElement) {
             writer.write(PROVE_DLOG_OP);

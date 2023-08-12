@@ -6,7 +6,7 @@ import { SType } from "./types";
 
 export const MAX_CONSTANT_LENGTH = 4096;
 
-export class SigmaConstant<V = unknown, T extends SType = SType> {
+export class SConstant<V = unknown, T extends SType = SType> {
   readonly #type: T;
   readonly #data: V;
 
@@ -15,12 +15,12 @@ export class SigmaConstant<V = unknown, T extends SType = SType> {
     this.#data = type.coerce(data) as V;
   }
 
-  static from<D, T extends SType = SType>(bytes: Uint8Array | string): SigmaConstant<D, T> {
+  static from<D, T extends SType = SType>(bytes: Uint8Array | string): SConstant<D, T> {
     const reader = new SigmaReader(bytes);
     const type = TypeSerializer.deserialize(reader);
     const data = DataSerializer.deserialize(type, reader);
 
-    return new SigmaConstant(type as T, data as D);
+    return new SConstant(type as T, data as D);
   }
 
   get type(): T {

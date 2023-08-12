@@ -5,9 +5,9 @@ import {
   SBool,
   SByte,
   SCollType,
-  SColl as serializerSColl,
+  SColl as SerSColl,
+  SConstant as SerSConstant,
   SGroupElement,
-  SigmaConstant,
   SInt,
   SLong,
   SShort,
@@ -20,7 +20,7 @@ import {
  * @deprecated Use {@link @fleet-sdk/serializer} instead.
  * This function will be removed from core package in v1.0.0.
  */
-export function SConstant(constant: SigmaConstant): HexString {
+export function SConstant(constant: SerSConstant): HexString {
   return constant.toHex();
 }
 
@@ -29,7 +29,7 @@ export function SConstant(constant: SigmaConstant): HexString {
  * This function will be removed from core package in v1.0.0.
  */
 export function SParse<T>(bytes: HexString | Uint8Array): T {
-  return SigmaConstant.from<T>(bytes).data;
+  return SerSConstant.from<T>(bytes).data;
 }
 
 /**
@@ -41,7 +41,7 @@ function SColl<T>(type: () => SType, elements: ArrayLike<T> | Uint8Array) {
     elements = hex.decode(elements);
   }
 
-  return serializerSColl(type, elements as ArrayLike<number>);
+  return SerSColl(type, elements as ArrayLike<number>);
 }
 
 export {
