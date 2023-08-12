@@ -4,4 +4,16 @@ export * from "./primitives";
 export * from "./descriptors";
 export * from "./generics";
 export * from "./monomorphics";
-export * from "./constructors";
+export {
+  SByte,
+  SBool,
+  SShort,
+  SInt,
+  SLong,
+  SBigInt,
+  SGroupElement,
+  SSigmaProp,
+  SUnit,
+  SColl,
+  SPair
+} from "./constructors";

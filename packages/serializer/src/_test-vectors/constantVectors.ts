@@ -1,18 +1,7 @@
 import { hex, utf8 } from "@fleet-sdk/crypto";
 import { SigmaConstant } from "../sigmaConstant";
-import {
-  SBigInt,
-  SBool,
-  SByte,
-  SColl,
-  SConstructor,
-  SGroupElement,
-  SInt,
-  SLong,
-  SPair,
-  SShort,
-  STuple
-} from "../types";
+import { SBigInt, SBool, SByte, SColl, SGroupElement, SInt, SLong, SPair, SShort } from "../types";
+import { SConstructor, STuple } from "../types/constructors";
 
 const u8a = (input: number[]) => Uint8Array.from(input);
 

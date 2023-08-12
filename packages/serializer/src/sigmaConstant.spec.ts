@@ -27,9 +27,9 @@ import {
   SLong,
   SShort,
   SSigmaProp,
-  STuple,
   SUnit
 } from "./types/";
+import { STuple } from "./types/constructors";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
