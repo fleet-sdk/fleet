@@ -10,9 +10,9 @@ export class SigmaConstant<V = unknown, T extends SType = SType> {
   readonly #type: T;
   readonly #data: V;
 
-  constructor(type: T, value: V) {
+  constructor(type: T, data: V) {
     this.#type = type;
-    this.#data = value;
+    this.#data = type.coerce(data) as V;
   }
 
   static from<D, T extends SType = SType>(bytes: Uint8Array | string): SigmaConstant<D, T> {

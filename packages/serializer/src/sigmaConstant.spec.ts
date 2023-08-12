@@ -105,24 +105,25 @@ describe("SColl serialization and parsing", () => {
 
 describe("Not implemented types", () => {
   it("Should fail while trying to serialize a not implemented type", () => {
-    const unimplementedType: SType = {
+    const unimplementedType = {
       code: 0x64, // AvlTree type code
-      embeddable: false
-    };
+      embeddable: false,
+      coerce: (val) => val
+    } as SType;
 
     expect(() => {
       new SigmaConstant(unimplementedType, "").toBytes();
-    }).to.throw();
+    }).to.throw("Serialization error: type not implemented.");
 
     // not implemented SSigmaProp expression
     expect(() => {
       SSigmaProp(new SigmaConstant(unimplementedType, Uint8Array.from([0]))).toBytes();
-    }).to.throw();
+    }).to.throw("Serialization error: SigmaProp operation not implemented.");
 
     // not implemented SSigmaProp expression
     expect(() => {
       DataSerializer.serialize("", unimplementedType, new SigmaWriter(1));
-    }).to.throw();
+    }).to.throw("Serialization error: '0x64' type not implemented.");
   });
 
   it("Should fail while trying to deserialize a not implemented SigmaProp expression", () => {

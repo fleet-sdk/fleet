@@ -2,9 +2,7 @@ import { ensureBigInt } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { SigmaConstant } from "../sigmaConstant";
 import { SPrimitiveType } from "./base";
-
-type BigIntInput = string | bigint;
-type ByteInput = Uint8Array | string;
+import { BigIntInput, ByteInput } from "./constructors";
 
 export class SBoolType extends SPrimitiveType<boolean> {
   get code(): number {

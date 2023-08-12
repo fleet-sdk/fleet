@@ -77,7 +77,7 @@ export class DataSerializer {
       return writer;
     }
 
-    throw Error(`Serialization error: '0x${type.code}' type not implemented.`);
+    throw Error(`Serialization error: '0x${type.code.toString(16)}' type not implemented.`);
   }
 
   static deserialize(type: SType, reader: SigmaReader): unknown {
@@ -135,6 +135,6 @@ export class DataSerializer {
       }
     }
 
-    throw new Error(`Parsing error: '0x${type.code}' type not implemented.`);
+    throw new Error(`Parsing error: '0x${type.code.toString(16)}' type not implemented.`);
   }
 }

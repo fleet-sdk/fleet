@@ -31,23 +31,25 @@ const MAX_PRIMITIVE_TYPE_CODE = 0x0b;
 export const PRIMITIVE_TYPE_RANGE = MAX_PRIMITIVE_TYPE_CODE + 0x01;
 const typeCodeOf = (constructor: number) => PRIMITIVE_TYPE_RANGE * constructor;
 
+type Descriptor = { code: number; embeddable: boolean };
+
 const collDescriptor = Object.freeze({
   code: typeCodeOf(constructorCode.simpleColl),
+  embeddable: false,
   simpleCollTypeCode: typeCodeOf(constructorCode.simpleColl),
-  nestedCollTypeCode: typeCodeOf(constructorCode.nestedColl),
-  embeddable: false
-}) satisfies SType;
+  nestedCollTypeCode: typeCodeOf(constructorCode.nestedColl)
+}) satisfies Descriptor;
 
 const tupleDescriptor = Object.freeze({
   code: typeCodeOf(constructorCode.pairOne),
+  embeddable: false,
   pairOneTypeCode: typeCodeOf(constructorCode.pairOne),
   pairTwoTypeCode: typeCodeOf(constructorCode.pairTwo),
   tripleTypeCode: typeCodeOf(constructorCode.pairTwo),
   symmetricPairTypeCode: typeCodeOf(constructorCode.symmetricPair),
   quadrupleTypeCode: typeCodeOf(constructorCode.symmetricPair),
-  genericTupleTypeCode: typeCodeOf(constructorCode.genericTuple),
-  embeddable: false
-}) satisfies SType;
+  genericTupleTypeCode: typeCodeOf(constructorCode.genericTuple)
+}) satisfies Descriptor;
 
 export const descriptors = {
   bool: new SBoolType(),
@@ -61,7 +63,7 @@ export const descriptors = {
   unit: new SUnitType(),
   coll: collDescriptor,
   tuple: tupleDescriptor
-} satisfies { [key: string]: SType };
+} satisfies { [key: string]: Descriptor };
 
 export function isColl(type: SType): type is SCollType {
   return (
@@ -96,6 +98,8 @@ export function getPrimitiveType(typeCode: number) {
     case descriptors.sigmaProp.code:
       return descriptors.sigmaProp;
     default:
-      throw new Error(`The type code '0x${typeCode}' is not a valid primitive type code.`);
+      throw new Error(
+        `The type code '0x${typeCode.toString(16)}' is not a valid primitive type code.`
+      );
   }
 }

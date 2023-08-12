@@ -41,7 +41,7 @@ function SColl<T>(type: () => SType, elements: ArrayLike<T> | Uint8Array) {
     elements = hex.decode(elements);
   }
 
-  return serializerSColl(type, elements);
+  return serializerSColl(type, elements as ArrayLike<number>);
 }
 
 export {
