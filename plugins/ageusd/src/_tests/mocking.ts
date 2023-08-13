@@ -1,5 +1,5 @@
-import { SConstant, SLong } from "@fleet-sdk/core";
 import { mockUTxO } from "@fleet-sdk/mock-chain";
+import { SLong } from "@fleet-sdk/serializer";
 import { AgeUSDBankBox, OracleBox } from "../ageUsdBank";
 
 export function mockOracleBox(rate: bigint): OracleBox {
@@ -12,7 +12,7 @@ export function mockOracleBox(rate: bigint): OracleBox {
       { tokenId: "011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f", amount: 1n }
     ],
     additionalRegisters: {
-      R4: SConstant(SLong(rate))
+      R4: SLong(rate).toHex()
     }
   }) as OracleBox;
 }
@@ -48,8 +48,8 @@ export function mockBankBox(
       }
     ],
     additionalRegisters: {
-      R4: SConstant(SLong(args.circulatingStableCoin)),
-      R5: SConstant(SLong(args.circulatingReserveCoin))
+      R4: SLong(args.circulatingStableCoin).toHex(),
+      R5: SLong(args.circulatingReserveCoin).toHex()
     }
   }) as AgeUSDBankBox;
 }

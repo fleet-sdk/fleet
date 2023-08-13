@@ -15,8 +15,8 @@ import {
 } from "./_test-vectors/constantVectors";
 import { SigmaWriter } from "./coders";
 import { DataSerializer } from "./serializers";
-import { SConstant } from "./sigmaConstant";
-import { SType } from "./types";
+import { parse, SConstant } from "./sigmaConstant";
+import { SGroupElementType } from "./types";
 import {
   SBigInt,
   SBool,
@@ -86,6 +86,14 @@ describe("Primitive types serialization and parsing", () => {
 
     expect(SConstant.from(tv.hex).data).to.be.equal(BigInt(tv.value));
   });
+
+  it("Should coerce alternative input types", () => {
+    const expectedBytes = Uint8Array.from([0xde, 0xad, 0xbe, 0xef]);
+
+    expect(SGroupElement("deadbeef").data).to.be.deep.equal(expectedBytes);
+    expect(SLong("1").data).to.be.deep.equal(1n);
+    expect(SBigInt("123").data).to.be.deep.equal(123n);
+  });
 });
 
 describe("Monomorphic types serialization and parsing", () => {
@@ -101,6 +109,38 @@ describe("SColl serialization and parsing", () => {
     expect(tv.sconst.toHex()).to.be.equal(tv.hex);
     expect(SConstant.from(tv.hex).data).to.be.deep.equal(tv.value);
   });
+
+  it("Should coerce alternative input types", () => {
+    const expectedBytes = Uint8Array.from([0xde, 0xad, 0xbe, 0xef]);
+    expect(SColl(SByte, "deadbeef").data).to.be.deep.equal(expectedBytes);
+    expect(SColl(SByte, [222, 173, 190, 239]).data).to.be.deep.equal(expectedBytes);
+    expect(SColl(SByte, Uint8Array.from([0xde, 0xad, 0xbe, 0xef])).data).to.be.deep.equal(
+      expectedBytes
+    );
+
+    expect(SColl(SGroupElement, ["deadbeef"]).data).to.be.deep.equal([expectedBytes]);
+    expect(SColl(SLong, ["1", 2n]).data).to.be.deep.equal([1n, 2n]);
+    expect(SColl(SBigInt, ["1", 2n]).data).to.be.deep.equal([1n, 2n]);
+  });
+});
+
+describe("Data only parsing", () => {
+  it("Should parse only data", () => {
+    expect(parse("40050002")).to.deep.equal([0, 1n]);
+    expect(parse("0101")).to.deep.equal(true);
+  });
+
+  it("Should throw with invalid bytes in 'strict' parsing mode", () => {
+    expect(() => parse("deadbeef")).to.throw();
+    expect(() => parse("deadbeef", "strict")).to.throw();
+  });
+
+  it("Should not throw but return undefined with invalid bytes in 'safe' parsing mode", () => {
+    expect(() => parse("deadbeef", "safe")).not.to.throw();
+    expect(parse("deadbeef", "safe")).to.be.undefined;
+    expect(parse(undefined as unknown as string, "safe")).to.be.undefined;
+    expect(parse("0102", "safe")).to.be.equal(false);
+  });
 });
 
 describe("Not implemented types", () => {
@@ -108,8 +148,8 @@ describe("Not implemented types", () => {
     const unimplementedType = {
       code: 0x64, // AvlTree type code
       embeddable: false,
-      coerce: (val) => val
-    } as SType;
+      coerce: (val: unknown) => val
+    } as unknown as SGroupElementType;
 
     expect(() => {
       new SConstant(unimplementedType, "").toBytes();

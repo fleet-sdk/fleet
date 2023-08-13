@@ -1,5 +1,6 @@
 import { isDefined, isHex, isUndefined } from "@fleet-sdk/common";
-import { Amount, Box, R4ToR5Registers, SParse } from "@fleet-sdk/core";
+import { Amount, Box, R4ToR5Registers } from "@fleet-sdk/core";
+import { parse } from "@fleet-sdk/serializer";
 import { BABEL_ERGOTREE_PREFIX, BABEL_ERGOTREE_SUFFIX } from "./constants";
 
 const TOKEN_ID_HEX_LENGTH = 64;
@@ -17,7 +18,7 @@ export function getTokenPrice(babelBox: Box<Amount>): bigint {
     throw Error("Invalid babel box.");
   }
 
-  return SParse(babelBox.additionalRegisters.R5);
+  return parse(babelBox.additionalRegisters.R5);
 }
 
 /**

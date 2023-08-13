@@ -24,7 +24,8 @@
   ],
   "dependencies": {
     "@fleet-sdk/core": "workspace:^",
-    "@fleet-sdk/common": "workspace:^"
+    "@fleet-sdk/common": "workspace:^",
+    "@fleet-sdk/serializer": "workspace:^"
   },
   "devDependencies": {
     "@fleet-sdk/mock-chain": "workspace:^"

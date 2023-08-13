@@ -1,3 +1,4 @@
+import { hex } from "@fleet-sdk/crypto";
 import { SGenericType, SType } from "./base";
 import { descriptors } from "./descriptors";
 
@@ -8,7 +9,9 @@ export class SCollType<T extends SType = SType> extends SGenericType<T> {
 
   override coerce<I, O>(elements: I[]): O[] | Uint8Array {
     if (this.elementsType.code === descriptors.byte.code && !(elements instanceof Uint8Array)) {
-      return Uint8Array.from(elements as ArrayLike<number>);
+      return typeof elements === "string"
+        ? hex.decode(elements)
+        : Uint8Array.from(elements as ArrayLike<number>);
     }
 
     return elements.map((el) => this.elementsType.coerce(el)) as O[];

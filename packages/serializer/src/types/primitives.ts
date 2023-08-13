@@ -5,31 +5,31 @@ import { SPrimitiveType } from "./base";
 import { BigIntInput, ByteInput } from "./constructors";
 
 export class SBoolType extends SPrimitiveType<boolean> {
-  get code(): number {
+  get code(): 0x01 {
     return 0x01;
   }
 }
 
 export class SByteType extends SPrimitiveType<number> {
-  get code(): number {
+  get code(): 0x02 {
     return 0x02;
   }
 }
 
 export class SShortType extends SPrimitiveType<number> {
-  get code(): number {
+  get code(): 0x03 {
     return 0x03;
   }
 }
 
 export class SIntType extends SPrimitiveType<number> {
-  get code(): number {
+  get code(): 0x04 {
     return 0x04;
   }
 }
 
 export class SLongType extends SPrimitiveType<BigIntInput, bigint> {
-  get code(): number {
+  get code(): 0x05 {
     return 0x05;
   }
 
@@ -49,7 +49,7 @@ export class SBigIntType extends SPrimitiveType<string | bigint, bigint> {
 }
 
 export class SGroupElementType extends SPrimitiveType<ByteInput, Uint8Array> {
-  get code(): number {
+  get code(): 0x07 {
     return 0x07;
   }
 
@@ -59,7 +59,7 @@ export class SGroupElementType extends SPrimitiveType<ByteInput, Uint8Array> {
 }
 
 export class SSigmaPropType extends SPrimitiveType<SConstant<Uint8Array>> {
-  get code(): number {
+  get code(): 0x08 {
     return 0x08;
   }
 }

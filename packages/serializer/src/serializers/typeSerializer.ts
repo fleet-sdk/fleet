@@ -1,16 +1,12 @@
 import { assert, first, last } from "@fleet-sdk/common";
 import { SigmaReader, SigmaWriter } from "../coders";
+import { isColl, isTuple, SCollType, STupleType, SType } from "../types";
 import {
   constructorCode,
   descriptors,
   getPrimitiveType,
-  isColl,
-  isTuple,
-  PRIMITIVE_TYPE_RANGE,
-  SCollType,
-  STupleType,
-  SType
-} from "../types";
+  PRIMITIVE_TYPE_RANGE
+} from "../types/descriptors";
 
 export class TypeSerializer {
   static serialize(type: SType, writer: SigmaWriter) {

@@ -1,6 +1,7 @@
 import { fail } from "assert";
 import { ensureBigInt, first } from "@fleet-sdk/common";
-import { SByte, SColl, SConstant, SParse, TransactionBuilder } from "@fleet-sdk/core";
+import { TransactionBuilder } from "@fleet-sdk/core";
+import { parse, SByte, SColl } from "@fleet-sdk/serializer";
 import { regularBoxes } from "_test-vectors";
 import { babelBoxesMock } from "_test-vectors";
 import { describe, expect, it } from "vitest";
@@ -33,13 +34,13 @@ describe("Babel Swap Plugin", () => {
       fail();
     }
 
-    const outputIndex = SParse<number>(input.extension[0]);
+    const outputIndex = parse<number>(input.extension[0]);
     const output = tx.outputs[outputIndex];
     expect(isValidBabelContract(output.ergoTree)).toBeTruthy();
     expect(output.ergoTree).toBe(input.ergoTree);
     expect(output.additionalRegisters.R4).toBe(input.additionalRegisters.R4);
     expect(output.additionalRegisters.R5).toBe(input.additionalRegisters.R5);
-    expect(output.additionalRegisters.R6).toBe(SConstant(SColl(SByte, input.boxId)));
+    expect(output.additionalRegisters.R6).toBe(SColl(SByte, input.boxId).toHex());
 
     const swappedNanoErgs = getTokenPrice(input) * payingTokenAmount;
     expect(ensureBigInt(input.value)).toBe(BigInt(output.value) + swappedNanoErgs);

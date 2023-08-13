@@ -147,10 +147,15 @@ function buildCollVectors<T>(
   elType: SConstructor<T>,
   vectors: {
     hex: string;
-    value: ArrayLike<T>;
+    value: ArrayLike<unknown>;
   }[]
 ): GenericTypeTestVector[] {
-  return vectors.map((v) => ({ name, hex: v.hex, sconst: SColl(elType, v.value), value: v.value }));
+  return vectors.map((v) => ({
+    name,
+    hex: v.hex,
+    sconst: SColl(elType, v.value as T[]),
+    value: v.value
+  }));
 }
 
 export const collVectors: GenericTypeTestVector[] = [

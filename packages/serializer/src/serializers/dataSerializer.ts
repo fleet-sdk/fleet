@@ -1,7 +1,8 @@
 import { assert } from "@fleet-sdk/common";
 import { SigmaReader, SigmaWriter } from "../coders";
 import { SConstant } from "../sigmaConstant";
-import { descriptors, isColl, isTuple, SCollType, STupleType, SType } from "../types";
+import { isColl, isTuple, SCollType, STupleType, SType } from "../types";
+import { descriptors } from "../types/descriptors";
 
 const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
@@ -39,8 +40,8 @@ export class DataSerializer {
       }
     } else if (isColl(type)) {
       if (type.elementsType.code === descriptors.byte.code) {
-        const assertion = data instanceof Uint8Array;
-        assert(assertion, `SColl[Byte] expected an UInt8Array, got ${typeof data}.`);
+        const isUint8Array = data instanceof Uint8Array;
+        assert(isUint8Array, `SColl[Byte] expected an UInt8Array, got ${typeof data}.`);
       } else {
         assert(Array.isArray(data), `SColl expected an array, got ${typeof data}.`);
       }

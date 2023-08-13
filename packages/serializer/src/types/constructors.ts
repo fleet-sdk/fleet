@@ -20,9 +20,7 @@ import {
 export type BigIntInput = string | bigint;
 export type ByteInput = Uint8Array | string;
 
-export type SConstructor<T = unknown> = (arg?: T) => SType | SCollType<SType>;
-type SCollConstant<T> = SConstant<ArrayLike<T>>;
-type STupleConstant<T> = SConstant<T, STupleType>;
+export type SConstructor<T = unknown, S extends SType = SType | SCollType<SType>> = (arg?: T) => S;
 
 type Constructable<T = any> = { new (...args: any): T };
 type GenericProxyArgs<R> = R extends (...args: any) => unknown ? Parameters<R> : [];
@@ -48,7 +46,7 @@ type SProxy<T extends SType, I, O = I> = {
  * @param forceConstruction If true, bypasses the constant creation and returns a type.
  * @returns
  */
-function monoProxy<I, O = I, T extends SType = SType<I, O>>(
+function monoProxy<T extends SType, I, O = I>(
   ctor: Constructable<T>,
   cache?: T,
   forceConstruction?: boolean
@@ -75,35 +73,38 @@ function genericProxy<T extends SType, R>(
   }) as R;
 }
 
-export const SByte = monoProxy<number>(SByteType, descriptors.byte);
+export const SByte = monoProxy<SByteType, number>(SByteType, descriptors.byte);
 
-export const SBool = monoProxy<boolean>(SBoolType, descriptors.bool);
+export const SBool = monoProxy<SBoolType, boolean>(SBoolType, descriptors.bool);
 
-export const SShort = monoProxy<number>(SShortType, descriptors.short);
+export const SShort = monoProxy<SShortType, number>(SShortType, descriptors.short);
 
-export const SInt = monoProxy<number>(SIntType, descriptors.int);
+export const SInt = monoProxy<SIntType, number>(SIntType, descriptors.int);
 
-export const SLong = monoProxy<BigIntInput, bigint>(SLongType, descriptors.long);
+export const SLong = monoProxy<SLongType, BigIntInput, bigint>(SLongType, descriptors.long);
 
-export const SBigInt = monoProxy<BigIntInput, bigint>(SBigIntType, descriptors.bigInt);
+export const SBigInt = monoProxy<SBigIntType, BigIntInput, bigint>(SBigIntType, descriptors.bigInt);
 
-export const SGroupElement = monoProxy<ByteInput, Uint8Array>(
+export const SGroupElement = monoProxy<SGroupElementType, ByteInput, Uint8Array>(
   SGroupElementType,
   descriptors.groupElement
 );
 
-export const SSigmaProp = monoProxy<SConstant<Uint8Array>>(SSigmaPropType, descriptors.sigmaProp);
+export const SSigmaProp = monoProxy<SSigmaPropType, SConstant<Uint8Array>>(
+  SSigmaPropType,
+  descriptors.sigmaProp
+);
 
-type SUnit = (value?: undefined) => SConstant<undefined>;
+type SUnit = (value?: undefined) => SConstant<undefined, SUnitType>;
 export const SUnit: SUnit = monoProxy(SUnitType, undefined, true);
 
 type SColl = {
-  <T>(type: SConstructor<T>): SConstructor<ArrayLike<T>>;
-  <T>(type: SConstructor<T>, elements?: ArrayLike<T>): SCollConstant<T>;
-  <T>(
-    type: SConstructor<T>,
-    elements?: ArrayLike<T>
-  ): SCollConstant<T> | SConstructor<ArrayLike<T>>;
+  <D, T extends SType>(type: SConstructor<D, T>): SConstructor<D[], T>;
+  <D, T extends SByteType>(
+    type: SConstructor<D, T>,
+    elements: ByteInput | D[]
+  ): SConstant<Uint8Array, T>;
+  <D, T extends SType>(type: SConstructor<D, T>, elements: D[]): SConstant<D[], T>;
 };
 
 export const SColl = genericProxy<SCollType, SColl>(SCollType, (target, _, args) => {
@@ -121,13 +122,13 @@ export function STuple(...items: SConstant[]) {
   );
 }
 
+type ByteInputOr<D, T extends SType> = T extends SByteType ? ByteInput | D : D;
 type SPair = {
-  <L, R>(left: SConstant<L>, right: SConstant<R>): STupleConstant<[L, R]>;
-  <L, R>(left: SConstructor<L>, right: SConstructor<R>): SConstructor<[L, R]>;
-  <L, R>(
-    left: SConstant<L> | SConstructor<L>,
-    right: SConstant<R> | SConstructor<R>
-  ): STupleConstant<[L, R]> | SConstructor<[L, R]>;
+  <L, R>(left: SConstant<L>, right: SConstant<R>): SConstant<[L, R], STupleType>;
+  <LD, RD, LT extends SType, RT extends SType>(
+    left: SConstructor<LD, LT>,
+    right: SConstructor<RD, RT>
+  ): SConstructor<[ByteInputOr<LD, LT>, ByteInputOr<RD, RT>]>;
 };
 
 export const SPair = genericProxy<STupleType, SPair>(STupleType, (target, _, args) => {

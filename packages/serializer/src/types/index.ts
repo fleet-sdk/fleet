@@ -1,7 +1,6 @@
 export * from "./base";
-export * from "./base";
 export * from "./primitives";
-export * from "./descriptors";
+export { isColl, isTuple } from "./descriptors";
 export * from "./generics";
 export * from "./monomorphics";
 export {

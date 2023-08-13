@@ -1,11 +1,10 @@
 import { HexString } from "@fleet-sdk/common";
-import { hex } from "@fleet-sdk/crypto";
 import {
   SBigInt,
   SBool,
   SByte,
+  SColl,
   SCollType,
-  SColl as SerSColl,
   SConstant as SerSConstant,
   SGroupElement,
   SInt,
@@ -30,18 +29,6 @@ export function SConstant(constant: SerSConstant): HexString {
  */
 export function SParse<T>(bytes: HexString | Uint8Array): T {
   return SerSConstant.from<T>(bytes).data;
-}
-
-/**
- * @deprecated Use {@link @fleet-sdk/serializer} instead.
- * This function will be removed from core package in v1.0.0.
- */
-function SColl<T>(type: () => SType, elements: ArrayLike<T> | Uint8Array) {
-  if (typeof elements === "string") {
-    elements = hex.decode(elements);
-  }
-
-  return SerSColl(type, elements as ArrayLike<number>);
 }
 
 export {

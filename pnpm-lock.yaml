@@ -175,6 +175,9 @@ importers:
       '@fleet-sdk/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@fleet-sdk/serializer':
+        specifier: workspace:^
+        version: link:../../packages/serializer
     devDependencies:
       '@fleet-sdk/mock-chain':
         specifier: workspace:^
@@ -188,6 +191,9 @@ importers:
       '@fleet-sdk/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@fleet-sdk/serializer':
+        specifier: workspace:^
+        version: link:../../packages/serializer
 
 packages:
 

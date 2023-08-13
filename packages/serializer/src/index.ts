@@ -1,4 +1,4 @@
-export { estimateVLQSize, SigmaReader, SigmaWriter } from "./coders";
-export { SConstant } from "./sigmaConstant";
+export { estimateVLQSize } from "./coders";
+export { SConstant, parse } from "./sigmaConstant";
+export * from "./types";
 export * from "./serializers";
-export * from "./types/index";

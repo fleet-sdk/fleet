@@ -1,10 +1,6 @@
-import {
-  RECOMMENDED_MIN_FEE_VALUE,
-  SAFE_MIN_BOX_VALUE,
-  SParse,
-  TransactionBuilder
-} from "@fleet-sdk/core";
+import { RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "@fleet-sdk/core";
 import { MockChain } from "@fleet-sdk/mock-chain";
+import { parse } from "@fleet-sdk/serializer";
 import { beforeEach, describe, expect, it } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_tests/mocking";
 import { AgeUSDBankBox } from "./ageUsdBank";
@@ -36,10 +32,10 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const bank = new SigmaUSDBank(
       mockBankBox({
         reserveNanoergs: 1_482_462_367921576n,
-        circulatingStableCoin: SParse("0584cda232"),
-        circulatingReserveCoin: SParse("05acdac7e612")
+        circulatingStableCoin: parse("0584cda232"),
+        circulatingReserveCoin: parse("05acdac7e612")
       }),
-      mockOracleBox(SParse("05b8e68b8106"))
+      mockOracleBox(parse("05b8e68b8106"))
     ).setImplementorFee({
       percentage: 11n,
       precision: 4n,
@@ -101,10 +97,10 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const bank = new SigmaUSDBank(
       mockBankBox({
         reserveNanoergs: 1_482_462_367921576n,
-        circulatingStableCoin: SParse("0584cda232"),
-        circulatingReserveCoin: SParse("05acdac7e612")
+        circulatingStableCoin: parse("0584cda232"),
+        circulatingReserveCoin: parse("05acdac7e612")
       }),
-      mockOracleBox(SParse("05b8e68b8106"))
+      mockOracleBox(parse("05b8e68b8106"))
     ).setImplementorFee({
       percentage: 11n,
       precision: 4n,
@@ -166,10 +162,10 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const bank = new SigmaUSDBank(
       mockBankBox({
         reserveNanoergs: 1_481_754_555029675n,
-        circulatingStableCoin: SParse("05d4d59732"),
-        circulatingReserveCoin: SParse("05acdac7e612")
+        circulatingStableCoin: parse("05d4d59732"),
+        circulatingReserveCoin: parse("05acdac7e612")
       }),
-      mockOracleBox(SParse("0580a0f8fa05"))
+      mockOracleBox(parse("0580a0f8fa05"))
     ).setImplementorFee({
       percentage: 22n,
       precision: 4n,
@@ -237,10 +233,10 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const bank = new SigmaUSDBank(
       mockBankBox({
         reserveNanoergs: 1_481_754_555029675n,
-        circulatingStableCoin: SParse("05d4d59732"),
-        circulatingReserveCoin: SParse("05acdac7e612")
+        circulatingStableCoin: parse("05d4d59732"),
+        circulatingReserveCoin: parse("05acdac7e612")
       }),
-      mockOracleBox(SParse("0580a0f8fa05"))
+      mockOracleBox(parse("0580a0f8fa05"))
     ).setImplementorFee({
       percentage: 22n,
       precision: 4n,
@@ -306,10 +302,10 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const bank = new SigmaUSDBank(
       mockBankBox({
         reserveNanoergs: 1_481_754_555029675n,
-        circulatingStableCoin: SParse("05d4d59732"),
-        circulatingReserveCoin: SParse("05acdac7e612")
+        circulatingStableCoin: parse("05d4d59732"),
+        circulatingReserveCoin: parse("05acdac7e612")
       }),
-      mockOracleBox(SParse("0580a0f8fa05"))
+      mockOracleBox(parse("0580a0f8fa05"))
     );
 
     bankParty.addUTxOs(bank.bankBox);
@@ -339,10 +335,10 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const bank = new SigmaUSDBank(
       mockBankBox({
         reserveNanoergs: 1_482_462_367921576n,
-        circulatingStableCoin: SParse("0584cda232"),
-        circulatingReserveCoin: SParse("05acdac7e612")
+        circulatingStableCoin: parse("0584cda232"),
+        circulatingReserveCoin: parse("05acdac7e612")
       }),
-      mockOracleBox(SParse("05b8e68b8106"))
+      mockOracleBox(parse("05b8e68b8106"))
     );
 
     bankParty.addUTxOs(bank.bankBox);
@@ -369,10 +365,10 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const bank = new SigmaUSDBank(
       mockBankBox({
         reserveNanoergs: 1_482_462_367921576n,
-        circulatingStableCoin: SParse("0584cda232"),
-        circulatingReserveCoin: SParse("05acdac7e612")
+        circulatingStableCoin: parse("0584cda232"),
+        circulatingReserveCoin: parse("05acdac7e612")
       }),
-      mockOracleBox(SParse("05b8e68b8106"))
+      mockOracleBox(parse("05b8e68b8106"))
     );
 
     bankParty.addUTxOs(bank.bankBox);
