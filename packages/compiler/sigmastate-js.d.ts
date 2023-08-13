@@ -56,7 +56,7 @@ declare module "sigmastate-js/main" {
     static ofInt(value: number): Value<number>;
     static ofLong(value: bigint): Value<bigint>;
     static ofBigInt(value: bigint): Value<bigint>;
-    static pairOf<R, L>(left: Value<R>, right: Value<L>): Value<[R, L]>;
+    static pairOf<L, R>(left: Value<R>, right: Value<L>): Value<[L, R]>;
     static collOf<T>(items: T[], type: Type): Value<T[]>;
     static fromHex<T>(hex: HexString): Value<T>;
   }

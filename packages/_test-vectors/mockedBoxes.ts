@@ -1719,7 +1719,7 @@ export const outOfOrderRegistersBox = {
   index: 0
 };
 
-export const babelBoxesMock: Box<string>[] = [
+export const babelBoxes: Box<string>[] = [
   {
     boxId: "8fccab355e7b02f758f4aeab625a8b0b42c75a21c9855d3a40d9bb3e06ba70d7",
     transactionId: "b34bf160ed1d14185884836ccbbc4932b4cccf13855321883a1a695837d5fce8",

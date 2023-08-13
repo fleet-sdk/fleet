@@ -3,7 +3,7 @@ import { ensureBigInt, first } from "@fleet-sdk/common";
 import { TransactionBuilder } from "@fleet-sdk/core";
 import { parse, SByte, SColl } from "@fleet-sdk/serializer";
 import { regularBoxes } from "_test-vectors";
-import { babelBoxesMock } from "_test-vectors";
+import { babelBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { BabelSwapPlugin } from "./plugins";
 import { getTokenPrice, isValidBabelBox, isValidBabelContract } from "./utils";
@@ -13,7 +13,7 @@ describe("Babel Swap Plugin", () => {
   const changeAddress = "9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ";
 
   it("Should add babel input and output", () => {
-    const babelBox = first(babelBoxesMock);
+    const babelBox = first(babelBoxes);
     const payingTokenAmount = 5n;
 
     const tx = new TransactionBuilder(height)
@@ -69,7 +69,7 @@ describe("Babel Swap Plugin", () => {
   });
 
   it("Should fail if valid babel box is added but incompatible tokenId", () => {
-    const babelBox = first(babelBoxesMock);
+    const babelBox = first(babelBoxes);
 
     expect(() => {
       new TransactionBuilder(height)
@@ -87,7 +87,7 @@ describe("Babel Swap Plugin", () => {
   });
 
   it("Should fail if the box does not have enough ERG to swap for the tokens", () => {
-    const babelBox = first(babelBoxesMock);
+    const babelBox = first(babelBoxes);
 
     expect(() => {
       new TransactionBuilder(height)
