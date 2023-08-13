@@ -1,5 +1,6 @@
-import { HexString, hexToBigInt, isEmpty } from "@fleet-sdk/common";
+import { HexString, isEmpty } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
+import { hexToBigInt } from "./bigint";
 import { readBigVLQ, readVLQ } from "./vlq";
 import { zigZagDecode, zigZagDecodeBigInt } from "./zigZag";
 

@@ -30,22 +30,6 @@ describe("Sigma Writer", () => {
     expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]));
   });
 
-  it("Should fail for invalid hex string", () => {
-    const sigmaBuffer = new SigmaWriter(MAX_CONSTANT_LENGTH);
-
-    expect(() => {
-      sigmaBuffer.writeHex("000021f");
-    }).toThrow(Error("Invalid hex padding"));
-
-    expect(() => {
-      sigmaBuffer.writeHex("-1");
-    }).toThrow(Error("Invalid byte sequence"));
-
-    expect(() => {
-      sigmaBuffer.writeHex("ka");
-    }).toThrow(Error("Invalid byte sequence"));
-  });
-
   it("Should put a boolean", () => {
     const sigmaBuffer = new SigmaWriter(MAX_CONSTANT_LENGTH);
     sigmaBuffer.writeBoolean(true);

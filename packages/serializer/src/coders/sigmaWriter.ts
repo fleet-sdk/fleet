@@ -1,5 +1,5 @@
-import { bigIntToHex } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
+import { bigIntToHex } from "./bigint";
 import { writeBigVLQ, writeVLQ } from "./vlq";
 import { zigZagEncode, zigZagEncodeBigInt } from "./zigZag";
 
@@ -61,23 +61,8 @@ export class SigmaWriter {
     return this;
   }
 
-  public writeHex(hex: string): SigmaWriter {
-    if (hex.length % 2) {
-      throw new Error("Invalid hex padding");
-    }
-
-    for (let i = 0; i < hex.length / 2; i++) {
-      const j = i * 2;
-      const byte = Number.parseInt(hex.slice(j, j + 2), 16);
-
-      if (Number.isNaN(byte) || byte < 0) {
-        throw new Error("Invalid byte sequence");
-      }
-
-      this.write(byte);
-    }
-
-    return this;
+  public writeHex(bytesHex: string): SigmaWriter {
+    return this.writeBytes(hex.decode(bytesHex));
   }
 
   public writeBits(bits: ArrayLike<boolean>): SigmaWriter {
