@@ -19,11 +19,11 @@ import {
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
+import { estimateVLQSize } from "@fleet-sdk/serializer";
 import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
-import { estimateVLQSize } from "../serializer/vlq";
 import {
   BOX_VALUE_PER_BYTE,
   estimateMinBoxValue,

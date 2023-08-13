@@ -4,11 +4,9 @@ import {
   ErgoAddress,
   FleetPlugin,
   OutputBuilder,
-  SAFE_MIN_BOX_VALUE,
-  SConstant,
-  SLong,
-  SParse
+  SAFE_MIN_BOX_VALUE
 } from "@fleet-sdk/core";
+import { SConstant, SLong } from "@fleet-sdk/serializer";
 import { ActionType, AgeUSDBank, CoinType } from "./ageUsdBank";
 
 export type AgeUSDActionBase = {
@@ -98,8 +96,8 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
         .addTokens({ tokenId: reserve.tokenId, amount: big(reserve.amount) + reserveDelta })
         .addTokens(nft)
         .setAdditionalRegisters({
-          R4: SConstant(SLong(SParse<bigint>(box.additionalRegisters.R4) - stableDelta)),
-          R5: SConstant(SLong(SParse<bigint>(box.additionalRegisters.R5) - reserveDelta))
+          R4: SLong(SConstant.from<bigint>(box.additionalRegisters.R4).data - stableDelta).toHex(),
+          R5: SLong(SConstant.from<bigint>(box.additionalRegisters.R5).data - reserveDelta).toHex()
         }),
       { index: 0 }
     );
@@ -111,8 +109,8 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
     if (action.recipient) {
       const recipient = new OutputBuilder(recipientAmount, action.recipient).setAdditionalRegisters(
         {
-          R4: SConstant(SLong(circulationDelta)),
-          R5: SConstant(SLong(nanoergsDelta))
+          R4: SLong(circulationDelta).toHex(),
+          R5: SLong(nanoergsDelta).toHex()
         }
       );
 

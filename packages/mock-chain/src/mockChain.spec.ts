@@ -4,12 +4,10 @@ import {
   OutputBuilder,
   RECOMMENDED_MIN_FEE_VALUE,
   SAFE_MIN_BOX_VALUE,
-  SBool,
-  SByte,
-  SColl,
-  SConstant,
   TransactionBuilder
 } from "@fleet-sdk/core";
+import { utf8 } from "@fleet-sdk/crypto";
+import { SBool, SByte, SColl } from "@fleet-sdk/serializer";
 import { bgRed, bold, red } from "picocolors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MockChain } from "./mockChain";
@@ -352,7 +350,7 @@ describe("Contract execution and chain mocking", () => {
             amount: 1000n
           })
           .setAdditionalRegisters({
-            R4: SConstant(SColl(SByte, new TextEncoder().encode("Test Token 4")))
+            R4: SColl(SByte, utf8.decode("Test Token 4")).toHex()
           })
       )
       .sendChangeTo(bob.address)
@@ -373,9 +371,9 @@ describe("Contract execution and chain mocking", () => {
             amount: 1000n
           })
           .setAdditionalRegisters({
-            R4: SConstant(SColl(SByte, new TextEncoder().encode("Test Token 5"))),
-            R5: SConstant(SColl(SByte, new TextEncoder().encode(""))),
-            R6: SConstant(SBool(false)) // non standard, should not throw on parsing
+            R4: SColl(SByte, utf8.decode("Test Token 5")).toHex(),
+            R5: SColl(SByte, utf8.decode("")).toHex(),
+            R6: SBool(false).toHex() // non standard, should not throw on parsing
           })
       )
       .sendChangeTo(bob.address)

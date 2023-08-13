@@ -1,5 +1,5 @@
-import { SInt } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
+import { SInt } from "@fleet-sdk/serializer";
 import { HexString, Value, ValueObj } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import { compile, compilerDefaults, CompilerOptions, parseNamedConstantsMap } from "./compiler";
@@ -145,7 +145,7 @@ describe("Compiler constants map parsing", () => {
     const parsedMap = parseNamedConstantsMap(originalMap);
 
     expect(originalMap).not.to.be.equal(parsedMap);
-    expect(originalMap.test).to.be.deep.equal({ type: 4, value: 100 });
+    expect(originalMap.test).to.be.deep.equal(SInt(100));
   });
 
   it("Should throw is an invalid hex string is passed", () => {

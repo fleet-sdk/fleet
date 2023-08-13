@@ -1,11 +1,11 @@
 import { TransactionBuilder } from "@fleet-sdk/core";
 import { ErgoHDKey } from "@fleet-sdk/wallet";
+import { regularBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { execute } from "./executor";
 import { MockChain } from "./mockChain";
 import { mockUTxO } from "./objectMocking";
 import { KeyedMockChainParty } from "./party";
-import { regularBoxesMock } from "./tests/regularBoxesMock";
 
 describe("Transaction executor", () => {
   const chain = new MockChain();
@@ -13,7 +13,7 @@ describe("Transaction executor", () => {
   it("Should not execute transaction, invalid private key", () => {
     const bob = new KeyedMockChainParty(chain, "bob");
     const unsigned = new TransactionBuilder(1032850)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .sendChangeTo("9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga")
       .payMinFee()
       .build();

@@ -1,17 +1,17 @@
 import { NonMandatoryRegisters } from "@fleet-sdk/common";
-import { describe, expect, it } from "vitest";
 import {
-  invalidBoxesMock,
-  manyTokensBoxesMock,
+  invalidBoxes,
+  manyTokensBoxes,
   outOfOrderRegistersBox,
-  regularBoxesMock,
-  validBoxesMock
-} from "../tests/mocks/mockBoxes";
+  regularBoxes,
+  validBoxes
+} from "_test-vectors";
+import { describe, expect, it } from "vitest";
 import { ErgoBox } from "./ergoBox";
 
 describe("Construction", () => {
   it("Should construct from a vanilla object", () => {
-    for (const box of regularBoxesMock) {
+    for (const box of regularBoxes) {
       const ergoBox = new ErgoBox(box);
 
       expect(ergoBox.boxId).toBe(box.boxId);
@@ -28,16 +28,16 @@ describe("Construction", () => {
 
 describe("Validation", () => {
   it("Should validate valid boxes", () => {
-    for (const box of regularBoxesMock) {
+    for (const box of regularBoxes) {
       expect(ErgoBox.validate(box)).toBeTruthy();
     }
 
-    for (const box of manyTokensBoxesMock) {
+    for (const box of manyTokensBoxes) {
       expect(ErgoBox.validate(box)).toBeTruthy();
       new ErgoBox(box);
     }
 
-    for (const box of validBoxesMock) {
+    for (const box of validBoxes) {
       expect(new ErgoBox<NonMandatoryRegisters>(box).isValid()).toBeTruthy();
     }
 
@@ -45,7 +45,7 @@ describe("Validation", () => {
   });
 
   it("Should not validate invalid boxes", () => {
-    for (const box of invalidBoxesMock) {
+    for (const box of invalidBoxes) {
       expect(ErgoBox.validate(box)).toBeFalsy();
       expect(new ErgoBox<NonMandatoryRegisters>(box).isValid()).toBeFalsy();
     }

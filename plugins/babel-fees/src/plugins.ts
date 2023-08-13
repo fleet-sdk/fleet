@@ -6,12 +6,9 @@ import {
   FleetPlugin,
   OutputBuilder,
   SAFE_MIN_BOX_VALUE,
-  SByte,
-  SColl,
-  SConstant,
-  SInt,
   TokenAmount
 } from "@fleet-sdk/core";
+import { SByte, SColl, SInt } from "@fleet-sdk/serializer";
 import { getTokenPrice, isBabelContractForTokenId, isValidBabelBox } from "./utils";
 
 export function BabelSwapPlugin(babelBox: Box<Amount>, token: TokenAmount<Amount>): FleetPlugin {
@@ -42,13 +39,13 @@ export function BabelSwapPlugin(babelBox: Box<Amount>, token: TokenAmount<Amount
         .setAdditionalRegisters({
           R4: input.additionalRegisters.R4,
           R5: input.additionalRegisters.R5,
-          R6: SConstant(SColl(SByte, input.boxId))
+          R6: SColl(SByte, input.boxId).toHex()
         })
     );
 
     addInputs(
       input.setContextVars({
-        0: SConstant(SInt(outputsLength - 1))
+        0: SInt(outputsLength - 1).toHex()
       })
     );
   };

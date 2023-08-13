@@ -1,8 +1,7 @@
 import { first } from "@fleet-sdk/common";
+import { babelBoxes, regularBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
-import { babelBoxesMock } from "./tests/babelBoxesMock";
-import { regularBoxesMock } from "./tests/regularBoxesMock";
-import { babelContractTestVectors } from "./tests/testVectors";
+import { babelContractTestVectors } from "./_test-vectors/babelContractsVectors";
 import {
   buildBabelContract,
   extractTokenIdFromBabelContract,
@@ -13,11 +12,11 @@ import {
 
 describe("getTokenPrice()", () => {
   it("Should get the token rate for a box", () => {
-    expect(getTokenPrice(first(babelBoxesMock))).toBe(4000000n);
+    expect(getTokenPrice(first(babelBoxes))).toBe(4000000n);
   });
 
   it("Should fail with an invalid Babel Box", () => {
-    for (const regularBox of regularBoxesMock) {
+    for (const regularBox of regularBoxes) {
       expect(() => {
         getTokenPrice(regularBox);
       }).toThrow();

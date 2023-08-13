@@ -1,6 +1,6 @@
 import { Box } from "@fleet-sdk/common";
+import { regularBoxes } from "_test-vectors";
 import { describe, expect, it, vi } from "vitest";
-import { regularBoxesMock } from "../../../tests/mocks/mockBoxes";
 import { CustomSelectionStrategy } from "./customSelectionStrategy";
 
 describe("Custom selection strategy", () => {
@@ -10,7 +10,7 @@ describe("Custom selection strategy", () => {
     });
     const selection = new CustomSelectionStrategy(mockSelector);
 
-    expect(selection.select(regularBoxesMock)).toBe(regularBoxesMock);
+    expect(selection.select(regularBoxes)).toBe(regularBoxes);
     expect(mockSelector).toBeCalled();
   });
 });

@@ -1,15 +1,14 @@
 import { Amount, BoxCandidate, Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
+import { estimateBoxSize, SByte, SColl } from "@fleet-sdk/serializer";
+import { invalidBoxes, manyTokensBoxes, regularBoxes } from "_test-vectors";
 import { describe, expect, it, vi } from "vitest";
 import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
 import { ErgoAddress, ErgoUnsignedInput, InputsCollection, MAX_TOKENS_PER_BOX } from "../models";
-import { SByte, SColl, SConstant } from "../serializer";
-import { estimateBoxSize } from "../serializer/sigma/boxSerializer";
-import { invalidBoxesMock, manyTokensBoxesMock, regularBoxesMock } from "../tests/mocks/mockBoxes";
 import {
   BOX_VALUE_PER_BYTE,
   estimateMinBoxValue,
@@ -46,9 +45,9 @@ describe("basic construction", () => {
   });
 
   it("Should create a transaction builder with inputs", () => {
-    const builder = new TransactionBuilder(height).from(regularBoxesMock);
+    const builder = new TransactionBuilder(height).from(regularBoxes);
 
-    expect(builder.inputs).toHaveLength(regularBoxesMock.length);
+    expect(builder.inputs).toHaveLength(regularBoxes.length);
     expect(builder.dataInputs).toHaveLength(0);
     expect(builder.outputs).toHaveLength(0);
     expect(builder.changeAddress).toBeFalsy();
@@ -59,10 +58,10 @@ describe("basic construction", () => {
   });
 
   it("Should create a transaction builder with inputs from collection", () => {
-    const inputsCollection = new InputsCollection(regularBoxesMock);
+    const inputsCollection = new InputsCollection(regularBoxes);
     const builder = new TransactionBuilder(height).from(inputsCollection);
 
-    expect(builder.inputs).toHaveLength(regularBoxesMock.length);
+    expect(builder.inputs).toHaveLength(regularBoxes.length);
     expect(builder.dataInputs).toHaveLength(0);
     expect(builder.outputs).toHaveLength(0);
     expect(builder.changeAddress).toBeFalsy();
@@ -73,11 +72,9 @@ describe("basic construction", () => {
   });
 
   it("Should create transaction builder with inputs from multiple sources", () => {
-    const builder = new TransactionBuilder(height)
-      .from(regularBoxesMock)
-      .and.from(manyTokensBoxesMock);
+    const builder = new TransactionBuilder(height).from(regularBoxes).and.from(manyTokensBoxes);
 
-    expect(builder.inputs).toHaveLength(regularBoxesMock.length + manyTokensBoxesMock.length);
+    expect(builder.inputs).toHaveLength(regularBoxes.length + manyTokensBoxes.length);
     expect(builder.dataInputs).toHaveLength(0);
     expect(builder.outputs).toHaveLength(0);
     expect(builder.changeAddress).toBeFalsy();
@@ -89,21 +86,21 @@ describe("basic construction", () => {
 
   it("Should add data inputs", () => {
     const builder = new TransactionBuilder(height)
-      .from(regularBoxesMock)
-      .withDataFrom(regularBoxesMock.slice(0, 2));
+      .from(regularBoxes)
+      .withDataFrom(regularBoxes.slice(0, 2));
 
-    expect(builder.inputs).toHaveLength(regularBoxesMock.length);
+    expect(builder.inputs).toHaveLength(regularBoxes.length);
     expect(builder.dataInputs).toHaveLength(2);
     expect(builder.outputs).toHaveLength(0);
   });
 
   it("Should add outputs", () => {
     const builder = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address, height));
 
     expect(builder.outputs).toHaveLength(1);
-    expect(builder.inputs).toHaveLength(regularBoxesMock.length);
+    expect(builder.inputs).toHaveLength(regularBoxes.length);
     expect(builder.dataInputs).toHaveLength(0);
   });
 
@@ -112,7 +109,7 @@ describe("basic construction", () => {
     const secondOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, a1.address, height);
 
     const builder = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .to([firstOutput, secondOutput]);
 
     expect(builder.outputs.at(0)).toBe(firstOutput);
@@ -129,13 +126,13 @@ describe("basic construction", () => {
   });
 
   it("Should set change address by base58 encoded address", () => {
-    const builder = new TransactionBuilder(height).from(regularBoxesMock).sendChangeTo(a1.address);
+    const builder = new TransactionBuilder(height).from(regularBoxes).sendChangeTo(a1.address);
 
     expect(builder.changeAddress?.toString()).toBe(a1.address);
   });
 
   it("Should set change address by ErgoTree", () => {
-    const builder = new TransactionBuilder(height).from(regularBoxesMock).sendChangeTo(a1.ergoTree);
+    const builder = new TransactionBuilder(height).from(regularBoxes).sendChangeTo(a1.ergoTree);
 
     expect(builder.changeAddress?.toString()).toBe(a1.address);
     expect(builder.changeAddress?.ergoTree).toBe(a1.ergoTree);
@@ -144,26 +141,26 @@ describe("basic construction", () => {
 
   it("Should set change address by ErgoAddress", () => {
     const address = ErgoAddress.fromBase58(a1.address);
-    const builder = new TransactionBuilder(height).from(regularBoxesMock).sendChangeTo(address);
+    const builder = new TransactionBuilder(height).from(regularBoxes).sendChangeTo(address);
 
     expect(builder.changeAddress).toBe(address);
   });
 
   it("Should set fee amount", () => {
     const fee = RECOMMENDED_MIN_FEE_VALUE * 3n;
-    const builder = new TransactionBuilder(height).from(regularBoxesMock).payFee(fee);
+    const builder = new TransactionBuilder(height).from(regularBoxes).payFee(fee);
 
     expect(builder.fee).toBe(fee);
   });
 
   it("Should set min recommended fee amount", () => {
-    const builder = new TransactionBuilder(height).from(regularBoxesMock).payMinFee();
+    const builder = new TransactionBuilder(height).from(regularBoxes).payMinFee();
 
     expect(builder.fee).toBe(RECOMMENDED_MIN_FEE_VALUE);
   });
 
   it("Should set burning tokens", () => {
-    const builder = new TransactionBuilder(height).from(regularBoxesMock).burnTokens({
+    const builder = new TransactionBuilder(height).from(regularBoxes).burnTokens({
       tokenId: token1,
       amount: "1"
     });
@@ -173,7 +170,7 @@ describe("basic construction", () => {
   });
 
   it("Should set transaction building settings", () => {
-    const builder = new TransactionBuilder(height).from(regularBoxesMock);
+    const builder = new TransactionBuilder(height).from(regularBoxes);
     expect(builder.settings.canBurnTokens).toBeFalsy();
     expect(builder.settings.maxTokensPerChangeBox).toBe(MAX_TOKENS_PER_BOX);
 
@@ -186,7 +183,7 @@ describe("basic construction", () => {
   });
 
   it("Should eject context", () => {
-    const builder = new TransactionBuilder(height).from(regularBoxesMock);
+    const builder = new TransactionBuilder(height).from(regularBoxes);
 
     builder.eject(({ inputs, dataInputs, outputs, burning, settings }) => {
       expect(inputs).toBe(builder.inputs);
@@ -200,7 +197,7 @@ describe("basic construction", () => {
 
 describe("Building", () => {
   it("Should build without change and fee", () => {
-    const inputs = [first(regularBoxesMock)];
+    const inputs = [first(regularBoxes)];
     const inputsSum = sumBy(inputs, (x) => x.value);
     const transaction = new TransactionBuilder(height)
       .from(inputs)
@@ -221,7 +218,7 @@ describe("Building", () => {
   });
 
   it("Should build without change", () => {
-    const inputs = [first(regularBoxesMock)];
+    const inputs = [first(regularBoxes)];
     const inputsSum = sumBy(inputs, (x) => x.value);
     const transaction = new TransactionBuilder(height)
       .from(inputs)
@@ -416,7 +413,7 @@ describe("Building", () => {
   });
 
   it("Should build with only ERG change", () => {
-    const inputs = [first(regularBoxesMock)];
+    const inputs = [first(regularBoxes)];
     const inputsSum = sumBy(inputs, (x) => x.value);
     const change = inputsSum - RECOMMENDED_MIN_FEE_VALUE;
 
@@ -454,7 +451,7 @@ describe("Building", () => {
   });
 
   it("Should build with one input only ERG change", () => {
-    const inputs = [first(regularBoxesMock)];
+    const inputs = [first(regularBoxes)];
     const inputsSum = sumBy(inputs, (x) => x.value);
     const change = inputsSum - RECOMMENDED_MIN_FEE_VALUE - SAFE_MIN_BOX_VALUE * 2n;
 
@@ -510,7 +507,7 @@ describe("Building", () => {
   });
 
   it("Should build with multiple inputs and tokens with change", () => {
-    const boxes = regularBoxesMock.filter((input) =>
+    const boxes = regularBoxes.filter((input) =>
       [
         "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
         "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
@@ -520,7 +517,7 @@ describe("Building", () => {
 
     const transaction = new TransactionBuilder(height)
       .from(boxes)
-      .withDataFrom(manyTokensBoxesMock[0])
+      .withDataFrom(manyTokensBoxes[0])
       .to(
         new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).addTokens({
           tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
@@ -533,7 +530,7 @@ describe("Building", () => {
 
     expect(transaction.inputs).toHaveLength(2);
     expect(transaction.dataInputs).toHaveLength(1);
-    expect(transaction.dataInputs[0].boxId).toBe(manyTokensBoxesMock[0].boxId);
+    expect(transaction.dataInputs[0].boxId).toBe(manyTokensBoxes[0].boxId);
     expect(transaction.outputs).toHaveLength(3);
 
     const customOutput = transaction.outputs[0];
@@ -570,7 +567,7 @@ describe("Building", () => {
   });
 
   it("Should build with multiple inputs and tokens with change and input inclusion insurance", () => {
-    const boxes = regularBoxesMock.filter((input) =>
+    const boxes = regularBoxes.filter((input) =>
       [
         "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
         "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
@@ -640,7 +637,7 @@ describe("Building", () => {
 
   it("Should build with min box value estimation", () => {
     const transaction = new TransactionBuilder(height)
-      .from(manyTokensBoxesMock)
+      .from(manyTokensBoxes)
       .to(
         new OutputBuilder(estimateMinBoxValue(), a2.address)
           .addTokens({
@@ -661,7 +658,7 @@ describe("Building", () => {
 
   it("Should produce multiple change boxes and run multiple input selections if necessary", () => {
     const transaction = new TransactionBuilder(height)
-      .from(manyTokensBoxesMock)
+      .from(manyTokensBoxes)
       .to(
         new OutputBuilder(2200000n, a2.address)
           .addTokens({
@@ -677,7 +674,7 @@ describe("Building", () => {
       .sendChangeTo(a1.address)
       .build();
 
-    expect(sumBy(manyTokensBoxesMock, (x) => ensureBigInt(x.value))).toBe(
+    expect(sumBy(manyTokensBoxes, (x) => ensureBigInt(x.value))).toBe(
       sumBy(transaction.outputs, (x) => ensureBigInt(x.value))
     );
     expect(transaction.inputs).toHaveLength(3);
@@ -731,7 +728,7 @@ describe("Building", () => {
     const tokensPerBox = 2;
 
     const transaction = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .sendChangeTo(a1.address)
       .configureSelector((selector) => selector.ensureInclusion((i) => some(i.assets)))
       .configure((settings) => settings.setMaxTokensPerChangeBox(tokensPerBox))
@@ -758,7 +755,7 @@ describe("Building", () => {
     const tokensPerBox = 3;
 
     const transaction = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .sendChangeTo(a1.address)
       .configureSelector((selector) => selector.ensureInclusion((i) => some(i.assets)))
       .configure((settings) => settings.setMaxTokensPerChangeBox(tokensPerBox))
@@ -781,7 +778,7 @@ describe("Building", () => {
     const tokensPerBox = 3;
 
     const transaction = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .sendChangeTo(a1.address)
       .configureSelector((selector) => selector.ensureInclusion((i) => some(i.assets)))
       .configure((settings) => settings.setMaxTokensPerChangeBox(tokensPerBox).isolateErgOnChange())
@@ -803,8 +800,8 @@ describe("Building", () => {
 
   it("Should build in EIP-12 format", () => {
     const transaction = new TransactionBuilder(height)
-      .from(regularBoxesMock)
-      .withDataFrom(regularBoxesMock[1])
+      .from(regularBoxes)
+      .withDataFrom(regularBoxes[1])
       .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
       .payMinFee()
       .sendChangeTo(a1.address)
@@ -851,7 +848,7 @@ describe("Building", () => {
 
   it("Should fail if invalid inputs are used", () => {
     const tx = new TransactionBuilder(height)
-      .from(invalidBoxesMock)
+      .from(invalidBoxes)
       .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address))
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .sendChangeTo(a2.ergoTree);
@@ -862,11 +859,11 @@ describe("Building", () => {
   });
 
   it("Should preserve inputs extension", () => {
-    const input = new ErgoUnsignedInput(regularBoxesMock[0]);
+    const input = new ErgoUnsignedInput(regularBoxes[0]);
     input.setContextVars({ 0: "0580c0fc82aa02" });
 
     const unsignedTransaction = new TransactionBuilder(height)
-      .from(regularBoxesMock[1])
+      .from(regularBoxes[1])
       .and.from(input)
       .configureSelector((selector) => selector.ensureInclusion((input) => input.value > 0n))
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
@@ -881,7 +878,7 @@ describe("Building", () => {
 describe("Token minting", () => {
   it("Should use first input boxId as minted tokenId", () => {
     const transaction = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .to(
         new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({
           amount: 100n,
@@ -905,7 +902,7 @@ describe("Token minting", () => {
   });
 
   it("Should mint setting a the tokenId", () => {
-    const input = first(regularBoxesMock);
+    const input = first(regularBoxes);
 
     const transaction = new TransactionBuilder(height)
       .from(input)
@@ -927,7 +924,7 @@ describe("Token minting", () => {
 
   it("Should mint and transfer other tokens in the same box", () => {
     const transaction = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .to(
         new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address)
           .mintToken({
@@ -956,7 +953,7 @@ describe("Token minting", () => {
 
   it("Should fail if trying to mint more than one token", () => {
     const builder = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .to([
         new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({ name: "token1", amount: 1n }),
         new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).mintToken({ name: "token2", amount: 1n })
@@ -984,7 +981,7 @@ describe("Token minting", () => {
  * feels like an abuse of the API.
  */
 describe("Non-standardized token minting", () => {
-  const input = first(regularBoxesMock);
+  const input = first(regularBoxes);
   const mintingTokenId = input.boxId;
 
   it("Should 'manually' mint tokens, this must bypass EIP-4 validations", () => {
@@ -997,9 +994,9 @@ describe("Non-standardized token minting", () => {
             amount: 1n
           })
           .setAdditionalRegisters({
-            R4: SConstant(SColl(SByte, utf8.decode("TestToken"))), //         name
-            R5: SConstant(SColl(SByte, utf8.decode("Description test"))), //  description
-            R6: SConstant(SColl(SByte, utf8.decode("4"))) //                  decimals
+            R4: SColl(SByte, utf8.decode("TestToken")).toHex(), //         name
+            R5: SColl(SByte, utf8.decode("Description test")).toHex(), //  description
+            R6: SColl(SByte, utf8.decode("4")).toHex() //                  decimals
           })
       )
       .and.to(
@@ -1062,7 +1059,7 @@ describe("Token burning", () => {
     const regularTokenId = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
 
     const transaction = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .burnTokens([
         { tokenId: nftTokenId, amount: 1n },
         { tokenId: regularTokenId, amount: 126679716n }
@@ -1076,7 +1073,7 @@ describe("Token burning", () => {
   });
 
   it("Should burn tokens by omitting change address and explicitly allowing token burning", () => {
-    const inputs = regularBoxesMock.filter(
+    const inputs = regularBoxes.filter(
       (input) => input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
     );
 
@@ -1106,11 +1103,11 @@ describe("Token burning", () => {
   });
 
   it("Should fail if burning is not explicit allowed", () => {
-    const outputValue = sumBy(regularBoxesMock, (x) => x.value) - RECOMMENDED_MIN_FEE_VALUE;
+    const outputValue = sumBy(regularBoxes, (x) => x.value) - RECOMMENDED_MIN_FEE_VALUE;
 
     // tokens can alternatively be burned by omitting the change address
     const builder = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .to(new OutputBuilder(outputValue, a1.address)) // force add boxes to be included by adding all nanoergs
       .payFee(RECOMMENDED_MIN_FEE_VALUE);
 
@@ -1123,7 +1120,7 @@ describe("Token burning", () => {
     const outputValue = 1000000000n - RECOMMENDED_MIN_FEE_VALUE;
     const builder = new TransactionBuilder(height)
       .from(
-        regularBoxesMock.filter(
+        regularBoxes.filter(
           (input) =>
             input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
         )
@@ -1138,7 +1135,7 @@ describe("Token burning", () => {
 
   it("Should fail if trying to burn ERG even if burning is explicitly allowed", () => {
     const outputValue = 1000000000n - RECOMMENDED_MIN_FEE_VALUE;
-    const inputs = regularBoxesMock.filter(
+    const inputs = regularBoxes.filter(
       (input) => input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
     );
 
@@ -1158,8 +1155,8 @@ describe("Plugins", () => {
   it("Should include inputs, data inputs and outputs from plugin", () => {
     const tx = new TransactionBuilder(height)
       .extend(({ addInputs, addDataInputs, addOutputs }) => {
-        addInputs(regularBoxesMock);
-        addDataInputs(first(regularBoxesMock));
+        addInputs(regularBoxes);
+        addDataInputs(first(regularBoxes));
         addOutputs(new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address, height));
       })
       .sendChangeTo("9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ")
@@ -1167,21 +1164,21 @@ describe("Plugins", () => {
 
     expect(tx.outputs).toHaveLength(2); // output from plugin context and change
     expect(tx.outputs[0].ergoTree).toBe(a1.ergoTree);
-    expect(tx.inputs).toHaveLength(regularBoxesMock.length); // should include all inputs added from plugin context
+    expect(tx.inputs).toHaveLength(regularBoxes.length); // should include all inputs added from plugin context
     expect(tx.dataInputs).toHaveLength(1);
-    expect(tx.dataInputs[0].boxId).toBe(regularBoxesMock[0].boxId);
+    expect(tx.dataInputs[0].boxId).toBe(regularBoxes[0].boxId);
   });
 
   it("Should include inputs, data inputs and outputs from multiple plugins", () => {
     const tx = new TransactionBuilder(height)
       .extend(({ addInputs, addDataInputs, addOutputs }) => {
-        addInputs(regularBoxesMock[1]);
-        addDataInputs(regularBoxesMock[1]);
+        addInputs(regularBoxes[1]);
+        addDataInputs(regularBoxes[1]);
         addOutputs(new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address, height));
       })
       .extend(({ addInputs, addDataInputs, addOutputs }) => {
-        addInputs(regularBoxesMock[2]);
-        addDataInputs(regularBoxesMock[2]);
+        addInputs(regularBoxes[2]);
+        addDataInputs(regularBoxes[2]);
         addOutputs(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address, height));
       })
       .sendChangeTo("9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ")
@@ -1194,8 +1191,8 @@ describe("Plugins", () => {
     expect(tx.inputs).toHaveLength(2); // should include all inputs added from plugin context
 
     expect(tx.dataInputs).toHaveLength(2);
-    expect(tx.dataInputs[0].boxId).toBe(regularBoxesMock[1].boxId);
-    expect(tx.dataInputs[1].boxId).toBe(regularBoxesMock[2].boxId);
+    expect(tx.dataInputs[0].boxId).toBe(regularBoxes[1].boxId);
+    expect(tx.dataInputs[1].boxId).toBe(regularBoxes[2].boxId);
   });
 
   it("Should burn tokens, plugin context allowed", () => {
@@ -1203,7 +1200,7 @@ describe("Plugins", () => {
     const tokenIdb = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
 
     const tx = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .configure((settings) => settings.allowTokenBurningFromPlugins(true))
       .extend(({ burnTokens }) => {
         burnTokens([
@@ -1224,7 +1221,7 @@ describe("Plugins", () => {
     const tokenIdb = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
 
     const tx = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .configure((settings) => settings.allowTokenBurning(true))
       .extend(({ burnTokens }) => {
         burnTokens([
@@ -1246,7 +1243,7 @@ describe("Plugins", () => {
 
     expect(() => {
       new TransactionBuilder(height)
-        .from(regularBoxesMock)
+        .from(regularBoxes)
         .extend(({ burnTokens }) => {
           burnTokens([
             { tokenId: tokenIda, amount: 1n },
@@ -1263,7 +1260,7 @@ describe("Plugins", () => {
     });
 
     const tx = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .extend(plugin)
       .sendChangeTo(a2.address);
 

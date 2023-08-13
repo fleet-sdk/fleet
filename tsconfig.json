@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "incremental": true,
+    // "incremental": true,
     "target": "ESNext",
     "moduleResolution": "Node",
-    "module": "CommonJS",
+    "module": "ESNext",
     "declaration": true,
     "inlineSourceMap": false,
     "esModuleInterop": true,
@@ -18,8 +18,12 @@
     "listFiles": false,
     "pretty": true,
     "lib": ["ESNext", "DOM"],
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "_test-vectors": ["./packages/_test-vectors/"]
+    }
   },
   "compileOnSave": false,
-  "exclude": ["**/node_modules"]
+  "exclude": ["**/node_modules", "**/dist"]
 }

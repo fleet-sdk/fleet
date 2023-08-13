@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { keyAddressesTestVectors } from "./_test-vectors/keyVectors";
 import { generateMnemonic, validateMnemonic } from "./mnemonic";
-import { keyAddressesTestVectors } from "./tests/keyTestVectors";
 
 describe("Mnemonic generation", () => {
   it("Should create a valid 12 word mnemonic", () => {

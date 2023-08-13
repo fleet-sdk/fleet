@@ -11,7 +11,8 @@ import {
   percent,
   TokenAmount
 } from "@fleet-sdk/common";
-import { OnlyR4Register, R4ToR5Registers, SParse } from "@fleet-sdk/core";
+import { OnlyR4Register, R4ToR5Registers } from "@fleet-sdk/core";
+import { parse, SConstant, SLong } from "@fleet-sdk/serializer";
 import { AgeUSDBankParameters } from "./sigmaUsdParameters";
 
 const _2n = BigInt(2);
@@ -69,7 +70,7 @@ export class AgeUSDBank {
     this._oracleBox = oracleBox;
     const datapoint = oracleBox.additionalRegisters.R4;
     const decimals = this._params.oracle.decimals ?? 0;
-    this._oracleRate = SParse<bigint>(datapoint) / BigInt(10 ** decimals);
+    this._oracleRate = parse<bigint>(datapoint) / BigInt(10 ** decimals);
   }
 
   get oracleRate(): bigint {
@@ -124,11 +125,11 @@ export class AgeUSDBank {
   }
 
   get circulatingStableCoins(): bigint {
-    return SParse(this._bankBox.additionalRegisters.R4);
+    return parse(this._bankBox.additionalRegisters.R4);
   }
 
   get circulatingReserveCoins(): bigint {
-    return SParse(this._bankBox.additionalRegisters.R5);
+    return parse(this._bankBox.additionalRegisters.R5);
   }
 
   get stableCoinPrice(): bigint {
@@ -205,7 +206,7 @@ export class AgeUSDBank {
     return (
       oracleBox.assets[0].tokenId === params.oracle.nftId &&
       isDefined(oracleBox.additionalRegisters.R4) &&
-      typeof SParse(oracleBox.additionalRegisters.R4) === "bigint"
+      SConstant.from(oracleBox.additionalRegisters.R4).type instanceof SLong
     );
   }
 

@@ -1,7 +1,7 @@
 import { ErgoBox, SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
+import { regularBoxes } from "_test-vectors";
 import { describe, expect, it, vi } from "vitest";
 import { MockChain } from "../mockChain";
-import { regularBoxesMock } from "../tests/regularBoxesMock";
 import { KeyedMockChainParty } from "./keyedMockChainParty";
 
 describe("Keyed mock chain party", () => {
@@ -23,21 +23,21 @@ describe("Keyed mock chain party", () => {
 
   it("Should add UTxOs directly", () => {
     const party = new KeyedMockChainParty(chain, "bob");
-    party.addUTxOs(regularBoxesMock);
+    party.addUTxOs(regularBoxes);
 
-    expect(party.utxos).to.have.length(regularBoxesMock.length);
+    expect(party.utxos).to.have.length(regularBoxes.length);
   });
 
   it("Should add UTxOs directly using withUTxOs syntax sugar", () => {
     const party = new KeyedMockChainParty(chain, "bob");
     const addUTxOsSpy = vi.spyOn(party, "addUTxOs");
 
-    party.withUTxOs(regularBoxesMock);
+    party.withUTxOs(regularBoxes);
 
     expect(party.key).not.to.be.undefined;
-    expect(party.utxos).to.have.length(regularBoxesMock.length);
+    expect(party.utxos).to.have.length(regularBoxes.length);
     expect(addUTxOsSpy).toHaveBeenCalledTimes(1);
-    expect(addUTxOsSpy).toHaveBeenCalledWith(regularBoxesMock);
+    expect(addUTxOsSpy).toHaveBeenCalledWith(regularBoxes);
   });
 
   it("Should add balance", () => {

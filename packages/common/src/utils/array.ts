@@ -190,3 +190,7 @@ export function uniqBy<T>(
       .values()
   );
 }
+
+export function depthOf(array: unknown | unknown[]): number {
+  return Array.isArray(array) ? 1 + Math.max(0, ...array.map(depthOf)) : 0;
+}

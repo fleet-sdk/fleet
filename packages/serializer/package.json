@@ -1,0 +1,46 @@
+{
+  "name": "@fleet-sdk/serializer",
+  "version": "0.0.0",
+  "description": "Ergo constant serializer and parser.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "require": "./dist/index.js",
+    "import": "./dist/index.mjs"
+  },
+  "sideEffects": false,
+  "repository": "fleet-sdk/fleet",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "keywords": [
+    "ergo",
+    "blockchain",
+    "transactions",
+    "serialization"
+  ],
+  "scripts": {
+    "build": "run-p build:*",
+    "build:cjs": "tsup"
+  },
+  "dependencies": {
+    "@fleet-sdk/common": "workspace:^",
+    "@fleet-sdk/crypto": "workspace:^"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "files": [
+    "src",
+    "dist",
+    "!**/*.spec.*",
+    "!**/*.json",
+    "!tests",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ]
+}

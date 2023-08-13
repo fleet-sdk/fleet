@@ -1,5 +1,6 @@
 import { percent } from "@fleet-sdk/common";
-import { Amount, Box, RECOMMENDED_MIN_FEE_VALUE, SBool, SConstant, SParse } from "@fleet-sdk/core";
+import { Amount, Box, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/core";
+import { parse, SBool } from "@fleet-sdk/serializer";
 import { describe, expect, it, test } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_tests/mocking";
 import { AgeUSDBank } from "./ageUsdBank";
@@ -160,7 +161,7 @@ describe("Bank construction", () => {
     }).to.throw("Invalid oracle box.");
 
     const wrongR4DataTypeIdgOracleBox = mockOracleBox(210526315n);
-    wrongR4DataTypeIdgOracleBox.additionalRegisters.R4 = SConstant(SBool(true));
+    wrongR4DataTypeIdgOracleBox.additionalRegisters.R4 = SBool(true).toHex();
     expect(() => {
       new AgeUSDBank(_bankBox, wrongR4DataTypeIdgOracleBox, SIGMA_USD_PARAMETERS);
     }).to.throw("Invalid oracle box.");
@@ -283,10 +284,10 @@ describe("Bank calculations", () => {
   it("Should be able to mint reserve coins and redeem stable coin, but not mint stable. Reserve == 347, sigmausd.io", () => {
     const bankBox = mockBankBox({
       reserveNanoergs: 1_482_462_367_921_576n,
-      circulatingStableCoin: SParse("0584cda232"),
-      circulatingReserveCoin: SParse("05acdac7e612")
+      circulatingStableCoin: parse("0584cda232"),
+      circulatingReserveCoin: parse("05acdac7e612")
     });
-    const oracleBox = mockOracleBox(SParse("05b096ee8406"));
+    const oracleBox = mockOracleBox(parse("05b096ee8406"));
     const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
 
     bank.setImplementorFee({
@@ -344,10 +345,10 @@ describe("Bank calculations", () => {
   it("Should be able to mint reserve coins and redeem stable coin, but not mint stable. Reserve == 345, tokenjay", () => {
     const bankBox = mockBankBox({
       reserveNanoergs: 1_482_462_367921576n,
-      circulatingStableCoin: SParse("0584cda232"),
-      circulatingReserveCoin: SParse("05acdac7e612")
+      circulatingStableCoin: parse("0584cda232"),
+      circulatingReserveCoin: parse("05acdac7e612")
     });
-    const oracleBox = mockOracleBox(SParse("058494ac8706"));
+    const oracleBox = mockOracleBox(parse("058494ac8706"));
     const bank = new AgeUSDBank(bankBox, oracleBox, SIGMA_USD_PARAMETERS);
 
     expect(bank.stableCoinPrice).to.be.equal(8130081n);

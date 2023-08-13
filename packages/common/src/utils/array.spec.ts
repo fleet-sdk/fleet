@@ -4,6 +4,7 @@ import {
   areEqualBy,
   at,
   chunk,
+  depthOf,
   endsWith,
   first,
   hasDuplicates,
@@ -395,5 +396,20 @@ describe("uniqBy()", () => {
         (x) => x.a
       )
     ).to.be.true;
+  });
+});
+
+describe("depthOf()", () => {
+  it("Should count depth of arrays", () => {
+    expect(depthOf([])).to.be.equal(1);
+    expect(depthOf([[]])).to.be.equal(2);
+    expect(depthOf([[[], []]])).to.be.equal(3);
+    expect(depthOf([[[[], [], []]]])).to.be.equal(4);
+    expect(depthOf([[[[], [[[]]]]]])).to.be.equal(6);
+
+    expect(depthOf({})).to.be.equal(0);
+    expect(depthOf(1)).to.be.equal(0);
+    expect(depthOf(undefined)).to.be.equal(0);
+    expect(depthOf(null)).to.be.equal(0);
   });
 });

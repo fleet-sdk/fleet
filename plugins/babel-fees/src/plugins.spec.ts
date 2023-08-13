@@ -1,10 +1,11 @@
 import { fail } from "assert";
 import { ensureBigInt, first } from "@fleet-sdk/common";
-import { SByte, SColl, SConstant, SParse, TransactionBuilder } from "@fleet-sdk/core";
+import { TransactionBuilder } from "@fleet-sdk/core";
+import { parse, SByte, SColl } from "@fleet-sdk/serializer";
+import { regularBoxes } from "_test-vectors";
+import { babelBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { BabelSwapPlugin } from "./plugins";
-import { babelBoxesMock } from "./tests/babelBoxesMock";
-import { regularBoxesMock } from "./tests/regularBoxesMock";
 import { getTokenPrice, isValidBabelBox, isValidBabelContract } from "./utils";
 
 describe("Babel Swap Plugin", () => {
@@ -12,11 +13,11 @@ describe("Babel Swap Plugin", () => {
   const changeAddress = "9hY16vzHmmfyVBwKeFGHvb2bMFsG94A1u7To1QWtUokACyFVENQ";
 
   it("Should add babel input and output", () => {
-    const babelBox = first(babelBoxesMock);
+    const babelBox = first(babelBoxes);
     const payingTokenAmount = 5n;
 
     const tx = new TransactionBuilder(height)
-      .from(regularBoxesMock)
+      .from(regularBoxes)
       .extend(
         BabelSwapPlugin(babelBox, {
           tokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
@@ -33,13 +34,13 @@ describe("Babel Swap Plugin", () => {
       fail();
     }
 
-    const outputIndex = SParse<number>(input.extension[0]);
+    const outputIndex = parse<number>(input.extension[0]);
     const output = tx.outputs[outputIndex];
     expect(isValidBabelContract(output.ergoTree)).toBeTruthy();
     expect(output.ergoTree).toBe(input.ergoTree);
     expect(output.additionalRegisters.R4).toBe(input.additionalRegisters.R4);
     expect(output.additionalRegisters.R5).toBe(input.additionalRegisters.R5);
-    expect(output.additionalRegisters.R6).toBe(SConstant(SColl(SByte, input.boxId)));
+    expect(output.additionalRegisters.R6).toBe(SColl(SByte, input.boxId).toHex());
 
     const swappedNanoErgs = getTokenPrice(input) * payingTokenAmount;
     expect(ensureBigInt(input.value)).toBe(BigInt(output.value) + swappedNanoErgs);
@@ -50,11 +51,11 @@ describe("Babel Swap Plugin", () => {
   });
 
   it("Should fail if invalid babel box is added", () => {
-    const nonBabelBox = regularBoxesMock[1];
+    const nonBabelBox = regularBoxes[1];
 
     expect(() => {
       new TransactionBuilder(height)
-        .from(regularBoxesMock[0])
+        .from(regularBoxes[0])
         .extend(
           BabelSwapPlugin(nonBabelBox, {
             tokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
@@ -68,11 +69,11 @@ describe("Babel Swap Plugin", () => {
   });
 
   it("Should fail if valid babel box is added but incompatible tokenId", () => {
-    const babelBox = first(babelBoxesMock);
+    const babelBox = first(babelBoxes);
 
     expect(() => {
       new TransactionBuilder(height)
-        .from(regularBoxesMock)
+        .from(regularBoxes)
         .extend(
           BabelSwapPlugin(babelBox, {
             tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
@@ -86,11 +87,11 @@ describe("Babel Swap Plugin", () => {
   });
 
   it("Should fail if the box does not have enough ERG to swap for the tokens", () => {
-    const babelBox = first(babelBoxesMock);
+    const babelBox = first(babelBoxes);
 
     expect(() => {
       new TransactionBuilder(height)
-        .from(regularBoxesMock)
+        .from(regularBoxes)
         .extend(
           BabelSwapPlugin(babelBox, {
             tokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
