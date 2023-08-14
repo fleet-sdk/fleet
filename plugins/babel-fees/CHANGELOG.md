@@ -1,5 +1,22 @@
 # @fleet-sdk/babel-fees-plugin
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [5a79c57]
+- Updated dependencies [fffd1ed]
+- Updated dependencies [76d4c3d]
+- Updated dependencies [cd877ce]
+- Updated dependencies [a491ab9]
+- Updated dependencies [3236dd8]
+- Updated dependencies [cd877ce]
+- Updated dependencies [e532fb8]
+- Updated dependencies [9bd393b]
+  - @fleet-sdk/common@0.2.0
+  - @fleet-sdk/core@0.2.0
+  - @fleet-sdk/serializer@0.2.0
+
 ## 0.1.3
 
 ### Patch Changes
