@@ -159,7 +159,7 @@ function buildCollVectors<T>(
 }
 
 export const collVectors: GenericTypeTestVector[] = [
-  ...buildCollVectors("[SBool]", SBool, [
+  ...buildCollVectors("SColl[SBool]", SBool, [
     {
       hex: "0d0c010e",
       value: [true, false, false, false, false, false, false, false, false, true, true, true]
@@ -173,7 +173,7 @@ export const collVectors: GenericTypeTestVector[] = [
       value: [false, true, true, true, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false, false, true, true, false, true, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false, false, false, false] /* prettier-ignore */
     }
   ]),
-  ...buildCollVectors("[SByte]", SByte, [
+  ...buildCollVectors("SColl[SByte]", SByte, [
     { hex: "0e0a46656d616c6520233035", value: utf8.decode("Female #05") },
     { hex: "0e0130", value: utf8.decode("0") },
     { hex: "0e00", value: u8a([]) },
@@ -186,7 +186,7 @@ export const collVectors: GenericTypeTestVector[] = [
       value: utf8.decode('{"721":{"ergoat-00346":{"index":346,"generation":1,"background":"Psycho","back_accessory":"Green Parrot","body":"Purple","clothes":"White ERGoat Shirt","mouth":"Gritted Teeth","eyes":"Angry Red","wield":"Spirit Gun","accessory":"Silver Medal","head":"Cowboy Hat","earring":"None"}}}') /* prettier-ignore */
     }
   ]),
-  ...buildCollVectors("[SShort]", SShort, [
+  ...buildCollVectors("SColl[SShort]", SShort, [
     { hex: "0f00", value: [] },
     { hex: "0f0102", value: [1] },
     { hex: "0f020000", value: [0, 0] },
@@ -223,7 +223,7 @@ export const collVectors: GenericTypeTestVector[] = [
       value: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] /* prettier-ignore */
     }
   ]),
-  ...buildCollVectors("[SInt]", SInt, [
+  ...buildCollVectors("SColl[SInt]", SInt, [
     { hex: "1000", value: [] },
     { hex: "100102", value: [1] },
     { hex: "10020000", value: [0, 0] },
@@ -253,7 +253,7 @@ export const collVectors: GenericTypeTestVector[] = [
       value: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] /* prettier-ignore */
     }
   ]),
-  ...buildCollVectors("[SLong]", SLong, [
+  ...buildCollVectors("SColl[SLong]", SLong, [
     { hex: "110100", value: [0n] },
     { hex: "110102", value: [1n] },
     { hex: "110124", value: [18n] },
@@ -262,7 +262,7 @@ export const collVectors: GenericTypeTestVector[] = [
     { hex: "11018081f0e5dd60", value: [1661856514112n] },
     { hex: "110182d2ad9dce60", value: [1659767207041n] }
   ]),
-  ...buildCollVectors("[SBigInt]", SBigInt, [
+  ...buildCollVectors("SColl[SBigInt]", SBigInt, [
     { hex: "12010100", value: [0n] },
     { hex: "1202010106018271d5b481", value: [1n, 1659767207041n] },
     { hex: "12010112", value: [18n] },
@@ -271,7 +271,7 @@ export const collVectors: GenericTypeTestVector[] = [
     { hex: "1201060182ee5e0040", value: [1661856514112n] },
     { hex: "120206018271d5b48106018271d5b481", value: [1659767207041n, 1659767207041n] }
   ]),
-  ...buildCollVectors("[[SByte]]", SColl(SByte), [
+  ...buildCollVectors("SColl[SColl[SByte]]", SColl(SByte), [
     {
       hex: "1a031c4c657427732063656c656272617465204572676f526166666c6521201c4c657427732063656c656272617465204572676f526166666c65212020e730bbae0463346f8ce72be23ab8391d1e7a58f48ed857fcf4ee9aecf6915307",
       value: [
@@ -281,11 +281,11 @@ export const collVectors: GenericTypeTestVector[] = [
       ]
     }
   ]),
-  ...buildCollVectors("[[[[SByte]]]]", SColl(SColl(SColl(SByte))), [
+  ...buildCollVectors("SColl[SColl[SColl[SColl[SByte]]]]", SColl(SColl(SColl(SByte))), [
     { hex: "0c0c1a00", value: [] },
     { hex: "0c0c1a0101010201ff", value: [[[u8a([0x01, 0xff])]]] }
   ]),
-  ...buildCollVectors("[(SInt, SLong)]", SPair(SInt, SLong), [
+  ...buildCollVectors("SColl[(SInt, SLong)]", SPair(SInt, SLong), [
     {
       hex: "0c400504b40180febe81027880d4d4ab015a80bfdf80013c80aaea55",
       value: [
@@ -296,7 +296,7 @@ export const collVectors: GenericTypeTestVector[] = [
       ]
     }
   ]),
-  ...buildCollVectors("Coll[(Coll[SByte], SInt)]", SPair(SColl(SByte), SInt), [
+  ...buildCollVectors("SColl[(SColl[SByte], SInt)]", SPair(SColl(SByte), SInt), [
     {
       hex: "0c4c0e01240008cd0302122c332fd4e3c901f045ac18f559dcecf8dc61f6f94fbb34d0c7c3aac71fb714",
       value: [
@@ -318,7 +318,7 @@ export const collVectors: GenericTypeTestVector[] = [
       ]
     }
   ]),
-  ...buildCollVectors("Coll[(Coll[SByte], SInt)]", SPair(SColl(SByte), SColl(SByte)), [
+  ...buildCollVectors("SColl[(SColl[SByte], SColl[SByte])]", SPair(SColl(SByte), SColl(SByte)), [
     {
       hex: "0c3c0e0e02240008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf573339694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443240008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59333967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a",
       value: [
@@ -333,7 +333,7 @@ export const collVectors: GenericTypeTestVector[] = [
       ]
     }
   ]),
-  ...buildCollVectors("Coll[Coll[(Int, Int)]]", SColl(SPair(SInt, SInt)), [
+  ...buildCollVectors("SColl[SColl[(SInt, SInt)]]", SColl(SPair(SInt, SInt)), [
     {
       hex: "0c0c580202020406080208060402",
       value: [
@@ -376,13 +376,13 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
     hex: "40020e01"
   },
   {
-    name: "(SInt, [SByte])",
+    name: "(SInt, SColl[SByte])",
     sconst: SPair(SInt(1), SColl(SByte, hex.decode("0a0c"))),
     value: [1, Uint8Array.from([10, 12])],
     hex: "400e02020a0c"
   },
   {
-    name: "([SByte], [SByte])",
+    name: "(SColl[SByte], SColl[SByte])",
     sconst: SPair(
       SColl(SByte, hex.decode("505250")),
       SColl(SByte, hex.decode("596f7572206c6f616e204a616e75617279"))
@@ -391,13 +391,13 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
     hex: "3c0e0e0350525011596f7572206c6f616e204a616e75617279"
   },
   {
-    name: "([SByte], SBool, SByte)",
+    name: "(SColl[SByte], SBool, SByte)",
     sconst: STuple(SColl(SByte, [10, 12]), SBool(true), SByte(2)),
     value: [u8a([10, 12]), true, 2],
     hex: "480e0102020a0c0102"
   },
   {
-    name: "([SByte], SGroupElement)",
+    name: "(SColl[SByte], SGroupElement)",
     sconst: SPair(
       SColl(SByte, hex.decode("8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006")),
       SGroupElement(
@@ -411,7 +411,7 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
     hex: "4f0e208743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607"
   },
   {
-    name: "([([Byte], [Byte])], ([([Byte], (Int, Int))], [([Byte], (Int, Int))]))",
+    name: "(SColl[(SColl[SByte], SColl[SByte])], (SColl[(SColl[SByte], (SInt, SInt))], SColl[(SColl[SByte], (SInt, SInt))]))",
     sconst: SPair(
       SColl(SPair(SColl(SByte), SColl(SByte)), [[u8a([1, 2, 3]), u8a([4, 5, 6])]]),
       SPair(
@@ -426,7 +426,7 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
     hex: "3c0c3c0e0e3c0c3c0e580c3c0e58010301020303040506010301020314160103040506181a"
   },
   {
-    name: "([([Byte], [Byte])], ([([Byte], (Int, Int))], [([Byte], (Int, Int))]))",
+    name: "(SColl[(SColl[SByte], SColl[SByte])], (SColl[(SColl[SByte], (SInt, SInt))], SColl[(SColl[SByte], (SInt, SInt))]))",
     sconst: SPair(
       SColl(SPair(SColl(SByte), SColl(SByte)), [
         [u8a([98, 97, 99, 107, 103, 114, 111, 117, 110, 100]), u8a([98, 108, 117, 101])],
