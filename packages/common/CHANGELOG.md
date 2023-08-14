@@ -1,5 +1,16 @@
 # @fleet-sdk/common
 
+## 0.2.0
+
+### Minor Changes
+
+- 5a79c57: Add `concatBytes()` function.
+- a491ab9: Add `ensureDefaults()` function.
+- 3236dd8: Add new assertion functions:
+  - `assertTypeOf()` - uses `typeof` to check for JavaScript type primitives;
+  - `assertInstanceOf()` - uses `instanceof` to check for object instances.
+- 9bd393b: Add `depthOf()` function.
+
 ## 0.1.3
 
 ### Patch Changes
