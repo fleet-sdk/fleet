@@ -33,58 +33,71 @@ import { STuple } from "./types/constructors";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
-    expect(SBool(tv.value).toHex()).to.be.equal(tv.hex);
+    const sconst = SBool(tv.value);
+
+    expect(sconst.toHex()).to.be.equal(tv.hex);
+    expect(sconst.type.toString()).to.be.equal("SBool");
     expect(SConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
   it.each(byteVectors)("Should road-trip SByte($value)", (tv) => {
-    expect(SByte(tv.value).toHex()).to.be.equal(tv.hex);
+    const sconst = SByte(tv.value);
+
+    expect(sconst.toHex()).to.be.equal(tv.hex);
+    expect(sconst.type.toString()).to.be.equal("SByte");
     expect(SConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
   it.each(shortVectors)("Should road-trip SShort($value)", (tv) => {
-    expect(SShort(tv.value).toHex()).to.be.equal(tv.hex);
+    const sconst = SShort(tv.value);
+
+    expect(sconst.toHex()).to.be.equal(tv.hex);
+    expect(sconst.type.toString()).to.be.equal("SShort");
     expect(SConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
   it.each(intVectors)("Should road-trip SInt($value)", (tv) => {
-    expect(SInt(tv.value).toHex()).to.be.equal(tv.hex);
+    const sconst = SInt(tv.value);
+
+    expect(sconst.toHex()).to.be.equal(tv.hex);
+    expect(sconst.type.toString()).to.be.equal("SInt");
     expect(SConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
   it.each(longVectors)("Should road-trip SLong($value)", (tv) => {
-    expect(SLong(tv.value).toHex()).to.be.equal(tv.hex);
-    expect(SLong(String(tv.value)).toHex()).to.be.equal(tv.hex);
+    const sconst = SLong(tv.value);
 
+    expect(sconst.toHex()).to.be.equal(tv.hex);
+    expect(sconst.type.toString()).to.be.equal("SLong");
+    expect(SLong(String(tv.value)).toHex()).to.be.equal(tv.hex);
     expect(SConstant.from(tv.hex).data).to.be.equal(ensureBigInt(tv.value));
   });
 
-  it.each(longVectors)("Should road-trip SLong($value)", (tv) => {
-    expect(SLong(tv.value).toHex()).to.be.equal(tv.hex);
-    expect(SLong(String(tv.value)).toHex()).to.be.equal(tv.hex);
-
+  it.each(bigintVectors)("Should road-trip SBigInt($value)", (tv) => {
+    const sconst = SBigInt(tv.value);
+    expect(sconst.toHex()).to.be.equal(tv.hex);
+    expect(sconst.type.toString()).to.be.equal("SBigInt");
+    expect(SBigInt(BigInt(tv.value)).toHex()).to.be.equal(tv.hex);
     expect(SConstant.from(tv.hex).data).to.be.equal(ensureBigInt(tv.value));
   });
 
   it.each(groupElementVectors)("Should road-trip SGroupElement($value)", (tv) => {
-    expect(SGroupElement(tv.value).toHex()).to.be.equal(tv.hex);
+    const sconst = SGroupElement(tv.value);
+    expect(sconst.toHex()).to.be.equal(tv.hex);
+    expect(sconst.type.toString()).to.be.equal("SGroupElement");
     expect(SGroupElement(hex.decode(tv.value)).toHex()).to.be.equal(tv.hex);
 
     expect(SConstant.from(tv.hex).data).to.be.deep.equal(hex.decode(tv.value));
   });
 
   it.each(sigmaPropVectors)("Should road-trip SSigmaProp(ProveDlog($value))", (tv) => {
-    expect(SSigmaProp(SGroupElement(tv.value)).toHex()).to.be.equal(tv.hex);
+    const sconst = SSigmaProp(SGroupElement(tv.value));
+
+    expect(sconst.toHex()).to.be.equal(tv.hex);
+    expect(sconst.type.toString()).to.be.equal("SSigmaProp");
     expect(SSigmaProp(SGroupElement(hex.decode(tv.value))).toHex()).to.be.equal(tv.hex);
 
     expect(SConstant.from(tv.hex).data).to.be.deep.equal(hex.decode(tv.value));
-  });
-
-  it.each(bigintVectors)("Should road-trip SBigInt($value)", (tv) => {
-    expect(SBigInt(tv.value).toHex()).to.be.equal(tv.hex);
-    expect(SBigInt(BigInt(tv.value)).toHex()).to.be.equal(tv.hex);
-
-    expect(SConstant.from(tv.hex).data).to.be.equal(BigInt(tv.value));
   });
 
   it("Should coerce alternative input types", () => {
@@ -100,6 +113,7 @@ describe("Monomorphic types serialization and parsing", () => {
   it("Should serialize SUnit", () => {
     const sUnitHex = "62";
     expect(SUnit().toHex()).toBe(sUnitHex);
+    expect(SUnit().type.toString()).toBe("SUnit");
     expect(SConstant.from(sUnitHex).data).to.be.undefined;
   });
 });
@@ -108,6 +122,7 @@ describe("SColl serialization and parsing", () => {
   it.each(collVectors)("Should serialize $name", (tv) => {
     expect(tv.sconst.toHex()).to.be.equal(tv.hex);
     expect(SConstant.from(tv.hex).data).to.be.deep.equal(tv.value);
+    expect(tv.sconst.type.toString()).to.be.equal(tv.name);
   });
 
   it("Should coerce alternative input types", () => {
@@ -182,6 +197,7 @@ describe("Not implemented types", () => {
 describe("Tuple serialization", () => {
   it.each(tupleTestVectors)("Should road-trip $name", (tv) => {
     expect(tv.sconst.toHex()).to.be.equal(tv.hex);
+    expect(tv.sconst.type.toString()).to.be.equal(tv.name);
     expect(SConstant.from(tv.hex).data).to.be.deep.equal(tv.value);
   });
 

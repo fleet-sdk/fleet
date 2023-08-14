@@ -3,9 +3,11 @@ export abstract class SType<I = unknown, O = I> {
   abstract get embeddable(): boolean;
 
   coerce(data: I): O {
-    // a bit hacky but most of types will not need an specific coercion function.
+    // a bit hacky but most of types will not need a specific coercion function.
     return data as unknown as O;
   }
+
+  abstract toString(): string;
 }
 
 export abstract class SMonomorphicType<I, O = I> extends SType<I, O> {

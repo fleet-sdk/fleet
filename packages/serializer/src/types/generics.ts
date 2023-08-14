@@ -16,6 +16,10 @@ export class SCollType<T extends SType = SType> extends SGenericType<T> {
 
     return elements.map((el) => this.elementsType.coerce(el)) as O[];
   }
+
+  toString(): string {
+    return `SColl[${this.elementsType.toString()}]`;
+  }
 }
 
 export class STupleType<T extends SType[] = SType[]> extends SGenericType<T> {
@@ -30,5 +34,9 @@ export class STupleType<T extends SType[] = SType[]> extends SGenericType<T> {
     }
 
     return output;
+  }
+
+  toString(): string {
+    return `(${this.elementsType.map((el) => el.toString()).join(", ")})`;
   }
 }
