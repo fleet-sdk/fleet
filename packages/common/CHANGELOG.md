@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.2.1
+
+### Patch Changes
+
+- edf2830: Fix module exporting.
+
 ## 0.2.0
 
 ### Minor Changes
