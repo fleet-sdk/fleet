@@ -2,12 +2,12 @@
   "name": "@fleet-sdk/compiler",
   "version": "0.2.0",
   "description": "Sigma.JS powered ErgoScript compiler.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "require": "./dist/index.js",
-    "import": "./dist/index.mjs"
+    "require": "./dist/index.cjs.js",
+    "import": "./dist/index.esm.js"
   },
   "sideEffects": false,
   "repository": "fleet-sdk/fleet",
@@ -29,7 +29,7 @@
     "sigmastate-js": "0.2.1-snapshot.8a862d393"
   },
   "scripts": {
-    "build": "tsup"
+    "build": "tsup --config ../../tsup.config.ts"
   },
   "engines": {
     "node": ">=14"
