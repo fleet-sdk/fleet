@@ -2,12 +2,12 @@
   "name": "@fleet-sdk/crypto",
   "version": "0.2.0",
   "description": "Ergo blockchain crypto primitives.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "require": "./dist/index.js",
-    "import": "./dist/index.mjs"
+    "require": "./dist/index.cjs.js",
+    "import": "./dist/index.esm.js"
   },
   "sideEffects": true,
   "repository": "fleet-sdk/fleet",
@@ -22,7 +22,7 @@
     "crypto"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup --config ../../tsup.config.ts"
   },
   "engines": {
     "node": ">=14"
