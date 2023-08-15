@@ -23,8 +23,7 @@
     "serialization"
   ],
   "scripts": {
-    "build": "run-p build:*",
-    "build:cjs": "tsup --config ../../tsup.config.ts"
+    "build": "tsup --config ../../tsup.config.ts"
   },
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
