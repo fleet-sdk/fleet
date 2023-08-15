@@ -1,5 +1,16 @@
 # @fleet-sdk/compiler
 
+## 0.2.1
+
+### Patch Changes
+
+- edf2830: Fix module exporting.
+- Updated dependencies [edf2830]
+  - @fleet-sdk/serializer@0.2.1
+  - @fleet-sdk/common@0.2.1
+  - @fleet-sdk/crypto@0.2.1
+  - @fleet-sdk/core@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes

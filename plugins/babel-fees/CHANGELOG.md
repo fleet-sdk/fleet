@@ -1,5 +1,15 @@
 # @fleet-sdk/babel-fees-plugin
 
+## 0.1.5
+
+### Patch Changes
+
+- edf2830: Fix module exporting.
+- Updated dependencies [edf2830]
+  - @fleet-sdk/serializer@0.2.1
+  - @fleet-sdk/common@0.2.1
+  - @fleet-sdk/core@0.2.1
+
 ## 0.1.4
 
 ### Patch Changes
