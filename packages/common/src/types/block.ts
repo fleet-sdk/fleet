@@ -2,10 +2,10 @@ import { HexString } from "./common";
 import { SignedTransaction } from "./transactions";
 
 export type PoWSolution = {
-  "pk": HexString;
-  "w": HexString;
-  "n": string;
-  "d": number;
+  pk: HexString;
+  w: HexString;
+  n: string;
+  d: number;
 };
 
 export type BlockHeaderId = string;
