@@ -8,5 +8,5 @@
   ],
   "access": "public",
   "baseBranch": "master",
-  "updateInternalDependencies": "patch"
+  "updateInternalDependencies": "minor"
 }
