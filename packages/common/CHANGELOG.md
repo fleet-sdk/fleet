@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.2.2
+
+### Patch Changes
+
+- 9cbd414: Add `Block` and `BlockHeader` types.
+
 ## 0.2.1
 
 ### Patch Changes
