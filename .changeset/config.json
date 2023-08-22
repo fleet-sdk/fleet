@@ -3,7 +3,10 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
+  "linked": [
+    ["*/core", "*/common", "*/wallet", "*/mock-chain", "*/compiler", "*/crypto", "*/serializer"]
+  ],
   "access": "public",
   "baseBranch": "master",
-  "updateInternalDependencies": "minor"
+  "updateInternalDependencies": "patch"
 }
