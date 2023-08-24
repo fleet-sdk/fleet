@@ -6,7 +6,10 @@ const ui8 = (bytes: number[]) => Uint8Array.from(bytes);
 describe("Hex <> Bytes serialization", () => {
   it("Should convert hex to bytes", () => {
     expect(hex.decode("deadbeef")).to.be.deep.equal(ui8([0xde, 0xad, 0xbe, 0xef]));
+    expect(hex.decode("DEADBEEF")).to.be.deep.equal(ui8([0xde, 0xad, 0xbe, 0xef]));
     expect(hex.decode("cafe123456")).to.be.deep.equal(ui8([0xca, 0xfe, 0x12, 0x34, 0x56]));
+    expect(hex.decode("CAFE123456")).to.be.deep.equal(ui8([0xca, 0xfe, 0x12, 0x34, 0x56]));
+    // todo: add more test vectors
   });
 
   it("Should convert bytes to hex", () => {
