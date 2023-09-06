@@ -39,6 +39,7 @@
     "sigmastate-js": "0.2.1-snapshot.8a862d393",
     "ts-node": "^10.9.1",
     "tsup": "^7.2.0",
+    "type-fest": "^4.3.1",
     "typescript": "^5.1.6",
     "vite": "^4.4.9",
     "vitest": "^0.34.1"
