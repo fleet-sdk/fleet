@@ -1,4 +1,5 @@
 import { BytesInput, hex } from "@fleet-sdk/crypto";
+import { assert } from "packages/common/src";
 import { SigmaReader, SigmaWriter } from "./coders";
 import { DataSerializer } from "./serializers/dataSerializer";
 import { TypeSerializer } from "./serializers/typeSerializer";
@@ -16,6 +17,8 @@ export class SConstant<D = unknown, T extends SType = SType> {
   }
 
   static from<D, T extends SType = SType>(bytes: BytesInput): SConstant<D, T> {
+    assert(bytes.length > 0, "Empty constant bytes.");
+
     const reader = new SigmaReader(bytes);
     const type = TypeSerializer.deserialize(reader);
     const data = DataSerializer.deserialize(type, reader);
@@ -44,15 +47,15 @@ export class SConstant<D = unknown, T extends SType = SType> {
   }
 }
 
-export function parse<T>(bytes: BytesInput): T;
-export function parse<T>(bytes: BytesInput, mode: "strict"): T;
-export function parse<T>(bytes: BytesInput, mode: "safe"): T | undefined;
-export function parse<T>(bytes: BytesInput, mode: "strict" | "safe" = "strict") {
-  if (mode === "strict") return SConstant.from<T>(bytes).data;
-  if (!bytes) return;
+export function parse<T>(constant: BytesInput): T;
+export function parse<T>(constant: BytesInput, mode: "strict"): T;
+export function parse<T>(constant: BytesInput | undefined, mode: "safe"): T | undefined;
+export function parse<T>(constant: BytesInput | undefined, mode: "strict" | "safe" = "strict") {
+  if (mode === "strict") return SConstant.from<T>(constant ?? "").data;
+  if (!constant) return;
 
   try {
-    return SConstant.from<T>(bytes).data;
+    return SConstant.from<T>(constant).data;
   } catch {
     return;
   }
