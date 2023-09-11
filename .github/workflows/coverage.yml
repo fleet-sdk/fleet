@@ -20,7 +20,7 @@ jobs:
       - name: Collect coverage
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 20
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r build

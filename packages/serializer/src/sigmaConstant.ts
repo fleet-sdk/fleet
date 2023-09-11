@@ -1,5 +1,5 @@
+import { assert } from "@fleet-sdk/common";
 import { BytesInput, hex } from "@fleet-sdk/crypto";
-import { assert } from "packages/common/src";
 import { SigmaReader, SigmaWriter } from "./coders";
 import { DataSerializer } from "./serializers/dataSerializer";
 import { TypeSerializer } from "./serializers/typeSerializer";
