@@ -74,7 +74,7 @@ jobs:
       - run: pnpm run test:unit
 
   build-and-test-other-envs:
-    name: Build and Test
+    name: Build and Test browser and edge environments
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
