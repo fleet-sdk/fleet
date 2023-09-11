@@ -1,6 +1,18 @@
 import { blake2b } from "@noble/hashes/blake2b";
-import { sha256 as nobleSha256 } from "@noble/hashes/sha256";
+import { sha256 as _sha256 } from "@noble/hashes/sha256";
+import { hex } from "./coders";
 import { BytesInput } from "./types";
 
-export const blake2b256 = (message: BytesInput) => blake2b(message, { dkLen: 32 });
-export const sha256 = nobleSha256 as (message: BytesInput) => Uint8Array;
+function ensureBytes(input: BytesInput): Uint8Array {
+  if (input instanceof Uint8Array) return input;
+
+  return hex.decode(input);
+}
+
+export function blake2b256(message: BytesInput): Uint8Array {
+  return blake2b(ensureBytes(message), { dkLen: 32 });
+}
+
+export function sha256(message: BytesInput): Uint8Array {
+  return _sha256(ensureBytes(message));
+}
