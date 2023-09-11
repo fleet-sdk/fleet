@@ -13,7 +13,7 @@ export type BoxQuery<W extends BoxWhere> = {
   where: RequireAtLeastOne<W>;
 
   /**
-   * Determines if should include unspent boxes from the mempool.
+   * Determines if it should include unspent boxes from the mempool.
    * @default true
    */
   includeUnconfirmed?: boolean;
