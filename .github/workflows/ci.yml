@@ -63,7 +63,7 @@ jobs:
         with:
           version: 8
 
-      - name: Build and Test ${{ matrix.node-version }}
+      - name: Build and Test using Node.js v${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
@@ -72,3 +72,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r build
       - run: pnpm run test:unit
+
+      - name: Test using happy-dom
+        run: pnpm run test:unit-browser
+
+      - name: Test using edge-runtime
+        run: pnpm run test:unit-edge
