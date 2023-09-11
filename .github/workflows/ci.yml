@@ -31,7 +31,7 @@ jobs:
       - run: pnpm run test:lint
 
   prettier:
-    name: Check formatting
+    name: Format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -49,7 +49,7 @@ jobs:
       - run: pnpm run test:prettier
 
   build-and-test-node:
-    name: Build and Test
+    name: "[node] build and test"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -63,7 +63,7 @@ jobs:
         with:
           version: 8
 
-      - name: Build and Test using Node.js v${{ matrix.node-version }}
+      - name: Build and test using Node.js v${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
@@ -74,7 +74,7 @@ jobs:
       - run: pnpm run test:unit
 
   build-and-test-other-envs:
-    name: Build and Test browser and edge environments
+    name: "[happy-dom, edge-runtime] test"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -86,7 +86,7 @@ jobs:
         with:
           version: 8
 
-      - name: Build and using Node.js v20
+      - name: Build using Node.js v20
         uses: actions/setup-node@v3
         with:
           node-version: 20
