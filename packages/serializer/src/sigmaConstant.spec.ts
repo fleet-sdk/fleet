@@ -128,6 +128,7 @@ describe("SColl serialization and parsing", () => {
   it("Should coerce alternative input types", () => {
     const expectedBytes = Uint8Array.from([0xde, 0xad, 0xbe, 0xef]);
     expect(SColl(SByte, "deadbeef").data).to.be.deep.equal(expectedBytes);
+    expect(SColl(SByte, "deadbeef").data).to.be.instanceOf(Uint8Array);
     expect(SColl(SByte, [222, 173, 190, 239]).data).to.be.deep.equal(expectedBytes);
     expect(SColl(SByte, Uint8Array.from([0xde, 0xad, 0xbe, 0xef])).data).to.be.deep.equal(
       expectedBytes
@@ -136,6 +137,10 @@ describe("SColl serialization and parsing", () => {
     expect(SColl(SGroupElement, ["deadbeef"]).data).to.be.deep.equal([expectedBytes]);
     expect(SColl(SLong, ["1", 2n]).data).to.be.deep.equal([1n, 2n]);
     expect(SColl(SBigInt, ["1", 2n]).data).to.be.deep.equal([1n, 2n]);
+  });
+
+  it("Should return a Uint8Array instance when parsing SColl[SByte] type", () => {
+    expect(SConstant.from("0e0a46656d616c6520233035").data).to.be.instanceof(Uint8Array);
   });
 });
 
@@ -148,12 +153,15 @@ describe("Data only parsing", () => {
   it("Should throw with invalid bytes in 'strict' parsing mode", () => {
     expect(() => parse("deadbeef")).to.throw();
     expect(() => parse("deadbeef", "strict")).to.throw();
+    expect(() => parse("", "strict")).to.throw();
+    expect(() => parse(undefined as unknown as string, "strict")).to.throw();
   });
 
   it("Should not throw but return undefined with invalid bytes in 'safe' parsing mode", () => {
     expect(() => parse("deadbeef", "safe")).not.to.throw();
     expect(parse("deadbeef", "safe")).to.be.undefined;
-    expect(parse(undefined as unknown as string, "safe")).to.be.undefined;
+    expect(parse(undefined, "safe")).to.be.undefined;
+    expect(parse("", "safe")).to.be.undefined;
     expect(parse("0102", "safe")).to.be.equal(false);
   });
 });
@@ -181,13 +189,22 @@ describe("Not implemented types", () => {
     }).to.throw("Serialization error: '0x64' type not implemented.");
   });
 
-  it("Should fail while trying to deserialize a not implemented SigmaProp expression", () => {
+  it("Should fail when trying to deserialize a not implemented SigmaProp expression", () => {
     expect(() => {
       SConstant.from("08ce");
     }).to.throw();
   });
 
-  it("Should fail while trying to deserialize a not implemented type", () => {
+  it("Should fail when trying to deserialize empty bytes", () => {
+    expect(() => {
+      SConstant.from("");
+    }).to.throw("Empty constant bytes.");
+    expect(() => {
+      SConstant.from(Uint8Array.from([]));
+    }).to.throw("Empty constant bytes.");
+  });
+
+  it("Should fail when trying to deserialize a not implemented type", () => {
     expect(() => {
       SConstant.from("deadbeef");
     }).to.throw();
