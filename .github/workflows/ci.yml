@@ -24,7 +24,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
@@ -42,13 +42,13 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm run test:prettier
 
-  build-and-test:
+  build-and-test-node:
     name: Build and Test
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -72,6 +72,28 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r build
       - run: pnpm run test:unit
+
+  build-and-test-other-envs:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Build and using Node.js v20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
 
       - name: Test using happy-dom
         run: pnpm run test:unit-browser
