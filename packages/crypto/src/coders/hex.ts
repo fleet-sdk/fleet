@@ -28,16 +28,16 @@ function hexToBytes(hex: string): Uint8Array {
   assert(hex.length % 2 === 0, "Invalid hex padding.");
 
   const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0, j = 0, len = bytes.length; i < len; i++, j = i * 2) {
-    const n1 = charToHexValue(hex.charCodeAt(j));
-    const n2 = charToHexValue(hex.charCodeAt(j + 1));
+  for (let i = 0, j = 0, len = bytes.length; i < len; i++) {
+    const n1 = charCodeToBase16(hex.charCodeAt(j++));
+    const n2 = charCodeToBase16(hex.charCodeAt(j++));
     bytes[i] = n1 * 16 + n2;
   }
 
   return bytes;
 }
 
-function charToHexValue(char: number) {
+function charCodeToBase16(char: number) {
   if (char >= HexCharCode.ZERO && char <= HexCharCode.NINE) {
     return char - HexCharCode.ZERO;
   } else if (char >= HexCharCode.A_UP && char <= HexCharCode.F_UP) {
