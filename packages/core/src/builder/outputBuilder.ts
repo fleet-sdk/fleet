@@ -18,6 +18,7 @@ import {
   NonMandatoryRegisters,
   OneOrMore,
   TokenAmount,
+  TokenId,
   UnsignedInput
 } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
@@ -133,6 +134,12 @@ export class OutputBuilder {
     }
 
     return this;
+  }
+
+  public addNfts(...tokenIds: TokenId[]): OutputBuilder {
+    const tokens = tokenIds.map((tokenId) => ({ tokenId, amount: 1n }));
+
+    return this.addTokens(tokens);
   }
 
   public mintToken(token: NewToken<Amount>): OutputBuilder {
