@@ -28,6 +28,7 @@
     "node": ">=14"
   },
   "dependencies": {
+    "@ergo-graphql/types": "^0.5.0",
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/core": "workspace:^",
     "@urql/core": "^4.1.2"
