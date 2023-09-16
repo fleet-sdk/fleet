@@ -1,5 +1,5 @@
 import { Header, QueryBoxesArgs } from "@ergo-graphql/types";
-import { Client, createClient, fetchExchange, gql } from "@urql/core";
+import { HexString } from "@fleet-sdk/common";
 import {
   BlockHeader,
   BoxQuery,
@@ -8,10 +8,10 @@ import {
   IChainDataClient,
   SignedTransaction,
   UnsignedTransaction
-} from "packages/common/src";
-import { HexString } from "sigmastate-js/main";
+} from "@fleet-sdk/common";
+import { Client, createClient, fetchExchange, gql } from "@urql/core";
 
-export type ExtendedBoxWhere = BoxWhere & {
+export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded BoxIds */
   boxIds?: HexString[];
 
@@ -19,19 +19,19 @@ export type ExtendedBoxWhere = BoxWhere & {
   contracts?: HexString[];
 };
 
-export type ExtendedBoxQuery = BoxQuery<ExtendedBoxWhere>;
+export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
 
 export class GraphqlClient implements IChainDataClient<BoxWhere> {
   private _client: Client;
 
-  constructor() {
+  constructor(graphqlUrl: string) {
     this._client = createClient({
-      url: "TODO",
+      url: graphqlUrl,
       exchanges: [fetchExchange],
       requestPolicy: "network-only"
     });
   }
-  async getUnspentBoxes(q: BoxQuery<ExtendedBoxWhere>): Promise<ChainClientBox[]> {
+  async getUnspentBoxes(q: GraphQLBoxQuery): Promise<ChainClientBox[]> {
     const query = gql<{ boxes: Omit<ChainClientBox, "confirmed">[] }, QueryBoxesArgs>`
       query boxes(
         $boxId: String
@@ -100,31 +100,19 @@ export class GraphqlClient implements IChainDataClient<BoxWhere> {
           difficulty
           parentId
           votes
-          extension {
-            headerId
-          }
-          adProof {
-            headerId
-          }
         }
       }
     `;
 
     const response = await this._client.query(query, { count });
 
-    // What is size? Is it the block size?
-    // What is `transactionsId`?
     return (
       response.data?.blockHeaders.map((header) => ({
         ...header,
         id: header.headerId,
         timestamp: Number(header.timestamp),
         nBits: Number(header.nBits),
-        votes: header.votes.join(""),
-        size: 0,
-        transactionsId: "",
-        adProofsId: header.adProof.headerId,
-        extensionId: header.extension.headerId
+        votes: header.votes.join("")
       })) ?? []
     );
   }

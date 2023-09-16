@@ -130,9 +130,6 @@ importers:
 
   packages/graphql-client:
     dependencies:
-      '@ergo-graphql/types':
-        specifier: ^0.5.0
-        version: 0.5.0
       '@fleet-sdk/common':
         specifier: workspace:^
         version: link:../common
@@ -142,6 +139,10 @@ importers:
       '@urql/core':
         specifier: ^4.1.2
         version: 4.1.2
+    devDependencies:
+      '@ergo-graphql/types':
+        specifier: ^0.5.0
+        version: 0.5.0
 
   packages/mock-chain:
     dependencies:
@@ -481,7 +482,7 @@ packages:
 
   /@ergo-graphql/types@0.5.0:
     resolution: {integrity: sha512-88XVtcXujvL4bCB3Jb1q/uyNcwWNi91kVbqRIqbTN5P25g9s1hrVbW1mCEjxSntzEJe0iJDFsTfBTzNV1alFDw==}
-    dev: false
+    dev: true
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}
