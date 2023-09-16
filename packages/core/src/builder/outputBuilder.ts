@@ -1,5 +1,6 @@
 import {
   _0n,
+  _1n,
   Amount,
   areRegistersDenselyPacked,
   assert,
@@ -137,7 +138,7 @@ export class OutputBuilder {
   }
 
   public addNfts(...tokenIds: TokenId[]): OutputBuilder {
-    const tokens = tokenIds.map((tokenId) => ({ tokenId, amount: 1n }));
+    const tokens = tokenIds.map((tokenId) => ({ tokenId, amount: _1n }));
 
     return this.addTokens(tokens);
   }
