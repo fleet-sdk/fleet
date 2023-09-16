@@ -130,6 +130,9 @@ importers:
 
   packages/graphql-client:
     dependencies:
+      '@ergo-graphql/types':
+        specifier: ^0.5.0
+        version: 0.5.0
       '@fleet-sdk/common':
         specifier: workspace:^
         version: link:../common
@@ -475,6 +478,10 @@ packages:
     dependencies:
       '@edge-runtime/primitives': 4.0.0
     dev: true
+
+  /@ergo-graphql/types@0.5.0:
+    resolution: {integrity: sha512-88XVtcXujvL4bCB3Jb1q/uyNcwWNi91kVbqRIqbTN5P25g9s1hrVbW1mCEjxSntzEJe0iJDFsTfBTzNV1alFDw==}
+    dev: false
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}
