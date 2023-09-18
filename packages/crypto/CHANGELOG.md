@@ -1,5 +1,15 @@
 # @fleet-sdk/crypto
 
+## 0.2.3
+
+### Patch Changes
+
+- 1e0edd4: Fix missing `types` export in `package.json`
+- 65d5b33: Hex encoder performance improvements.
+- 514dcd2: Fix wrong Base16 hash input encoding.
+- Updated dependencies [1e0edd4]
+  - @fleet-sdk/common@0.2.3
+
 ## 0.2.2
 
 ### Patch Changes

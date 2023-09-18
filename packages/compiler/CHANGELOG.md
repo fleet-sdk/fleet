@@ -1,5 +1,20 @@
 # @fleet-sdk/compiler
 
+## 0.2.3
+
+### Patch Changes
+
+- 1e0edd4: Fix missing `types` export in `package.json`
+- Updated dependencies [37cdfdd]
+- Updated dependencies [ce1b6f3]
+- Updated dependencies [1e0edd4]
+- Updated dependencies [65d5b33]
+- Updated dependencies [514dcd2]
+  - @fleet-sdk/serializer@0.2.3
+  - @fleet-sdk/core@0.2.3
+  - @fleet-sdk/common@0.2.3
+  - @fleet-sdk/crypto@0.2.3
+
 ## 0.2.2
 
 ### Patch Changes
