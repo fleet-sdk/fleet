@@ -1,15 +1,20 @@
-import { Header, QueryBoxesArgs } from "@ergo-graphql/types";
-import { HexString } from "@fleet-sdk/common";
+import {
+  SignedTransaction as gqlSignedTransaction,
+  Header,
+  QueryBoxesArgs
+} from "@ergo-graphql/types";
 import {
   BlockHeader,
   BoxQuery,
   BoxWhere,
   ChainClientBox,
+  HexString,
   IChainDataClient,
-  SignedTransaction,
-  UnsignedTransaction
+  NotSupportedError,
+  SignedTransaction
 } from "@fleet-sdk/common";
 import { Client, createClient, fetchExchange, gql } from "@urql/core";
+import { castSignedTxToGql } from "./utils";
 
 export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded BoxIds */
@@ -116,16 +121,33 @@ export class GraphqlClient implements IChainDataClient<BoxWhere> {
       })) ?? []
     );
   }
-  checkTransaction(transaction: SignedTransaction): Promise<boolean> {
-    // Size is missing from SignedTransaction! What to do?
-    throw new Error("Method not implemented.");
+  async checkTransaction(transaction: SignedTransaction): Promise<boolean> {
+    const query = gql<{ checkTransaction: string }, { tx: gqlSignedTransaction }>`
+      mutation checkTransaction($tx: SignedTransaction!) {
+        checkTransaction(signedTransaction: $tx)
+      }
+    `;
+
+    const response = await this._client.mutation(query, { tx: castSignedTxToGql(transaction) });
+
+    if (response.data?.checkTransaction === transaction.id) {
+      return true;
+    }
+
+    return false;
   }
-  submitTransaction(transaction: SignedTransaction): Promise<string> {
-    // Same as checkTransaction
-    throw new Error("Method not implemented.");
+  async submitTransaction(transaction: SignedTransaction): Promise<string> {
+    const query = gql<{ submitTransaction: string }, { tx: gqlSignedTransaction }>`
+      mutation submitTransaction($tx: SignedTransaction!) {
+        submitTransaction(signedTransaction: $tx)
+      }
+    `;
+
+    const response = await this._client.mutation(query, { tx: castSignedTxToGql(transaction) });
+
+    return response.data?.submitTransaction ?? "";
   }
-  reduceTransaction(transaction: UnsignedTransaction): Promise<string> {
-    // It's not implemented in graphql. What to do?
-    throw new Error("Method not implemented.");
+  reduceTransaction(): Promise<string> {
+    throw new NotSupportedError("Reducing transactions is not supported by ergo-graphql yet.");
   }
 }
