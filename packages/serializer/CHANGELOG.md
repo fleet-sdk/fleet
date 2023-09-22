@@ -1,5 +1,17 @@
 # @fleet-sdk/serializer
 
+## 0.2.3
+
+### Patch Changes
+
+- 37cdfdd: Add support for possibly `undefined` values to `parse()` function when in `safe` mode.
+- 1e0edd4: Fix missing `types` export in `package.json`
+- Updated dependencies [1e0edd4]
+- Updated dependencies [65d5b33]
+- Updated dependencies [514dcd2]
+  - @fleet-sdk/common@0.2.3
+  - @fleet-sdk/crypto@0.2.3
+
 ## 0.2.2
 
 ### Patch Changes

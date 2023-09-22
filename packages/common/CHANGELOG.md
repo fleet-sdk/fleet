@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.2.3
+
+### Patch Changes
+
+- 1e0edd4: Fix missing `types` export in `package.json`
+
 ## 0.2.2
 
 ### Patch Changes
