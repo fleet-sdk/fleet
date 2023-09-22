@@ -1,23 +1,48 @@
+import fc from "fast-check";
 import { describe, expect, it, test } from "vitest";
 import { hex } from "./hex";
 
-const ui8 = (bytes: number[]) => Uint8Array.from(bytes);
+const ui8a = (bytes: number[]) => Uint8Array.from(bytes);
+const paddedHexArb = fc
+  .mixedCase(fc.hexaString({ size: "medium" }))
+  .map((v) => (v.length % 2 ? v.padStart(v.length + 1, "0") : v));
 
-describe("Hex <> Bytes serialization", () => {
+describe("Fuzzy hex <-> bytes roundtrip", () => {
+  test("byte -> hex -> byte", () => {
+    fc.assert(
+      fc.property(fc.uint8Array({ size: "medium" }), (bytes) => {
+        expect(hex.decode(hex.encode(bytes))).to.be.deep.equal(bytes);
+      })
+    );
+  });
+
+  test("hex -> byte -> hex", () => {
+    fc.assert(
+      fc.property(paddedHexArb, (hexString) => {
+        expect(hex.encode(hex.decode(hexString))).to.be.equal(hexString.toLowerCase());
+      })
+    );
+  });
+});
+
+describe("Hex <-> Bytes serialization", () => {
   it("Should convert hex to bytes", () => {
-    expect(hex.decode("deadbeef")).to.be.deep.equal(ui8([0xde, 0xad, 0xbe, 0xef]));
-    expect(hex.decode("cafe123456")).to.be.deep.equal(ui8([0xca, 0xfe, 0x12, 0x34, 0x56]));
+    expect(hex.decode("deadbeef")).to.be.deep.equal(ui8a([0xde, 0xad, 0xbe, 0xef]));
+    expect(hex.decode("DEADBEEF")).to.be.deep.equal(ui8a([0xde, 0xad, 0xbe, 0xef]));
+    expect(hex.decode("deadBEEF")).to.be.deep.equal(ui8a([0xde, 0xad, 0xbe, 0xef]));
+    expect(hex.decode("cafe123456")).to.be.deep.equal(ui8a([0xca, 0xfe, 0x12, 0x34, 0x56]));
+    expect(hex.decode("CAFE123456")).to.be.deep.equal(ui8a([0xca, 0xfe, 0x12, 0x34, 0x56]));
   });
 
   it("Should convert bytes to hex", () => {
-    expect(hex.encode(ui8([0xde, 0xad, 0xbe, 0xef]))).to.be.equal("deadbeef");
-    expect(hex.encode(ui8([0xca, 0xfe, 0x12, 0x34, 0x56]))).to.be.equal("cafe123456");
+    expect(hex.encode(ui8a([0xde, 0xad, 0xbe, 0xef]))).to.be.equal("deadbeef");
+    expect(hex.encode(ui8a([0xca, 0xfe, 0x12, 0x34, 0x56]))).to.be.equal("cafe123456");
   });
 
   it("Should roundtrip", () => {
     expect(hex.encode(hex.decode("deadbeef"))).to.be.deep.equal("deadbeef");
-    expect(hex.decode(hex.encode(ui8([0xca, 0xfe, 0x12, 0x34, 0x56])))).to.be.deep.equal(
-      ui8([0xca, 0xfe, 0x12, 0x34, 0x56])
+    expect(hex.decode(hex.encode(ui8a([0xca, 0xfe, 0x12, 0x34, 0x56])))).to.be.deep.equal(
+      ui8a([0xca, 0xfe, 0x12, 0x34, 0x56])
     );
   });
 
