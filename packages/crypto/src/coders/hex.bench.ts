@@ -1,15 +1,36 @@
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { hex as scureHex } from "@scure/base";
 import { bench, describe } from "vitest";
+import { regularBoxes, validBoxes } from "../../../_test-vectors/mockedBoxes";
 import { hex as fleetHex } from "./hex";
 
-describe("HEX <> Bytes decoding", () => {
-  const validHex = "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7";
+const hexString = [...regularBoxes, ...validBoxes].map((x) => x.ergoTree).join("");
+const bytes = hexToBytes(hexString);
 
-  bench("@scure implementation", () => {
-    scureHex.encode(scureHex.decode(validHex));
+describe("Decode hex to bytes", () => {
+  bench("@noble/hashes implementation", () => {
+    hexToBytes(hexString);
   });
 
-  bench("Fleet implementation", () => {
-    fleetHex.encode(fleetHex.decode(validHex));
+  bench("@scure/base implementation", () => {
+    scureHex.decode(hexString);
+  });
+
+  bench("@fleet-sdk/crypto implementation", () => {
+    fleetHex.decode(hexString);
+  });
+});
+
+describe("Encode bytes to hex", () => {
+  bench("@noble/hashes implementation", () => {
+    bytesToHex(bytes);
+  });
+
+  bench("@scure/base implementation", () => {
+    scureHex.encode(bytes);
+  });
+
+  bench("@fleet-sdk/crypto implementation", () => {
+    fleetHex.encode(bytes);
   });
 });

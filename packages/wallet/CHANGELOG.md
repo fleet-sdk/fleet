@@ -1,5 +1,14 @@
 # @fleet-sdk/wallet
 
+## 0.2.3
+
+### Patch Changes
+
+- 1e0edd4: Fix missing `types` export in `package.json`
+- Updated dependencies [ce1b6f3]
+- Updated dependencies [1e0edd4]
+  - @fleet-sdk/core@0.2.3
+
 ## 0.2.2
 
 ### Patch Changes

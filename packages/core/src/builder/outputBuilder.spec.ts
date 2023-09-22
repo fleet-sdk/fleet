@@ -159,6 +159,15 @@ describe("Token handling", () => {
     expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(10n);
   });
 
+  it("Should add tokens with amount equal to one for NFTs", () => {
+    builder.addNfts(tokenA, tokenB);
+    const tokens = builder.assets.toArray();
+
+    expect(tokens).toHaveLength(2);
+    expect(tokens.find((x) => x.tokenId === tokenA)?.amount).toEqual(1n);
+    expect(tokens.find((x) => x.tokenId === tokenB)?.amount).toEqual(1n);
+  });
+
   it("Should sum if the same tokenId is added more than one time", () => {
     builder
       .addTokens({ tokenId: tokenA, amount: "50" })
