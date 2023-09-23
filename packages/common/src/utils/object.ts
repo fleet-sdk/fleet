@@ -12,7 +12,7 @@ export function clearUndefined(value: Record<string, unknown>) {
   return result;
 }
 
-export function ensureDefaults<T extends Partial<R>, R extends object = Required<T>>(
+export function ensureDefaults<T extends object, R extends object>(
   options: T | undefined,
   defaults: R
 ): R & T {
@@ -21,7 +21,7 @@ export function ensureDefaults<T extends Partial<R>, R extends object = Required
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const newObj: any = { ...defaults, ...options };
   for (const key in newObj) {
-    newObj[key as keyof object] = options[key as keyof R] ?? defaults[key as keyof R];
+    newObj[key as keyof object] = options[key as keyof T] ?? defaults[key as keyof R];
   }
 
   return newObj;
