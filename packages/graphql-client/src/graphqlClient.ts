@@ -1,4 +1,5 @@
 import {
+  Box,
   SignedTransaction as gqlSignedTransaction,
   Header,
   QueryBoxesArgs
@@ -37,26 +38,23 @@ export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
     });
   }
   async getUnspentBoxes(q: GraphQLBoxQuery): Promise<ChainClientBox[]> {
-    const query = gql<{ boxes: Omit<ChainClientBox, "confirmed">[] }, QueryBoxesArgs>`
+    const query = gql<{ boxes: Box[] }, QueryBoxesArgs>`
       query boxes(
-        $boxId: String
         $boxIds: [String!]
-        $contract: String
-        $contracts: [String!]
-        $template: String
+        $ergoTrees: [String!]
+        $ergoTreeTemplateHash: String
         $tokenId: String
         $skip: Int
         $take: Int
       ) {
         boxes(
-          boxId: $boxId
           boxIds: $boxIds
-          ergoTree: $contract
-          ergoTrees: $contracts
-          ergoTreeTemplateHash: $template
+          ergoTrees: $ergoTrees
+          ergoTreeTemplateHash: $ergoTreeTemplateHash
           tokenId: $tokenId
           skip: $skip
           take: $take
+          spent: false
         ) {
           boxId
           transactionId
@@ -74,19 +72,25 @@ export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
     `;
 
     const response = await this._client.query(query, {
-      boxId: q.where.boxId,
-      boxIds: q.where.boxIds,
-      address: q.where.contract,
-      addresses: q.where.contracts,
+      boxIds: q.where.boxIds ?? q.where.boxId ? [q.where.boxId!] : [],
+      ergoTrees: q.where.contracts ?? q.where.contract ? [q.where.contract!] : [],
       ergoTreeTemplateHash: q.where.template,
       tokenId: q.where.tokenId,
       skip: q.skip,
-      take: q.take,
-      spent: false
+      take: q.take
     });
 
-    // What to do about confirmed?
-    return response.data?.boxes.map((box) => ({ ...box, confirmed: true })) ?? [];
+    return (
+      response.data?.boxes.map((box) => ({
+        ...box,
+        assets: box.assets.map((asset) => ({
+          tokenId: asset.tokenId,
+          amount: BigInt(asset.amount)
+        })),
+        confirmed: true,
+        value: BigInt(box.value)
+      })) ?? []
+    );
   }
   async getLastHeaders(count: number): Promise<BlockHeader[]> {
     const query = gql<{ blockHeaders: Header[] }, { count: number }>`
