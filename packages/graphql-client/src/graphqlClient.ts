@@ -26,7 +26,7 @@ export type GraphQLBoxWhere = BoxWhere & {
 
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
 
-export class GraphqlClient implements IChainDataClient<BoxWhere> {
+export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
   private _client: Client;
 
   constructor(graphqlUrl: string) {
