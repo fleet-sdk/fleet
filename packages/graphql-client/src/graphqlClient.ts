@@ -1,8 +1,10 @@
 import {
   Box,
-  SignedTransaction as gqlSignedTransaction,
+  QueryBoxesArgs as BoxesArgs,
+  MutationCheckTransactionArgs as CheckTxArgs,
   Header,
-  QueryBoxesArgs
+  QueryBlockHeadersArgs as HeadersArgs,
+  MutationSubmitTransactionArgs as SendTxArgs
 } from "@ergo-graphql/types";
 import {
   BlockHeader,
@@ -14,8 +16,8 @@ import {
   NotSupportedError,
   SignedTransaction
 } from "@fleet-sdk/common";
-import { Client, createClient, fetchExchange, gql } from "@urql/core";
-import { castSignedTxToGql } from "./utils";
+import { CHECK_TX_MUTATION, CONF_BOX_QUERY, HEADERS_QUERY, SEND_TX_MUTATION } from "./queries";
+import { castSignedTxToGql, createOperation, isRequestParam, RequestOptions } from "./utils";
 
 export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded BoxIds */
@@ -27,57 +29,36 @@ export type GraphQLBoxWhere = BoxWhere & {
 
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
 
+type BoxesResponse = { boxes: Box[] };
+type HeadersResponse = { blockHeaders: Header[] };
+type CheckTxResponse = { checkTransaction: string };
+type SendTxResponse = { submitTransaction: string };
+
 export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
-  private _client: Client;
+  #getConfBoxes;
+  #getHeaders;
+  #checkTx;
+  #sendTx;
 
-  constructor(graphqlUrl: string) {
-    this._client = createClient({
-      url: graphqlUrl,
-      exchanges: [fetchExchange],
-      requestPolicy: "network-only"
-    });
+  constructor(options: RequestOptions);
+  constructor(url: string | URL);
+  constructor(optOrUrl: RequestOptions | string | URL) {
+    const opt = isRequestParam(optOrUrl) ? optOrUrl : { url: optOrUrl };
+
+    this.#getConfBoxes = createOperation<BoxesResponse, BoxesArgs>(CONF_BOX_QUERY, opt);
+    this.#getHeaders = createOperation<HeadersResponse, HeadersArgs>(HEADERS_QUERY, opt);
+    this.#checkTx = createOperation<CheckTxResponse, CheckTxArgs>(CHECK_TX_MUTATION, opt);
+    this.#sendTx = createOperation<SendTxResponse, SendTxArgs>(SEND_TX_MUTATION, opt);
   }
-  async getUnspentBoxes(q: GraphQLBoxQuery): Promise<ChainClientBox[]> {
-    const query = gql<{ boxes: Box[] }, QueryBoxesArgs>`
-      query boxes(
-        $boxIds: [String!]
-        $ergoTrees: [String!]
-        $ergoTreeTemplateHash: String
-        $tokenId: String
-        $skip: Int
-        $take: Int
-      ) {
-        boxes(
-          boxIds: $boxIds
-          ergoTrees: $ergoTrees
-          ergoTreeTemplateHash: $ergoTreeTemplateHash
-          tokenId: $tokenId
-          skip: $skip
-          take: $take
-          spent: false
-        ) {
-          boxId
-          transactionId
-          index
-          value
-          creationHeight
-          ergoTree
-          assets {
-            tokenId
-            amount
-          }
-          additionalRegisters
-        }
-      }
-    `;
 
-    const response = await this._client.query(query, {
-      boxIds: q.where.boxIds ?? q.where.boxId ? [q.where.boxId!] : [],
-      ergoTrees: q.where.contracts ?? q.where.contract ? [q.where.contract!] : [],
-      ergoTreeTemplateHash: q.where.template,
-      tokenId: q.where.tokenId,
-      skip: q.skip,
-      take: q.take
+  async getUnspentBoxes(args: GraphQLBoxQuery): Promise<ChainClientBox[]> {
+    const response = await this.#getConfBoxes({
+      boxIds: args.where.boxIds ?? args.where.boxId ? [args.where.boxId!] : undefined,
+      ergoTrees: args.where.contracts ?? args.where.contract ? [args.where.contract!] : undefined,
+      ergoTreeTemplateHash: args.where.template,
+      tokenId: args.where.tokenId,
+      skip: args.skip,
+      take: args.take
     });
 
     return (
@@ -92,28 +73,9 @@ export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
       })) ?? []
     );
   }
-  async getLastHeaders(count: number): Promise<BlockHeader[]> {
-    const query = gql<{ blockHeaders: Header[] }, { count: number }>`
-      query blockHeaders($count: Int) {
-        blockHeaders(take: $count) {
-          headerId
-          timestamp
-          version
-          adProofsRoot
-          stateRoot
-          transactionsRoot
-          nBits
-          extensionHash
-          powSolutions
-          height
-          difficulty
-          parentId
-          votes
-        }
-      }
-    `;
 
-    const response = await this._client.query(query, { count });
+  async getLastHeaders(count: number): Promise<BlockHeader[]> {
+    const response = await this.#getHeaders({ take: count });
 
     return (
       response.data?.blockHeaders.map((header) => ({
@@ -125,32 +87,19 @@ export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
       })) ?? []
     );
   }
+
   async checkTransaction(transaction: SignedTransaction): Promise<boolean> {
-    const query = gql<{ checkTransaction: string }, { tx: gqlSignedTransaction }>`
-      mutation checkTransaction($tx: SignedTransaction!) {
-        checkTransaction(signedTransaction: $tx)
-      }
-    `;
+    const response = await this.#checkTx({ signedTransaction: castSignedTxToGql(transaction) });
 
-    const response = await this._client.mutation(query, { tx: castSignedTxToGql(transaction) });
-
-    if (response.data?.checkTransaction === transaction.id) {
-      return true;
-    }
-
-    return false;
+    return response.data?.checkTransaction === transaction.id;
   }
-  async submitTransaction(transaction: SignedTransaction): Promise<string> {
-    const query = gql<{ submitTransaction: string }, { tx: gqlSignedTransaction }>`
-      mutation submitTransaction($tx: SignedTransaction!) {
-        submitTransaction(signedTransaction: $tx)
-      }
-    `;
 
-    const response = await this._client.mutation(query, { tx: castSignedTxToGql(transaction) });
+  async submitTransaction(transaction: SignedTransaction): Promise<string> {
+    const response = await this.#sendTx({ signedTransaction: castSignedTxToGql(transaction) });
 
     return response.data?.submitTransaction ?? "";
   }
+
   reduceTransaction(): Promise<string> {
     throw new NotSupportedError("Reducing transactions is not supported by ergo-graphql yet.");
   }

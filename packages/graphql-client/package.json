@@ -29,8 +29,7 @@
   },
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
-    "@fleet-sdk/core": "workspace:^",
-    "@urql/core": "^4.1.2"
+    "@fleet-sdk/core": "workspace:^"
   },
   "files": [
     "src",
