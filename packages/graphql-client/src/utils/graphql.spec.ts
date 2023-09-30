@@ -1,15 +1,12 @@
 import { Box, QueryBoxesArgs, State } from "@ergo-graphql/types";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { TestUtils } from "./TestUtils";
 import { createOperation, DEFAULT_HEADERS, getOpName, gql } from "./graphql";
-
-function mockResponse(data: string) {
-  return { text: () => new Promise((resolve) => resolve(data)) } as unknown as Response;
-}
 
 describe("GraphQL query builder", () => {
   const fetchSpy = vi
     .spyOn(global, "fetch")
-    .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+    .mockResolvedValueOnce(TestUtils.mockResponse('{"data":{"state":{"height":1098787}}}'));
 
   const parseSpy = vi.spyOn(JSON, "parse");
   const stringifySpy = vi.spyOn(JSON, "stringify");
@@ -52,7 +49,7 @@ describe("GraphQL query builder", () => {
     const mockedFetch = vi
       .fn()
       .mockImplementation(fetch)
-      .mockResolvedValueOnce(mockResponse(`{"data":{"boxes":[{"boxId":"${boxId}"}]}}`));
+      .mockResolvedValueOnce(TestUtils.mockResponse(`{"data":{"boxes":[{"boxId":"${boxId}"}]}}`));
 
     const mockedParser = {
       parse: vi.fn().mockImplementation(JSON.parse),
