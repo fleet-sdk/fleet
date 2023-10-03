@@ -1,3 +1,4 @@
+import { SBool } from "@fleet-sdk/serializer";
 import { regularBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
@@ -23,9 +24,12 @@ describe("Construction", () => {
 describe("Tweaking", () => {
   it("Should set extension", () => {
     const input = new ErgoUnsignedInput(regularBoxes[0]);
-    input.setContextVars({ 0: "0402", 1: "0580c0fc82aa02" });
+    input.setContextExtension({ 0: "0402", 1: "0580c0fc82aa02", 2: undefined, 3: SBool(true) });
 
-    expect(input.extension).toEqual({ 0: "0402", 1: "0580c0fc82aa02" });
+    expect(input.extension).toEqual({ 0: "0402", 1: "0580c0fc82aa02", 3: "0101" });
+
+    input.setContextVars({ 0: SBool(false) });
+    expect(input.extension).toEqual({ 0: "0100" });
   });
 });
 
@@ -43,7 +47,7 @@ describe("Unsigned input object conversion", () => {
     for (const box of regularBoxes) {
       expect(
         new ErgoUnsignedInput(box)
-          .setContextVars({ 0: "0580c0fc82aa02" })
+          .setContextExtension({ 0: "0580c0fc82aa02" })
           .toUnsignedInputObject("default")
       ).toEqual({
         boxId: box.boxId,
@@ -56,7 +60,7 @@ describe("Unsigned input object conversion", () => {
     for (const box of regularBoxes) {
       expect(
         new ErgoUnsignedInput(box)
-          .setContextVars({ 0: "0580c0fc82aa02" })
+          .setContextExtension({ 0: "0580c0fc82aa02" })
           .toUnsignedInputObject("EIP-12")
       ).toEqual({
         boxId: box.boxId,
@@ -85,7 +89,9 @@ describe("Unsigned data input object conversion", () => {
   it("Should ignore context vars", () => {
     for (const box of regularBoxes) {
       expect(
-        new ErgoUnsignedInput(box).setContextVars({ 0: "0580c0fc82aa02" }).toPlainObject("default")
+        new ErgoUnsignedInput(box)
+          .setContextExtension({ 0: "0580c0fc82aa02" })
+          .toPlainObject("default")
       ).toEqual({
         boxId: box.boxId
       });
@@ -95,7 +101,9 @@ describe("Unsigned data input object conversion", () => {
   it("Should convert to EIP-12 unsigned input object and ignore extension content", () => {
     for (const box of regularBoxes) {
       expect(
-        new ErgoUnsignedInput(box).setContextVars({ 0: "0580c0fc82aa02" }).toPlainObject("EIP-12")
+        new ErgoUnsignedInput(box)
+          .setContextExtension({ 0: "0580c0fc82aa02" })
+          .toPlainObject("EIP-12")
       ).toEqual({
         boxId: box.boxId,
         value: box.value.toString(),

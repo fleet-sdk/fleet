@@ -1,61 +1,7 @@
-import { Amount, Box, HexString, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
+import { Amount, Box, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeBox } from "@fleet-sdk/serializer";
-
-export type OnlyR4Register = {
-  R4: HexString;
-  R5?: HexString;
-  R6?: HexString;
-  R7?: HexString;
-  R8?: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR5Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6?: HexString;
-  R7?: HexString;
-  R8?: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR6Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6: HexString;
-  R7?: HexString;
-  R8?: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR7Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6: HexString;
-  R7: HexString;
-  R8?: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR8Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6: HexString;
-  R7: HexString;
-  R8: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR9Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6: HexString;
-  R7: HexString;
-  R8: HexString;
-  R9: HexString;
-};
 
 export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
   boxId!: string;
