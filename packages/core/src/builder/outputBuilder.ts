@@ -23,9 +23,11 @@ import {
 } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
 import { estimateBoxSize, SByte, SColl, SConstant } from "@fleet-sdk/serializer";
-import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
-import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
-import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
+import {
+  InvalidRegistersPacking,
+  UndefinedCreationHeight,
+  UndefinedMintingContext
+} from "../errors";
 import { ErgoAddress, ErgoTree } from "../models";
 import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
 
@@ -151,7 +153,7 @@ export class OutputBuilder {
     return this;
   }
 
-  public setAdditionalRegisters<T extends AdditionalRegisters>(
+  public setAdditionalRegisters<T extends AdditionalRegistersInput>(
     registers: SequentialNonMandatoryRegisters<T>
   ): OutputBuilder {
     const hexRegisters: NonMandatoryRegisters = {};
@@ -243,66 +245,59 @@ export class OutputBuilder {
 
 export type ConstantInput = SConstant | HexString;
 
-export type AdditionalRegisters = {
-  R4?: ConstantInput;
-  R5?: ConstantInput;
-  R6?: ConstantInput;
-  R7?: ConstantInput;
-  R8?: ConstantInput;
-  R9?: ConstantInput;
-};
+export type AdditionalRegistersInput = NonMandatoryRegisters<ConstantInput>;
 
-export type OnlyR4Register = {
-  R4: ConstantInput;
-} & AdditionalRegisters;
+export type OnlyR4Register<T = HexString> = {
+  R4: T;
+} & NonMandatoryRegisters<T>;
 
-export type R4ToR5Registers = {
-  R4: ConstantInput;
-  R5: ConstantInput;
-} & AdditionalRegisters;
+export type R4ToR5Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+} & NonMandatoryRegisters<T>;
 
-export type R4ToR6Registers = {
-  R4: ConstantInput;
-  R5: ConstantInput;
-  R6: ConstantInput;
-} & AdditionalRegisters;
+export type R4ToR6Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+  R6: T;
+} & NonMandatoryRegisters<T>;
 
-export type R4ToR7Registers = {
-  R4: ConstantInput;
-  R5: ConstantInput;
-  R6: ConstantInput;
-  R7: ConstantInput;
-} & AdditionalRegisters;
+export type R4ToR7Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+  R6: T;
+  R7: T;
+} & NonMandatoryRegisters<T>;
 
-export type R4ToR8Registers = {
-  R4: ConstantInput;
-  R5: ConstantInput;
-  R6: ConstantInput;
-  R7: ConstantInput;
-  R8: ConstantInput;
-} & AdditionalRegisters;
+export type R4ToR8Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+  R6: T;
+  R7: T;
+  R8: T;
+} & NonMandatoryRegisters<T>;
 
-export type R4ToR9Registers = {
-  R4: ConstantInput;
-  R5: ConstantInput;
-  R6: ConstantInput;
-  R7: ConstantInput;
-  R8: ConstantInput;
-  R9: ConstantInput;
-} & AdditionalRegisters;
+export type R4ToR9Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+  R6: T;
+  R7: T;
+  R8: T;
+  R9: T;
+} & NonMandatoryRegisters<T>;
 
-export type SequentialNonMandatoryRegisters<T extends AdditionalRegisters> = T extends {
+export type SequentialNonMandatoryRegisters<T extends AdditionalRegistersInput> = T extends {
   R9: ConstantInput;
 }
-  ? R4ToR9Registers
+  ? R4ToR9Registers<ConstantInput>
   : T extends { R8: ConstantInput }
-  ? R4ToR8Registers
+  ? R4ToR8Registers<ConstantInput>
   : T extends { R7: ConstantInput }
-  ? R4ToR7Registers
+  ? R4ToR7Registers<ConstantInput>
   : T extends { R6: ConstantInput }
-  ? R4ToR6Registers
+  ? R4ToR6Registers<ConstantInput>
   : T extends { R5: ConstantInput }
-  ? R4ToR5Registers
+  ? R4ToR5Registers<ConstantInput>
   : T extends { R4: ConstantInput }
-  ? OnlyR4Register
+  ? OnlyR4Register<ConstantInput>
   : T;

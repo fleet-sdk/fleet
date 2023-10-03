@@ -1,10 +1,10 @@
 import { HexString } from "./common";
 
-export type NonMandatoryRegisters = {
-  R4?: HexString;
-  R5?: HexString;
-  R6?: HexString;
-  R7?: HexString;
-  R8?: HexString;
-  R9?: HexString;
+export type NonMandatoryRegisters<T = HexString> = {
+  R4?: T;
+  R5?: T;
+  R6?: T;
+  R7?: T;
+  R8?: T;
+  R9?: T;
 };
