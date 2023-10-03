@@ -6,11 +6,9 @@ import {
   assert,
   Box,
   BoxCandidate,
-  clearUndefined,
   ensureBigInt,
   ErgoTreeHex,
   first,
-  HexString,
   isDefined,
   isEmpty,
   isHex,
@@ -28,14 +26,11 @@ import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
 import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
 import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
 import {
+  AdditionalRegisters,
   ErgoAddress,
   ErgoTree,
-  OnlyR4Register,
-  R4ToR5Registers,
-  R4ToR6Registers,
-  R4ToR7Registers,
-  R4ToR8Registers,
-  R4ToR9Registers
+  RegisterInput,
+  SequentialNonMandatoryRegisters
 } from "../models";
 import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
 
@@ -161,14 +156,19 @@ export class OutputBuilder {
     return this;
   }
 
-  public setAdditionalRegisters<T extends NonMandatoryRegisters>(
+  public setAdditionalRegisters<T extends AdditionalRegisters>(
     registers: SequentialNonMandatoryRegisters<T>
   ): OutputBuilder {
-    this._registers = clearUndefined(registers);
+    const hexRegisters: NonMandatoryRegisters = {};
+    for (const key in registers) {
+      const r = registers[key] as RegisterInput;
+      if (!r) continue;
 
-    if (!areRegistersDenselyPacked(registers)) {
-      throw new InvalidRegistersPacking();
+      hexRegisters[key as keyof NonMandatoryRegisters] = typeof r === "string" ? r : r.toHex();
     }
+
+    if (!areRegistersDenselyPacked(hexRegisters)) throw new InvalidRegistersPacking();
+    this._registers = hexRegisters;
 
     return this;
   }
@@ -189,9 +189,9 @@ export class OutputBuilder {
 
       if (isEmpty(this.additionalRegisters)) {
         this.setAdditionalRegisters({
-          R4: SColl(SByte, utf8.decode(this.minting.name || "")).toHex(),
-          R5: SColl(SByte, utf8.decode(this.minting.description || "")).toHex(),
-          R6: SColl(SByte, utf8.decode(this.minting.decimals?.toString() || "0")).toHex()
+          R4: SColl(SByte, utf8.decode(this.minting.name || "")),
+          R5: SColl(SByte, utf8.decode(this.minting.description || "")),
+          R6: SColl(SByte, utf8.decode(this.minting.decimals?.toString() || "0"))
         });
       }
 
@@ -245,19 +245,3 @@ export class OutputBuilder {
     return estimateBoxSize(plainBoxObject);
   }
 }
-
-export type SequentialNonMandatoryRegisters<T extends NonMandatoryRegisters> = T extends {
-  R9: HexString;
-}
-  ? R4ToR9Registers
-  : T extends { R8: HexString }
-  ? R4ToR8Registers
-  : T extends { R7: HexString }
-  ? R4ToR7Registers
-  : T extends { R6: HexString }
-  ? R4ToR6Registers
-  : T extends { R5: HexString }
-  ? R4ToR5Registers
-  : T extends { R4: HexString }
-  ? OnlyR4Register
-  : T;

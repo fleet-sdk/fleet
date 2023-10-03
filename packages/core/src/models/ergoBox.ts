@@ -1,61 +1,7 @@
 import { Amount, Box, HexString, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
-import { serializeBox } from "@fleet-sdk/serializer";
-
-export type OnlyR4Register = {
-  R4: HexString;
-  R5?: HexString;
-  R6?: HexString;
-  R7?: HexString;
-  R8?: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR5Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6?: HexString;
-  R7?: HexString;
-  R8?: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR6Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6: HexString;
-  R7?: HexString;
-  R8?: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR7Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6: HexString;
-  R7: HexString;
-  R8?: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR8Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6: HexString;
-  R7: HexString;
-  R8: HexString;
-  R9?: HexString;
-};
-
-export type R4ToR9Registers = {
-  R4: HexString;
-  R5: HexString;
-  R6: HexString;
-  R7: HexString;
-  R8: HexString;
-  R9: HexString;
-};
+import { SConstant, serializeBox } from "@fleet-sdk/serializer";
 
 export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
   boxId!: string;
@@ -92,3 +38,69 @@ export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
     return box.boxId === hash;
   }
 }
+
+export type RegisterInput = SConstant | HexString;
+
+export type AdditionalRegisters = {
+  R4?: RegisterInput;
+  R5?: RegisterInput;
+  R6?: RegisterInput;
+  R7?: RegisterInput;
+  R8?: RegisterInput;
+  R9?: RegisterInput;
+};
+
+export type OnlyR4Register = {
+  R4: RegisterInput;
+} & AdditionalRegisters;
+
+export type R4ToR5Registers = {
+  R4: RegisterInput;
+  R5: RegisterInput;
+} & AdditionalRegisters;
+
+export type R4ToR6Registers = {
+  R4: RegisterInput;
+  R5: RegisterInput;
+  R6: RegisterInput;
+} & AdditionalRegisters;
+
+export type R4ToR7Registers = {
+  R4: RegisterInput;
+  R5: RegisterInput;
+  R6: RegisterInput;
+  R7: RegisterInput;
+} & AdditionalRegisters;
+
+export type R4ToR8Registers = {
+  R4: RegisterInput;
+  R5: RegisterInput;
+  R6: RegisterInput;
+  R7: RegisterInput;
+  R8: RegisterInput;
+} & AdditionalRegisters;
+
+export type R4ToR9Registers = {
+  R4: RegisterInput;
+  R5: RegisterInput;
+  R6: RegisterInput;
+  R7: RegisterInput;
+  R8: RegisterInput;
+  R9: RegisterInput;
+} & AdditionalRegisters;
+
+export type SequentialNonMandatoryRegisters<T extends AdditionalRegisters> = T extends {
+  R9: RegisterInput;
+}
+  ? R4ToR9Registers
+  : T extends { R8: RegisterInput }
+  ? R4ToR8Registers
+  : T extends { R7: RegisterInput }
+  ? R4ToR7Registers
+  : T extends { R6: RegisterInput }
+  ? R4ToR6Registers
+  : T extends { R5: RegisterInput }
+  ? R4ToR5Registers
+  : T extends { R4: RegisterInput }
+  ? OnlyR4Register
+  : T;

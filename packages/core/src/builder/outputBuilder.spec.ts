@@ -1,9 +1,12 @@
 import { NonMandatoryRegisters } from "@fleet-sdk/common";
+import { SBool, SInt } from "@fleet-sdk/serializer";
 import { regularBoxes } from "_test-vectors";
 import { beforeEach, describe, expect, it } from "vitest";
-import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
-import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
-import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
+import {
+  InvalidRegistersPacking,
+  UndefinedCreationHeight,
+  UndefinedMintingContext
+} from "../errors";
 import { ErgoAddress, ErgoTree, TokensCollection } from "../models";
 import { estimateMinBoxValue, OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 
@@ -262,25 +265,35 @@ describe("Additional registers", () => {
     builder.setAdditionalRegisters({
       R4: "0580c0fc82aa02",
       R5: "0e240008cd036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17",
-      R6: "07036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17"
+      R6: "07036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17",
+      R7: SBool(true), // should convert to hex automatically
+      R8: undefined // should eliminate undefined properties
     });
 
     expect(builder.additionalRegisters).toEqual({
       R4: "0580c0fc82aa02",
       R5: "0e240008cd036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17",
-      R6: "07036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17"
+      R6: "07036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17",
+      R7: "0101"
     });
 
     expect(() => {
       builder.setAdditionalRegisters({
         R4: "0580c0fc82aa02",
-        R5: "0e240008cd036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17"
+        R5: "0e240008cd036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17",
+        R6: SInt(0)
       });
     }).not.toThrow();
 
     expect(() => {
       builder.setAdditionalRegisters({
         R4: "0580c0fc82aa02"
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      builder.setAdditionalRegisters({
+        R4: SInt(20)
       });
     }).not.toThrow();
   });
@@ -293,6 +306,23 @@ describe("Additional registers", () => {
     // R4 not included
     expect(() => {
       builder.setAdditionalRegisters({
+        R5: "0580c0fc82aa02"
+      } as NonMandatoryRegisters);
+    }).toThrow(InvalidRegistersPacking);
+
+    // R5 not included
+    expect(() => {
+      builder.setAdditionalRegisters({
+        R4: "0580c0fc82aa02",
+        R6: "0580c0fc82aa02"
+      } as NonMandatoryRegisters);
+    }).toThrow(InvalidRegistersPacking);
+
+    // R5 explicitly set to undefined
+    expect(() => {
+      builder.setAdditionalRegisters({
+        R4: "0580c0fc82aa02",
+        R5: undefined,
         R6: "0580c0fc82aa02"
       } as NonMandatoryRegisters);
     }).toThrow(InvalidRegistersPacking);
