@@ -4,7 +4,16 @@
   "commit": false,
   "fixed": [],
   "linked": [
-    ["*/core", "*/common", "*/wallet", "*/mock-chain", "*/compiler", "*/crypto", "*/serializer"]
+    [
+      "fleet-sdk",
+      "*/core",
+      "*/common",
+      "*/crypto",
+      "*/serializer",
+      "*/mock-chain",
+      "*/compiler",
+      "*/wallet"
+    ]
   ],
   "access": "public",
   "baseBranch": "master",
