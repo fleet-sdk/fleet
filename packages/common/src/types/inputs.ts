@@ -1,10 +1,15 @@
 import { BoxId } from "./boxes";
-import { ErgoTreeHex } from "./common";
-import { ContextExtension } from "./contextExtension";
-import { ProverResult } from "./proverResult";
+import { ErgoTreeHex, HexString } from "./common";
 import { NonMandatoryRegisters } from "./registers";
 import { TokenAmount } from "./token";
 import { TransactionId } from "./transactions";
+
+export type ContextExtension<T = HexString> = { [key: number]: T | undefined };
+
+export type ProverResult = {
+  readonly proofBytes: HexString;
+  readonly extension: ContextExtension;
+};
 
 export type SignedInput = {
   readonly boxId: BoxId;

@@ -188,6 +188,15 @@ describe("Densely pack check - areRegistersDenselyPacked()", () => {
       })
     ).toBeFalsy();
 
+    // R5 explicitly set to undefined
+    expect(
+      areRegistersDenselyPacked({
+        R4: "0580c0fc82aa02",
+        R5: undefined,
+        R6: "07036b84756b351ee1c57fd8c302e66a1bb927e5d8b6e1a8e085935de3971f84ae17"
+      })
+    ).toBeFalsy();
+
     // R4, R5 and R6 not included
     expect(
       areRegistersDenselyPacked({

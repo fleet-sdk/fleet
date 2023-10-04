@@ -9,6 +9,7 @@ import {
   NonMandatoryRegisters,
   UnsignedInput
 } from "@fleet-sdk/common";
+import { ConstantInput } from "../builder";
 import { ErgoBox } from "./ergoBox";
 
 type InputType<T> = T extends "default" ? UnsignedInput : EIP12UnsignedInput;
@@ -16,14 +17,15 @@ type DataInputType<T> = T extends "default" ? DataInput : EIP12UnsignedDataInput
 type InputBox<R extends NonMandatoryRegisters> = Box<Amount, R> & {
   extension?: ContextExtension;
 };
+type ContextExtensionInput = ContextExtension<ConstantInput>;
 
 export class ErgoUnsignedInput<
   R extends NonMandatoryRegisters = NonMandatoryRegisters
 > extends ErgoBox<R> {
-  private _extension?: ContextExtension;
+  #extension?: ContextExtension;
 
   public get extension(): ContextExtension | undefined {
-    return this._extension;
+    return this.#extension;
   }
 
   constructor(box: InputBox<R>) {
@@ -34,16 +36,31 @@ export class ErgoUnsignedInput<
     }
   }
 
-  public setContextVars(extension: ContextExtension): ErgoUnsignedInput {
-    this._extension = extension;
+  public setContextExtension(extension: ContextExtensionInput): ErgoUnsignedInput {
+    const vars: ContextExtension = {};
+    for (const key in extension) {
+      const c = extension[key] as ConstantInput;
+      if (!c) continue;
+
+      vars[key as unknown as keyof ContextExtension] = typeof c === "string" ? c : c.toHex();
+    }
+
+    this.#extension = vars;
 
     return this;
+  }
+
+  /**
+   * @deprecated use `setContextExtension` instead.
+   */
+  public setContextVars(extension: ContextExtensionInput): ErgoUnsignedInput {
+    return this.setContextExtension(extension);
   }
 
   public toUnsignedInputObject<T extends BuildOutputType>(type: T): InputType<T> {
     return {
       ...this.toPlainObject(type),
-      extension: this._extension || {}
+      extension: this.#extension || {}
     } as InputType<T>;
   }
 

@@ -6,7 +6,6 @@ import {
   assert,
   Box,
   BoxCandidate,
-  clearUndefined,
   ensureBigInt,
   ErgoTreeHex,
   first,
@@ -23,20 +22,13 @@ import {
   UnsignedInput
 } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
-import { estimateBoxSize, SByte, SColl } from "@fleet-sdk/serializer";
-import { InvalidRegistersPacking } from "../errors/invalidRegistersPacking";
-import { UndefinedCreationHeight } from "../errors/undefinedCreationHeight";
-import { UndefinedMintingContext } from "../errors/undefinedMintingContext";
+import { estimateBoxSize, SByte, SColl, SConstant } from "@fleet-sdk/serializer";
 import {
-  ErgoAddress,
-  ErgoTree,
-  OnlyR4Register,
-  R4ToR5Registers,
-  R4ToR6Registers,
-  R4ToR7Registers,
-  R4ToR8Registers,
-  R4ToR9Registers
-} from "../models";
+  InvalidRegistersPacking,
+  UndefinedCreationHeight,
+  UndefinedMintingContext
+} from "../errors";
+import { ErgoAddress, ErgoTree } from "../models";
 import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
 
 export const BOX_VALUE_PER_BYTE = BigInt(360);
@@ -161,14 +153,19 @@ export class OutputBuilder {
     return this;
   }
 
-  public setAdditionalRegisters<T extends NonMandatoryRegisters>(
+  public setAdditionalRegisters<T extends AdditionalRegistersInput>(
     registers: SequentialNonMandatoryRegisters<T>
   ): OutputBuilder {
-    this._registers = clearUndefined(registers);
+    const hexRegisters: NonMandatoryRegisters = {};
+    for (const key in registers) {
+      const r = registers[key] as ConstantInput;
+      if (!r) continue;
 
-    if (!areRegistersDenselyPacked(registers)) {
-      throw new InvalidRegistersPacking();
+      hexRegisters[key as keyof NonMandatoryRegisters] = typeof r === "string" ? r : r.toHex();
     }
+
+    if (!areRegistersDenselyPacked(hexRegisters)) throw new InvalidRegistersPacking();
+    this._registers = hexRegisters;
 
     return this;
   }
@@ -189,9 +186,9 @@ export class OutputBuilder {
 
       if (isEmpty(this.additionalRegisters)) {
         this.setAdditionalRegisters({
-          R4: SColl(SByte, utf8.decode(this.minting.name || "")).toHex(),
-          R5: SColl(SByte, utf8.decode(this.minting.description || "")).toHex(),
-          R6: SColl(SByte, utf8.decode(this.minting.decimals?.toString() || "0")).toHex()
+          R4: SColl(SByte, utf8.decode(this.minting.name || "")),
+          R5: SColl(SByte, utf8.decode(this.minting.description || "")),
+          R6: SColl(SByte, utf8.decode(this.minting.decimals?.toString() || "0"))
         });
       }
 
@@ -246,18 +243,61 @@ export class OutputBuilder {
   }
 }
 
-export type SequentialNonMandatoryRegisters<T extends NonMandatoryRegisters> = T extends {
-  R9: HexString;
+export type ConstantInput = SConstant | HexString;
+
+export type AdditionalRegistersInput = NonMandatoryRegisters<ConstantInput>;
+
+export type OnlyR4Register<T = HexString> = {
+  R4: T;
+} & NonMandatoryRegisters<T>;
+
+export type R4ToR5Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+} & NonMandatoryRegisters<T>;
+
+export type R4ToR6Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+  R6: T;
+} & NonMandatoryRegisters<T>;
+
+export type R4ToR7Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+  R6: T;
+  R7: T;
+} & NonMandatoryRegisters<T>;
+
+export type R4ToR8Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+  R6: T;
+  R7: T;
+  R8: T;
+} & NonMandatoryRegisters<T>;
+
+export type R4ToR9Registers<T = HexString> = {
+  R4: T;
+  R5: T;
+  R6: T;
+  R7: T;
+  R8: T;
+  R9: T;
+} & NonMandatoryRegisters<T>;
+
+export type SequentialNonMandatoryRegisters<T extends AdditionalRegistersInput> = T extends {
+  R9: ConstantInput;
 }
-  ? R4ToR9Registers
-  : T extends { R8: HexString }
-  ? R4ToR8Registers
-  : T extends { R7: HexString }
-  ? R4ToR7Registers
-  : T extends { R6: HexString }
-  ? R4ToR6Registers
-  : T extends { R5: HexString }
-  ? R4ToR5Registers
-  : T extends { R4: HexString }
-  ? OnlyR4Register
+  ? R4ToR9Registers<ConstantInput>
+  : T extends { R8: ConstantInput }
+  ? R4ToR8Registers<ConstantInput>
+  : T extends { R7: ConstantInput }
+  ? R4ToR7Registers<ConstantInput>
+  : T extends { R6: ConstantInput }
+  ? R4ToR6Registers<ConstantInput>
+  : T extends { R5: ConstantInput }
+  ? R4ToR5Registers<ConstantInput>
+  : T extends { R4: ConstantInput }
+  ? OnlyR4Register<ConstantInput>
   : T;
