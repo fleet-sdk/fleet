@@ -6,10 +6,7 @@ export const castSignedTxToGql = (transaction: SignedTransaction): gqlSignedTran
     id: transaction.id,
     inputs: transaction.inputs.map((input) => ({
       boxId: input.boxId,
-      spendingProof: {
-        proofBytes: input.spendingProof.proofBytes,
-        extension: input.spendingProof.extension
-      }
+      spendingProof: input.spendingProof
     })),
     dataInputs: transaction.dataInputs.map((input) => ({
       boxId: input.boxId

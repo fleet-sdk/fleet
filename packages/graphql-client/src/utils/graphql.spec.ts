@@ -1,12 +1,12 @@
 import { Box, QueryBoxesArgs, State } from "@ergo-graphql/types";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { TestUtils } from "./TestUtils";
-import { createOperation, DEFAULT_HEADERS, getOpName, gql } from "./graphql";
+import { createOperation, DEFAULT_HEADERS, getOpName, gql, isRequestParam } from "./graphql";
+import { mockResponse } from "./testUtils";
 
 describe("GraphQL query builder", () => {
   const fetchSpy = vi
     .spyOn(global, "fetch")
-    .mockResolvedValueOnce(TestUtils.mockResponse('{"data":{"state":{"height":1098787}}}'));
+    .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
 
   const parseSpy = vi.spyOn(JSON, "parse");
   const stringifySpy = vi.spyOn(JSON, "stringify");
@@ -49,7 +49,7 @@ describe("GraphQL query builder", () => {
     const mockedFetch = vi
       .fn()
       .mockImplementation(fetch)
-      .mockResolvedValueOnce(TestUtils.mockResponse(`{"data":{"boxes":[{"boxId":"${boxId}"}]}}`));
+      .mockResolvedValueOnce(mockResponse(`{"data":{"boxes":[{"boxId":"${boxId}"}]}}`));
 
     const mockedParser = {
       parse: vi.fn().mockImplementation(JSON.parse),
@@ -126,5 +126,16 @@ describe("Operation name extraction", () => {
     expect(getOpName("query { boxes { boxId } }")).to.be.undefined;
     expect(getOpName("mutation { boxes { boxId } }")).to.be.undefined;
     expect(getOpName(" query ($take: Int) { boxes { boxId } }")).to.be.undefined;
+  });
+});
+
+describe("Request param handler", () => {
+  it("should return true for valid request params", () => {
+    expect(isRequestParam({ url: "https://gql.example.com/" })).to.be.true;
+  });
+
+  it("should return false for invalid request params", () => {
+    expect(isRequestParam({})).to.be.false;
+    expect(isRequestParam(3)).to.be.false;
   });
 });

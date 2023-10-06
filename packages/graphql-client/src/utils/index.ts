@@ -1,3 +1,3 @@
 export * from "./cast";
 export * from "./graphql";
-export * from "./TestUtils";
+export * from "./testUtils";
