@@ -1,7 +1,7 @@
+import { SignedTransaction as gqlSignedTransaction } from "@ergo-graphql/types";
 import { SignedTransaction } from "@fleet-sdk/common";
 import { describe, expect, it } from "vitest";
 import { castSignedTxToGql } from "./cast";
-import { SignedTransaction as gqlSignedTransaction } from "@ergo-graphql/types";
 
 describe("Graphql cast function", () => {
   it("Should cast SignedTransaction to gqlSignedTransaction", () => {
@@ -47,9 +47,8 @@ describe("Graphql cast function", () => {
           spendingProof: {
             proofBytes: "123",
             extension: ""
-          },
-
-        },
+          }
+        }
       ],
       dataInputs: [
         {
@@ -68,7 +67,7 @@ describe("Graphql cast function", () => {
               amount: "123"
             }
           ],
-          additionalRegisters: {},
+          additionalRegisters: {}
         }
       ]
     };
