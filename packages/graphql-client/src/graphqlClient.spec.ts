@@ -37,6 +37,55 @@ describe("Graphql Client", () => {
   });
 
   /**
+   * @description For testing UnspentBoxes function of ErgoGraphQLClient
+   * @expected it should return correct array of boxes based on mock data
+   */
+  it("Should fetch UnspentBoxes when filtering contract", async () => {
+    const mockData =
+      '{"data":{"boxes":[{"boxId":"187","transactionId":"15f","index":0,"value":"20000000","creationHeight":1099205,"ergoTree":"1002","assets":[],"additionalRegisters":{}}]}}';
+    const mockDataJSON = JSON.parse(mockData);
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
+
+    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const response = await client.getUnspentBoxes({
+      where: {
+        contract: "1002"
+      }
+    });
+    expect(response.length).to.be.equal(1);
+    expect(response).to.deep.equal(
+      mockDataJSON.data.boxes.map((box: Box) => ({
+        ...box,
+        assets: box.assets.map((asset) => ({
+          tokenId: asset.tokenId,
+          amount: BigInt(asset.amount)
+        })),
+        confirmed: true,
+        value: BigInt(box.value)
+      }))
+    );
+    expect(fetchSpy).toHaveBeenCalledOnce();
+  });
+
+  /**
+   * @description For testing UnspentBoxes function of ErgoGraphQLClient
+   * @expected it should return empty array when response is empty
+   */
+  it("Should return empty UnspentBoxes when response is corrupted", async () => {
+    const mockData = "{}";
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
+
+    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const response = await client.getUnspentBoxes({
+      where: {
+        template: "1002"
+      }
+    });
+    expect(response).to.deep.equal([]);
+    expect(fetchSpy).toHaveBeenCalledOnce();
+  });
+
+  /**
    * @description For testing getLastHeaders function of ErgoGraphQLClient
    * @expected it should return correct array of headers based on mock data
    */
@@ -58,6 +107,20 @@ describe("Graphql Client", () => {
         votes: header.votes.join("")
       }))
     );
+    expect(fetchSpy).toHaveBeenCalledOnce();
+  });
+
+  /**
+   * @description For testing getLastHeaders function of ErgoGraphQLClient
+   * @expected it should return empty array when response is empty
+   */
+  it("Should return empty LastHeaders when response is corrupted", async () => {
+    const mockData = "{}";
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
+
+    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const response = await client.getLastHeaders(2);
+    expect(response).to.deep.equal([]);
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
@@ -118,6 +181,26 @@ describe("Graphql Client", () => {
     });
 
     expect(response).to.be.equal("txId");
+    expect(fetchSpy).toHaveBeenCalledOnce();
+  });
+
+  /**
+   * @description For testing submitTransaction function of ErgoGraphQLClient
+   * @expected it should return empty string when gql returns empty response
+   */
+  it("should return empty string when node can't submit the transaction", async () => {
+    const mockData = "{}";
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
+
+    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const response = await client.submitTransaction({
+      id: "txId",
+      inputs: [],
+      outputs: [],
+      dataInputs: []
+    });
+
+    expect(response).to.be.equal("");
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
