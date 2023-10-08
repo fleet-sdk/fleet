@@ -3,6 +3,21 @@ import { isDefined } from "../utils";
 
 export type CollectionAddOptions = { index?: number };
 
+/**
+ * Collection abstract model
+ *
+ * @example
+ * Define a new collection class with internal type `number` and external type `string`
+ * ```
+ * class TestCollection extends Collection<number, string> {
+ *    protected _map(item: string | number): number {
+ *      return Number(item);
+ *    }
+ *    // Some other methods
+ *  }
+ * ```
+ *
+ */
 export abstract class Collection<InternalType, ExternalType> implements Iterable<InternalType> {
   protected readonly _items: InternalType[];
 
@@ -27,14 +42,24 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
     };
   }
 
+  /**
+   * Number of items in the collection
+   */
   public get length(): number {
     return this._items.length;
   }
 
+  /**
+   * True if the collection is empty
+   */
   public get isEmpty(): boolean {
     return this.length === 0;
   }
 
+  /**
+   * Get item at index, if index is out of bounds, throws RangeError
+   * @param index
+   */
   public at(index: number): InternalType {
     if (this._isIndexOutOfBounds(index)) {
       throw new RangeError(`Index '${index}' is out of range.`);
@@ -43,12 +68,23 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
     return this._items[index];
   }
 
+  /**
+   * Add item to the collection
+   * @param items
+   * @param options
+   * @returns The new length of the collection
+   */
   public add(items: OneOrMore<ExternalType>, options?: CollectionAddOptions): number {
     return this._addOneOrMore(items, options);
   }
 
   abstract remove(item: unknown): number;
 
+  /**
+   * Map external type to internal type
+   * @param item
+   * @protected
+   */
   protected abstract _map(item: ExternalType | InternalType): InternalType;
 
   protected _addOne(item: InternalType | ExternalType, options?: CollectionAddOptions): number {
@@ -89,6 +125,9 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
     return this.length;
   }
 
+  /**
+   * Get the collection as an array
+   */
   public toArray(): InternalType[] {
     return [...this._items];
   }
