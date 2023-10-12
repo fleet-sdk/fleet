@@ -13,6 +13,27 @@ import { _0n } from "./bigInt";
 
 const NANOERGS_TOKEN_ID = "nanoErgs";
 
+/**
+ * Calculates the sum of all nanoErgs and tokens in the given boxes.
+ * @param boxes
+ *
+ * @example
+ * ```
+ * const boxes = [
+ * {
+ *  value: 10,
+ *  assets: [{ tokenId: "test", amount: 20 }]
+ *  }, {
+ *  value: 20,
+ *  assets: [{ tokenId: "test", amount: 30 }]
+ *  }
+ *  ];
+ *  const sum = utxoSum(boxes);
+ *  console.log(sum);
+ *  // { nanoErgs: 30n, tokens: [{ tokenId: "test", amount: 50n }] }
+ *  ```
+ *
+ */
 export function utxoSum(boxes: MinimalBoxAmounts): BoxSummary;
 export function utxoSum(boxes: MinimalBoxAmounts, tokenId: TokenId): bigint;
 export function utxoSum(boxes: MinimalBoxAmounts, tokenId?: TokenId): BoxSummary | bigint {
@@ -46,6 +67,25 @@ export function utxoSum(boxes: MinimalBoxAmounts, tokenId?: TokenId): BoxSummary
   };
 }
 
+/**
+ * Calculates the difference between two utxos or utxo sets.
+ * @param minuend
+ * @param subtrahend
+ *
+ * @example
+ * ```
+ * const minuend = {
+ * nanoErgs: 30n,
+ * tokens: [{ tokenId: "test", amount: 50n }]
+ * };
+ * const subtrahend = {
+ * nanoErgs: 10n,
+ * tokens: [{ tokenId: "test", amount: 20n }]
+ * };
+ * const diff = utxoDiff(minuend, subtrahend);
+ * console.log(diff);
+ * // { nanoErgs: 20n, tokens: [{ tokenId: "test", amount: 30n }] }
+ */
 export function utxoDiff(
   minuend: BoxSummary | Box<Amount>[],
   subtrahend: BoxSummary | Box<Amount>[]
@@ -76,6 +116,21 @@ export function utxoDiff(
 const MIN_NON_MANDATORY_REGISTER_INDEX = 4;
 const MAX_NON_MANDATORY_REGISTER_INDEX = 9;
 
+/**
+ * Checks if the given registers are densely packed.
+ * @param registers
+ *
+ * @example
+ * ```
+ * const registers = {
+ * R4: "0x0000000000",
+ * R6: "0x0000000000",
+ * R7: "0x0000000000",
+ * };
+ * const result = areRegistersDenselyPacked(registers);
+ * console.log(result);
+ * // false
+ */
 export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boolean {
   let lastIndex = 0;
   for (let i = MIN_NON_MANDATORY_REGISTER_INDEX; i <= MAX_NON_MANDATORY_REGISTER_INDEX; i++) {
@@ -97,6 +152,11 @@ export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boo
   return true;
 }
 
+/**
+ * Filters the given utxos by the given filter parameters.
+ * @param utxos
+ * @param filterParams
+ */
 export function utxoFilter<T extends AmountType>(
   utxos: Box<T>[],
   filterParams: UTxOFilterParams<T>
@@ -167,6 +227,10 @@ export type MinimalBoxAmounts = readonly {
   assets: TokenAmount<Amount>[];
 }[];
 
+/**
+ * Ensures that the given box candidate has big integer values.
+ * @param box
+ */
 export function ensureUTxOBigInt(box: Box<Amount>): Box<bigint>;
 export function ensureUTxOBigInt(candidate: BoxCandidate<Amount>): BoxCandidate<bigint>;
 export function ensureUTxOBigInt(
