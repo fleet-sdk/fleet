@@ -29,10 +29,10 @@ export type BlockHeader = {
   difficulty: string;
   parentId: BlockHeaderId;
   votes: string;
-  size: number;
-  extensionId: HexString;
-  transactionsId: HexString;
-  adProofsId: HexString;
+  size?: number;
+  extensionId?: HexString;
+  transactionsId?: HexString;
+  adProofsId?: HexString;
 };
 
 export type Block = {
