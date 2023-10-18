@@ -57,8 +57,9 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
   }
 
   /**
-   * Get item at index, if index is out of bounds, throws RangeError
+   * Get item at index
    * @param index
+   * @throws RangeError if index is out of bounds
    */
   public at(index: number): InternalType {
     if (this._isIndexOutOfBounds(index)) {

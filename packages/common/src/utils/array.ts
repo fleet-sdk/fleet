@@ -4,8 +4,9 @@ import { assert, isEmpty } from "./assertions";
 type ObjectSelector<T> = (item: T) => T[keyof T];
 
 /**
- * Returns the first element of an array. Throws an error if the array is empty.
+ * Returns the first element of an array.
  * @param array
+ * @throws an error if the array is empty.
  */
 export function first(array: undefined): undefined;
 export function first<T>(array: ArrayLike<T>): T;
@@ -17,8 +18,9 @@ export function first<T>(array: ArrayLike<T> | undefined): T | number | undefine
 }
 
 /**
- * Returns the last element of an array. Throws an error if the array is empty.
+ * Returns the last element of an array.
  * @param array
+ * @throws an error if the array is empty.
  */
 export function last(array: undefined): undefined;
 export function last<T>(array: ArrayLike<T>): T;
@@ -122,7 +124,7 @@ export function orderBy<T>(
 }
 
 /**
- * Returns true if arrays are equal
+ * Checks if arrays are equal
  * @param array1
  * @param array2
  *
@@ -156,7 +158,7 @@ export function areEqual<T>(array1: ArrayLike<T>, array2: ArrayLike<T>): boolean
 }
 
 /**
- * Returns true if arrays are equal by the specified property
+ * Checks if arrays are equal by the specified property
  * @param array1
  * @param array2
  * @param selector
@@ -194,7 +196,7 @@ export function areEqualBy<T>(
 }
 
 /**
- * Returns true if the array starts with the specified target
+ * Checks if the array starts with the specified target
  * @param array
  * @param target
  *
@@ -227,7 +229,7 @@ export function startsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolea
 }
 
 /**
- * Returns true if the array ends with the specified target
+ * Checks if the array ends with the specified target
  * @param array
  * @param target
  *
