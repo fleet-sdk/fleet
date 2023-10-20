@@ -12,6 +12,10 @@ export const _63n = BigInt(63);
 export const _127n = BigInt(127);
 export const _128n = BigInt(128);
 
+/**
+ * Ensure that the given value is a bigint
+ * @param number
+ */
 export function ensureBigInt(number: NumberLike): bigint {
   return typeof number === "bigint" ? number : BigInt(number);
 }
@@ -29,6 +33,16 @@ type ParsingOptions = {
   decimalMark?: string;
 };
 
+/**
+ * Parse a decimal string into a bigint with options
+ * @param decimalStr
+ * @param options
+ *
+ * @example
+ * undecimalize("129.8379183", { decimals: 9 }) // 129837918300n
+ * undecimalize("1", { decimals: 2 }) // 100n
+ * undecimalize("1", 2) // 100n
+ */
 export function undecimalize(decimalStr: string, options?: ParsingOptions | number): bigint {
   if (!decimalStr) {
     return _0n;
@@ -60,6 +74,10 @@ export function undecimalize(decimalStr: string, options?: ParsingOptions | numb
   return BigInt(negative + _stripNonDigits(integer + decimal));
 }
 
+/**
+ * Strip all non-digits from a string
+ * @param value
+ */
 function _stripNonDigits(value: string): string {
   return value.replace(/\D/g, "");
 }
@@ -82,6 +100,15 @@ type FormattingOptions = {
   decimalMark?: string;
 };
 
+/**
+ * Format a bigint into a decimal string with options
+ * @param value
+ * @param options
+ *
+ * @example
+ * decimalize(129837918300n, { decimals: 9 }) // "129.8379183"
+ * decimalize(100n, { decimals: 2 }) // "1"
+ */
 export function decimalize(value: Amount, options?: FormattingOptions | number): string {
   value = ensureBigInt(value);
   if (!options) {
@@ -99,6 +126,20 @@ export function decimalize(value: Amount, options?: FormattingOptions | number):
   return _buildFormattedDecimal(integer.toString(10), decimal.toString(10), options);
 }
 
+/**
+ * Format a bigint percentage into a decimal string with options
+ * @param value
+ * @param percentage
+ * @param precision
+ *
+ * @example
+ * ```
+ * percent(3498n, 1n) // 34n(1%)
+ * percent(3498n, 2n) // 69n(2%)
+ * percent(3498n, 10n) // 349n(10%)
+ * ```
+ *
+ */
 export function percent(value: bigint, percentage: bigint, precision = 2n) {
   return (value * percentage) / 10n ** precision;
 }
@@ -142,6 +183,25 @@ function _removeLeadingZeros(value: string): string {
   return value.replace(/^0+\.?/, "");
 }
 
+/**
+ * Sum a collection of numbers by a given iteratee
+ * @param collection
+ * @param iteratee
+ * @param condition
+ *
+ * @example
+ * ```
+ * const values = [
+ *  { key: 1, value: 100n },
+ *  { key: 2, value: 200n },
+ *  { key: 3, value: 300n },
+ *  { key: 4, value: 400n },
+ *  ];
+ *
+ *  sumBy(values, x => x.value) // 1000n
+ *  sumBy(values, x => x.value, x => x.key < 0) // 0n
+ *  sumBy(values, x => x.value, x => x.key % 2 === 0) // 600n
+ */
 export function sumBy<T>(
   collection: readonly T[],
   iteratee: (value: T) => bigint,
@@ -161,6 +221,10 @@ export function sumBy<T>(
   return acc;
 }
 
+/**
+ * Get the minimum value from a collection of numbers
+ * @param numbers
+ */
 export function min<T extends bigint | number>(...numbers: T[]): T {
   let min = first(numbers);
 
@@ -173,6 +237,10 @@ export function min<T extends bigint | number>(...numbers: T[]): T {
   return min;
 }
 
+/**
+ * Get the maximum value from a collection of numbers
+ * @param numbers
+ */
 export function max<T extends bigint | number>(...numbers: T[]): T {
   let max = first(numbers);
 

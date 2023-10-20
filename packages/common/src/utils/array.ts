@@ -3,6 +3,11 @@ import { assert, isEmpty } from "./assertions";
 
 type ObjectSelector<T> = (item: T) => T[keyof T];
 
+/**
+ * Returns the first element of an array.
+ * @param array
+ * @throws an error if the array is empty.
+ */
 export function first(array: undefined): undefined;
 export function first<T>(array: ArrayLike<T>): T;
 export function first<T>(array: ArrayLike<T> | undefined): T | number | undefined {
@@ -12,6 +17,11 @@ export function first<T>(array: ArrayLike<T> | undefined): T | number | undefine
   return array[0];
 }
 
+/**
+ * Returns the last element of an array.
+ * @param array
+ * @throws an error if the array is empty.
+ */
 export function last(array: undefined): undefined;
 export function last<T>(array: ArrayLike<T>): T;
 export function last<T>(array: ArrayLike<T> | undefined): T | undefined {
@@ -21,6 +31,11 @@ export function last<T>(array: ArrayLike<T> | undefined): T | undefined {
   return at(array, -1);
 }
 
+/**
+ * Returns the element at the specified index. Negative indices are counted from the end of the array.
+ * @param array
+ * @param index
+ */
 export function at(array: undefined, index: number): undefined;
 export function at<T>(array: ArrayLike<T>, index: number): T;
 export function at<T>(array: ArrayLike<T> | undefined, index: number): T | undefined {
@@ -52,6 +67,19 @@ export function hasDuplicatesBy<T>(array: T[], selector: ObjectSelector<T>): boo
   });
 }
 
+/**
+ * Turns an array into chunks of the specified size
+ * @param array
+ * @param size
+ *
+ * @example
+ * ```
+ * const array = [1, 2, 3, 4, 5];
+ * const chunks = chunk(array, 2);
+ * console.log(chunks);
+ * // [[1, 2], [3, 4], [5]]
+ * ```
+ */
 export function chunk<T>(array: T[], size: number): T[][] {
   if (array.length <= size) {
     return [array];
@@ -65,6 +93,20 @@ export function chunk<T>(array: T[], size: number): T[][] {
   return chunks;
 }
 
+/**
+ * Sorts an array of objects by the specified property
+ * @param array
+ * @param iteratee
+ * @param order
+ *
+ * @example
+ * ```
+ * const array = [{ name: "John", age: 25 }, { name: "Jane", age: 30 }];
+ * const sorted = orderBy(array, (item) => item.age, "desc");
+ * console.log(sorted);
+ * // [{ name: "Jane", age: 30 }, { name: "John", age: 25 }]
+ * ```
+ */
 export function orderBy<T>(
   array: T[],
   iteratee: SortingSelector<T>,
@@ -81,6 +123,22 @@ export function orderBy<T>(
   });
 }
 
+/**
+ * Checks if arrays are equal
+ * @param array1
+ * @param array2
+ *
+ * @example
+ * ```
+ * const array1 = [1, 2, 3];
+ * const array2 = [1, 2, 3];
+ * const array3 = [1, 2, 4];
+ * const array4 = [1, 2, 3, 4];
+ * areEqual(array1, array2); // true
+ * areEqual(array1, array3); // false
+ * areEqual(array1, array4); // false
+ * ```
+ */
 export function areEqual<T>(array1: ArrayLike<T>, array2: ArrayLike<T>): boolean {
   if (array1 === array2) {
     return true;
@@ -99,6 +157,22 @@ export function areEqual<T>(array1: ArrayLike<T>, array2: ArrayLike<T>): boolean
   return true;
 }
 
+/**
+ * Checks if arrays are equal by the specified property
+ * @param array1
+ * @param array2
+ * @param selector
+ *
+ * @example
+ * ```
+ * const array1 = [{ name: "John", age: 25 }, { name: "Jane", age: 30 }];
+ * const array2 = [{ name: "John", age: 25 }, { name: "Jane", age: 30 }];
+ * const array3 = [{ name: "John", age: 25 }, { name: "Jane", age: 31 }];
+ *
+ * areEqualBy(array1, array2, (item) => item.age); // true
+ * areEqualBy(array1, array3, (item) => item.age); // false
+ * ```
+ */
 export function areEqualBy<T>(
   array1: ArrayLike<T>,
   array2: ArrayLike<T>,
@@ -121,6 +195,21 @@ export function areEqualBy<T>(
   return true;
 }
 
+/**
+ * Checks if the array starts with the specified target
+ * @param array
+ * @param target
+ *
+ * @example
+ * ```
+ * const array = [1, 2, 3, 4, 5];
+ * const target1 = [1, 2];
+ * const target2 = [1, 3];
+ *
+ * startsWith(array, target1); // true
+ * startsWith(array, target2); // false
+ * ```
+ */
 export function startsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolean {
   if (array === target) {
     return true;
@@ -139,6 +228,21 @@ export function startsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolea
   return true;
 }
 
+/**
+ * Checks if the array ends with the specified target
+ * @param array
+ * @param target
+ *
+ * @example
+ * ```
+ * const array = [1, 2, 3, 4, 5];
+ * const target1 = [4, 5];
+ * const target2 = [3, 5];
+ *
+ * endsWith(array, target1); // true
+ * endsWith(array, target2); // false
+ * ```
+ */
 export function endsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolean {
   if (array === target) {
     return true;
@@ -159,6 +263,18 @@ export function endsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolean 
   return true;
 }
 
+/**
+ * Makes an array unique by removing duplicate elements
+ * @param array
+ *
+ * @example
+ * ```
+ * const array = [1, 2, 3, 3, 4, 5, 5];
+ * const unique = uniq(array);
+ * console.log(unique);
+ * // [1, 2, 3, 4, 5]
+ * ```
+ */
 export function uniq<T>(array: Array<T>): Array<T> {
   if (isEmpty(array)) {
     return array;
@@ -167,6 +283,20 @@ export function uniq<T>(array: Array<T>): Array<T> {
   return Array.from(new Set(array));
 }
 
+/**
+ * Makes an array unique by removing duplicate elements using the specified property
+ * @param array
+ * @param selector
+ * @param selection
+ *
+ * @example
+ * ```
+ * const array = [{ name: "John", age: 25 }, { name: "Jane", age: 30 }, { name: "John", age: 30 }];
+ * const unique = uniqBy(array, (item) => item.name);
+ * console.log(unique);
+ * // [{ name: "John", age: 25 }, { name: "Jane", age: 30 }]
+ * ```
+ */
 export function uniqBy<T>(
   array: Array<T>,
   selector: ObjectSelector<T>,
@@ -191,6 +321,17 @@ export function uniqBy<T>(
   );
 }
 
+/**
+ * Returns the depth of an array
+ * @param array
+ *
+ * @example
+ * ```
+ * const array = [1, 2, 3, [4, 5, [6, 7]]];
+ * const depth = depthOf(array);
+ * console.log(depth);
+ * // 3
+ */
 export function depthOf(array: unknown | unknown[]): number {
   return Array.isArray(array) ? 1 + Math.max(0, ...array.map(depthOf)) : 0;
 }
