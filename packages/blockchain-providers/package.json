@@ -1,7 +1,7 @@
 {
-  "name": "@fleet-sdk/graphql-client",
+  "name": "@fleet-sdk/blockchain-providers",
   "version": "0.0.0",
-  "description": "Blockchain data client for ergo-graphql",
+  "description": "Blockchain data providers",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.esm.js",
   "types": "./dist/index.d.ts",

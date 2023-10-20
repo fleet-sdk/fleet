@@ -35,23 +35,16 @@ export interface RequestOptions {
   credentials?: Credentials;
 }
 
-export function createOperation<R, V extends Variables = Variables>(
+export function createGqlOperation<R, V extends Variables = Variables>(
   query: string,
-  options?: RequestOptions
+  options: RequestOptions
 ): GraphQLOperation<R, V> {
-  const opt = ensureDefaults(options, {
-    credentials: "same-origin",
-    parser: JSON,
-    fetcher: fetch
-  });
-  opt.headers = ensureDefaults(options?.headers, DEFAULT_HEADERS);
-
   return async (variables?: V): Promise<GraphQLResponse<R>> => {
-    const response = await opt.fetcher(opt.url, {
+    const response = await (options.fetcher ?? fetch)(options.url, {
       method: "POST",
-      headers: opt.headers,
-      credentials: opt.credentials,
-      body: opt.parser.stringify({
+      headers: ensureDefaults(options.headers, DEFAULT_HEADERS),
+      credentials: options.credentials,
+      body: (options.parser ?? JSON).stringify({
         operationName: getOpName(query),
         query,
         variables: variables ? clearUndefined(variables) : undefined
@@ -59,7 +52,7 @@ export function createOperation<R, V extends Variables = Variables>(
     });
     const data = await response.text();
 
-    return opt.parser.parse(data);
+    return (options.parser ?? JSON).parse(data);
   };
 }
 

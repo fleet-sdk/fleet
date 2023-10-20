@@ -1,10 +1,8 @@
 import {
   Box,
   QueryBoxesArgs as BoxesArgs,
-  MutationCheckTransactionArgs as CheckTxArgs,
   Header,
-  QueryBlockHeadersArgs as HeadersArgs,
-  MutationSubmitTransactionArgs as SendTxArgs
+  QueryBlockHeadersArgs as HeadersArgs
 } from "@ergo-graphql/types";
 import {
   BlockHeader,
@@ -17,7 +15,7 @@ import {
   SignedTransaction
 } from "@fleet-sdk/common";
 import { CHECK_TX_MUTATION, CONF_BOX_QUERY, HEADERS_QUERY, SEND_TX_MUTATION } from "./queries";
-import { castSignedTxToGql, createOperation, isRequestParam, RequestOptions } from "./utils";
+import { createGqlOperation, isRequestParam, RequestOptions } from "./utils";
 
 export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded BoxIds */
@@ -33,6 +31,7 @@ type BoxesResponse = { boxes: Box[] };
 type HeadersResponse = { blockHeaders: Header[] };
 type CheckTxResponse = { checkTransaction: string };
 type SendTxResponse = { submitTransaction: string };
+type SignedTxArgs = { signedTransaction: SignedTransaction };
 
 export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
   #getConfBoxes;
@@ -45,18 +44,19 @@ export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
   constructor(optOrUrl: RequestOptions | string | URL) {
     const opt = isRequestParam(optOrUrl) ? optOrUrl : { url: optOrUrl };
 
-    this.#getConfBoxes = createOperation<BoxesResponse, BoxesArgs>(CONF_BOX_QUERY, opt);
-    this.#getHeaders = createOperation<HeadersResponse, HeadersArgs>(HEADERS_QUERY, opt);
-    this.#checkTx = createOperation<CheckTxResponse, CheckTxArgs>(CHECK_TX_MUTATION, opt);
-    this.#sendTx = createOperation<SendTxResponse, SendTxArgs>(SEND_TX_MUTATION, opt);
+    this.#getConfBoxes = createGqlOperation<BoxesResponse, BoxesArgs>(CONF_BOX_QUERY, opt);
+    this.#getHeaders = createGqlOperation<HeadersResponse, HeadersArgs>(HEADERS_QUERY, opt);
+    this.#checkTx = createGqlOperation<CheckTxResponse, SignedTxArgs>(CHECK_TX_MUTATION, opt);
+    this.#sendTx = createGqlOperation<SendTxResponse, SignedTxArgs>(SEND_TX_MUTATION, opt);
   }
 
   async getUnspentBoxes(args: GraphQLBoxQuery): Promise<ChainClientBox[]> {
     const response = await this.#getConfBoxes({
-      boxIds: args.where.boxIds ?? args.where.boxId ? [args.where.boxId!] : undefined,
-      ergoTrees: args.where.contracts ?? args.where.contract ? [args.where.contract!] : undefined,
-      ergoTreeTemplateHash: args.where.template,
-      tokenId: args.where.tokenId,
+      spent: false,
+      boxIds: args.where?.boxIds ?? args.where?.boxId ? [args.where.boxId!] : undefined,
+      ergoTrees: args.where?.contracts ?? args.where?.contract ? [args.where.contract!] : undefined,
+      ergoTreeTemplateHash: args.where?.template,
+      tokenId: args.where?.tokenId,
       skip: args.skip,
       take: args.take
     });
@@ -88,19 +88,19 @@ export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
     );
   }
 
-  async checkTransaction(transaction: SignedTransaction): Promise<boolean> {
-    const response = await this.#checkTx({ signedTransaction: castSignedTxToGql(transaction) });
+  async checkTransaction(signedTransaction: SignedTransaction): Promise<boolean> {
+    const response = await this.#checkTx({ signedTransaction });
 
-    return response.data?.checkTransaction === transaction.id;
+    return response.data?.checkTransaction === signedTransaction.id;
   }
 
-  async submitTransaction(transaction: SignedTransaction): Promise<string> {
-    const response = await this.#sendTx({ signedTransaction: castSignedTxToGql(transaction) });
+  async submitTransaction(signedTransaction: SignedTransaction): Promise<string> {
+    const response = await this.#sendTx({ signedTransaction });
 
     return response.data?.submitTransaction ?? "";
   }
 
   reduceTransaction(): Promise<string> {
-    throw new NotSupportedError("Reducing transactions is not supported by ergo-graphql yet.");
+    throw new NotSupportedError("Transaction reducing is not supported by ergo-graphql.");
   }
 }

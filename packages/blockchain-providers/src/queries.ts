@@ -2,6 +2,7 @@ import { gql } from "./utils";
 
 export const CONF_BOX_QUERY = gql`
   query boxes(
+    $spent: Boolean!
     $boxIds: [String!]
     $ergoTrees: [String!]
     $ergoTreeTemplateHash: String
@@ -10,13 +11,13 @@ export const CONF_BOX_QUERY = gql`
     $take: Int
   ) {
     boxes(
+      spent: $spent
       boxIds: $boxIds
       ergoTrees: $ergoTrees
       ergoTreeTemplateHash: $ergoTreeTemplateHash
       tokenId: $tokenId
       skip: $skip
       take: $take
-      spent: false
     ) {
       boxId
       transactionId

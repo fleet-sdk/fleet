@@ -1,7 +1,7 @@
 import { Box, QueryBoxesArgs, State } from "@ergo-graphql/types";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createOperation, DEFAULT_HEADERS, getOpName, gql, isRequestParam } from "./graphql";
-import { mockResponse } from "./testUtils";
+import { mockResponse } from "./_tests";
+import { createGqlOperation, DEFAULT_HEADERS, getOpName, gql, isRequestParam } from "./graphql";
 
 describe("GraphQL query builder", () => {
   const fetchSpy = vi
@@ -23,7 +23,7 @@ describe("GraphQL query builder", () => {
         }
       }
     `;
-    const getBoxes = createOperation<{ state: State }>(query, {
+    const getBoxes = createGqlOperation<{ state: State }>(query, {
       url: "https://gql.example.com/"
     });
 
@@ -36,7 +36,6 @@ describe("GraphQL query builder", () => {
     expect(fetchSpy).toHaveBeenCalledWith("https://gql.example.com/", {
       method: "POST",
       headers: DEFAULT_HEADERS,
-      credentials: "same-origin",
       body: JSON.stringify({
         operationName: getOpName(query),
         query
@@ -64,7 +63,7 @@ describe("GraphQL query builder", () => {
       }
     `;
 
-    const getBoxes = createOperation<{ boxes: Box[] }, QueryBoxesArgs>(query, {
+    const getBoxes = createGqlOperation<{ boxes: Box[] }, QueryBoxesArgs>(query, {
       url: "https://gql.example.com/",
       fetcher: mockedFetch,
       parser: mockedParser,
@@ -80,7 +79,6 @@ describe("GraphQL query builder", () => {
     expect(mockedFetch).toHaveBeenCalledWith("https://gql.example.com/", {
       method: "POST",
       headers: { ...DEFAULT_HEADERS, foo: "bar" },
-      credentials: "same-origin",
       body: JSON.stringify({
         operationName: getOpName(query),
         query,

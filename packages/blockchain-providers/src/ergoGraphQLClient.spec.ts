@@ -1,7 +1,7 @@
 import { Box, Header } from "@ergo-graphql/types";
 import { NotSupportedError } from "@fleet-sdk/common";
 import { describe, expect, it, vi } from "vitest";
-import { ErgoGraphQLClient } from "./graphqlClient";
+import { ErgoGraphQLClient } from "./ergoGraphQLClient";
 import { mockResponse } from "./utils";
 
 describe("Graphql Client", () => {
@@ -148,7 +148,7 @@ describe("Graphql Client", () => {
    * @description For testing checkTransaction function of ErgoGraphQLClient
    * @expected it should return false when gql returns empty string
    */
-  it("checkTx sould return false when transaction is valid", async () => {
+  it("checkTx should return false when transaction is valid", async () => {
     const mockData = '{"data":{"checkTransaction": ""}}';
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
