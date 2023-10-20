@@ -1,0 +1,44 @@
+{
+  "name": "@fleet-sdk/explorer-client",
+  "version": "0.0.0",
+  "description": "Blockchain data client for ergo explorer",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "require": "./dist/index.cjs.js",
+    "import": "./dist/index.esm.js"
+  },
+  "sideEffects": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "repository": "fleet-sdk/fleet",
+  "keywords": [
+    "ergo",
+    "blockchain",
+    "crypto"
+  ],
+  "scripts": {
+    "build": "tsup --config ../../tsup.config.ts"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "@fleet-sdk/common": "workspace:^",
+    "@fleet-sdk/core": "workspace:^"
+  },
+  "files": [
+    "src",
+    "dist",
+    "!**/*.spec.*",
+    "!**/*.json",
+    "!tests",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ]
+}
