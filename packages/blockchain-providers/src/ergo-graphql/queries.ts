@@ -1,4 +1,4 @@
-import { gql } from "./utils";
+import { gql } from "../utils";
 
 export const CONF_BOX_QUERY = gql`
   query boxes(

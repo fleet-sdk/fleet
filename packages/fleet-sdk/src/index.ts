@@ -56,7 +56,6 @@ export {
 export {
   AddressType,
   Amount,
-  AmountType,
   AssertErrorMessageInput,
   Base58String,
   Block,
@@ -77,7 +76,7 @@ export {
   EIP12UnsignedTransaction,
   ErgoTreeHex,
   HexString,
-  MinimalBoxAmounts,
+  MinimalBoxAmountsArray,
   Network,
   NewToken,
   NonMandatoryRegisters,

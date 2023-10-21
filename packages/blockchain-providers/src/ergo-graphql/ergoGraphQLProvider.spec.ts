@@ -1,10 +1,10 @@
 import { Box, Header } from "@ergo-graphql/types";
 import { NotSupportedError } from "@fleet-sdk/common";
 import { describe, expect, it, vi } from "vitest";
-import { ErgoGraphQLClient } from "./ergoGraphQLClient";
-import { mockResponse } from "./utils";
+import { mockResponse } from "../utils";
+import { ErgoGraphQLProvider } from "./ergoGraphQLProvider";
 
-describe("Graphql Client", () => {
+describe("ergo-graphql provider", () => {
   /**
    * @description For testing UnspentBoxes function of ErgoGraphQLClient
    * @expected it should return correct array of boxes based on mock data
@@ -15,7 +15,7 @@ describe("Graphql Client", () => {
     const mockDataJSON = JSON.parse(mockData);
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
-    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.getUnspentBoxes({
       where: {
         boxIds: [""]
@@ -46,7 +46,7 @@ describe("Graphql Client", () => {
     const mockDataJSON = JSON.parse(mockData);
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
-    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.getUnspentBoxes({
       where: {
         contract: "1002"
@@ -75,7 +75,7 @@ describe("Graphql Client", () => {
     const mockData = "{}";
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
-    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.getUnspentBoxes({
       where: {
         template: "1002"
@@ -95,7 +95,7 @@ describe("Graphql Client", () => {
     const mockDataJSON = JSON.parse(mockData);
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
-    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.getLastHeaders(2);
     expect(response.length).to.be.equal(2);
     expect(response).to.deep.equal(
@@ -118,7 +118,7 @@ describe("Graphql Client", () => {
     const mockData = "{}";
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
-    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.getLastHeaders(2);
     expect(response).to.deep.equal([]);
     expect(fetchSpy).toHaveBeenCalledOnce();
@@ -132,7 +132,7 @@ describe("Graphql Client", () => {
     const mockData = '{"data":{"checkTransaction": "txId"}}';
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
-    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.checkTransaction({
       id: "txId",
       inputs: [],
@@ -140,7 +140,7 @@ describe("Graphql Client", () => {
       dataInputs: []
     });
 
-    expect(response).to.be.true;
+    expect(response).to.be.deep.equal({ success: true, transactionId: "txId" });
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
@@ -149,10 +149,10 @@ describe("Graphql Client", () => {
    * @expected it should return false when gql returns empty string
    */
   it("checkTx should return false when transaction is valid", async () => {
-    const mockData = '{"data":{"checkTransaction": ""}}';
+    const mockData = '{"errors":[{"message":"Transaction is invalid"}]}';
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
-    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.checkTransaction({
       id: "txId",
       inputs: [],
@@ -160,7 +160,7 @@ describe("Graphql Client", () => {
       dataInputs: []
     });
 
-    expect(response).to.be.false;
+    expect(response).to.be.deep.equal({ success: false, message: "Transaction is invalid" });
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
@@ -172,7 +172,7 @@ describe("Graphql Client", () => {
     const mockData = '{"data":{"submitTransaction": "txId"}}';
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
-    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.submitTransaction({
       id: "txId",
       inputs: [],
@@ -180,7 +180,7 @@ describe("Graphql Client", () => {
       dataInputs: []
     });
 
-    expect(response).to.be.equal("txId");
+    expect(response).to.be.deep.equal({ success: true, transactionId: "txId" });
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
@@ -188,11 +188,11 @@ describe("Graphql Client", () => {
    * @description For testing submitTransaction function of ErgoGraphQLClient
    * @expected it should return empty string when gql returns empty response
    */
-  it("should return empty string when node can't submit the transaction", async () => {
-    const mockData = "{}";
+  it("should return error when an error occurs on transaction submitting", async () => {
+    const mockData = '{"errors":[{"message":"Transaction not accepted by the node"}]}';
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
-    const client = new ErgoGraphQLClient("https://gql.example.com/");
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.submitTransaction({
       id: "txId",
       inputs: [],
@@ -200,7 +200,10 @@ describe("Graphql Client", () => {
       dataInputs: []
     });
 
-    expect(response).to.be.equal("");
+    expect(response).to.be.deep.equal({
+      success: false,
+      message: "Transaction not accepted by the node"
+    });
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
@@ -209,7 +212,7 @@ describe("Graphql Client", () => {
    * @expected it should throw not supported error
    */
   it("should throw not supported error when reduceTransaction is called", async () => {
-    const client = new ErgoGraphQLClient({ url: "https://gql.example.com/" });
+    const client = new ErgoGraphQLProvider({ url: "https://gql.example.com/" });
     expect(client.reduceTransaction).to.throw(NotSupportedError);
   });
 });

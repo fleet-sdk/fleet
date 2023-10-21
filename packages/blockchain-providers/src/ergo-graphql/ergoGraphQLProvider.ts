@@ -9,13 +9,16 @@ import {
   BoxQuery,
   BoxWhere,
   ChainClientBox,
+  ensureDefaults,
   HexString,
-  IChainDataClient,
+  IChainDataProvider,
   NotSupportedError,
-  SignedTransaction
+  SignedTransaction,
+  TransactionEvaluationResult,
+  TransactionReductionResult
 } from "@fleet-sdk/common";
+import { createGqlOperation, GraphQLRequestOptions, isRequestParam } from "../utils";
 import { CHECK_TX_MUTATION, CONF_BOX_QUERY, HEADERS_QUERY, SEND_TX_MUTATION } from "./queries";
-import { createGqlOperation, isRequestParam, RequestOptions } from "./utils";
 
 export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded BoxIds */
@@ -33,16 +36,19 @@ type CheckTxResponse = { checkTransaction: string };
 type SendTxResponse = { submitTransaction: string };
 type SignedTxArgs = { signedTransaction: SignedTransaction };
 
-export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
+export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
   #getConfBoxes;
   #getHeaders;
   #checkTx;
   #sendTx;
 
-  constructor(options: RequestOptions);
   constructor(url: string | URL);
-  constructor(optOrUrl: RequestOptions | string | URL) {
-    const opt = isRequestParam(optOrUrl) ? optOrUrl : { url: optOrUrl };
+  constructor(url: GraphQLRequestOptions);
+  constructor(optOrUrl: GraphQLRequestOptions | string | URL) {
+    const opt = ensureDefaults<GraphQLRequestOptions, { throwOnNonNetworkError: true }>(
+      isRequestParam(optOrUrl) ? optOrUrl : { url: optOrUrl },
+      { throwOnNonNetworkError: true }
+    );
 
     this.#getConfBoxes = createGqlOperation<BoxesResponse, BoxesArgs>(CONF_BOX_QUERY, opt);
     this.#getHeaders = createGqlOperation<HeadersResponse, HeadersArgs>(HEADERS_QUERY, opt);
@@ -88,19 +94,31 @@ export class ErgoGraphQLClient implements IChainDataClient<BoxWhere> {
     );
   }
 
-  async checkTransaction(signedTransaction: SignedTransaction): Promise<boolean> {
-    const response = await this.#checkTx({ signedTransaction });
+  async checkTransaction(
+    signedTransaction: SignedTransaction
+  ): Promise<TransactionEvaluationResult> {
+    try {
+      const response = await this.#checkTx({ signedTransaction });
 
-    return response.data?.checkTransaction === signedTransaction.id;
+      return { success: true, transactionId: response.data.checkTransaction };
+    } catch (e) {
+      return { success: false, message: (e as Error).message };
+    }
   }
 
-  async submitTransaction(signedTransaction: SignedTransaction): Promise<string> {
-    const response = await this.#sendTx({ signedTransaction });
+  async submitTransaction(
+    signedTransaction: SignedTransaction
+  ): Promise<TransactionEvaluationResult> {
+    try {
+      const response = await this.#sendTx({ signedTransaction });
 
-    return response.data?.submitTransaction ?? "";
+      return { success: true, transactionId: response.data.submitTransaction };
+    } catch (e) {
+      return { success: false, message: (e as Error).message };
+    }
   }
 
-  reduceTransaction(): Promise<string> {
+  reduceTransaction(): Promise<TransactionReductionResult> {
     throw new NotSupportedError("Transaction reducing is not supported by ergo-graphql.");
   }
 }

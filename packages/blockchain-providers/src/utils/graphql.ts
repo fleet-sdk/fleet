@@ -1,4 +1,10 @@
-import { clearUndefined, ensureDefaults } from "@fleet-sdk/common";
+import {
+  BlockchainProviderError,
+  clearUndefined,
+  ensureDefaults,
+  isEmpty,
+  some
+} from "@fleet-sdk/common";
 
 const OP_NAME_REGEX = /(query|mutation)\s?([\w\-_]+)?/;
 export const DEFAULT_HEADERS: Headers = {
@@ -6,19 +12,35 @@ export const DEFAULT_HEADERS: Headers = {
   accept: "application/graphql-response+json, application/json"
 };
 
-type Variables = Record<string, unknown> | null;
-type GraphQLOperation<R, V extends Variables> = (variables?: V) => Promise<GraphQLResponse<R>>;
 type Credentials = RequestCredentials;
 type Headers = HeadersInit;
 type Fetcher = typeof fetch;
 
-export interface GraphQLResponse<T> {
-  data?: T;
+export type GraphQLVariables = Record<string, unknown> | null;
+
+export interface GraphQLError {
+  message: string;
 }
 
+export interface GraphQLSuccessResponse<T = unknown> {
+  data: T;
+  errors: null;
+}
+
+export interface GraphQLErrorResponse {
+  data: null;
+  errors: GraphQLError[];
+}
+
+export type GraphQLResponse<T = unknown> = GraphQLSuccessResponse<T> | GraphQLErrorResponse;
+
+export type GraphQLOperation<R extends GraphQLResponse, V extends GraphQLVariables> = (
+  variables?: V
+) => Promise<R>;
+
 export interface ResponseParser {
-  parse(text: string): unknown;
-  stringify(value: unknown): string;
+  parse<T>(text: string): T;
+  stringify<T>(value: T): string;
 }
 
 export interface RequestParams {
@@ -27,18 +49,31 @@ export interface RequestParams {
   variables?: Record<string, unknown> | null;
 }
 
-export interface RequestOptions {
+export interface GraphQLRequestOptions {
   url: URL | string;
   headers?: Headers;
   parser?: ResponseParser;
   fetcher?: Fetcher;
   credentials?: Credentials;
+  throwOnNonNetworkError?: boolean;
 }
 
-export function createGqlOperation<R, V extends Variables = Variables>(
+export interface GraphQLThrowableOptions extends GraphQLRequestOptions {
+  throwOnNonNetworkError: true;
+}
+
+export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
   query: string,
-  options: RequestOptions
-): GraphQLOperation<R, V> {
+  options: GraphQLThrowableOptions
+): GraphQLOperation<GraphQLSuccessResponse<R>, V>;
+export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
+  query: string,
+  options: GraphQLRequestOptions
+): GraphQLOperation<GraphQLResponse<R>, V>;
+export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
+  query: string,
+  options: GraphQLRequestOptions
+): GraphQLOperation<GraphQLResponse<R>, V> {
   return async (variables?: V): Promise<GraphQLResponse<R>> => {
     const response = await (options.fetcher ?? fetch)(options.url, {
       method: "POST",
@@ -50,9 +85,15 @@ export function createGqlOperation<R, V extends Variables = Variables>(
         variables: variables ? clearUndefined(variables) : undefined
       } as RequestParams)
     });
-    const data = await response.text();
 
-    return (options.parser ?? JSON).parse(data);
+    const rawData = await response.text();
+    const parsedData = (options.parser ?? JSON).parse(rawData) as GraphQLResponse<R>;
+
+    if (options.throwOnNonNetworkError && some(parsedData.errors) && isEmpty(parsedData.data)) {
+      throw new BlockchainProviderError(parsedData.errors[0].message, { cause: parsedData.errors });
+    }
+
+    return parsedData;
   };
 }
 
@@ -64,6 +105,6 @@ export function getOpName(query: string): string | undefined {
   return OP_NAME_REGEX.exec(query)?.at(2);
 }
 
-export function isRequestParam(obj: unknown): obj is RequestOptions {
-  return typeof obj === "object" && (obj as RequestOptions).url !== undefined;
+export function isRequestParam(obj: unknown): obj is GraphQLRequestOptions {
+  return typeof obj === "object" && (obj as GraphQLRequestOptions).url !== undefined;
 }

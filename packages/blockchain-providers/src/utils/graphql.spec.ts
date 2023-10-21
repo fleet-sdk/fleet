@@ -1,7 +1,17 @@
 import { Box, QueryBoxesArgs, State } from "@ergo-graphql/types";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { BlockchainProviderError } from "@fleet-sdk/common";
+import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { mockResponse } from "./_tests";
-import { createGqlOperation, DEFAULT_HEADERS, getOpName, gql, isRequestParam } from "./graphql";
+import {
+  createGqlOperation,
+  DEFAULT_HEADERS,
+  getOpName,
+  gql,
+  GraphQLOperation,
+  GraphQLSuccessResponse,
+  GraphQLVariables,
+  isRequestParam
+} from "./graphql";
 
 describe("GraphQL query builder", () => {
   const fetchSpy = vi
@@ -85,6 +95,23 @@ describe("GraphQL query builder", () => {
         variables: { boxId }
       })
     });
+  });
+
+  it("Should throw if throwOnNonNetworkErrors is true and server returns errors", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      mockResponse('{"errors":[{"message":"test error 1"},{"message":"test error 2"}]}')
+    );
+
+    const operation = createGqlOperation("query test { state { height } }", {
+      url: "http://gql.example.com",
+      throwOnNonNetworkError: true
+    });
+
+    expectTypeOf(operation).toMatchTypeOf<
+      GraphQLOperation<GraphQLSuccessResponse, GraphQLVariables>
+    >();
+
+    await expect(operation).rejects.toThrowError(BlockchainProviderError);
   });
 });
 
