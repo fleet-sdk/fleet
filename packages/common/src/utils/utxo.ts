@@ -1,12 +1,14 @@
 import {
   Amount,
-  AmountType,
   Box,
   BoxCandidate,
+  ConfirmedBox,
   NonMandatoryRegisters,
   TokenAmount,
-  TokenId
+  TokenId,
+  UnconfirmedBox
 } from "../types";
+import { uniqBy } from "./array";
 import { isDefined, isEmpty, isUndefined } from "./assertions";
 import { ensureBigInt } from "./bigInt";
 import { _0n } from "./bigInt";
@@ -20,23 +22,18 @@ const NANOERGS_TOKEN_ID = "nanoErgs";
  * @example
  * ```
  * const boxes = [
- * {
- *  value: 10,
- *  assets: [{ tokenId: "test", amount: 20 }]
- *  }, {
- *  value: 20,
- *  assets: [{ tokenId: "test", amount: 30 }]
- *  }
- *  ];
- *  const sum = utxoSum(boxes);
- *  console.log(sum);
- *  // { nanoErgs: 30n, tokens: [{ tokenId: "test", amount: 50n }] }
- *  ```
+ *   { value: "10", assets: [{ tokenId: "test", amount: "20" }] },
+ *   { value: 20n, assets: [{ tokenId: "test", amount: 30n }] }
+ * ];
  *
+ * const sum = utxoSum(boxes);
+ * console.log(sum);
+ * // { nanoErgs: 30n, tokens: [{ tokenId: "test", amount: 50n }] }
+ * ```
  */
-export function utxoSum(boxes: MinimalBoxAmounts): BoxSummary;
-export function utxoSum(boxes: MinimalBoxAmounts, tokenId: TokenId): bigint;
-export function utxoSum(boxes: MinimalBoxAmounts, tokenId?: TokenId): BoxSummary | bigint {
+export function utxoSum(boxes: MinimalBoxAmounts[]): BoxSummary;
+export function utxoSum(boxes: MinimalBoxAmounts[], tokenId: TokenId): bigint;
+export function utxoSum(boxes: MinimalBoxAmounts[], tokenId?: TokenId): BoxSummary | bigint {
   const balances: { [tokenId: string]: bigint } = {};
 
   for (const box of boxes) {
@@ -74,17 +71,12 @@ export function utxoSum(boxes: MinimalBoxAmounts, tokenId?: TokenId): BoxSummary
  *
  * @example
  * ```
- * const minuend = {
- * nanoErgs: 30n,
- * tokens: [{ tokenId: "test", amount: 50n }]
- * };
- * const subtrahend = {
- * nanoErgs: 10n,
- * tokens: [{ tokenId: "test", amount: 20n }]
- * };
+ * const minuend = [{ nanoErgs: 30n, tokens: [{ tokenId: "test", amount: 50n }] }];
+ * const subtrahend = [{ nanoErgs: 10n, tokens: [{ tokenId: "test", amount: 20n }] }];
  * const diff = utxoDiff(minuend, subtrahend);
  * console.log(diff);
  * // { nanoErgs: 20n, tokens: [{ tokenId: "test", amount: 30n }] }
+ * ```
  */
 export function utxoDiff(
   minuend: BoxSummary | Box<Amount>[],
@@ -113,6 +105,48 @@ export function utxoDiff(
   return { nanoErgs, tokens };
 }
 
+export type SpendableUTxOSet<T extends Amount> = (ConfirmedBox<T> | UnconfirmedBox<T>)[];
+
+/**
+ * Builds a set of UTxOs from the given confirmed and unconfirmed boxes.
+ * @param confirmed An array of confirmed boxes.
+ * @param unconfirmed An array of unconfirmed boxes.
+ * @returns A set of spendable UTXOs.
+ * @template T The type of amount associated with the boxes.
+ */
+export function getUTxOSetFrom<T extends Amount>(
+  confirmed: Box<T>[],
+  unconfirmed: Box<T>[]
+): SpendableUTxOSet<T> {
+  const boxId = (box: Box) => box.boxId;
+  if (isEmpty(confirmed)) return uniqBy(unconfirmed, boxId);
+  if (isEmpty(unconfirmed)) return uniqBy(confirmed, boxId);
+
+  const unconfirmedMap = new Map(uniqBy(unconfirmed, boxId).map((box) => [box.boxId, box]));
+  const confirmedBoxes = uniqBy(confirmed, boxId);
+  const spendable: SpendableUTxOSet<T> = [];
+
+  for (const box of confirmedBoxes) {
+    if (unconfirmedMap.get(box.boxId) !== undefined) {
+      // if a box is present in unconfirmed map that means it's being spent,
+      // so must be removed from spendable array.
+      unconfirmedMap.delete(box.boxId);
+    } else {
+      box.confirmed = true;
+      spendable.push(box);
+    }
+  }
+
+  if (unconfirmedMap.size > 0) {
+    const unmatched = Array.from(unconfirmedMap.values());
+    unmatched.forEach((box) => (box.confirmed = false));
+
+    return spendable.concat(unmatched);
+  }
+
+  return spendable;
+}
+
 const MIN_NON_MANDATORY_REGISTER_INDEX = 4;
 const MAX_NON_MANDATORY_REGISTER_INDEX = 9;
 
@@ -123,9 +157,9 @@ const MAX_NON_MANDATORY_REGISTER_INDEX = 9;
  * @example
  * ```
  * const registers = {
- * R4: "0x0000000000",
- * R6: "0x0000000000",
- * R7: "0x0000000000",
+ *   R4: "0x0000000000",
+ *   R6: "0x0000000000",
+ *   R7: "0x0000000000",
  * };
  * const result = areRegistersDenselyPacked(registers);
  * console.log(result);
@@ -157,10 +191,7 @@ export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boo
  * @param utxos
  * @param filterParams
  */
-export function utxoFilter<T extends AmountType>(
-  utxos: Box<T>[],
-  filterParams: UTxOFilterParams<T>
-) {
+export function utxoFilter<T extends Amount>(utxos: Box<T>[], filterParams: UTxOFilterParams<T>) {
   if (isEmpty(filterParams) || isEmpty(utxos)) {
     return utxos;
   }
@@ -193,7 +224,7 @@ export function utxoFilter<T extends AmountType>(
   return filtered;
 }
 
-function _getDistinctTokenIds(utxos: Box<AmountType>[], max: number): Set<string> {
+function _getDistinctTokenIds(utxos: Box[], max: number): Set<string> {
   const tokenIds = new Set<string>();
 
   for (let i = 0; i < utxos.length && tokenIds.size < max; i++) {
@@ -209,10 +240,25 @@ function _getDistinctTokenIds(utxos: Box<AmountType>[], max: number): Set<string
   return tokenIds;
 }
 
-export type UTxOFilterParams<T extends AmountType> = {
+/**
+ * Parameters for filtering unspent transaction outputs (UTxOs).
+ */
+export type UTxOFilterParams<T extends Amount> = {
+  /**
+   * A function that returns a boolean indicating whether a given UTxO should be included in the filtered results.
+   */
   by?: (utxo: Box<T>) => boolean;
+  /**
+   * An object specifying the maximum number of UTxOs and distinct tokens to include in the filtered results.
+   */
   max?: {
+    /**
+     * The maximum number of UTxOs to include in the filtered results.
+     */
     count?: number;
+    /**
+     * The maximum number of distinct tokens to include in the filtered results.
+     */
     aggregatedDistinctTokens?: number;
   };
 };
@@ -222,14 +268,14 @@ export type BoxSummary = {
   tokens: TokenAmount<bigint>[];
 };
 
-export type MinimalBoxAmounts = readonly {
+export type MinimalBoxAmounts = {
   value: Amount;
   assets: TokenAmount<Amount>[];
-}[];
+};
 
 /**
- * Ensures that the given box candidate has big integer values.
- * @param box
+ * Ensures that the value and asset amounts of a given box are represented as BigInts.
+ * @returns A new box object with BigInt representation for the value and asset amounts.
  */
 export function ensureUTxOBigInt(box: Box<Amount>): Box<bigint>;
 export function ensureUTxOBigInt(candidate: BoxCandidate<Amount>): BoxCandidate<bigint>;
