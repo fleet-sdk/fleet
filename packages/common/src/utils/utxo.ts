@@ -31,9 +31,9 @@ const NANOERGS_TOKEN_ID = "nanoErgs";
  * // { nanoErgs: 30n, tokens: [{ tokenId: "test", amount: 50n }] }
  * ```
  */
-export function utxoSum(boxes: MinimalBoxAmounts[]): BoxSummary;
-export function utxoSum(boxes: MinimalBoxAmounts[], tokenId: TokenId): bigint;
-export function utxoSum(boxes: MinimalBoxAmounts[], tokenId?: TokenId): BoxSummary | bigint {
+export function utxoSum(boxes: MinimalBoxAmountsArray): BoxSummary;
+export function utxoSum(boxes: MinimalBoxAmountsArray, tokenId: TokenId): bigint;
+export function utxoSum(boxes: MinimalBoxAmountsArray, tokenId?: TokenId): BoxSummary | bigint {
   const balances: { [tokenId: string]: bigint } = {};
 
   for (const box of boxes) {
@@ -268,10 +268,10 @@ export type BoxSummary = {
   tokens: TokenAmount<bigint>[];
 };
 
-export type MinimalBoxAmounts = {
+export type MinimalBoxAmountsArray = readonly {
   value: Amount;
   assets: TokenAmount<Amount>[];
-};
+}[];
 
 /**
  * Ensures that the value and asset amounts of a given box are represented as BigInts.

@@ -1,8 +1,8 @@
 import { RequireAtLeastOne } from "type-fest";
-import { TransactionId } from "../../dist";
 import { BlockHeader } from "./block";
 import { Box } from "./boxes";
 import { HexString } from "./common";
+import { TransactionId } from "./transactions";
 import { SignedTransaction, UnsignedTransaction } from "./transactions";
 
 export type QueryBase = {
