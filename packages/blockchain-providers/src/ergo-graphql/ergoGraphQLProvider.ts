@@ -12,12 +12,22 @@ import {
   ensureDefaults,
   HexString,
   IChainDataProvider,
+  isEmpty,
   NotSupportedError,
   SignedTransaction,
   TransactionEvaluationResult,
-  TransactionReductionResult
+  TransactionReductionResult,
+  uniqBy
 } from "@fleet-sdk/common";
-import { createGqlOperation, GraphQLRequestOptions, isRequestParam } from "../utils";
+import { orderBy, some } from "packages/common/src";
+import {
+  createGqlOperation,
+  GraphQLOperation,
+  GraphQLRequestOptions,
+  GraphQLSuccessResponse,
+  GraphQLVariables,
+  isRequestParam
+} from "../utils";
 import { CHECK_TX_MUTATION, CONF_BOX_QUERY, HEADERS_QUERY, SEND_TX_MUTATION } from "./queries";
 
 export type GraphQLBoxWhere = BoxWhere & {
@@ -35,6 +45,8 @@ type HeadersResponse = { blockHeaders: Header[] };
 type CheckTxResponse = { checkTransaction: string };
 type SendTxResponse = { submitTransaction: string };
 type SignedTxArgs = { signedTransaction: SignedTransaction };
+
+const PAGE_SIZE = 50;
 
 export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
   #getConfBoxes;
@@ -56,27 +68,71 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
     this.#sendTx = createGqlOperation<SendTxResponse, SignedTxArgs>(SEND_TX_MUTATION, opt);
   }
 
-  async getUnspentBoxes(args: GraphQLBoxQuery): Promise<ChainClientBox[]> {
-    const response = await this.#getConfBoxes({
-      spent: false,
-      boxIds: args.where?.boxIds ?? args.where?.boxId ? [args.where.boxId!] : undefined,
-      ergoTrees: args.where?.contracts ?? args.where?.contract ? [args.where.contract!] : undefined,
-      ergoTreeTemplateHash: args.where?.template,
-      tokenId: args.where?.tokenId,
-      skip: args.skip,
-      take: args.take
-    });
+  async #getAll<R, T, A extends GraphQLVariables>(
+    operation: GraphQLOperation<GraphQLSuccessResponse<T>, A>,
+    query: A,
+    mapFn: (response: GraphQLSuccessResponse<T>) => R[],
+    checkMoreFn: (response: GraphQLSuccessResponse<T>) => boolean
+  ): Promise<R[]> {
+    const queryArgs = { ...query, skip: 0, take: PAGE_SIZE };
+    let result: R[] = [];
+    let hasMore: boolean;
 
-    return (
-      response.data?.boxes.map((box) => ({
-        ...box,
-        assets: box.assets.map((asset) => ({
-          tokenId: asset.tokenId,
-          amount: BigInt(asset.amount)
-        })),
-        confirmed: true,
-        value: BigInt(box.value)
-      })) ?? []
+    do {
+      const response = await operation(queryArgs);
+      const data = mapFn(response);
+
+      if (some(data)) {
+        result = result.concat(data);
+        hasMore = checkMoreFn(response);
+      } else {
+        hasMore = false;
+      }
+
+      if (hasMore) queryArgs.skip += PAGE_SIZE;
+    } while (hasMore);
+
+    return result;
+  }
+
+  async getUnspentBoxes(args: GraphQLBoxQuery): Promise<ChainClientBox[]> {
+    if (isEmpty(args.where)) {
+      throw new Error("Cannot fetch unspent boxes without a where clause.");
+    }
+
+    const includeUnconfirmed = args.includeUnconfirmed || args.includeUnconfirmed === undefined;
+    const query = {
+      spent: false,
+      boxIds: args.where.boxIds ?? (args.where.boxId ? [args.where.boxId] : undefined),
+      ergoTrees: args.where.contracts ?? (args.where.contract ? [args.where.contract] : undefined),
+      ergoTreeTemplateHash: args.where.template,
+      tokenId: args.where.tokenId
+    } satisfies BoxesArgs;
+
+    const responses = await Promise.all([
+      this.#getAll(
+        this.#getConfBoxes,
+        query,
+        ({ data }) => {
+          const boxes = includeUnconfirmed ? data.boxes.filter((x) => !x.beingSpent) : data.boxes;
+
+          return boxes.map(mapBoxAsConfirmed(true));
+        },
+        ({ data }) => data.boxes.length === PAGE_SIZE
+      ),
+      includeUnconfirmed
+        ? this.#getAll(
+            this.#getConfBoxes,
+            query,
+            ({ data }) => data.boxes.map(mapBoxAsConfirmed(false)),
+            ({ data }) => data.boxes.length === PAGE_SIZE
+          )
+        : undefined
+    ]);
+
+    return orderBy(
+      uniqBy(responses.filter(some).flat(), (box) => box.boxId),
+      (box) => box.creationHeight
     );
   }
 
@@ -121,4 +177,16 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
   reduceTransaction(): Promise<TransactionReductionResult> {
     throw new NotSupportedError("Transaction reducing is not supported by ergo-graphql.");
   }
+}
+
+function mapBoxAsConfirmed(confirmed: boolean) {
+  return (box: Box): ChainClientBox => ({
+    ...box,
+    value: BigInt(box.value),
+    assets: box.assets.map((asset) => ({
+      tokenId: asset.tokenId,
+      amount: BigInt(asset.amount)
+    })),
+    confirmed
+  });
 }

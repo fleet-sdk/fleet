@@ -30,6 +30,7 @@ export const CONF_BOX_QUERY = gql`
         amount
       }
       additionalRegisters
+      beingSpent
     }
   }
 `;
