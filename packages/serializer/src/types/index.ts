@@ -13,6 +13,7 @@ export {
   SGroupElement,
   SSigmaProp,
   SUnit,
+  STuple,
   SColl,
   SPair
 } from "./constructors";
