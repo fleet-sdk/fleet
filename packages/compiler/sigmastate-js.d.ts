@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 declare module "sigmastate-js/main" {
   type SigmaCompilerNamedConstantsMap = { [key: string]: Value };
   type HexString = string;

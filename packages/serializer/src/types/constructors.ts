@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/naming-convention */
 import { isEmpty } from "@fleet-sdk/common";
 import { SConstant } from "../sigmaConstant";
 import { SType } from "./base";
