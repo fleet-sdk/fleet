@@ -1,14 +1,23 @@
-import { Box, BoxCandidate } from "@fleet-sdk/common";
+import { Box } from "@fleet-sdk/common";
+import { SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { blake2b256, randomBytes } from "@fleet-sdk/crypto";
 import { serializeBox } from "@fleet-sdk/serializer";
 
-export function mockUTxO(candidate: BoxCandidate<bigint>): Box<bigint> {
+type MockBoxOptions = Partial<Omit<Box<bigint>, "boxId">> & { ergoTree: string };
+
+export function mockUTxO(mock: MockBoxOptions): Box<bigint> {
   const box: Box<bigint> = {
     boxId: "",
-    transactionId: hex.encode(randomBytes(32)),
-    index: 0,
-    ...candidate
+
+    value: mock.value ?? SAFE_MIN_BOX_VALUE,
+    ergoTree: mock.ergoTree,
+    assets: mock.assets ?? [],
+    creationHeight: mock.creationHeight ?? 0,
+    additionalRegisters: mock.additionalRegisters ?? {},
+
+    transactionId: mock.transactionId ?? getRandomId(),
+    index: mock.index ?? 0
   };
 
   const bytes = serializeBox(box).toBytes();

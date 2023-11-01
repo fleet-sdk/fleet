@@ -1,10 +1,28 @@
 import { BoxCandidate, hasDuplicatesBy } from "@fleet-sdk/common";
-import { ErgoBox } from "@fleet-sdk/core";
+import { ErgoBox, SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { hex, randomBytes } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
 import { mockHeaders, mockUTxO } from "./objectMocking";
 
-describe("candidateToUTxO()", () => {
+describe("mockUTxO()", () => {
+  it("Should set default values when omitted", () => {
+    const ergoTree = "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d";
+
+    const utxo = mockUTxO({ ergoTree });
+
+    expect(utxo.boxId).to.have.length(64);
+    expect(utxo.value).to.be.equal(SAFE_MIN_BOX_VALUE);
+    expect(utxo.ergoTree).to.be.equal(ergoTree);
+    expect(utxo.assets).to.be.empty;
+    expect(utxo.creationHeight).to.be.equal(0);
+    expect(utxo.additionalRegisters).to.be.empty;
+
+    expect(utxo.transactionId).to.have.length(64);
+    expect(utxo.index).to.be.equal(0);
+
+    expect(ErgoBox.validate(utxo)).to.be.true;
+  });
+
   it("Should transform a candidate in a valid UTxO", () => {
     const candidate: BoxCandidate<bigint> = {
       ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
@@ -21,9 +39,15 @@ describe("candidateToUTxO()", () => {
 
     const utxo = mockUTxO(candidate);
 
-    expect(utxo.boxId).not.to.be.undefined;
-    expect(utxo.transactionId).not.to.be.undefined;
-    expect(utxo.index).not.to.be.undefined;
+    expect(utxo.boxId).to.have.length(64);
+    expect(utxo.value).to.be.equal(candidate.value);
+    expect(utxo.ergoTree).to.be.equal(candidate.ergoTree);
+    expect(utxo.assets).to.be.deep.equal(candidate.assets);
+    expect(utxo.creationHeight).to.be.equal(candidate.creationHeight);
+    expect(utxo.additionalRegisters).to.be.deep.equal(candidate.additionalRegisters);
+
+    expect(utxo.transactionId).to.have.length(64);
+    expect(utxo.index).to.be.equal(0);
 
     expect(ErgoBox.validate(utxo)).to.be.true;
   });
