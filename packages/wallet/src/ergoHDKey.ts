@@ -1,3 +1,4 @@
+import { assert } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
 import { HDKey } from "@scure/bip32";
 import { mnemonicToSeed, mnemonicToSeedSync } from "@scure/bip39";
@@ -7,57 +8,77 @@ import { mnemonicToSeed, mnemonicToSeedSync } from "@scure/bip39";
  */
 export const ERGO_HD_CHANGE_PATH = "m/44'/429'/0'/0";
 
+const VERSIONS = { private: 0x0488ade4, public: 0x0488b21e };
+
 export type FromMnemonicOptions = {
   passphrase?: string;
   path?: string;
 };
 
+export type HDKeyOptionsBase = {
+  depth?: number;
+  index?: number;
+  parentFingerprint?: number;
+  chainCode?: Uint8Array;
+};
+
+export type PrivateKeyOptions = HDKeyOptionsBase & {
+  privateKey: Uint8Array | bigint;
+};
+
+export type PublicKeyOptions = HDKeyOptionsBase & {
+  publicKey: Uint8Array;
+};
+
+export type HDKeyOptions = PrivateKeyOptions | PublicKeyOptions;
+
 export class ErgoHDKey {
-  private readonly _root: HDKey;
-  private readonly _publicKey: Uint8Array;
-  private readonly _address: ErgoAddress;
+  readonly #root: HDKey;
+  readonly #publicKey: Uint8Array;
 
-  private constructor(hdKey: HDKey) {
-    /* c8 ignore next 3 */
-    if (!hdKey.publicKey) {
-      throw new Error("Public key is not present");
-    }
+  #address?: ErgoAddress;
 
-    this._root = hdKey;
-    this._publicKey = hdKey.publicKey;
-    this._address = ErgoAddress.fromPublicKey(this._publicKey);
+  private constructor(key: HDKey) {
+    assert(!!key.publicKey, "Public key is not present");
+
+    this.#root = key;
+    this.#publicKey = key.publicKey;
   }
 
   get publicKey(): Uint8Array {
-    return this._publicKey;
+    return this.#publicKey;
   }
 
-  get privateKey(): Uint8Array | null {
-    return this._root.privateKey;
+  get privateKey(): Uint8Array | undefined {
+    return this.#root.privateKey ?? undefined;
   }
 
-  get chainCode(): Uint8Array | null {
-    return this._root.chainCode;
+  get chainCode(): Uint8Array | undefined {
+    return this.#root.chainCode ?? undefined;
   }
 
   get extendedPublicKey(): string {
-    return this._root.publicExtendedKey;
+    return this.#root.publicExtendedKey;
   }
 
   get extendedPrivateKey(): string {
-    return this._root.privateExtendedKey;
+    return this.#root.privateExtendedKey;
   }
 
   get index(): number {
-    return this._root.index;
+    return this.#root.index;
   }
 
   get depth(): number {
-    return this._root.depth;
+    return this.#root.depth;
   }
 
   get address(): ErgoAddress {
-    return this._address;
+    if (!this.#address) {
+      this.#address = ErgoAddress.fromPublicKey(this.publicKey);
+    }
+
+    return this.#address;
   }
 
   static async fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<ErgoHDKey> {
@@ -77,20 +98,31 @@ export class ErgoHDKey {
     return new ErgoHDKey(key);
   }
 
-  static fromExtendedKey(base58EncodedExtKey: string): ErgoHDKey {
-    return new ErgoHDKey(HDKey.fromExtendedKey(base58EncodedExtKey));
+  static fromExtendedKey(options: HDKeyOptions): ErgoHDKey;
+  static fromExtendedKey(encodedKey: string): ErgoHDKey;
+  static fromExtendedKey(keyOrOptions: string | HDKeyOptions): ErgoHDKey {
+    const rootKey =
+      typeof keyOrOptions === "string"
+        ? HDKey.fromExtendedKey(keyOrOptions)
+        : new HDKey({
+            versions: VERSIONS,
+            chainCode: keyOrOptions.chainCode as unknown as Uint8Array,
+            ...keyOrOptions
+          });
+
+    return new ErgoHDKey(rootKey);
   }
 
   deriveChild(index: number): ErgoHDKey {
-    return new ErgoHDKey(this._root.deriveChild(index));
+    return new ErgoHDKey(this.#root.deriveChild(index));
   }
 
   derive(path: string): ErgoHDKey {
-    return new ErgoHDKey(this._root.derive(path));
+    return new ErgoHDKey(this.#root.derive(path));
   }
 
   wipePrivateData(): ErgoHDKey {
-    this._root.wipePrivateData();
+    this.#root.wipePrivateData();
 
     return this;
   }
