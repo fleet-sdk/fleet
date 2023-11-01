@@ -73,6 +73,30 @@ jobs:
       - run: pnpm -r build
       - run: pnpm run test:unit
 
+  build-and-test-bun:
+    name: "[bun] build and test"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        bun-version: ["latest"]
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Build and test using bun ${{ matrix.bun-version }}
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ matrix.bun-version }}
+
+      - run: bun run pnpm install --frozen-lockfile
+      - run: bun run pnpm -r build
+      - run: bun run test:unit
+
   build-and-test-other-envs:
     name: "[happy-dom, edge-runtime] test"
     runs-on: ubuntu-latest
