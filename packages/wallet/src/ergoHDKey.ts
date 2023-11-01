@@ -104,6 +104,7 @@ export class ErgoHDKey {
       typeof keyOrOptions === "string"
         ? HDKey.fromExtendedKey(keyOrOptions)
         : new HDKey({
+            // todo: remove this if https://github.com/paulmillr/scure-bip32/pull/14 is merged
             versions: VERSIONS,
             chainCode: keyOrOptions.chainCode as unknown as Uint8Array,
             ...keyOrOptions
