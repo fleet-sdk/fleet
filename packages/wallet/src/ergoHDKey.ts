@@ -15,22 +15,20 @@ export type FromMnemonicOptions = {
   path?: string;
 };
 
-export type HDKeyOptionsBase = {
+export type HDKeyOptions = {
   depth?: number;
   index?: number;
   parentFingerprint?: number;
   chainCode?: Uint8Array;
 };
 
-export type PrivateKeyOptions = HDKeyOptionsBase & {
+export type PrivateKeyOptions = HDKeyOptions & {
   privateKey: Uint8Array | bigint;
 };
 
-export type PublicKeyOptions = HDKeyOptionsBase & {
+export type PublicKeyOptions = HDKeyOptions & {
   publicKey: Uint8Array;
 };
-
-export type HDKeyOptions = PrivateKeyOptions | PublicKeyOptions;
 
 export class ErgoHDKey {
   readonly #root: HDKey;
@@ -98,9 +96,10 @@ export class ErgoHDKey {
     return new ErgoHDKey(key);
   }
 
-  static fromExtendedKey(options: HDKeyOptions): ErgoHDKey;
+  static fromExtendedKey(options: PrivateKeyOptions): ErgoHDKey;
+  static fromExtendedKey(options: PublicKeyOptions): ErgoHDKey;
   static fromExtendedKey(encodedKey: string): ErgoHDKey;
-  static fromExtendedKey(keyOrOptions: string | HDKeyOptions): ErgoHDKey {
+  static fromExtendedKey(keyOrOptions: string | PrivateKeyOptions | PublicKeyOptions): ErgoHDKey {
     const rootKey =
       typeof keyOrOptions === "string"
         ? HDKey.fromExtendedKey(keyOrOptions)
