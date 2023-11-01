@@ -15,27 +15,16 @@ import {
   mockUTXOByAddress
 } from "_test-vectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { NodeClient } from "./nodeClient";
+import { getNodeClient } from "./nodeClient";
 
 import * as rest from "./utils/rest";
-
-function getNodeClient() {
-  const nodeOptions: rest.RequestOptions = {
-    url: "https://www.sample.node.url",
-    parser: JSON,
-    fetcher: fetch,
-    headers: rest.DEFAULT_HEADERS
-  };
-
-  return new NodeClient(nodeOptions);
-}
 
 describe("Test node client", async () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  const nodeClient = getNodeClient();
+  const nodeClient = getNodeClient("https://test0.com");
 
   const testOptions = {
     url: "https://test.com"

@@ -11,7 +11,7 @@ import {
   TransactionId
 } from "@fleet-sdk/common";
 import { ErgoBox } from "@fleet-sdk/core";
-import { get, post, RequestOptions } from "./utils/rest";
+import { DEFAULT_HEADERS, Fetcher, get, post, RequestOptions, ResponseParser } from "./utils/rest";
 
 export type TokenInfo = {
   id: TokenId;
@@ -36,6 +36,30 @@ export type NodeErrorOutput = {
 
 export type NodeCompilerOutput = { address?: string } & NodeErrorOutput;
 export type NodeSendTransactionOutput = { transactionId?: TransactionId } & NodeErrorOutput;
+
+/**
+ * Get a node client
+ * @param url url of the node including the port and the trailing /
+ * @param parser parse the response text and stringify the body for post. Use json-bigint to avoid overflow.
+ * @param fetcher fetcher to reteive the data
+ * @param headers headers for the get and post request
+ * @returns NodeClient
+ */
+export function getNodeClient(
+  url: URL | string,
+  parser: ResponseParser = JSON,
+  fetcher: Fetcher = fetch,
+  headers: Headers = DEFAULT_HEADERS
+): NodeClient {
+  const nodeOptions: RequestOptions = {
+    url: url,
+    parser: parser,
+    fetcher: fetcher,
+    headers: headers
+  };
+
+  return new NodeClient(nodeOptions);
+}
 
 export class NodeClient {
   private _nodeOptions: RequestOptions;
