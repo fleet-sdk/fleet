@@ -3,8 +3,8 @@ export const mockCompileScript = {
 };
 
 export const mockIndexedHeight = {
-  "indexedHeight": 1125453,
-  "fullHeight": 1125453
+  indexedHeight: 1125453,
+  fullHeight: 1125453
 };
 
 export const mockCompileError = {
