@@ -1,0 +1,45 @@
+{
+  "name": "@fleet-sdk/node-client",
+  "version": "0.1.0",
+  "description": "Node client for Fleet SDK.",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "require": "./dist/index.cjs.js",
+    "import": "./dist/index.esm.js"
+  },
+  "sideEffects": false,
+  "repository": "fleet-sdk/fleet",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "keywords": [
+    "ergo",
+    "blockchain",
+    "node client"
+  ],
+  "dependencies": {
+    "@fleet-sdk/common": "workspace:^",
+    "@fleet-sdk/core": "workspace:^",
+    "@fleet-sdk/serializer": "workspace:^"
+  },
+  "scripts": {
+    "build": "tsup --config ../../tsup.config.ts"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "files": [
+    "src",
+    "dist",
+    "!**/*.spec.*",
+    "!**/*.json",
+    "!tests",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ]
+}
