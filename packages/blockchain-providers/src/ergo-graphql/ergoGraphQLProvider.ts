@@ -28,7 +28,13 @@ import {
   GraphQLVariables,
   isRequestParam
 } from "../utils";
-import { CHECK_TX_MUTATION, CONF_BOX_QUERY, HEADERS_QUERY, SEND_TX_MUTATION } from "./queries";
+import {
+  ALL_BOX_QUERY,
+  CHECK_TX_MUTATION,
+  CONF_BOX_QUERY,
+  HEADERS_QUERY,
+  SEND_TX_MUTATION
+} from "./queries";
 
 export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded BoxIds */
@@ -41,6 +47,7 @@ export type GraphQLBoxWhere = BoxWhere & {
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
 
 type BoxesResponse = { boxes: Box[] };
+type AllBoxesResponse = { boxes: Box[]; mempool: { boxes: Box[] } };
 type HeadersResponse = { blockHeaders: Header[] };
 type CheckTxResponse = { checkTransaction: string };
 type SendTxResponse = { submitTransaction: string };
@@ -50,6 +57,7 @@ const PAGE_SIZE = 50;
 
 export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
   #getConfBoxes;
+  #getAllBoxes;
   #getHeaders;
   #checkTx;
   #sendTx;
@@ -63,6 +71,7 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
     );
 
     this.#getConfBoxes = createGqlOperation<BoxesResponse, BoxesArgs>(CONF_BOX_QUERY, opt);
+    this.#getAllBoxes = createGqlOperation<AllBoxesResponse, BoxesArgs>(ALL_BOX_QUERY, opt);
     this.#getHeaders = createGqlOperation<HeadersResponse, HeadersArgs>(HEADERS_QUERY, opt);
     this.#checkTx = createGqlOperation<CheckTxResponse, SignedTxArgs>(CHECK_TX_MUTATION, opt);
     this.#sendTx = createGqlOperation<SendTxResponse, SignedTxArgs>(SEND_TX_MUTATION, opt);
@@ -115,7 +124,6 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
         query,
         ({ data }) => {
           const boxes = includeUnconfirmed ? data.boxes.filter((x) => !x.beingSpent) : data.boxes;
-
           return boxes.map(mapBoxAsConfirmed(true));
         },
         ({ data }) => data.boxes.length === PAGE_SIZE
