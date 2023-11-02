@@ -16,24 +16,17 @@ import {
   NotSupportedError,
   SignedTransaction,
   TransactionEvaluationResult,
-  TransactionReductionResult,
-  uniqBy
+  TransactionReductionResult
 } from "@fleet-sdk/common";
-import { orderBy, some } from "packages/common/src";
-import {
-  createGqlOperation,
-  GraphQLOperation,
-  GraphQLRequestOptions,
-  GraphQLSuccessResponse,
-  GraphQLVariables,
-  isRequestParam
-} from "../utils";
+import { some } from "packages/common/src";
+import { createGqlOperation, GraphQLRequestOptions, isRequestParam } from "../utils";
 import {
   ALL_BOX_QUERY,
   CHECK_TX_MUTATION,
   CONF_BOX_QUERY,
   HEADERS_QUERY,
-  SEND_TX_MUTATION
+  SEND_TX_MUTATION,
+  UNCONF_BOX_QUERY
 } from "./queries";
 
 export type GraphQLBoxWhere = BoxWhere & {
@@ -46,17 +39,19 @@ export type GraphQLBoxWhere = BoxWhere & {
 
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
 
-type BoxesResponse = { boxes: Box[] };
-type AllBoxesResponse = { boxes: Box[]; mempool: { boxes: Box[] } };
-type HeadersResponse = { blockHeaders: Header[] };
-type CheckTxResponse = { checkTransaction: string };
-type SendTxResponse = { submitTransaction: string };
-type SignedTxArgs = { signedTransaction: SignedTransaction };
+type ConfBoxesResp = { boxes: Box[] };
+type UnconfBoxesResp = { mempool: { boxes: Box[] } };
+type AllBoxesResp = ConfBoxesResp & UnconfBoxesResp;
+type HeadersResp = { blockHeaders: Header[] };
+type CheckTxResp = { checkTransaction: string };
+type SendTxResp = { submitTransaction: string };
+type SignedTxArgsResp = { signedTransaction: SignedTransaction };
 
 const PAGE_SIZE = 50;
 
 export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
   #getConfBoxes;
+  #getUnconfBoxes;
   #getAllBoxes;
   #getHeaders;
   #checkTx;
@@ -70,78 +65,108 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
       { throwOnNonNetworkError: true }
     );
 
-    this.#getConfBoxes = createGqlOperation<BoxesResponse, BoxesArgs>(CONF_BOX_QUERY, opt);
-    this.#getAllBoxes = createGqlOperation<AllBoxesResponse, BoxesArgs>(ALL_BOX_QUERY, opt);
-    this.#getHeaders = createGqlOperation<HeadersResponse, HeadersArgs>(HEADERS_QUERY, opt);
-    this.#checkTx = createGqlOperation<CheckTxResponse, SignedTxArgs>(CHECK_TX_MUTATION, opt);
-    this.#sendTx = createGqlOperation<SendTxResponse, SignedTxArgs>(SEND_TX_MUTATION, opt);
+    this.#getConfBoxes = createGqlOperation<ConfBoxesResp, BoxesArgs>(CONF_BOX_QUERY, opt);
+    this.#getUnconfBoxes = createGqlOperation<UnconfBoxesResp, BoxesArgs>(UNCONF_BOX_QUERY, opt);
+    this.#getAllBoxes = createGqlOperation<AllBoxesResp, BoxesArgs>(ALL_BOX_QUERY, opt);
+    this.#getHeaders = createGqlOperation<HeadersResp, HeadersArgs>(HEADERS_QUERY, opt);
+    this.#checkTx = createGqlOperation<CheckTxResp, SignedTxArgsResp>(CHECK_TX_MUTATION, opt);
+    this.#sendTx = createGqlOperation<SendTxResp, SignedTxArgsResp>(SEND_TX_MUTATION, opt);
   }
 
-  async #getAll<R, T, A extends GraphQLVariables>(
-    operation: GraphQLOperation<GraphQLSuccessResponse<T>, A>,
-    query: A,
-    mapFn: (response: GraphQLSuccessResponse<T>) => R[],
-    checkMoreFn: (response: GraphQLSuccessResponse<T>) => boolean
-  ): Promise<R[]> {
-    const queryArgs = { ...query, skip: 0, take: PAGE_SIZE };
-    let result: R[] = [];
-    let hasMore: boolean;
+  #fetchBoxes(args: BoxesArgs, inclConf: boolean, inclUnconf: boolean) {
+    if (inclConf && inclUnconf) {
+      return this.#getAllBoxes(args);
+    } else if (inclConf) {
+      return this.#getConfBoxes(args);
+    } else if (inclUnconf) {
+      return this.#getUnconfBoxes(args);
+    }
 
-    do {
-      const response = await operation(queryArgs);
-      const data = mapFn(response);
-
-      if (some(data)) {
-        result = result.concat(data);
-        hasMore = checkMoreFn(response);
-      } else {
-        hasMore = false;
-      }
-
-      if (hasMore) queryArgs.skip += PAGE_SIZE;
-    } while (hasMore);
-
-    return result;
+    return;
   }
 
-  async getUnspentBoxes(args: GraphQLBoxQuery): Promise<ChainClientBox[]> {
-    if (isEmpty(args.where)) {
+  async *streamUnspentBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainClientBox[]> {
+    if (isEmpty(query.where)) {
       throw new Error("Cannot fetch unspent boxes without a where clause.");
     }
 
-    const includeUnconfirmed = args.includeUnconfirmed || args.includeUnconfirmed === undefined;
-    const query = {
+    const includeMempool = query.includeUnconfirmed || query.includeUnconfirmed === undefined;
+    const queryArgs = {
       spent: false,
-      boxIds: args.where.boxIds ?? (args.where.boxId ? [args.where.boxId] : undefined),
-      ergoTrees: args.where.contracts ?? (args.where.contract ? [args.where.contract] : undefined),
-      ergoTreeTemplateHash: args.where.template,
-      tokenId: args.where.tokenId
+      boxIds: query.where.boxIds ?? (query.where.boxId ? [query.where.boxId] : undefined),
+      ergoTrees:
+        query.where.contracts ?? (query.where.contract ? [query.where.contract] : undefined),
+      ergoTreeTemplateHash: query.where.template,
+      tokenId: query.where.tokenId,
+      skip: 0,
+      take: PAGE_SIZE
     } satisfies BoxesArgs;
 
-    const responses = await Promise.all([
-      this.#getAll(
-        this.#getConfBoxes,
-        query,
-        ({ data }) => {
-          const boxes = includeUnconfirmed ? data.boxes.filter((x) => !x.beingSpent) : data.boxes;
-          return boxes.map(mapBoxAsConfirmed(true));
-        },
-        ({ data }) => data.boxes.length === PAGE_SIZE
-      ),
-      includeUnconfirmed
-        ? this.#getAll(
-            this.#getConfBoxes,
-            query,
-            ({ data }) => data.boxes.map(mapBoxAsConfirmed(false)),
-            ({ data }) => data.boxes.length === PAGE_SIZE
-          )
-        : undefined
-    ]);
+    const notBeingSpent = (box: Box) => !box.beingSpent;
+    const returnedBoxIds = new Set<string>();
+    let fetchConfirmed = true;
+    let fetchMempool = includeMempool;
 
-    return orderBy(
-      uniqBy(responses.filter(some).flat(), (box) => box.boxId),
-      (box) => box.creationHeight
-    );
+    do {
+      const response = await this.#fetchBoxes(queryArgs, fetchConfirmed, fetchMempool);
+      if (!response) break;
+
+      const { data } = response;
+      let boxes: ChainClientBox[] = [];
+
+      if (hasMempool(data)) {
+        if (some(data.mempool.boxes)) {
+          const mempoolBoxes = data.mempool.boxes
+            .filter(notBeingSpent)
+            .map(mapBoxAsConfirmed(false));
+
+          boxes = boxes.concat(mempoolBoxes);
+        }
+
+        fetchMempool = data.mempool.boxes.length === PAGE_SIZE;
+      }
+
+      if (hasConfirmed(data)) {
+        if (some(data.boxes)) {
+          const confirmedBoxes = (
+            includeMempool ? data.boxes.filter(notBeingSpent) : data.boxes
+          ).map(mapBoxAsConfirmed(true));
+
+          boxes = boxes.concat(confirmedBoxes);
+        }
+
+        fetchConfirmed = data.boxes.length === PAGE_SIZE;
+      }
+
+      if (some(boxes)) {
+        // boxes can be moved from mempool to the blockchain while streaming,
+        // so we need to filter out boxes that have already been returned.
+        let returnedSome = false;
+        for (const box of boxes) {
+          if (!returnedSome && returnedBoxIds.has(box.boxId)) {
+            returnedSome = true;
+          } else {
+            returnedBoxIds.add(box.boxId);
+          }
+        }
+
+        boxes = returnedSome ? boxes.filter((b) => !returnedBoxIds.has(b.boxId)) : boxes;
+        if (some(boxes)) {
+          yield boxes;
+        }
+      }
+
+      if (fetchConfirmed || fetchMempool) queryArgs.skip += PAGE_SIZE;
+    } while (fetchConfirmed || fetchMempool);
+  }
+
+  async getUnspentBoxes(query: GraphQLBoxQuery): Promise<ChainClientBox[]> {
+    let boxes: ChainClientBox[] = [];
+    for await (const chunk of this.streamUnspentBoxes(query)) {
+      boxes = boxes.concat(chunk);
+    }
+
+    return boxes;
   }
 
   async getLastHeaders(count: number): Promise<BlockHeader[]> {
@@ -185,6 +210,14 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
   reduceTransaction(): Promise<TransactionReductionResult> {
     throw new NotSupportedError("Transaction reducing is not supported by ergo-graphql.");
   }
+}
+
+function hasMempool(data: AllBoxesResp | ConfBoxesResp | UnconfBoxesResp): data is UnconfBoxesResp {
+  return !!(data as UnconfBoxesResp).mempool;
+}
+
+function hasConfirmed(data: AllBoxesResp | ConfBoxesResp | UnconfBoxesResp): data is ConfBoxesResp {
+  return !!(data as ConfBoxesResp).boxes;
 }
 
 function mapBoxAsConfirmed(confirmed: boolean) {
