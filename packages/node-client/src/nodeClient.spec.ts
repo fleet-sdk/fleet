@@ -169,14 +169,14 @@ describe("Test node client", async () => {
     expect(utxos).toBeInstanceOf(Array<ErgoBox>);
   });
   it("getBoxesByAddress", async () => {
-    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockUTXOByAddress));
+    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve({ items: mockUTXOByAddress }));
     const utxos = await nodeClient.getBoxesByAddress(
       "9g16ZMPo22b3qaRL7HezyQt2HSW2ZBF6YR3WW9cYQjgQwYKxxoT"
     );
     expect(utxos).toBeInstanceOf(Array<ErgoBox>);
   });
   it("getBoxesByErgotree", async () => {
-    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockUTXOByAddress));
+    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve({ items: mockUTXOByAddress }));
     const utxos = await nodeClient.getBoxesByErgotree(
       "0008cd03b4cf5eb18d1f45f73472bc96578a87f6d967015c59c636c7a0b139348ce826b0"
     );
@@ -266,7 +266,7 @@ describe("Test node client", async () => {
   });
 
   it("getBoxesByTokenId", async () => {
-    vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockUTXOByAddress));
+    vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve({ items: mockUTXOByAddress }));
     const utxos = await nodeClient.getBoxesByTokenId(
       "fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40"
     );
