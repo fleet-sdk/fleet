@@ -39,10 +39,10 @@ export type NodeSendTransactionOutput = { transactionId?: TransactionId } & Node
 
 /**
  * Get a node client
- * @param url url of the node including the port and the trailing /
- * @param parser parse the response text and stringify the body for post. Use json-bigint to avoid overflow.
- * @param fetcher fetcher to reteive the data
- * @param headers headers for the get and post request
+ * @param url : url of the node including the port and the trailing /
+ * @param parser : parse the response text and stringify the body for post. Use json-bigint to avoid overflow.
+ * @param fetcher : fetcher to reteive the data
+ * @param headers : headers for the get and post request
  * @returns NodeClient
  */
 export function getNodeClient(
@@ -73,7 +73,7 @@ export class NodeClient {
    * @returns number
    */
   public async getCurrentHeight(): Promise<number> {
-    const res = await this._getRequest("blockchain/indexedHeight");
+    const res = await this.nodeGetRequest("blockchain/indexedHeight");
 
     return parseInt(res.fullHeight);
   }
@@ -83,7 +83,7 @@ export class NodeClient {
    * @returns number
    */
   public async getIndexedHeight(): Promise<number> {
-    const res = await this._getRequest("blockchain/indexedHeight");
+    const res = await this.nodeGetRequest("blockchain/indexedHeight");
 
     return parseInt(res.indexedHeight);
   }
@@ -94,7 +94,9 @@ export class NodeClient {
    * @returns SignedTransaction
    */
   public async getTransactionByTransactionId(txId: string): Promise<SignedTransaction> {
-    const output: SignedTransaction = await this._getRequest(`blockchain/transaction/byId/${txId}`);
+    const output: SignedTransaction = await this.nodeGetRequest(
+      `blockchain/transaction/byId/${txId}`
+    );
 
     return output;
   }
@@ -105,7 +107,7 @@ export class NodeClient {
    * @returns SignedTransaction
    */
   public async getTransactionByIndex(index: number): Promise<SignedTransaction> {
-    const output: SignedTransaction = await this._getRequest(
+    const output: SignedTransaction = await this.nodeGetRequest(
       `blockchain/transaction/byIndex/${index}`
     );
 
@@ -124,7 +126,7 @@ export class NodeClient {
     limit: number = 10,
     offset: number = 0
   ): Promise<Array<SignedTransaction>> {
-    const res = await this._postRequest(
+    const res = await this.nodePostRequest(
       `blockchain/transaction/byAddress?offset=${offset}&limit=${limit}`,
       addr
     );
@@ -153,7 +155,7 @@ export class NodeClient {
    * @returns ErgoBox
    */
   public async getBoxByBoxId(boxId: string): Promise<ErgoBox> {
-    const res = await this._getRequest(`blockchain/box/byId/${boxId}`);
+    const res = await this.nodeGetRequest(`blockchain/box/byId/${boxId}`);
     const ergoBox = new ErgoBox(res);
 
     return ergoBox;
@@ -165,7 +167,7 @@ export class NodeClient {
    * @returns ErgoBox
    */
   public async getBoxByIndex(index: number): Promise<ErgoBox> {
-    const res = await this._getRequest(`blockchain/box/byIndex/${index}`);
+    const res = await this.nodeGetRequest(`blockchain/box/byIndex/${index}`);
     const ergoBox = new ErgoBox(res);
 
     return ergoBox;
@@ -183,7 +185,7 @@ export class NodeClient {
     limit: number = 5,
     offset: number = 0
   ): Promise<Array<ErgoBox>> {
-    const res = await this._postRequest(
+    const res = await this.nodePostRequest(
       `blockchain/box/byAddress?offset=${offset}&limit=${limit}`,
       address
     );
@@ -206,7 +208,7 @@ export class NodeClient {
     limit: number = 5,
     offset: number = 0
   ): Promise<Array<ErgoBox>> {
-    const res = await this._postRequest(
+    const res = await this.nodePostRequest(
       `blockchain/box/byAddress?offset=${offset}&limit=${limit}`,
       ergotree
     );
@@ -233,7 +235,7 @@ export class NodeClient {
     sort: SortingDirection = "desc",
     includeUnconfirmed: boolean = false
   ): Promise<Array<ErgoBox>> {
-    const res = await this._postRequest(
+    const res = await this.nodePostRequest(
       `blockchain/box/unspent/byAddress?offset=${offset}&limit=${limit}&sortDirection=${sort}&includeUnconfirmed=${includeUnconfirmed}`,
       address
     );
@@ -260,7 +262,7 @@ export class NodeClient {
     sort: SortingDirection = "desc",
     includeUnconfirmed: boolean = false
   ): Promise<Array<ErgoBox>> {
-    const res = await this._postRequest(
+    const res = await this.nodePostRequest(
       `blockchain/box/unspent/byAddress?offset=${offset}&limit=${limit}&sortDirection=${sort}&includeUnconfirmed=${includeUnconfirmed}`,
       ergotree
     );
@@ -283,7 +285,7 @@ export class NodeClient {
     limit: number = 5,
     offset: number = 0
   ): Promise<Array<ErgoBox>> {
-    const res = await this._getRequest(
+    const res = await this.nodeGetRequest(
       `blockchain/box/unspent/byTokenId/${tokenId}?offset=${offset}&limit=${limit}`
     );
     const boxes: Array<ErgoBox> = res.map(
@@ -309,7 +311,7 @@ export class NodeClient {
     sort: SortingDirection = "desc",
     includeUnconfirmed: boolean = false
   ): Promise<Array<ErgoBox>> {
-    const res = await this._getRequest(
+    const res = await this.nodeGetRequest(
       `blockchain/box/unspent/byTokenId/${tokenId}?offset=${offset}&limit=${limit}&sortDirection=${sort}&includeUnconfirmed=${includeUnconfirmed}`
     );
     const boxes: Array<ErgoBox> = res.map(
@@ -329,7 +331,7 @@ export class NodeClient {
     address: string,
     confirmed: boolean = true
   ): Promise<BalanceInfo> {
-    const res = await this._postRequest(`blockchain/balance`, address);
+    const res = await this.nodePostRequest(`blockchain/balance`, address);
     const balance: BalanceInfo = { nanoERG: BigInt(0), tokens: [], confirmed: true };
     if (confirmed) {
       if (res && res.confirmed && res.confirmed.tokens) {
@@ -362,7 +364,7 @@ export class NodeClient {
    * @returns Array<BlockHeader>
    */
   public async getLastHeaders(count: number = 10): Promise<Array<BlockHeader>> {
-    const res = await this._getRequest(`blocks/lastHeaders/${count}`);
+    const res = await this.nodeGetRequest(`blocks/lastHeaders/${count}`);
 
     return res;
   }
@@ -373,7 +375,7 @@ export class NodeClient {
    * @returns TokenInfo
    */
   public async getTokenInfo(tokenId: TokenId): Promise<TokenInfo> {
-    const tokenInfo: TokenInfo = await this._getRequest(`blockchain/token/byId/${tokenId}`);
+    const tokenInfo: TokenInfo = await this.nodeGetRequest(`blockchain/token/byId/${tokenId}`);
 
     return tokenInfo;
   }
@@ -383,7 +385,7 @@ export class NodeClient {
    * @returns NodeInfo
    */
   public async getNodeInfo() {
-    const tokenInfo = await this._getRequest(`info`);
+    const tokenInfo = await this.nodeGetRequest(`info`);
 
     return tokenInfo;
   }
@@ -394,7 +396,7 @@ export class NodeClient {
    * @returns NodeCompilerOutput
    */
   public async compileErgoscript(script: string): Promise<NodeCompilerOutput> {
-    const res = await this._postRequest(`script/p2sAddress`, { source: script });
+    const res = await this.nodePostRequest(`script/p2sAddress`, { source: script });
     if (res.error) {
       const outputError: NodeCompilerOutput = res;
 
@@ -412,7 +414,7 @@ export class NodeClient {
    * @returns TransactionId
    */
   public async postTx(tx: SignedTransaction): Promise<NodeSendTransactionOutput> {
-    const res = await this._postRequest("transactions", tx);
+    const res = await this.nodePostRequest("transactions", tx);
     if (res.error) {
       const out: NodeErrorOutput = res;
 
@@ -424,6 +426,34 @@ export class NodeClient {
     }
   }
 
+  /**
+   * Generic get request to the node
+   * @param url : url to fetch without the node base url
+   * for example for information about the node: nodeGetRequest('info')
+   *             for box by boxId: nodeGetRequest('blockchain/box/byId/{boxId}')
+   * @returns any
+   */
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  public async nodeGetRequest(url: string): Promise<any> {
+    const res = await get(this._updateOptionURL(url));
+
+    return res;
+  }
+
+  /**
+   * Generic post request to the node
+   * @param url : url to fetch without the node base url
+   * for example for the balance of an address: nodePostRequest('blockchain/balance', "address" )
+   * @param body : body to post
+   * @returns any
+   */
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  public async nodePostRequest(url: string, body: any = {}): Promise<any> {
+    const res = await post(body, this._updateOptionURL(url));
+
+    return res;
+  }
+
   public get nodeOptions(): RequestOptions {
     return this._nodeOptions;
   }
@@ -433,21 +463,7 @@ export class NodeClient {
 
   private _updateOptionURL(url: string) {
     const res = { ...this._nodeOptions };
-    res.url = res.url + url;
-
-    return res;
-  }
-
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  private async _getRequest(url: string): Promise<any> {
-    const res = await get(this._updateOptionURL(url));
-
-    return res;
-  }
-
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  private async _postRequest(url: string, body: any = {}): Promise<any> {
-    const res = await post(body, this._updateOptionURL(url));
+    res.url = res.url.toString().replace(/\/?$/, "/") + url.replace(/^\/+/, ""); // force trailing slash, remove leading slashes
 
     return res;
   }
