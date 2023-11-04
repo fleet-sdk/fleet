@@ -195,7 +195,7 @@ export class NodeClient {
       `blockchain/box/byAddress?offset=${offset}&limit=${limit}`,
       address.toString()
     );
-    const boxes: Array<ErgoBox> = res.map(
+    const boxes: Array<ErgoBox> = res.items.map(
       (b: Box<Amount, NonMandatoryRegisters>) => new ErgoBox(b)
     );
 
@@ -215,13 +215,12 @@ export class NodeClient {
     offset: number = 0
   ): Promise<Array<ErgoBox>> {
     const res = await this.nodePostRequest(
-      `blockchain/box/byAddress?offset=${offset}&limit=${limit}`,
+      `blockchain/box/byErgoTree?offset=${offset}&limit=${limit}`,
       ergotree
     );
-    const boxes: Array<ErgoBox> = res.map(
+    const boxes: Array<ErgoBox> = res.items.map(
       (b: Box<Amount, NonMandatoryRegisters>) => new ErgoBox(b)
     );
-
     return boxes;
   }
 
@@ -294,7 +293,7 @@ export class NodeClient {
     const res = await this.nodeGetRequest(
       `blockchain/box/byTokenId/${tokenId}?offset=${offset}&limit=${limit}`
     );
-    const boxes: Array<ErgoBox> = res.map(
+    const boxes: Array<ErgoBox> = res.items.map(
       (b: Box<Amount, NonMandatoryRegisters>) => new ErgoBox(b)
     );
 
