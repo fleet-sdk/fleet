@@ -24,10 +24,10 @@ describe("Test node client", async () => {
     vi.restoreAllMocks();
   });
 
-  const nodeClient = getNodeClient("https://test0.com");
+  const nodeClient = getNodeClient("https://test0.com:9053/");
 
   const testOptions = {
-    url: "https://test.com"
+    url: "https://test0.com:9053/"
   };
   it("nodeOptions", async () => {
     nodeClient.nodeOptions = testOptions;
