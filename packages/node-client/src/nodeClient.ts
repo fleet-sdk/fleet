@@ -129,7 +129,7 @@ export class NodeClient {
    */
   public async getTransactionsByAddress(
     address: string | ErgoAddress,
-    limit: number = 10,
+    limit: number = 5,
     offset: number = 0
   ): Promise<Array<SignedTransaction>> {
     const res = await this.nodePostRequest(
