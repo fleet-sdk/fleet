@@ -3,6 +3,7 @@ import {
   BlockHeader,
   Box,
   BoxId,
+  ErgoTreeHex,
   NewToken,
   NonMandatoryRegisters,
   SignedTransaction,
@@ -10,7 +11,7 @@ import {
   TokenId,
   TransactionId
 } from "@fleet-sdk/common";
-import { ErgoBox } from "@fleet-sdk/core";
+import { ErgoAddress, ErgoBox } from "@fleet-sdk/core";
 import { DEFAULT_HEADERS, Fetcher, get, post, RequestOptions, ResponseParser } from "./utils/rest";
 
 export type TokenInfo = {
@@ -40,7 +41,8 @@ export type NodeSendTransactionOutput = { transactionId?: TransactionId } & Node
 /**
  * Get a node client
  * @param url : url of the node including the port and the trailing /
- * @param parser : parse the response text and stringify the body for post. Use json-bigint to avoid overflow.
+ * @param parser : parse the response text and stringify the body for post. Use json-bigint
+ *                 to avoid overflow of javascript number.
  * @param fetcher : fetcher to reteive the data
  * @param headers : headers for the get and post request
  * @returns NodeClient
@@ -61,6 +63,10 @@ export function getNodeClient(
   return new NodeClient(nodeOptions);
 }
 
+/**
+ * Client for indexed Ergo node (ergo.node.extraIndex = true)
+ * Node v5.0.15+ to get all the /blockchain/* endpoints
+ */
 export class NodeClient {
   private _nodeOptions: RequestOptions;
 
@@ -93,7 +99,7 @@ export class NodeClient {
    * @param txId
    * @returns SignedTransaction
    */
-  public async getTransactionByTransactionId(txId: string): Promise<SignedTransaction> {
+  public async getTransactionByTransactionId(txId: TransactionId): Promise<SignedTransaction> {
     const output: SignedTransaction = await this.nodeGetRequest(
       `blockchain/transaction/byId/${txId}`
     );
@@ -116,19 +122,19 @@ export class NodeClient {
 
   /**
    * Get the historical transactions for an address (limit max 100)
-   * @param addr
+   * @param address
    * @param limit
    * @param offset
    * @returns Array<SignedTransaction>
    */
   public async getTransactionsByAddress(
-    addr: string,
+    address: string | ErgoAddress,
     limit: number = 10,
     offset: number = 0
   ): Promise<Array<SignedTransaction>> {
     const res = await this.nodePostRequest(
       `blockchain/transaction/byAddress?offset=${offset}&limit=${limit}`,
-      addr
+      address.toString()
     );
     const output: Array<SignedTransaction> = res.items;
 
@@ -137,11 +143,11 @@ export class NodeClient {
 
   /**
    * Check if an address was already used
-   * @param addr
+   * @param address
    * @returns boolean, true if the address has one or more transactions
    */
-  public async addressHasTransactions(addr: string): Promise<boolean> {
-    const txList = await this.getTransactionsByAddress(addr, 1);
+  public async addressHasTransactions(address: string | ErgoAddress): Promise<boolean> {
+    const txList = await this.getTransactionsByAddress(address.toString(), 1);
     if (Array.isArray(txList)) {
       return txList.length > 0;
     } else {
@@ -154,7 +160,7 @@ export class NodeClient {
    * @param boxId
    * @returns ErgoBox
    */
-  public async getBoxByBoxId(boxId: string): Promise<ErgoBox> {
+  public async getBoxByBoxId(boxId: BoxId): Promise<ErgoBox> {
     const res = await this.nodeGetRequest(`blockchain/box/byId/${boxId}`);
     const ergoBox = new ErgoBox(res);
 
@@ -181,13 +187,13 @@ export class NodeClient {
    * @returns Array<ErgoBox>
    */
   public async getBoxesByAddress(
-    address: string,
+    address: string | ErgoAddress,
     limit: number = 5,
     offset: number = 0
   ): Promise<Array<ErgoBox>> {
     const res = await this.nodePostRequest(
       `blockchain/box/byAddress?offset=${offset}&limit=${limit}`,
-      address
+      address.toString()
     );
     const boxes: Array<ErgoBox> = res.map(
       (b: Box<Amount, NonMandatoryRegisters>) => new ErgoBox(b)
@@ -204,7 +210,7 @@ export class NodeClient {
    * @returns Array<ErgoBox>
    */
   public async getBoxesByErgotree(
-    ergotree: string,
+    ergotree: ErgoTreeHex,
     limit: number = 5,
     offset: number = 0
   ): Promise<Array<ErgoBox>> {
@@ -229,7 +235,7 @@ export class NodeClient {
    * @returns Array<ErgoBox>
    */
   public async getUnspentBoxesByAddress(
-    address: string,
+    address: string | ErgoAddress,
     limit: number = 5,
     offset: number = 0,
     sort: SortingDirection = "desc",
@@ -237,7 +243,7 @@ export class NodeClient {
   ): Promise<Array<ErgoBox>> {
     const res = await this.nodePostRequest(
       `blockchain/box/unspent/byAddress?offset=${offset}&limit=${limit}&sortDirection=${sort}&includeUnconfirmed=${includeUnconfirmed}`,
-      address
+      address.toString()
     );
     const boxes: Array<ErgoBox> = res.map(
       (b: Box<Amount, NonMandatoryRegisters>) => new ErgoBox(b)
@@ -256,7 +262,7 @@ export class NodeClient {
    * @returns Array<ErgoBox>
    */
   public async getUnspentBoxesByErgotree(
-    ergotree: string,
+    ergotree: ErgoTreeHex,
     limit: number = 5,
     offset: number = 0,
     sort: SortingDirection = "desc",
@@ -281,7 +287,7 @@ export class NodeClient {
    * @returns Array<ErgoBox>
    */
   public async getBoxesByTokenId(
-    tokenId: string,
+    tokenId: TokenId,
     limit: number = 5,
     offset: number = 0
   ): Promise<Array<ErgoBox>> {
@@ -305,7 +311,7 @@ export class NodeClient {
    * @returns Array<ErgoBox>
    */
   public async getUnspentBoxesByTokenId(
-    tokenId: string,
+    tokenId: TokenId,
     limit: number = 5,
     offset: number = 0,
     sort: SortingDirection = "desc",
@@ -328,10 +334,10 @@ export class NodeClient {
    * @returns BalanceInfo
    */
   public async getBalanceByAddress(
-    address: string,
+    address: string | ErgoAddress,
     confirmed: boolean = true
   ): Promise<BalanceInfo> {
-    const res = await this.nodePostRequest(`blockchain/balance`, address);
+    const res = await this.nodePostRequest(`blockchain/balance`, address.toString());
     const balance: BalanceInfo = { nanoERG: BigInt(0), tokens: [], confirmed: true };
     if (confirmed) {
       if (res && res.confirmed && res.confirmed.tokens) {
@@ -413,7 +419,7 @@ export class NodeClient {
    * @param tx
    * @returns TransactionId
    */
-  public async postTx(tx: SignedTransaction): Promise<NodeSendTransactionOutput> {
+  public async sendTransaction(tx: SignedTransaction): Promise<NodeSendTransactionOutput> {
     const res = await this.nodePostRequest("transactions", tx);
     if (res.error) {
       const out: NodeErrorOutput = res;
@@ -424,6 +430,79 @@ export class NodeClient {
 
       return out;
     }
+  }
+
+  /**
+   * Check a signed transaction, returns the transactionId if succeeds
+   * @param tx
+   * @returns
+   */
+  public async checkTransaction(tx: SignedTransaction): Promise<NodeSendTransactionOutput> {
+    const res = await this.nodePostRequest("transactions/check", tx);
+    if (res.error) {
+      const out: NodeErrorOutput = res;
+
+      return out;
+    } else {
+      const out = { transactionId: res };
+
+      return out;
+    }
+  }
+
+  /**
+   * Get current pool of the unconfirmed transactions pool
+   * @param limit : default 50
+   * @param offset : default 0
+   * @returns Array<SignedTransaction>
+   */
+  public async getUnconfirmedTransactions(
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<Array<SignedTransaction>> {
+    const res: Array<SignedTransaction> = await this.nodeGetRequest(
+      `transactions/unconfirmed?offset=${offset}&limit=${limit}`
+    );
+
+    return res;
+  }
+
+  /**
+   * Get an unconfirmed transaction by transactionId from the mempool, returns undefined if not found
+   * @param txId
+   * @returns SignedTransaction | undefined
+   */
+  public async getUnconfirmedTransactionsByTransactionId(
+    txId: TransactionId
+  ): Promise<SignedTransaction | undefined> {
+    const res: SignedTransaction & NodeErrorOutput = await this.nodeGetRequest(
+      `transactions/unconfirmed/byTransactionId/${txId}`
+    );
+    if (res.error) {
+      return;
+    } else {
+      return res;
+    }
+  }
+
+  /**
+   * Finds unconfirmed transactions by ErgoTree hex of one of its output or input boxes (if present in UtxoState)
+   * @param ergotree
+   * @param limit
+   * @param offset
+   * @returns Array<SignedTransaction>
+   */
+  public async getUnconfirmedTransactionsByErgoTree(
+    ergotree: ErgoTreeHex,
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<Array<SignedTransaction>> {
+    const res: Array<SignedTransaction> = await this.nodePostRequest(
+      `transactions/unconfirmed/byErgoTree?offset=${offset}&limit=${limit}`,
+      ergotree
+    );
+
+    return res;
   }
 
   /**

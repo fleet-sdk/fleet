@@ -1640,9 +1640,9 @@ export const mockUTXOByAddress = [
 ];
 
 export const mockPostTxSuccess = "18b11ee7adbb1e2b837052d7f28df3c50ffb257c31447b051eac21b74780d842";
-export const mockPostTxError = {
+
+export const mockNodeError = {
   error: 400,
   reason: "bad.request",
-  detail:
-    "The request content was malformed:\njava.lang.NegativeArraySizeException: DownField(1),DownField(extension),DownField(spendingProof),DownArray,DownField(inputs)"
+  detail: "Sample node error"
 };

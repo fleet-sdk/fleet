@@ -7,8 +7,8 @@ import {
   mockGetBoxById,
   mockIndexedHeight,
   mockLastHeaders,
+  mockNodeError,
   mockNodeInfo,
-  mockPostTxError,
   mockPostTxSuccess,
   mockTokenInfo,
   mockTransactionList,
@@ -183,18 +183,78 @@ describe("Test node client", async () => {
     expect(utxos).toBeInstanceOf(Array<ErgoBox>);
   });
 
-  it("postTx - success", async () => {
+  it("sendTransaction - success", async () => {
     vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockPostTxSuccess));
-    const txId = await nodeClient.postTx({ inputs: [], outputs: [], dataInputs: [], id: "" });
+    const txId = await nodeClient.sendTransaction({
+      inputs: [],
+      outputs: [],
+      dataInputs: [],
+      id: ""
+    });
     expect(txId).toEqual({
+      transactionId: "18b11ee7adbb1e2b837052d7f28df3c50ffb257c31447b051eac21b74780d842"
+    });
+    const txId2 = await nodeClient.checkTransaction({
+      inputs: [],
+      outputs: [],
+      dataInputs: [],
+      id: ""
+    });
+    expect(txId2).toEqual({
       transactionId: "18b11ee7adbb1e2b837052d7f28df3c50ffb257c31447b051eac21b74780d842"
     });
   });
 
-  it("postTx - error", async () => {
-    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockPostTxError));
-    const txError = await nodeClient.postTx({ inputs: [], outputs: [], dataInputs: [], id: "" });
+  it("sendTransaction - error", async () => {
+    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockNodeError));
+    const txError = await nodeClient.sendTransaction({
+      inputs: [],
+      outputs: [],
+      dataInputs: [],
+      id: ""
+    });
     expect(txError.error).toBe(400);
+    const txError2 = await nodeClient.checkTransaction({
+      inputs: [],
+      outputs: [],
+      dataInputs: [],
+      id: ""
+    });
+    expect(txError2.error).toBe(400);
+  });
+
+  it("getUnconfirmedTransactions", async () => {
+    vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockTransactionList.items));
+    const unconfirmedTx = await nodeClient.getUnconfirmedTransactions();
+    expect(unconfirmedTx).toBeInstanceOf(Array<SignedTransaction>);
+  });
+
+  it("getUnconfirmedTransactionsByTransactionId - success", async () => {
+    vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockTransactionList.items[0]));
+    const tx = await nodeClient.getUnconfirmedTransactionsByTransactionId(
+      "18b11ee7adbb1e2b837052d7f28df3c50ffb257c31447b051eac21b74780d842"
+    );
+    if (tx) {
+      expect(tx.id).toBeDefined();
+    } else {
+      expect(true).toBe(false);
+    }
+  });
+
+  it("getUnconfirmedTransactionsByTransactionId - error", async () => {
+    vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockNodeError));
+    const tx = await nodeClient.getUnconfirmedTransactionsByTransactionId(
+      "18b11ee7adbb1e2b837052d7f28df3c50ffb257c31447b051eac21b74780d842"
+    );
+    expect(tx).toBeUndefined();
+  });
+
+  it("getUnconfirmedTransactionsByErgoTree", async () => {
+    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockTransactionList.items));
+    const unconfirmedTx = await nodeClient.getUnconfirmedTransactionsByErgoTree(
+      "108a010400040004000e20b10b0001e...1273860193721b738701937227738801738901"
+    );
+    expect(unconfirmedTx).toBeInstanceOf(Array<SignedTransaction>);
   });
 
   it("getUnspentBoxesByTokenId", async () => {
@@ -204,6 +264,7 @@ describe("Test node client", async () => {
     );
     expect(utxos).toBeInstanceOf(Array<ErgoBox>);
   });
+
   it("getBoxesByTokenId", async () => {
     vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockUTXOByAddress));
     const utxos = await nodeClient.getBoxesByTokenId(
