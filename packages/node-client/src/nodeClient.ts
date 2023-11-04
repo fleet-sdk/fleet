@@ -269,7 +269,7 @@ export class NodeClient {
     includeUnconfirmed: boolean = false
   ): Promise<Array<ErgoBox>> {
     const res = await this.nodePostRequest(
-      `blockchain/box/unspent/byAddress?offset=${offset}&limit=${limit}&sortDirection=${sort}&includeUnconfirmed=${includeUnconfirmed}`,
+      `blockchain/box/unspent/byErgoTree?offset=${offset}&limit=${limit}&sortDirection=${sort}&includeUnconfirmed=${includeUnconfirmed}`,
       ergotree
     );
     const boxes: Array<ErgoBox> = res.map(
@@ -292,7 +292,7 @@ export class NodeClient {
     offset: number = 0
   ): Promise<Array<ErgoBox>> {
     const res = await this.nodeGetRequest(
-      `blockchain/box/unspent/byTokenId/${tokenId}?offset=${offset}&limit=${limit}`
+      `blockchain/box/byTokenId/${tokenId}?offset=${offset}&limit=${limit}`
     );
     const boxes: Array<ErgoBox> = res.map(
       (b: Box<Amount, NonMandatoryRegisters>) => new ErgoBox(b)
