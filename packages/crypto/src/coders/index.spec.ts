@@ -2,7 +2,6 @@ import { describe, expect, test } from "vitest";
 import { base58, base58check, base64, utf8 } from ".";
 
 describe("Coders smoke tests", () => {
-
   /**
    * @description For testing base64 coder
    * @expected it should encode and decode correctly
