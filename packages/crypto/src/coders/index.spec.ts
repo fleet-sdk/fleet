@@ -2,6 +2,11 @@ import { describe, expect, test } from "vitest";
 import { base58, base58check, base64, utf8 } from ".";
 
 describe("Coders smoke tests", () => {
+
+  /**
+   * @description For testing base64 coder
+   * @expected it should encode and decode correctly
+   */
   test("base64 coder roundtrip", () => {
     const decodedBase64 = utf8.decode("this is a base64 encoded string");
     const encodedBase64 = "dGhpcyBpcyBhIGJhc2U2NCBlbmNvZGVkIHN0cmluZw==";
@@ -10,6 +15,10 @@ describe("Coders smoke tests", () => {
     expect(base64.decode(encodedBase64)).to.be.deep.equal(decodedBase64);
   });
 
+  /**
+   * @description For testing base58 coder
+   * @expected it should encode and decode correctly
+   */
   test("base58 coder roundtrip", () => {
     const decodedBase58 = utf8.decode("this is a base58 encoded string");
     const encodedBase58 = "2mxCXDZDHgWsZCCCUBhmanjEeEFPM5dg8FVb659iiJa";
@@ -18,6 +27,10 @@ describe("Coders smoke tests", () => {
     expect(base58.decode(encodedBase58)).to.be.deep.equal(decodedBase58);
   });
 
+  /**
+   * @description For testing base58check coder
+   * @expected it should encode and decode correctly
+   */
   test("base58check coder roundtrip", () => {
     const decodedBase58check = utf8.decode("this is a base58check encoded string");
     const encodedBase58check = "6nURSRrD1s933Ruwq4Gi9XzULMhuRQbX1mYrnY2jknX9pW67uKbADDk";
