@@ -18,15 +18,15 @@ import {
   TransactionEvaluationResult,
   TransactionReductionResult
 } from "@fleet-sdk/common";
-import { some } from "packages/common/src";
+import { orderBy, some, uniqBy } from "packages/common/src";
 import { createGqlOperation, GraphQLRequestOptions, isRequestParam } from "../utils";
 import {
-  ALL_BOX_QUERY,
+  ALL_BOXES_QUERY,
   CHECK_TX_MUTATION,
-  CONF_BOX_QUERY,
+  CONF_BOXES_QUERY,
   HEADERS_QUERY,
   SEND_TX_MUTATION,
-  UNCONF_BOX_QUERY
+  UNCONF_BOXES_QUERY
 } from "./queries";
 
 export type GraphQLBoxWhere = BoxWhere & {
@@ -65,9 +65,9 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
       { throwOnNonNetworkError: true }
     );
 
-    this.#getConfBoxes = createGqlOperation<ConfBoxesResp, BoxesArgs>(CONF_BOX_QUERY, opt);
-    this.#getUnconfBoxes = createGqlOperation<UnconfBoxesResp, BoxesArgs>(UNCONF_BOX_QUERY, opt);
-    this.#getAllBoxes = createGqlOperation<AllBoxesResp, BoxesArgs>(ALL_BOX_QUERY, opt);
+    this.#getConfBoxes = createGqlOperation<ConfBoxesResp, BoxesArgs>(CONF_BOXES_QUERY, opt);
+    this.#getUnconfBoxes = createGqlOperation<UnconfBoxesResp, BoxesArgs>(UNCONF_BOXES_QUERY, opt);
+    this.#getAllBoxes = createGqlOperation<AllBoxesResp, BoxesArgs>(ALL_BOXES_QUERY, opt);
     this.#getHeaders = createGqlOperation<HeadersResp, HeadersArgs>(HEADERS_QUERY, opt);
     this.#checkTx = createGqlOperation<CheckTxResp, SignedTxArgsResp>(CHECK_TX_MUTATION, opt);
     this.#sendTx = createGqlOperation<SendTxResp, SignedTxArgsResp>(SEND_TX_MUTATION, opt);
@@ -76,13 +76,11 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
   #fetchBoxes(args: BoxesArgs, inclConf: boolean, inclUnconf: boolean) {
     if (inclConf && inclUnconf) {
       return this.#getAllBoxes(args);
-    } else if (inclConf) {
-      return this.#getConfBoxes(args);
     } else if (inclUnconf) {
       return this.#getUnconfBoxes(args);
+    } else {
+      return this.#getConfBoxes(args);
     }
-
-    return;
   }
 
   async *streamUnspentBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainClientBox[]> {
@@ -90,47 +88,34 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
       throw new Error("Cannot fetch unspent boxes without a where clause.");
     }
 
-    const includeMempool = query.includeUnconfirmed || query.includeUnconfirmed === undefined;
+    const notBeingSpent = (box: Box) => !box.beingSpent;
+    const returnedBoxIds = new Set<string>();
+    const includeMempool = query.includeUnconfirmed !== false;
+    const { where } = query;
     const queryArgs = {
       spent: false,
-      boxIds: query.where.boxIds ?? (query.where.boxId ? [query.where.boxId] : undefined),
-      ergoTrees:
-        query.where.contracts ?? (query.where.contract ? [query.where.contract] : undefined),
-      ergoTreeTemplateHash: query.where.template,
-      tokenId: query.where.tokenId,
+      boxIds: where.boxIds ?? (where.boxId ? [where.boxId] : undefined),
+      ergoTrees: where.contracts ?? (where.contract ? [where.contract] : undefined),
+      ergoTreeTemplateHash: where.template,
+      tokenId: where.tokenId,
       skip: 0,
       take: PAGE_SIZE
     } satisfies BoxesArgs;
 
-    const notBeingSpent = (box: Box) => !box.beingSpent;
-    const returnedBoxIds = new Set<string>();
     let fetchConfirmed = true;
     let fetchMempool = includeMempool;
 
     do {
       const response = await this.#fetchBoxes(queryArgs, fetchConfirmed, fetchMempool);
-      if (!response) break;
 
       const { data } = response;
       let boxes: ChainClientBox[] = [];
-
-      if (hasMempool(data)) {
-        if (some(data.mempool.boxes)) {
-          const mempoolBoxes = data.mempool.boxes
-            .filter(notBeingSpent)
-            .map(mapBoxAsConfirmed(false));
-
-          boxes = boxes.concat(mempoolBoxes);
-        }
-
-        fetchMempool = data.mempool.boxes.length === PAGE_SIZE;
-      }
 
       if (hasConfirmed(data)) {
         if (some(data.boxes)) {
           const confirmedBoxes = (
             includeMempool ? data.boxes.filter(notBeingSpent) : data.boxes
-          ).map(mapBoxAsConfirmed(true));
+          ).map(asConfirmed(true));
 
           boxes = boxes.concat(confirmedBoxes);
         }
@@ -138,20 +123,26 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
         fetchConfirmed = data.boxes.length === PAGE_SIZE;
       }
 
-      if (some(boxes)) {
-        // boxes can be moved from mempool to the blockchain while streaming,
-        // so we need to filter out boxes that have already been returned.
-        let returnedSome = false;
-        for (const box of boxes) {
-          if (!returnedSome && returnedBoxIds.has(box.boxId)) {
-            returnedSome = true;
-          } else {
-            returnedBoxIds.add(box.boxId);
-          }
+      if (includeMempool && hasMempool(data)) {
+        if (some(data.mempool.boxes)) {
+          const mempoolBoxes = data.mempool.boxes.filter(notBeingSpent).map(asConfirmed(false));
+          boxes = boxes.concat(mempoolBoxes);
         }
 
-        boxes = returnedSome ? boxes.filter((b) => !returnedBoxIds.has(b.boxId)) : boxes;
+        fetchMempool = data.mempool.boxes.length === PAGE_SIZE;
+      }
+
+      if (some(boxes)) {
+        // boxes can be moved from the mempool to the blockchain while streaming,
+        // so we need to filter out boxes that have already been returned.
+        if (boxes.some((box) => returnedBoxIds.has(box.boxId))) {
+          boxes = boxes.filter((b) => !returnedBoxIds.has(b.boxId));
+        }
+
         if (some(boxes)) {
+          boxes = uniqBy(boxes, (box) => box.boxId);
+          boxes.forEach((box) => returnedBoxIds.add(box.boxId));
+
           yield boxes;
         }
       }
@@ -166,7 +157,7 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
       boxes = boxes.concat(chunk);
     }
 
-    return boxes;
+    return orderBy(boxes, (box) => box.creationHeight);
   }
 
   async getLastHeaders(count: number): Promise<BlockHeader[]> {
@@ -213,14 +204,14 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
 }
 
 function hasMempool(data: AllBoxesResp | ConfBoxesResp | UnconfBoxesResp): data is UnconfBoxesResp {
-  return !!(data as UnconfBoxesResp).mempool;
+  return !!(data as UnconfBoxesResp)?.mempool?.boxes;
 }
 
 function hasConfirmed(data: AllBoxesResp | ConfBoxesResp | UnconfBoxesResp): data is ConfBoxesResp {
-  return !!(data as ConfBoxesResp).boxes;
+  return !!(data as ConfBoxesResp)?.boxes;
 }
 
-function mapBoxAsConfirmed(confirmed: boolean) {
+function asConfirmed(confirmed: boolean) {
   return (box: Box): ChainClientBox => ({
     ...box,
     value: BigInt(box.value),
