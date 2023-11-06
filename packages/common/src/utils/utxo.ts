@@ -1,14 +1,4 @@
-import {
-  Amount,
-  Box,
-  BoxCandidate,
-  ConfirmedBox,
-  NonMandatoryRegisters,
-  TokenAmount,
-  TokenId,
-  UnconfirmedBox
-} from "../types";
-import { uniqBy } from "./array";
+import { Amount, Box, BoxCandidate, NonMandatoryRegisters, TokenAmount, TokenId } from "../types";
 import { isDefined, isEmpty, isUndefined } from "./assertions";
 import { ensureBigInt } from "./bigInt";
 import { _0n } from "./bigInt";
@@ -103,48 +93,6 @@ export function utxoDiff(
   }
 
   return { nanoErgs, tokens };
-}
-
-export type SpendableUTxOSet<T extends Amount> = (ConfirmedBox<T> | UnconfirmedBox<T>)[];
-
-/**
- * Builds a set of UTxOs from the given confirmed and unconfirmed boxes.
- * @param confirmed An array of confirmed boxes.
- * @param unconfirmed An array of unconfirmed boxes.
- * @returns A set of spendable UTXOs.
- * @template T The type of amount associated with the boxes.
- */
-export function getUTxOSetFrom<T extends Amount>(
-  confirmed: Box<T>[],
-  unconfirmed: Box<T>[]
-): SpendableUTxOSet<T> {
-  const boxId = (box: Box) => box.boxId;
-  if (isEmpty(confirmed)) return uniqBy(unconfirmed, boxId);
-  if (isEmpty(unconfirmed)) return uniqBy(confirmed, boxId);
-
-  const unconfirmedMap = new Map(uniqBy(unconfirmed, boxId).map((box) => [box.boxId, box]));
-  const confirmedBoxes = uniqBy(confirmed, boxId);
-  const spendable: SpendableUTxOSet<T> = [];
-
-  for (const box of confirmedBoxes) {
-    if (unconfirmedMap.get(box.boxId) !== undefined) {
-      // if a box is present in unconfirmed map that means it's being spent,
-      // so must be removed from spendable array.
-      unconfirmedMap.delete(box.boxId);
-    } else {
-      box.confirmed = true;
-      spendable.push(box);
-    }
-  }
-
-  if (unconfirmedMap.size > 0) {
-    const unmatched = Array.from(unconfirmedMap.values());
-    unmatched.forEach((box) => (box.confirmed = false));
-
-    return spendable.concat(unmatched);
-  }
-
-  return spendable;
 }
 
 const MIN_NON_MANDATORY_REGISTER_INDEX = 4;

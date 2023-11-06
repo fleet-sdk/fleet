@@ -27,17 +27,4 @@ export type Box<
   boxId: BoxId;
   transactionId: TransactionId;
   index: number;
-  /**
-   * Box confirmation status
-   * @default true
-   */
-  confirmed?: boolean;
-};
-
-export type ConfirmedBox<T extends Amount> = Box<T> & {
-  confirmed: true | undefined;
-};
-
-export type UnconfirmedBox<T extends Amount> = Box<T> & {
-  confirmed: false;
 };

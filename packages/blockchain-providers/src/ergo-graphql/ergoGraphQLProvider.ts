@@ -14,11 +14,13 @@ import {
   IChainDataProvider,
   isEmpty,
   NotSupportedError,
+  orderBy,
   SignedTransaction,
+  some,
   TransactionEvaluationResult,
-  TransactionReductionResult
+  TransactionReductionResult,
+  uniqBy
 } from "@fleet-sdk/common";
-import { orderBy, some, uniqBy } from "packages/common/src";
 import { createGqlOperation, GraphQLRequestOptions, isRequestParam } from "../utils";
 import {
   ALL_BOXES_QUERY,

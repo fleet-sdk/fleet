@@ -7,7 +7,6 @@ import {
   areRegistersDenselyPacked,
   BoxSummary,
   ensureUTxOBigInt,
-  getUTxOSetFrom,
   utxoDiff,
   utxoFilter,
   utxoSum
@@ -318,47 +317,5 @@ describe("ensureUTxOBigInt()", () => {
 
     expect(ensureUTxOBigInt(stringAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
     expect(ensureUTxOBigInt(bigIntAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
-  });
-});
-
-describe("getUTxOSet function", () => {
-  const boxes = regularBoxes;
-
-  it("Should return the correct UTxO set when confirmed and unconfirmed does not contains any match", () => {
-    const confirmed = boxes.filter((x) => x.value > 1000000n);
-    const unconfirmed = boxes.filter((x) => x.value <= 1000000n);
-
-    const utxoSet = getUTxOSetFrom(confirmed, unconfirmed);
-    expect(utxoSet).to.have.length(boxes.length);
-  });
-
-  it("Should return the correct UTxO set when confirmed and unconfirmed does contains matches", () => {
-    const spendingBox = boxes[0];
-    const confirmed = [spendingBox, boxes[1]];
-    const unconfirmed = [boxes[2], boxes[3], spendingBox];
-
-    // spendingBox should be removed from the set and additional unconfirmed boxes should be added
-    const utxoSet = getUTxOSetFrom(confirmed, unconfirmed);
-    expect(utxoSet).to.be.deep.equal([boxes[1], boxes[2], boxes[3]]);
-
-    // spendingBox should be removed from the set
-    const utxoSet2 = getUTxOSetFrom(confirmed, [spendingBox]);
-    expect(utxoSet2).to.be.deep.equal([boxes[1]]);
-  });
-
-  it("Should return the correct and deduplicated UTxO set when confirmed or unconfirmed is empty", () => {
-    const confirmed = [boxes[0], boxes[1], boxes[1]];
-    const unconfirmed = [boxes[2], boxes[2], boxes[3]];
-
-    const utxoSet = getUTxOSetFrom(confirmed, []);
-    expect(utxoSet).to.be.deep.equal([boxes[0], boxes[1]]);
-
-    const utxoSet2 = getUTxOSetFrom([], unconfirmed);
-    expect(utxoSet2).to.be.deep.equal([boxes[2], boxes[3]]);
-  });
-
-  it("Should return empty when confirmed and unconfirmed are empty", () => {
-    const utxoSet = getUTxOSetFrom([], []);
-    expect(utxoSet).to.be.deep.equal([]);
   });
 });
