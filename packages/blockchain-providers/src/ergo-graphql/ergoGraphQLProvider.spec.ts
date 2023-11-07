@@ -1,6 +1,6 @@
 import { Header } from "@ergo-graphql/types";
 import { ChainClientBox, chunk, hasDuplicatesBy, NotSupportedError } from "@fleet-sdk/common";
-import { boxes } from "_test-vectors";
+import { mockedGraphQLBoxes } from "_test-vectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { mockChunkedResponse, mockResponse } from "../utils";
 import { ErgoGraphQLProvider } from "./ergoGraphQLProvider";
@@ -26,7 +26,10 @@ describe("ergo-graphql provider", () => {
     });
 
     it("Should map query arguments to GraphQL variables", async () => {
-      const mockedData = { boxes: boxes.slice(0, 2), mempool: { boxes: boxes.slice(2, 4) } };
+      const mockedData = {
+        boxes: mockedGraphQLBoxes.slice(0, 2),
+        mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
+      };
       const mockedResponse = encodeSuccessResponseData(mockedData);
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(mockResponse(mockedResponse));
 
@@ -68,7 +71,10 @@ describe("ergo-graphql provider", () => {
     });
 
     it("Should throw if not where clause is provided", async () => {
-      const mockedData = { boxes: boxes.slice(0, 2), mempool: { boxes: boxes.slice(2, 4) } };
+      const mockedData = {
+        boxes: mockedGraphQLBoxes.slice(0, 2),
+        mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
+      };
       const mockedResponse = encodeSuccessResponseData(mockedData);
       vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockedResponse));
 
@@ -79,7 +85,10 @@ describe("ergo-graphql provider", () => {
     });
 
     it("Should fetch boxes with default params", async () => {
-      const mockedData = { boxes: boxes.slice(0, 2), mempool: { boxes: boxes.slice(2, 4) } };
+      const mockedData = {
+        boxes: mockedGraphQLBoxes.slice(0, 2),
+        mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
+      };
       const mockedResponse = encodeSuccessResponseData(mockedData);
       const fetchSpy = vi
         .spyOn(global, "fetch")
@@ -107,7 +116,10 @@ describe("ergo-graphql provider", () => {
     });
 
     it("Should deduplicate boxes if response contains duplicated", async () => {
-      const mockedData = { boxes: boxes.slice(0, 2), mempool: { boxes: boxes.slice(0, 4) } };
+      const mockedData = {
+        boxes: mockedGraphQLBoxes.slice(0, 2),
+        mempool: { boxes: mockedGraphQLBoxes.slice(0, 4) }
+      };
       const mockedResponse = encodeSuccessResponseData(mockedData);
       const fetchSpy = vi
         .spyOn(global, "fetch")
@@ -136,7 +148,10 @@ describe("ergo-graphql provider", () => {
     });
 
     it("Should exclude beingSpent if includeMempool == true or undefined", async () => {
-      const mockedData = { boxes: boxes.slice(0, 2), mempool: { boxes: boxes.slice(2, 4) } };
+      const mockedData = {
+        boxes: mockedGraphQLBoxes.slice(0, 2),
+        mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
+      };
       mockedData.boxes[0].beingSpent = true;
       mockedData.mempool.boxes[0].beingSpent = true;
 
@@ -158,7 +173,10 @@ describe("ergo-graphql provider", () => {
     });
 
     it("Should ignore beingSpent if includeMempool = false", async () => {
-      const mockedData = { boxes: boxes.slice(0, 2), mempool: { boxes: boxes.slice(2, 4) } };
+      const mockedData = {
+        boxes: mockedGraphQLBoxes.slice(0, 2),
+        mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
+      };
       // this should be ignored for this case, as it's not a mempool aware operation
       mockedData.boxes[0].beingSpent = true;
 
@@ -184,7 +202,7 @@ describe("ergo-graphql provider", () => {
 
     it("Should stream boxes with default params with more confirmed boxes than unconfirmed", async () => {
       const pageSize = 50;
-      const chunks = chunk(boxes, pageSize);
+      const chunks = chunk(mockedGraphQLBoxes, pageSize);
       const [conf0, conf1, conf2, mempool] = chunks;
 
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
@@ -213,7 +231,7 @@ describe("ergo-graphql provider", () => {
         boxesCount += boxes.length;
       }
 
-      expect(boxesCount).to.be.equal(boxes.filter((x) => !x.beingSpent).length);
+      expect(boxesCount).to.be.equal(mockedGraphQLBoxes.filter((x) => !x.beingSpent).length);
       expect(fetchSpy).toBeCalledTimes(4);
 
       const [firstCall, secondCall, thirdCall, fourthCall] = fetchSpy.mock.calls.map((call) =>
@@ -234,7 +252,7 @@ describe("ergo-graphql provider", () => {
 
     it("Should stream boxes with default params with more unconfirmed boxes than confirmed", async () => {
       const pageSize = 50;
-      const chunks = chunk(boxes, pageSize);
+      const chunks = chunk(mockedGraphQLBoxes, pageSize);
       const [mem1, mem2, mem3, conf] = chunks;
 
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
@@ -263,7 +281,7 @@ describe("ergo-graphql provider", () => {
         boxesCount += boxes.length;
       }
 
-      expect(boxesCount).to.be.equal(boxes.filter((x) => !x.beingSpent).length);
+      expect(boxesCount).to.be.equal(mockedGraphQLBoxes.filter((x) => !x.beingSpent).length);
       expect(fetchSpy).toBeCalledTimes(4);
 
       const [firstCall, secondCall, thirdCall, fourthCall] = fetchSpy.mock.calls.map((call) =>
@@ -288,7 +306,7 @@ describe("ergo-graphql provider", () => {
      */
     it("Should not return duplicated boxes", async () => {
       const pageSize = 50;
-      const chunks = chunk(boxes, pageSize);
+      const chunks = chunk(mockedGraphQLBoxes, pageSize);
       const [conf0, conf1, conf2, mempool] = chunks;
 
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
@@ -324,7 +342,7 @@ describe("ergo-graphql provider", () => {
       }
 
       expect(hasDuplicatesBy(allBoxes, (box) => box.boxId)).to.be.false;
-      expect(allBoxes).to.have.length(boxes.filter((x) => !x.beingSpent).length);
+      expect(allBoxes).to.have.length(mockedGraphQLBoxes.filter((x) => !x.beingSpent).length);
       expect(fetchSpy).toBeCalledTimes(5);
     });
   });
