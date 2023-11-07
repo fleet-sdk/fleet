@@ -5,16 +5,20 @@ import {
   QueryBlockHeadersArgs as HeadersArgs
 } from "@ergo-graphql/types";
 import {
+  Base58String,
   BlockHeader,
   ensureDefaults,
   HexString,
   isEmpty,
+  isUndefined,
   NotSupportedError,
   orderBy,
   SignedTransaction,
   some,
+  uniq,
   uniqBy
 } from "@fleet-sdk/common";
+import { ErgoAddress } from "@fleet-sdk/core";
 import {
   BoxQuery,
   BoxWhere,
@@ -38,8 +42,11 @@ export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded BoxIds */
   boxIds?: HexString[];
 
-  /** Base16-encoded ErgoTrees or Base58-encoded addresses */
-  contracts?: HexString[];
+  /** Base16-encoded ErgoTrees */
+  ergoTrees?: HexString[];
+
+  /** Base58-encoded addresses or `ErgoAddress` objects */
+  addresses?: (Base58String | ErgoAddress)[];
 };
 
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
@@ -97,21 +104,13 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
     const returnedBoxIds = new Set<string>();
     const { where, from } = query;
     const includeMempool = from !== "blockchain";
-    const queryArgs = {
-      spent: false,
-      boxIds: where.boxIds ?? (where.boxId ? [where.boxId] : undefined),
-      ergoTrees: where.contracts ?? (where.ergoTree ? [where.ergoTree] : undefined),
-      ergoTreeTemplateHash: where.templateHash,
-      tokenId: where.tokenId,
-      skip: 0,
-      take: PAGE_SIZE
-    } satisfies BoxesArgs;
+    const args = buildGqlBoxQueryArgs(where);
 
     let fetchConfirmed = true;
     let fetchMempool = includeMempool;
 
     do {
-      const response = await this.#fetchBoxes(queryArgs, fetchConfirmed, fetchMempool);
+      const response = await this.#fetchBoxes(args, fetchConfirmed, fetchMempool);
 
       const { data } = response;
       let boxes: ChainProviderBox[] = [];
@@ -152,7 +151,7 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
         }
       }
 
-      if (fetchConfirmed || fetchMempool) queryArgs.skip += PAGE_SIZE;
+      if (fetchConfirmed || fetchMempool) args.skip += PAGE_SIZE;
     } while (fetchConfirmed || fetchMempool);
   }
 
@@ -206,6 +205,37 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   reduceTransaction(): Promise<TransactionReductionResult> {
     throw new NotSupportedError("Transaction reducing is not supported by ergo-graphql.");
   }
+}
+
+function buildGqlBoxQueryArgs(where: GraphQLBoxWhere) {
+  const args = {
+    spent: false,
+    boxIds: merge(where.boxIds, where.boxId),
+    ergoTrees: merge(where.ergoTrees, where.ergoTree),
+    ergoTreeTemplateHash: where.templateHash,
+    tokenId: where.tokenId,
+    skip: 0,
+    take: PAGE_SIZE
+  } satisfies BoxesArgs;
+
+  const addresses = merge(where.addresses, where.address);
+  if (some(addresses)) {
+    const trees = addresses.map((address) =>
+      typeof address === "string" ? ErgoAddress.fromBase58(address).ergoTree : address.ergoTree
+    );
+
+    args.ergoTrees = uniq(some(args.ergoTrees) ? args.ergoTrees.concat(trees) : trees);
+  }
+
+  return args;
+}
+
+function merge<T>(array?: T[], el?: T) {
+  if (isEmpty(array) && isUndefined(el)) return;
+
+  const set = new Set<T>(array ?? []);
+  if (!isUndefined(el)) set.add(el);
+  return Array.from(set.values());
 }
 
 function hasMempool(data: AllBoxesResp | ConfBoxesResp | UnconfBoxesResp): data is UnconfBoxesResp {

@@ -9,11 +9,8 @@ import {
   TransactionId,
   UnsignedTransaction
 } from "@fleet-sdk/common";
+import { ErgoAddress } from "@fleet-sdk/core";
 import { RequireAtLeastOne } from "type-fest";
-
-export type QueryBase = {
-  take?: number;
-};
 
 export type BoxSource = "blockchain" | "mempool" | "blockchain+mempool";
 
@@ -26,9 +23,9 @@ export type BoxQuery<W extends BoxWhere> = {
    * @default "blockchain+mempool"
    */
   from?: BoxSource;
-} & QueryBase;
+};
 
-export type HeaderQuery = Required<QueryBase>;
+export type HeaderQuery = { take: number };
 
 export type BoxWhere = {
   /** Base16-encoded BoxId */
@@ -38,7 +35,7 @@ export type BoxWhere = {
   ergoTree?: HexString;
 
   /** Base58-encoded address */
-  address?: Base58String;
+  address?: ErgoAddress | Base58String;
 
   /** Base16-encoded contract template hash */
   templateHash?: HexString;

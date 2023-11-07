@@ -1,5 +1,6 @@
 import { Header } from "@ergo-graphql/types";
 import { chunk, hasDuplicatesBy, NotSupportedError } from "@fleet-sdk/common";
+import { ErgoAddress } from "@fleet-sdk/core";
 import { mockedGraphQLBoxes } from "_test-vectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ChainProviderBox } from "../types";
@@ -57,7 +58,7 @@ describe("ergo-graphql provider", () => {
       await _client.getBoxes({
         where: {
           boxIds: ["boxId_1", "boxId_2"],
-          contracts: ["contract", "another_contract"]
+          ergoTrees: ["contract", "another_contract"]
         }
       });
 
@@ -69,6 +70,77 @@ describe("ergo-graphql provider", () => {
         skip: 0,
         take: 50
       });
+    });
+
+    it("Should map and deduplicate multiple element query fields", async () => {
+      const mockedData = {
+        boxes: mockedGraphQLBoxes.slice(0, 2),
+        mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
+      };
+      const mockedResponse = encodeSuccessResponseData(mockedData);
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(mockResponse(mockedResponse));
+
+      await _client.getBoxes({
+        where: {
+          boxIds: ["boxId_0", "boxId_1"],
+          boxId: "boxId_0",
+          ergoTrees: ["ergoTree_0", "ergoTree_1", "ergoTree_1"],
+          ergoTree: "ergoTree_2"
+        }
+      });
+
+      const call = JSON.parse(fetchSpy.mock.lastCall![1]!.body as string);
+      expect(call.variables).to.be.deep.equal({
+        spent: false,
+        boxIds: ["boxId_0", "boxId_1"],
+        ergoTrees: ["ergoTree_0", "ergoTree_1", "ergoTree_2"],
+        skip: 0,
+        take: 50
+      });
+    });
+
+    it("Should merge and deduplicate queries when ergoTree[s] and address[es] are present", async () => {
+      const mockedData = {
+        boxes: mockedGraphQLBoxes.slice(0, 2),
+        mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
+      };
+      const mockedResponse = encodeSuccessResponseData(mockedData);
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(mockResponse(mockedResponse));
+      const tree0 = "0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d";
+      const tree1 = "0008cd02c6ef80b5a3f433b3c315943ece9335e1b5ff531c47f09c962d7d7c885370c0b2";
+      const tree2 = "0008cd03479af981aac1aa68bf10cc7d934f42193b3b796055cd9ef581ab377395496bdb";
+      const tree3 = "0008cd03d3a3ee637d3883ccaa231b882d090550b07a149131c52bf54f27551a266cf7af";
+      const ergoTrees = [tree0, tree1, tree2, tree3];
+
+      await _client.getBoxes({
+        where: {
+          ergoTrees: [tree0], // unique
+          ergoTree: tree2, // duplicated
+          addresses: [
+            ErgoAddress.fromErgoTree(tree3).toString(), // unique
+            ErgoAddress.fromErgoTree(tree2) // duplicated
+          ],
+          address: ErgoAddress.fromErgoTree(tree1) // unique
+        }
+      });
+
+      let call = JSON.parse(fetchSpy.mock.lastCall![1]!.body as string);
+      expect(call.variables.ergoTrees).to.have.all.members(ergoTrees);
+
+      await _client.getBoxes({
+        where: {
+          addresses: [
+            ErgoAddress.fromErgoTree(tree0),
+            ErgoAddress.fromErgoTree(tree1),
+            ErgoAddress.fromErgoTree(tree2),
+            ErgoAddress.fromErgoTree(tree2)
+          ],
+          address: ErgoAddress.fromErgoTree(tree3).toString()
+        }
+      });
+
+      call = JSON.parse(fetchSpy.mock.lastCall![1]!.body as string);
+      expect(call.variables.ergoTrees).to.have.all.members(ergoTrees);
     });
 
     it("Should throw if not where clause is provided", async () => {
@@ -148,7 +220,7 @@ describe("ergo-graphql provider", () => {
       expect(fetchSpy).toHaveBeenCalledOnce();
     });
 
-    it("Should exclude beingSpent if includeMempool == true or undefined", async () => {
+    it("Should exclude beingSpent if from = 'blockchain+mempool' or undefined", async () => {
       const mockedData = {
         boxes: mockedGraphQLBoxes.slice(0, 2),
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
