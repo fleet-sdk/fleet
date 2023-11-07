@@ -1,40 +1,53 @@
+import {
+  Base58String,
+  BlockHeader,
+  Box,
+  BoxId,
+  HexString,
+  SignedTransaction,
+  TokenId,
+  TransactionId,
+  UnsignedTransaction
+} from "@fleet-sdk/common";
 import { RequireAtLeastOne } from "type-fest";
-import { BlockHeader } from "./block";
-import { Box } from "./boxes";
-import { HexString } from "./common";
-import { TransactionId } from "./transactions";
-import { SignedTransaction, UnsignedTransaction } from "./transactions";
 
 export type QueryBase = {
   take?: number;
-  skip?: number;
 };
 
+export type BoxSource = "blockchain" | "mempool" | "blockchain+mempool";
+
 export type BoxQuery<W extends BoxWhere> = {
+  /** The query to filter boxes. */
   where: RequireAtLeastOne<W>;
 
   /**
-   * Determines if it should include unspent boxes from the mempool.
-   * @default true
+   * The source of boxes to query.
+   * @default "blockchain+mempool"
    */
-  includeUnconfirmed?: boolean;
+  from?: BoxSource;
 } & QueryBase;
+
+export type HeaderQuery = Required<QueryBase>;
 
 export type BoxWhere = {
   /** Base16-encoded BoxId */
-  boxId?: HexString;
+  boxId?: BoxId;
 
-  /** Base16-encoded ErgoTree or Base58-encoded address */
-  contract?: HexString;
+  /** Base16-encoded ErgoTree */
+  ergoTree?: HexString;
 
-  /** Base16-encoded contract template */
-  template?: HexString;
+  /** Base58-encoded address */
+  address?: Base58String;
+
+  /** Base16-encoded contract template hash */
+  templateHash?: HexString;
 
   /**  Base16-encoded TokenId */
-  tokenId?: HexString;
+  tokenId?: TokenId;
 };
 
-export type ChainClientBox = Box<bigint> & {
+export type ChainProviderBox = Box<bigint> & {
   confirmed: boolean;
 };
 
@@ -56,16 +69,25 @@ export type TransactionReductionSuccess = {
 export type TransactionEvaluationResult = TransactionEvaluationError | TransactionEvaluationSuccess;
 export type TransactionReductionResult = TransactionEvaluationError | TransactionReductionSuccess;
 
-export interface IChainDataProvider<B extends BoxWhere> {
+/**
+ * Represents a blockchain provider that can interact with a blockchain network.
+ * @template B The type of the box query used by the provider.
+ */
+export interface IBlockchainProvider<B extends BoxWhere> {
   /**
-   * Get unspent boxes from the blockchain.
+   * Get boxes.
    */
-  getUnspentBoxes(query: BoxQuery<B>): Promise<ChainClientBox[]>;
+  getBoxes(query: BoxQuery<B>): Promise<ChainProviderBox[]>;
 
   /**
-   * Get the last `n` block headers from the blockchain.
+   * Stream boxes.
    */
-  getLastHeaders(count: number): Promise<BlockHeader[]>;
+  streamBoxes(query: BoxQuery<B>): AsyncIterable<ChainProviderBox[]>;
+
+  /**
+   * Get headers.
+   */
+  getHeaders(query: HeaderQuery): Promise<BlockHeader[]>;
 
   /**
    * Check for transaction validity without broadcasting it to the network.

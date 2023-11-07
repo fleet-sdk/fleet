@@ -1,7 +1,8 @@
 import { Header } from "@ergo-graphql/types";
-import { ChainClientBox, chunk, hasDuplicatesBy, NotSupportedError } from "@fleet-sdk/common";
+import { chunk, hasDuplicatesBy, NotSupportedError } from "@fleet-sdk/common";
 import { mockedGraphQLBoxes } from "_test-vectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { ChainProviderBox } from "../types";
 import { mockChunkedResponse, mockResponse } from "../utils";
 import { ErgoGraphQLProvider } from "./ergoGraphQLProvider";
 import { ALL_BOXES_QUERY, CONF_BOXES_QUERY, UNCONF_BOXES_QUERY } from "./queries";
@@ -33,11 +34,11 @@ describe("ergo-graphql provider", () => {
       const mockedResponse = encodeSuccessResponseData(mockedData);
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(mockResponse(mockedResponse));
 
-      await _client.getUnspentBoxes({
+      await _client.getBoxes({
         where: {
           boxId: "boxId",
-          contract: "contract",
-          template: "template",
+          ergoTree: "ergoTree",
+          templateHash: "templateHash",
           tokenId: "tokenId"
         }
       });
@@ -46,14 +47,14 @@ describe("ergo-graphql provider", () => {
       expect(call.variables).to.be.deep.equal({
         spent: false,
         boxIds: ["boxId"],
-        ergoTrees: ["contract"],
-        ergoTreeTemplateHash: "template",
+        ergoTrees: ["ergoTree"],
+        ergoTreeTemplateHash: "templateHash",
         tokenId: "tokenId",
         skip: 0,
         take: 50
       });
 
-      await _client.getUnspentBoxes({
+      await _client.getBoxes({
         where: {
           boxIds: ["boxId_1", "boxId_2"],
           contracts: ["contract", "another_contract"]
@@ -80,7 +81,7 @@ describe("ergo-graphql provider", () => {
 
       await expect(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        async () => await _client.getUnspentBoxes({ where: undefined } as any)
+        async () => await _client.getBoxes({ where: undefined } as any)
       ).rejects.toThrowError("Cannot fetch unspent boxes without a where clause.");
     });
 
@@ -97,7 +98,7 @@ describe("ergo-graphql provider", () => {
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
 
-      const response = await _client.getUnspentBoxes(_dumbQuery);
+      const response = await _client.getBoxes(_dumbQuery);
       expect(response).to.have.length(4);
       expect(response.map(_boxId)).to.have.members(
         mockedData.boxes.concat(mockedData.mempool.boxes).map(_boxId)
@@ -128,7 +129,7 @@ describe("ergo-graphql provider", () => {
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(4);
 
-      const response = await _client.getUnspentBoxes(_dumbQuery);
+      const response = await _client.getBoxes(_dumbQuery);
       expect(response).to.have.length(4);
 
       expect(fetchSpy).toHaveBeenCalledOnce();
@@ -141,7 +142,7 @@ describe("ergo-graphql provider", () => {
         .spyOn(global, "fetch")
         .mockResolvedValueOnce(mockResponse(mockedResponse));
 
-      const response = await _client.getUnspentBoxes(_dumbQuery);
+      const response = await _client.getBoxes(_dumbQuery);
       expect(response).to.be.empty;
 
       expect(fetchSpy).toHaveBeenCalledOnce();
@@ -163,7 +164,7 @@ describe("ergo-graphql provider", () => {
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
 
-      const response = await _client.getUnspentBoxes(_dumbQuery);
+      const response = await _client.getBoxes(_dumbQuery);
       expect(response).to.have.length(2);
 
       expect(response.map(_boxId)).not.to.contain(mockedData.boxes[0].boxId);
@@ -172,7 +173,7 @@ describe("ergo-graphql provider", () => {
       expect(fetchSpy).toHaveBeenCalledOnce();
     });
 
-    it("Should ignore beingSpent if includeMempool = false", async () => {
+    it("Should ignore beingSpent if from = 'blockchain'", async () => {
       const mockedData = {
         boxes: mockedGraphQLBoxes.slice(0, 2),
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
@@ -188,8 +189,8 @@ describe("ergo-graphql provider", () => {
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
 
-      const response = await _client.getUnspentBoxes({
-        includeUnconfirmed: false,
+      const response = await _client.getBoxes({
+        from: "blockchain",
         where: _dumbWhere
       });
       expect(response).to.have.length(2);
@@ -227,7 +228,7 @@ describe("ergo-graphql provider", () => {
       );
 
       let boxesCount = 0;
-      for await (const boxes of _client.streamUnspentBoxes(_dumbQuery)) {
+      for await (const boxes of _client.streamBoxes(_dumbQuery)) {
         boxesCount += boxes.length;
       }
 
@@ -277,7 +278,7 @@ describe("ergo-graphql provider", () => {
       );
 
       let boxesCount = 0;
-      for await (const boxes of _client.streamUnspentBoxes(_dumbQuery)) {
+      for await (const boxes of _client.streamBoxes(_dumbQuery)) {
         boxesCount += boxes.length;
       }
 
@@ -336,8 +337,8 @@ describe("ergo-graphql provider", () => {
         ])
       );
 
-      let allBoxes: ChainClientBox[] = [];
-      for await (const boxes of _client.streamUnspentBoxes(_dumbQuery)) {
+      let allBoxes: ChainProviderBox[] = [];
+      for await (const boxes of _client.streamBoxes(_dumbQuery)) {
         allBoxes = allBoxes.concat(boxes);
       }
 
@@ -354,7 +355,7 @@ describe("ergo-graphql provider", () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
-    const response = await client.getLastHeaders(2);
+    const response = await client.getHeaders({ take: 2 });
     expect(response.length).to.be.equal(2);
     expect(response).to.deep.equal(
       mockDataJSON.data.blockHeaders.map((header: Header) => ({
@@ -373,7 +374,7 @@ describe("ergo-graphql provider", () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
-    const response = await client.getLastHeaders(2);
+    const response = await client.getHeaders({ take: 2 });
     expect(response).to.deep.equal([]);
     expect(fetchSpy).toHaveBeenCalledOnce();
   });

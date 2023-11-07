@@ -6,21 +6,24 @@ import {
 } from "@ergo-graphql/types";
 import {
   BlockHeader,
-  BoxQuery,
-  BoxWhere,
-  ChainClientBox,
   ensureDefaults,
   HexString,
-  IChainDataProvider,
   isEmpty,
   NotSupportedError,
   orderBy,
   SignedTransaction,
   some,
-  TransactionEvaluationResult,
-  TransactionReductionResult,
   uniqBy
 } from "@fleet-sdk/common";
+import {
+  BoxQuery,
+  BoxWhere,
+  ChainProviderBox,
+  HeaderQuery,
+  IBlockchainProvider,
+  TransactionEvaluationResult,
+  TransactionReductionResult
+} from "../types";
 import { createGqlOperation, GraphQLRequestOptions, isRequestParam } from "../utils";
 import {
   ALL_BOXES_QUERY,
@@ -51,7 +54,7 @@ type SignedTxArgsResp = { signedTransaction: SignedTransaction };
 
 const PAGE_SIZE = 50;
 
-export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
+export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   #getConfBoxes;
   #getUnconfBoxes;
   #getAllBoxes;
@@ -85,20 +88,20 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
     }
   }
 
-  async *streamUnspentBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainClientBox[]> {
+  async *streamBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainProviderBox[]> {
     if (isEmpty(query.where)) {
       throw new Error("Cannot fetch unspent boxes without a where clause.");
     }
 
     const notBeingSpent = (box: Box) => !box.beingSpent;
     const returnedBoxIds = new Set<string>();
-    const includeMempool = query.includeUnconfirmed !== false;
-    const { where } = query;
+    const { where, from } = query;
+    const includeMempool = from !== "blockchain";
     const queryArgs = {
       spent: false,
       boxIds: where.boxIds ?? (where.boxId ? [where.boxId] : undefined),
-      ergoTrees: where.contracts ?? (where.contract ? [where.contract] : undefined),
-      ergoTreeTemplateHash: where.template,
+      ergoTrees: where.contracts ?? (where.ergoTree ? [where.ergoTree] : undefined),
+      ergoTreeTemplateHash: where.templateHash,
       tokenId: where.tokenId,
       skip: 0,
       take: PAGE_SIZE
@@ -111,7 +114,7 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
       const response = await this.#fetchBoxes(queryArgs, fetchConfirmed, fetchMempool);
 
       const { data } = response;
-      let boxes: ChainClientBox[] = [];
+      let boxes: ChainProviderBox[] = [];
 
       if (hasConfirmed(data)) {
         if (some(data.boxes)) {
@@ -153,17 +156,17 @@ export class ErgoGraphQLProvider implements IChainDataProvider<BoxWhere> {
     } while (fetchConfirmed || fetchMempool);
   }
 
-  async getUnspentBoxes(query: GraphQLBoxQuery): Promise<ChainClientBox[]> {
-    let boxes: ChainClientBox[] = [];
-    for await (const chunk of this.streamUnspentBoxes(query)) {
+  async getBoxes(query: GraphQLBoxQuery): Promise<ChainProviderBox[]> {
+    let boxes: ChainProviderBox[] = [];
+    for await (const chunk of this.streamBoxes(query)) {
       boxes = boxes.concat(chunk);
     }
 
     return orderBy(boxes, (box) => box.creationHeight);
   }
 
-  async getLastHeaders(count: number): Promise<BlockHeader[]> {
-    const response = await this.#getHeaders({ take: count });
+  async getHeaders(query: HeaderQuery): Promise<BlockHeader[]> {
+    const response = await this.#getHeaders(query);
 
     return (
       response.data?.blockHeaders.map((header) => ({
@@ -214,7 +217,7 @@ function hasConfirmed(data: AllBoxesResp | ConfBoxesResp | UnconfBoxesResp): dat
 }
 
 function asConfirmed(confirmed: boolean) {
-  return (box: Box): ChainClientBox => ({
+  return (box: Box): ChainProviderBox => ({
     ...box,
     value: BigInt(box.value),
     assets: box.assets.map((asset) => ({
