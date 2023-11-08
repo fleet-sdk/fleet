@@ -451,7 +451,7 @@ describe("ergo-graphql provider", () => {
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
-  it("checkTx should return true when transaction is valid", async () => {
+  it("Should return true when transaction is valid", async () => {
     const mockData = '{"data":{"checkTransaction": "txId"}}';
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
@@ -467,7 +467,7 @@ describe("ergo-graphql provider", () => {
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
-  it("checkTx should return false when transaction is valid", async () => {
+  it("Should return false when transaction is invalid", async () => {
     const mockData = '{"errors":[{"message":"Transaction is invalid"}]}';
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
@@ -483,7 +483,7 @@ describe("ergo-graphql provider", () => {
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
-  it("should return txId that is returned by the node", async () => {
+  it("Should return txId that is returned by the node", async () => {
     const mockData = '{"data":{"submitTransaction": "txId"}}';
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
@@ -499,7 +499,7 @@ describe("ergo-graphql provider", () => {
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
-  it("should return error when an error occurs on transaction submitting", async () => {
+  it("Should return error when an error occurs on transaction submitting", async () => {
     const mockData = '{"errors":[{"message":"Transaction not accepted by the node"}]}';
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));
 
@@ -518,7 +518,7 @@ describe("ergo-graphql provider", () => {
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
-  it("should throw not supported error when reduceTransaction is called", async () => {
+  it("Should throw not supported error when reduceTransaction is called", async () => {
     const client = new ErgoGraphQLProvider({ url: "https://gql.example.com/" });
     expect(client.reduceTransaction).to.throw(NotSupportedError);
   });

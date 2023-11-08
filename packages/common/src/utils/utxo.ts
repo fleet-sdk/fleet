@@ -105,9 +105,8 @@ const MAX_NON_MANDATORY_REGISTER_INDEX = 9;
  * @example
  * ```
  * const registers = {
- *   R4: "0x0000000000",
- *   R6: "0x0000000000",
- *   R7: "0x0000000000",
+ *   R4: "deadbeef",
+ *   R6: "cafe",
  * };
  * const result = areRegistersDenselyPacked(registers);
  * console.log(result);

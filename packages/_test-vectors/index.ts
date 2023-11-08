@@ -1,4 +1,4 @@
-import _boxes from "./mockedGraphQLResponses.json";
+import _boxes from "./mockedGraphQLBoxResponses.json";
 
 export * from "./mockedBoxes";
 export * from "./mockedTransactions";
