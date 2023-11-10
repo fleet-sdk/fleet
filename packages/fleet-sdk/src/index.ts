@@ -1,6 +1,8 @@
 export * from "@fleet-sdk/common";
 export * from "@fleet-sdk/crypto";
 export * from "@fleet-sdk/serializer";
+export * from "@fleet-sdk/blockchain-providers";
+
 // todo: export * after v1
 export {
   AccumulativeSelectionStrategy,

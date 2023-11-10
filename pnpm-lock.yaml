@@ -146,6 +146,9 @@ importers:
 
   packages/fleet-sdk:
     dependencies:
+      '@fleet-sdk/blockchain-providers':
+        specifier: workspace:^
+        version: link:../blockchain-providers
       '@fleet-sdk/common':
         specifier: workspace:^
         version: link:../common
