@@ -67,7 +67,7 @@ export type TransactionEvaluationResult = TransactionEvaluationError | Transacti
 export type TransactionReductionResult = TransactionEvaluationError | TransactionReductionSuccess;
 
 /**
- * Represents a blockchain provider that can interact with a blockchain network.
+ * Represents a blockchain provider that can interact with the blockchain.
  * @template B The type of the box query used by the provider.
  */
 export interface IBlockchainProvider<B extends BoxWhere> {

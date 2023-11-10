@@ -245,7 +245,7 @@ describe("ergo-graphql provider", () => {
       expect(fetchSpy).toHaveBeenCalledOnce();
     });
 
-    it("Should ignore beingSpent if from = 'blockchain'", async () => {
+    it("Should fetch from blockchain only when `from: 'blockchain'`", async () => {
       const mockedData = {
         boxes: mockedGraphQLBoxes.slice(0, 2),
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
@@ -268,9 +268,40 @@ describe("ergo-graphql provider", () => {
       expect(response).to.have.length(2);
 
       expect(response.map(_boxId)).to.have.all.members(mockedData.boxes.map(_boxId));
-      expect(response.map(_boxId)).not.to.have.any.members(mockedData.mempool.boxes.map(_boxId));
+      expect(response.map(_boxId)).not.to.have.members(mockedData.mempool.boxes.map(_boxId));
 
       expect(fetchSpy).toHaveBeenCalledOnce();
+
+      const call = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+      expect(call.query).to.be.equal(CONF_BOXES_QUERY); // from: "blockchain"
+    });
+
+    it("Should fetch from mempool only when `from: 'mempool'`", async () => {
+      const mockedData = {
+        boxes: mockedGraphQLBoxes.slice(0, 2),
+        mempool: { boxes: mockedGraphQLBoxes.slice(10, 12) }
+      };
+
+      const mockedResponse = encodeSuccessResponseData(mockedData);
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(mockResponse(mockedResponse));
+
+      expect(mockedData.boxes).to.have.length(2);
+      expect(mockedData.mempool.boxes).to.have.length(2);
+
+      const response = await _client.getBoxes({
+        from: "mempool",
+        where: _dumbWhere
+      });
+      expect(response).to.have.length(2);
+
+      expect(response.map(_boxId)).not.to.have.members(mockedData.boxes.map(_boxId));
+      expect(response.map(_boxId)).to.have.all.members(mockedData.mempool.boxes.map(_boxId));
+
+      expect(fetchSpy).toHaveBeenCalledOnce();
+      const call = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+      expect(call.query).to.be.equal(UNCONF_BOXES_QUERY); // from: "mempool"
     });
 
     it("Should stream boxes with default params with more confirmed boxes than unconfirmed", async () => {

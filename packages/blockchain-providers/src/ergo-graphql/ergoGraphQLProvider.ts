@@ -103,37 +103,37 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
     const notBeingSpent = (box: Box) => !box.beingSpent;
     const returnedBoxIds = new Set<string>();
     const { where, from } = query;
-    const includeMempool = from !== "blockchain";
     const args = buildGqlBoxQueryArgs(where);
 
-    let fetchConfirmed = true;
-    let fetchMempool = includeMempool;
+    let fetchFromChain = from !== "mempool";
+    let fetchFromMempool = from !== "blockchain";
+    const isMempoolAware = fetchFromMempool;
 
     do {
-      const response = await this.#fetchBoxes(args, fetchConfirmed, fetchMempool);
+      const response = await this.#fetchBoxes(args, fetchFromChain, fetchFromMempool);
 
       const { data } = response;
       let boxes: ChainProviderBox[] = [];
 
-      if (hasConfirmed(data)) {
+      if (fetchFromChain && hasConfirmed(data)) {
         if (some(data.boxes)) {
           const confirmedBoxes = (
-            includeMempool ? data.boxes.filter(notBeingSpent) : data.boxes
+            isMempoolAware ? data.boxes.filter(notBeingSpent) : data.boxes
           ).map(asConfirmed(true));
 
           boxes = boxes.concat(confirmedBoxes);
         }
 
-        fetchConfirmed = data.boxes.length === PAGE_SIZE;
+        fetchFromChain = data.boxes.length === PAGE_SIZE;
       }
 
-      if (includeMempool && hasMempool(data)) {
+      if (isMempoolAware && hasMempool(data)) {
         if (some(data.mempool.boxes)) {
           const mempoolBoxes = data.mempool.boxes.filter(notBeingSpent).map(asConfirmed(false));
           boxes = boxes.concat(mempoolBoxes);
         }
 
-        fetchMempool = data.mempool.boxes.length === PAGE_SIZE;
+        fetchFromMempool = data.mempool.boxes.length === PAGE_SIZE;
       }
 
       if (some(boxes)) {
@@ -151,8 +151,8 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
         }
       }
 
-      if (fetchConfirmed || fetchMempool) args.skip += PAGE_SIZE;
-    } while (fetchConfirmed || fetchMempool);
+      if (fetchFromChain || fetchFromMempool) args.skip += PAGE_SIZE;
+    } while (fetchFromChain || fetchFromMempool);
   }
 
   async getBoxes(query: GraphQLBoxQuery): Promise<ChainProviderBox[]> {
