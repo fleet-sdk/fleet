@@ -485,8 +485,7 @@ describe("ergo-graphql provider", () => {
     expect(response.data).to.be.deep.equal({ state: { height: 1098787 } });
 
     expect(fetchSpy).toHaveBeenCalledOnce();
-    const [callUrl] = fetchSpy.mock.calls[0];
-    expect(callUrl).to.be.equal(url);
+    expect(fetchSpy.mock.calls[0][0]).to.be.equal(url);
   });
 
   it("Should return empty LastHeaders when response is corrupted", async () => {
