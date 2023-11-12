@@ -83,19 +83,17 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   constructor(url: string | URL);
   constructor(url: ErgoGraphQLRequestOptions);
   constructor(optOrUrl: ErgoGraphQLRequestOptions | string | URL) {
-    const opt = {
+    this.#options = {
       ...(isRequestParam(optOrUrl) ? optOrUrl : { url: optOrUrl }),
       throwOnNonNetworkErrors: true
-    } as GraphQLThrowableOptions;
+    };
 
-    this.#getConfBoxes = createGqlOperation<ConfBoxesResp, BoxesArgs>(CONF_BOXES_QUERY, opt);
-    this.#getUnconfBoxes = createGqlOperation<UnconfBoxesResp, BoxesArgs>(UNCONF_BOXES_QUERY, opt);
-    this.#getAllBoxes = createGqlOperation<AllBoxesResp, BoxesArgs>(ALL_BOXES_QUERY, opt);
-    this.#getHeaders = createGqlOperation<HeadersResp, HeadersArgs>(HEADERS_QUERY, opt);
-    this.#checkTx = createGqlOperation<CheckTxResp, SignedTxArgsResp>(CHECK_TX_MUTATION, opt);
-    this.#sendTx = createGqlOperation<SendTxResp, SignedTxArgsResp>(SEND_TX_MUTATION, opt);
-
-    this.#options = opt;
+    this.#getConfBoxes = this.createOperation<ConfBoxesResp, BoxesArgs>(CONF_BOXES_QUERY);
+    this.#getUnconfBoxes = this.createOperation<UnconfBoxesResp, BoxesArgs>(UNCONF_BOXES_QUERY);
+    this.#getAllBoxes = this.createOperation<AllBoxesResp, BoxesArgs>(ALL_BOXES_QUERY);
+    this.#getHeaders = this.createOperation<HeadersResp, HeadersArgs>(HEADERS_QUERY);
+    this.#checkTx = this.createOperation<CheckTxResp, SignedTxArgsResp>(CHECK_TX_MUTATION);
+    this.#sendTx = this.createOperation<SendTxResp, SignedTxArgsResp>(SEND_TX_MUTATION);
   }
 
   #fetchBoxes(args: BoxesArgs, inclConf: boolean, inclUnconf: boolean) {
@@ -191,14 +189,14 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
     );
   }
 
-  createCustomOperation<R, V extends GraphQLVariables = GraphQLVariables>(
+  createOperation<R, V extends GraphQLVariables = GraphQLVariables>(
     query: string,
     options?: Partial<ErgoGraphQLRequestOptions>
   ): GraphQLOperation<GraphQLSuccessResponse<R>, V> {
-    return createGqlOperation(query, {
-      ...ensureDefaults(options, this.#options),
-      throwOnNonNetworkErrors: true
-    });
+    const opt = ensureDefaults(options, this.#options);
+    opt.throwOnNonNetworkErrors = true;
+
+    return createGqlOperation(query, opt);
   }
 
   async checkTransaction(

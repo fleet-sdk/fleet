@@ -479,7 +479,7 @@ describe("ergo-graphql provider", () => {
       .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
     const client = new ErgoGraphQLProvider(url);
 
-    const operation = client.createCustomOperation("query test { state { height } }");
+    const operation = client.createOperation("query test { state { height } }");
 
     const response = await operation();
     expect(response.data).to.be.deep.equal({ state: { height: 1098787 } });
