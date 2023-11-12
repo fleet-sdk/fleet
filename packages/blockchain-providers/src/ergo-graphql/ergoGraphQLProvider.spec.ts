@@ -472,6 +472,23 @@ describe("ergo-graphql provider", () => {
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
 
+  it("Should create a custom GraphQL operation", async () => {
+    const url = "https://gql.example.com/";
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+    const client = new ErgoGraphQLProvider(url);
+
+    const operation = client.createCustomOperation("query test { state { height } }");
+
+    const response = await operation();
+    expect(response.data).to.be.deep.equal({ state: { height: 1098787 } });
+
+    expect(fetchSpy).toHaveBeenCalledOnce();
+    const [callUrl] = fetchSpy.mock.calls[0];
+    expect(callUrl).to.be.equal(url);
+  });
+
   it("Should return empty LastHeaders when response is corrupted", async () => {
     const mockData = "{}";
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockData));

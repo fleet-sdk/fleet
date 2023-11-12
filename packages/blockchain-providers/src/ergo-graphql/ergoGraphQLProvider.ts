@@ -28,7 +28,15 @@ import {
   TransactionEvaluationResult,
   TransactionReductionResult
 } from "../types";
-import { createGqlOperation, GraphQLRequestOptions, isRequestParam } from "../utils";
+import {
+  createGqlOperation,
+  GraphQLOperation,
+  GraphQLRequestOptions,
+  GraphQLSuccessResponse,
+  GraphQLThrowableOptions,
+  GraphQLVariables,
+  isRequestParam
+} from "../utils";
 import {
   ALL_BOXES_QUERY,
   CHECK_TX_MUTATION,
@@ -50,6 +58,7 @@ export type GraphQLBoxWhere = BoxWhere & {
 };
 
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
+export type ErgoGraphQLRequestOptions = Omit<GraphQLRequestOptions, "throwOnNonNetworkError">;
 
 type ConfBoxesResp = { boxes: Box[] };
 type UnconfBoxesResp = { mempool: { boxes: Box[] } };
@@ -62,6 +71,8 @@ type SignedTxArgsResp = { signedTransaction: SignedTransaction };
 const PAGE_SIZE = 50;
 
 export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
+  #options: GraphQLThrowableOptions;
+
   #getConfBoxes;
   #getUnconfBoxes;
   #getAllBoxes;
@@ -70,12 +81,12 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   #sendTx;
 
   constructor(url: string | URL);
-  constructor(url: GraphQLRequestOptions);
-  constructor(optOrUrl: GraphQLRequestOptions | string | URL) {
-    const opt = ensureDefaults<GraphQLRequestOptions, { throwOnNonNetworkError: true }>(
-      isRequestParam(optOrUrl) ? optOrUrl : { url: optOrUrl },
-      { throwOnNonNetworkError: true }
-    );
+  constructor(url: ErgoGraphQLRequestOptions);
+  constructor(optOrUrl: ErgoGraphQLRequestOptions | string | URL) {
+    const opt = {
+      ...(isRequestParam(optOrUrl) ? optOrUrl : { url: optOrUrl }),
+      throwOnNonNetworkErrors: true
+    } as GraphQLThrowableOptions;
 
     this.#getConfBoxes = createGqlOperation<ConfBoxesResp, BoxesArgs>(CONF_BOXES_QUERY, opt);
     this.#getUnconfBoxes = createGqlOperation<UnconfBoxesResp, BoxesArgs>(UNCONF_BOXES_QUERY, opt);
@@ -83,6 +94,8 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
     this.#getHeaders = createGqlOperation<HeadersResp, HeadersArgs>(HEADERS_QUERY, opt);
     this.#checkTx = createGqlOperation<CheckTxResp, SignedTxArgsResp>(CHECK_TX_MUTATION, opt);
     this.#sendTx = createGqlOperation<SendTxResp, SignedTxArgsResp>(SEND_TX_MUTATION, opt);
+
+    this.#options = opt;
   }
 
   #fetchBoxes(args: BoxesArgs, inclConf: boolean, inclUnconf: boolean) {
@@ -176,6 +189,16 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
         votes: header.votes.join("")
       })) ?? []
     );
+  }
+
+  createCustomOperation<R, V extends GraphQLVariables = GraphQLVariables>(
+    query: string,
+    options?: Partial<ErgoGraphQLRequestOptions>
+  ): GraphQLOperation<GraphQLSuccessResponse<R>, V> {
+    return createGqlOperation(query, {
+      ...ensureDefaults(options, this.#options),
+      throwOnNonNetworkErrors: true
+    });
   }
 
   async checkTransaction(

@@ -55,11 +55,11 @@ export interface GraphQLRequestOptions {
   parser?: ResponseParser;
   fetcher?: Fetcher;
   credentials?: Credentials;
-  throwOnNonNetworkError?: boolean;
+  throwOnNonNetworkErrors?: boolean;
 }
 
 export interface GraphQLThrowableOptions extends GraphQLRequestOptions {
-  throwOnNonNetworkError: true;
+  throwOnNonNetworkErrors: true;
 }
 
 export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
@@ -89,7 +89,7 @@ export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariab
     const rawData = await response.text();
     const parsedData = (options.parser ?? JSON).parse(rawData) as GraphQLResponse<R>;
 
-    if (options.throwOnNonNetworkError && some(parsedData.errors) && isEmpty(parsedData.data)) {
+    if (options.throwOnNonNetworkErrors && some(parsedData.errors) && isEmpty(parsedData.data)) {
       throw new BlockchainProviderError(parsedData.errors[0].message, { cause: parsedData.errors });
     }
 

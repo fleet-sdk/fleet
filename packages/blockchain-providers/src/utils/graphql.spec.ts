@@ -104,7 +104,7 @@ describe("GraphQL query builder", () => {
 
     const operation = createGqlOperation("query test { state { height } }", {
       url: "http://gql.example.com",
-      throwOnNonNetworkError: true
+      throwOnNonNetworkErrors: true
     });
 
     expectTypeOf(operation).toMatchTypeOf<
