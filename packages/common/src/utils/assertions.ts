@@ -55,18 +55,14 @@ export function assertInstanceOf<T>(obj: T, expected: Constructable): asserts ob
   }
 }
 
-export function isEmpty<T extends object>(obj?: T): obj is undefined;
-export function isEmpty<T>(array?: T[]): array is undefined;
-export function isEmpty<T>(obj?: T[] | object): obj is undefined {
-  if (!obj) return true;
+export function isEmpty<T>(target: T | null | undefined): target is undefined | null {
+  if (!target) return true;
 
-  return Array.isArray(obj) ? obj.length === 0 : Object.keys(obj).length === 0;
+  return Array.isArray(target) ? target.length === 0 : Object.keys(target).length === 0;
 }
 
-export function some<T extends object>(obj?: T): obj is T;
-export function some<T>(array?: T[]): array is T[];
-export function some<T>(obj?: T[] | object): boolean {
-  return !isEmpty(obj);
+export function some<T>(target: T | null | undefined): target is T {
+  return !isEmpty(target);
 }
 
 export function isTruthy<T>(value?: T): value is NonNullable<T> {

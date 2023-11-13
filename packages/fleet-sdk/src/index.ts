@@ -1,6 +1,8 @@
 export * from "@fleet-sdk/common";
 export * from "@fleet-sdk/crypto";
 export * from "@fleet-sdk/serializer";
+export * from "@fleet-sdk/blockchain-providers";
+
 // todo: export * after v1
 export {
   AccumulativeSelectionStrategy,
@@ -56,7 +58,6 @@ export {
 export {
   AddressType,
   Amount,
-  AmountType,
   AssertErrorMessageInput,
   Base58String,
   Block,
@@ -77,7 +78,7 @@ export {
   EIP12UnsignedTransaction,
   ErgoTreeHex,
   HexString,
-  MinimalBoxAmounts,
+  MinimalBoxAmountsArray,
   Network,
   NewToken,
   NonMandatoryRegisters,

@@ -1,7 +1,17 @@
 import { Box, QueryBoxesArgs, State } from "@ergo-graphql/types";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { createOperation, DEFAULT_HEADERS, getOpName, gql, isRequestParam } from "./graphql";
-import { mockResponse } from "./testUtils";
+import { BlockchainProviderError } from "@fleet-sdk/common";
+import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
+import { mockResponse } from "./_tests";
+import {
+  createGqlOperation,
+  DEFAULT_HEADERS,
+  getOpName,
+  gql,
+  GraphQLOperation,
+  GraphQLSuccessResponse,
+  GraphQLVariables,
+  isRequestParam
+} from "./graphql";
 
 describe("GraphQL query builder", () => {
   const fetchSpy = vi
@@ -23,7 +33,7 @@ describe("GraphQL query builder", () => {
         }
       }
     `;
-    const getBoxes = createOperation<{ state: State }>(query, {
+    const getBoxes = createGqlOperation<{ state: State }>(query, {
       url: "https://gql.example.com/"
     });
 
@@ -36,7 +46,6 @@ describe("GraphQL query builder", () => {
     expect(fetchSpy).toHaveBeenCalledWith("https://gql.example.com/", {
       method: "POST",
       headers: DEFAULT_HEADERS,
-      credentials: "same-origin",
       body: JSON.stringify({
         operationName: getOpName(query),
         query
@@ -64,7 +73,7 @@ describe("GraphQL query builder", () => {
       }
     `;
 
-    const getBoxes = createOperation<{ boxes: Box[] }, QueryBoxesArgs>(query, {
+    const getBoxes = createGqlOperation<{ boxes: Box[] }, QueryBoxesArgs>(query, {
       url: "https://gql.example.com/",
       fetcher: mockedFetch,
       parser: mockedParser,
@@ -80,13 +89,29 @@ describe("GraphQL query builder", () => {
     expect(mockedFetch).toHaveBeenCalledWith("https://gql.example.com/", {
       method: "POST",
       headers: { ...DEFAULT_HEADERS, foo: "bar" },
-      credentials: "same-origin",
       body: JSON.stringify({
         operationName: getOpName(query),
         query,
         variables: { boxId }
       })
     });
+  });
+
+  it("Should throw if throwOnNonNetworkErrors is true and server returns errors", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      mockResponse('{"errors":[{"message":"test error 1"},{"message":"test error 2"}]}')
+    );
+
+    const operation = createGqlOperation("query test { state { height } }", {
+      url: "http://gql.example.com",
+      throwOnNonNetworkErrors: true
+    });
+
+    expectTypeOf(operation).toMatchTypeOf<
+      GraphQLOperation<GraphQLSuccessResponse, GraphQLVariables>
+    >();
+
+    await expect(operation).rejects.toThrowError(BlockchainProviderError);
   });
 });
 

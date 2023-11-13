@@ -1,12 +1,11 @@
-import { ErgoTreeHex } from "./common";
+import { Amount, ErgoTreeHex } from "./common";
 import { NonMandatoryRegisters } from "./registers";
 import { TokenAmount } from "./token";
 import { TransactionId } from "./transactions";
 
 export type BoxId = string;
-export type AmountType = string | bigint;
 
-type BoxBaseType<T extends AmountType, R extends NonMandatoryRegisters> = {
+type BoxBaseType<T extends Amount, R extends NonMandatoryRegisters> = {
   ergoTree: ErgoTreeHex;
   creationHeight: number;
   value: T;
@@ -15,14 +14,14 @@ type BoxBaseType<T extends AmountType, R extends NonMandatoryRegisters> = {
 };
 
 export type BoxCandidate<
-  T extends AmountType,
+  T extends Amount,
   R extends NonMandatoryRegisters = NonMandatoryRegisters
 > = BoxBaseType<T, R> & {
   boxId?: BoxId;
 };
 
 export type Box<
-  T extends AmountType,
+  T extends Amount = Amount,
   R extends NonMandatoryRegisters = NonMandatoryRegisters
 > = BoxBaseType<T, R> & {
   boxId: BoxId;

@@ -120,6 +120,7 @@ describe("isEmpty() guard", () => {
   it("Should return true if array is undefined or empty", () => {
     expect(isEmpty([])).toBe(true);
     expect(isEmpty(undefined)).toBe(true);
+    expect(isEmpty(null)).toBe(true);
   });
 
   it("Should return true if object contains no props", () => {
@@ -141,6 +142,7 @@ describe("some() guard", () => {
   it("Should return false if array is undefined or empty", () => {
     expect(some([])).toBe(false);
     expect(some(undefined)).toBe(false);
+    expect(some(null)).toBe(false);
   });
 
   it("Should return false if object contains no props", () => {

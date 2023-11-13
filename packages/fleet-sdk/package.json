@@ -32,7 +32,8 @@
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/core": "workspace:^",
     "@fleet-sdk/serializer": "workspace:^",
-    "@fleet-sdk/crypto": "workspace:^"
+    "@fleet-sdk/crypto": "workspace:^",
+    "@fleet-sdk/blockchain-providers": "workspace:^"
   },
   "files": [
     "dist",
