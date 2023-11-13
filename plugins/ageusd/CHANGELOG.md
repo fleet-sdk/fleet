@@ -1,16 +1,5 @@
 # @fleet-sdk/ageusd-plugin
 
-## 0.1.5
-
-### Patch Changes
-
-- Updated dependencies [b422424]
-- Updated dependencies [b422424]
-- Updated dependencies [b422424]
-  - @fleet-sdk/common@0.3.2
-  - @fleet-sdk/core@0.3.2
-  - @fleet-sdk/serializer@0.3.2
-
 ## 0.1.4
 
 ### Patch Changes

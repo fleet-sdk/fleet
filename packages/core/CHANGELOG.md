@@ -1,16 +1,5 @@
 # @fleet-sdk/core
 
-## 0.3.2
-
-### Patch Changes
-
-- b422424: Accept `SConstant` type in `OutputBuilder#setAdditionalRegisters()` and `ErgoUnsignedInput#setContextExtension()` methods
-- Updated dependencies [b422424]
-- Updated dependencies [b422424]
-  - @fleet-sdk/common@0.3.2
-  - @fleet-sdk/crypto@0.3.2
-  - @fleet-sdk/serializer@0.3.2
-
 ## 0.2.3
 
 ### Patch Changes
