@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/ageusd-plugin",
-  "version": "0.1.5",
+  "version": "0.1.4",
   "description": "AgeUSD protocol plugin for Fleet SDK.",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.esm.js",
