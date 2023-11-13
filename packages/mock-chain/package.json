@@ -30,11 +30,11 @@
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/core": "workspace:^",
-    "@fleet-sdk/wallet": "workspace:^",
     "@fleet-sdk/crypto": "workspace:^",
     "@fleet-sdk/serializer": "workspace:^",
+    "@fleet-sdk/wallet": "workspace:^",
     "diff": "^5.1.0",
-    "ergo-lib-wasm-nodejs": "^0.24.0",
+    "ergo-lib-wasm-nodejs": "^0.26.0",
     "picocolors": "^1.0.0"
   },
   "engines": {
