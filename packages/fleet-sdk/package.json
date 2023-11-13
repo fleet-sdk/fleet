@@ -1,5 +1,5 @@
 {
-  "name": "fleet-sdk",
+  "name": "fleetsdk",
   "version": "0.3.0",
   "description": "Simple, powerful, and extensible Ergo Blockchain SDK.",
   "main": "./dist/index.cjs.js",
