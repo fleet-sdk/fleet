@@ -1,13 +1,5 @@
 # @fleet-sdk/wallet
 
-## 0.3.0
-
-### Patch Changes
-
-- 6c15dc3: Create HD keys from options object
-- Updated dependencies [c42ca0d]
-  - @fleet-sdk/core@0.3.0
-
 ## 0.2.3
 
 ### Patch Changes
