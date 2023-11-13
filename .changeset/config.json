@@ -5,6 +5,7 @@
   "fixed": [],
   "linked": [
     [
+      "fleet-sdk",
       "*/core",
       "*/common",
       "*/crypto",
@@ -15,7 +16,6 @@
       "*/blockchain-providers"
     ]
   ],
-  "ignore": ["fleet-sdk"],
   "access": "public",
   "baseBranch": "master",
   "updateInternalDependencies": "patch"
