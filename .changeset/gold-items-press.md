@@ -2,6 +2,4 @@
 "@fleet-sdk/blockchain-providers": minor
 ---
 
-Introduce `@fleet-sdk/blockchain-providers` package
-
-- Add `ErgoGraphQLProvider` provider
+Introduce `@fleet-sdk/blockchain-providers` package with `ErgoGraphQLProvider`
