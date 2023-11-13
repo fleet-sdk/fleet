@@ -5,7 +5,7 @@
   "fixed": [],
   "linked": [
     [
-      "fleet-sdk",
+      "fleetsdk",
       "*/core",
       "*/common",
       "*/crypto",
