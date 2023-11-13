@@ -1,12 +1,5 @@
 # @fleet-sdk/common
 
-## 0.3.1
-
-### Patch Changes
-
-- 69daea5: Add API TSDocs
-- 69daea5: Fix `ensureDefaults` function types
-
 ## 0.2.3
 
 ### Patch Changes
