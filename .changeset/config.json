@@ -16,7 +16,6 @@
       "*/blockchain-providers"
     ]
   ],
-  "ignore": ["fleet-sdk"],
   "access": "public",
   "baseBranch": "master",
   "updateInternalDependencies": "patch"
