@@ -1,5 +1,11 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.3.3
+
+### Patch Changes
+
+- 227c888: Fix type exporting
+
 ## 0.3.2
 
 ### Patch Changes
