@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FleetError, NotSupportedError } from "./error";
+import { BlockchainProviderError, FleetError, NotSupportedError } from "./error";
 
 describe("Errors", () => {
   it("Should construct errors", () => {
@@ -7,6 +7,7 @@ describe("Errors", () => {
 
     expect(new FleetError().name).to.be.equal("FleetError");
     expect(new NotSupportedError().name).to.be.equal("NotSupportedError");
+    expect(new BlockchainProviderError().name).to.be.equal("BlockchainProviderError");
 
     expect(() => {
       throw new FleetError(errorMsg);

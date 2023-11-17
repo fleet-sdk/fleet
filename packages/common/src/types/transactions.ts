@@ -28,5 +28,5 @@ export type SignedTransaction = {
   readonly id: TransactionId;
   readonly inputs: SignedInput[];
   readonly dataInputs: DataInput[];
-  readonly outputs: Box<Amount>[];
+  readonly outputs: Box<string>[];
 };

@@ -5,14 +5,14 @@
   "fixed": [],
   "linked": [
     [
-      "fleet-sdk",
       "*/core",
       "*/common",
       "*/crypto",
       "*/serializer",
       "*/mock-chain",
       "*/compiler",
-      "*/wallet"
+      "*/wallet",
+      "*/blockchain-providers"
     ]
   ],
   "access": "public",
