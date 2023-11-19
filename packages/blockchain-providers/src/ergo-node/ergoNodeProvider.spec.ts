@@ -1,4 +1,4 @@
-import { BlockHeader, SignedTransaction } from "@fleet-sdk/common";
+import { BlockHeader, FleetError, NotSupportedError, SignedTransaction } from "@fleet-sdk/common";
 import { ErgoBox } from "@fleet-sdk/core";
 import {
   mockCompileError,
@@ -14,17 +14,16 @@ import {
   mockTransactionList,
   mockUTXOByAddress
 } from "_test-vectors";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { getNodeClient } from "./nodeClient";
-
-import * as rest from "./utils/rest";
+import { afterEach, describe, expect, it, vi, vitest } from "vitest";
+import * as rest from "../utils/rest";
+import { ErgoNodeProvider, getErgoNodeProvider } from "./ergoNodeProvider";
 
 describe("Test node client", async () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  const nodeClient = getNodeClient("https://test0.com:9053/");
+  const nodeClient = getErgoNodeProvider("https://test0.com:9053/");
 
   const testOptions = {
     url: "https://test0.com:9053/"
@@ -32,6 +31,123 @@ describe("Test node client", async () => {
   it("nodeOptions", async () => {
     nodeClient.nodeOptions = testOptions;
     expect(nodeClient.nodeOptions).toEqual(testOptions);
+  });
+
+  it("getBoxes - boxId", async () => {
+    vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockGetBoxById));
+    let boxes = await nodeClient.getBoxes({
+      where: { boxId: "45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6" },
+      from: "blockchain"
+    });
+    expect(boxes[0].boxId).toBe("45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6");
+    boxes = await nodeClient.getBoxes({
+      where: { boxId: "45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6" },
+      from: "mempool"
+    });
+    expect(boxes[0].boxId).toBe("45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6");
+    boxes = await nodeClient.getBoxes({
+      where: { boxId: "45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6" },
+      from: "blockchain+mempool"
+    });
+    expect(boxes[0].boxId).toBe("45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6");
+  });
+
+  it("getBoxes - address", async () => {
+    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockUTXOByAddress));
+    let boxes = await nodeClient.getBoxes({
+      where: { address: "9g16ZMPo22b3qaRL7HezyQt2HSW2ZBF6YR3WW9cYQjgQwYKxxoT" },
+      from: "blockchain",
+      limit: 5,
+      offset: 5,
+      sort: "asc"
+    });
+    expect(boxes.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    boxes = await nodeClient.getBoxes({
+      where: { address: "9g16ZMPo22b3qaRL7HezyQt2HSW2ZBF6YR3WW9cYQjgQwYKxxoT" },
+      from: "blockchain+mempool"
+    });
+    expect(boxes.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockTransactionList.items));
+    boxes = await nodeClient.getBoxes({
+      where: { address: "9g16ZMPo22b3qaRL7HezyQt2HSW2ZBF6YR3WW9cYQjgQwYKxxoT" },
+      from: "mempool"
+    });
+    expect(boxes.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+  });
+
+  it("getBoxes - ergoTree", async () => {
+    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockUTXOByAddress));
+    let boxes = await nodeClient.getBoxes({
+      where: {
+        ergoTree: "0008cd03b4cf5eb18d1f45f73472bc96578a87f6d967015c59c636c7a0b139348ce826b0"
+      },
+      from: "blockchain"
+    });
+    expect(boxes.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    boxes = await nodeClient.getBoxes({
+      where: {
+        ergoTree: "0008cd03b4cf5eb18d1f45f73472bc96578a87f6d967015c59c636c7a0b139348ce826b0"
+      },
+      from: "blockchain+mempool"
+    });
+    expect(boxes.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockTransactionList.items));
+    boxes = await nodeClient.getBoxes({
+      where: {
+        ergoTree: "0008cd02c35a808c1c713fc1ae169e33da7492eee8f913a2045a7d56a3ca3103b5525ff3"
+      },
+      from: "mempool"
+    });
+    expect(boxes.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    const boxes2 = await nodeClient.getBoxes({
+      where: {
+        ergoTree: "0008cd02c35a808c1c713fc1ae169e33da7492eee8f913a2045a7d56a3ca3103b5525ff3"
+      },
+      from: "mempool",
+      sort: "asc",
+      offset: 1,
+      limit: 1
+    });
+    expect(boxes2.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    expect(boxes[boxes.length - 2].boxId).toBe(boxes2[0].boxId);
+  });
+
+  it("getBoxes - tokenId", async () => {
+    vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockUTXOByAddress));
+    let boxes = await nodeClient.getBoxes({
+      where: { tokenId: "fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40" },
+      from: "blockchain"
+    });
+    expect(boxes.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    boxes = await nodeClient.getBoxes({
+      where: { tokenId: "fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40" },
+      from: "mempool"
+    });
+    expect(boxes.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    boxes = await nodeClient.getBoxes({
+      where: { tokenId: "fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40" },
+      from: "blockchain+mempool"
+    });
+    expect(boxes.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    const boxes2 = await nodeClient.getBoxes({
+      where: {
+        tokenId: "fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40"
+      },
+      from: "mempool",
+      sort: "asc",
+      offset: 1,
+      limit: 1
+    });
+    expect(boxes2.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+    expect(boxes[boxes.length - 2].boxId).toBe(boxes2[0].boxId);
+  });
+
+  it("Should throw not supported error when streamBoxes is called", async () => {
+    expect(nodeClient.streamBoxes).to.throw(NotSupportedError);
+  });
+
+  it("Should throw not supported error when reduceTransaction is called", async () => {
+    expect(nodeClient.reduceTransaction).to.throw(NotSupportedError);
   });
 
   it("getHeight", async () => {
@@ -44,7 +160,7 @@ describe("Test node client", async () => {
 
   it("getLastHeaders", async () => {
     vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockLastHeaders));
-    const headerArray = await nodeClient.getLastHeaders();
+    const headerArray = await nodeClient.getHeaders({ take: 10 });
     expect(headerArray).toBeInstanceOf(Array<BlockHeader>);
     expect(headerArray.length).toBe(10);
   });
@@ -80,13 +196,30 @@ describe("Test node client", async () => {
     const box = await nodeClient.getBoxByBoxId(
       "45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6"
     );
-    expect(box).toBeInstanceOf(ErgoBox);
+    expect(box.boxId).toBe("45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6");
+  });
+
+  it("getBoxByBoxIdWithMemPool", async () => {
+    vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockGetBoxById));
+    let box = await nodeClient.getBoxByBoxIdWithMemPool(
+      "45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6"
+    );
+    expect(box.boxId).toBe("45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6");
+    const mockGetBoxByBoxId = vitest.fn();
+    ErgoNodeProvider.prototype.getBoxByBoxId = mockGetBoxByBoxId;
+    mockGetBoxByBoxId.mockImplementation(() => {
+      throw new FleetError();
+    });
+    box = await nodeClient.getBoxByBoxIdWithMemPool(
+      "45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6"
+    );
+    expect(box.boxId).toBe("45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6");
   });
 
   it("getBoxByIndex", async () => {
     vi.spyOn(rest, "get").mockImplementation(() => Promise.resolve(mockGetBoxById));
     const box = await nodeClient.getBoxByIndex(33263731);
-    expect(box).toBeInstanceOf(ErgoBox);
+    expect(box.boxId).toBe("45ce2cd800136a44f2cbf8b48472c7585cd37530de842823684b38a0ffa317a6");
   });
 
   it("getTransactionByTransactionId", async () => {
@@ -159,39 +292,47 @@ describe("Test node client", async () => {
     const utxos = await nodeClient.getUnspentBoxesByAddress(
       "9g16ZMPo22b3qaRL7HezyQt2HSW2ZBF6YR3WW9cYQjgQwYKxxoT"
     );
-    expect(utxos).toBeInstanceOf(Array<ErgoBox>);
+    expect(utxos.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
   });
   it("getUnspentBoxesByErgotree", async () => {
     vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockUTXOByAddress));
     const utxos = await nodeClient.getUnspentBoxesByErgotree(
       "0008cd03b4cf5eb18d1f45f73472bc96578a87f6d967015c59c636c7a0b139348ce826b0"
     );
-    expect(utxos).toBeInstanceOf(Array<ErgoBox>);
+    expect(utxos.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
   });
   it("getBoxesByAddress", async () => {
     vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve({ items: mockUTXOByAddress }));
     const utxos = await nodeClient.getBoxesByAddress(
       "9g16ZMPo22b3qaRL7HezyQt2HSW2ZBF6YR3WW9cYQjgQwYKxxoT"
     );
-    expect(utxos).toBeInstanceOf(Array<ErgoBox>);
+    expect(utxos.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
   });
   it("getBoxesByErgotree", async () => {
     vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve({ items: mockUTXOByAddress }));
     const utxos = await nodeClient.getBoxesByErgotree(
       "0008cd03b4cf5eb18d1f45f73472bc96578a87f6d967015c59c636c7a0b139348ce826b0"
     );
-    expect(utxos).toBeInstanceOf(Array<ErgoBox>);
+    expect(utxos.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
+  });
+  it("getMempoolBoxesByErgotree", async () => {
+    vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockUTXOByAddress));
+    const utxos = await nodeClient.getMempoolBoxesByErgotree(
+      "0008cd03b4cf5eb18d1f45f73472bc96578a87f6d967015c59c636c7a0b139348ce826b0"
+    );
+    expect(utxos.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
   });
 
   it("sendTransaction - success", async () => {
     vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockPostTxSuccess));
-    const txId = await nodeClient.sendTransaction({
+    const txId = await nodeClient.submitTransaction({
       inputs: [],
       outputs: [],
       dataInputs: [],
       id: ""
     });
     expect(txId).toEqual({
+      success: true,
       transactionId: "18b11ee7adbb1e2b837052d7f28df3c50ffb257c31447b051eac21b74780d842"
     });
     const txId2 = await nodeClient.checkTransaction({
@@ -201,26 +342,27 @@ describe("Test node client", async () => {
       id: ""
     });
     expect(txId2).toEqual({
+      success: true,
       transactionId: "18b11ee7adbb1e2b837052d7f28df3c50ffb257c31447b051eac21b74780d842"
     });
   });
 
   it("sendTransaction - error", async () => {
     vi.spyOn(rest, "post").mockImplementation(() => Promise.resolve(mockNodeError));
-    const txError = await nodeClient.sendTransaction({
+    const txError = await nodeClient.submitTransaction({
       inputs: [],
       outputs: [],
       dataInputs: [],
       id: ""
     });
-    expect(txError.error).toBe(400);
+    expect(txError.success).toBe(false);
     const txError2 = await nodeClient.checkTransaction({
       inputs: [],
       outputs: [],
       dataInputs: [],
       id: ""
     });
-    expect(txError2.error).toBe(400);
+    expect(txError2.success).toBe(false);
   });
 
   it("getUnconfirmedTransactions", async () => {
@@ -262,7 +404,7 @@ describe("Test node client", async () => {
     const utxos = await nodeClient.getUnspentBoxesByTokenId(
       "fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40"
     );
-    expect(utxos).toBeInstanceOf(Array<ErgoBox>);
+    expect(utxos.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
   });
 
   it("getBoxesByTokenId", async () => {
@@ -270,6 +412,6 @@ describe("Test node client", async () => {
     const utxos = await nodeClient.getBoxesByTokenId(
       "fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40"
     );
-    expect(utxos).toBeInstanceOf(Array<ErgoBox>);
+    expect(utxos.map((b) => new ErgoBox(b))).toBeInstanceOf(Array<ErgoBox>);
   });
 });

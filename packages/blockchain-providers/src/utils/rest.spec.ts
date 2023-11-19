@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { mockResponse } from "./_tests";
 import { DEFAULT_HEADERS, get, post, RequestOptions } from "./rest";
 
-const mockResponseText = (data: string) => {
-  return { text: () => new Promise((resolve) => resolve(data)) } as unknown as Response;
-};
-const fetchMock = () => Promise.resolve(mockResponseText('{"test": 0}'));
+const fetchMock = () => Promise.resolve(mockResponse('{"test": 0}'));
 
 describe("rest - get", async () => {
   let nodeOptions: RequestOptions = {
