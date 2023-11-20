@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/core",
-  "version": "0.2.3",
+  "version": "0.3.2",
   "description": "Fleet SDK core library",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.esm.js",
