@@ -2,13 +2,20 @@
   "name": "@fleet-sdk/serializer",
   "version": "0.3.2",
   "description": "Ergo constant serializer and parser.",
-  "main": "./dist/index.cjs.js",
-  "module": "./dist/index.esm.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    "types": "./dist/index.d.ts",
-    "require": "./dist/index.cjs.js",
-    "import": "./dist/index.esm.js"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
   },
   "sideEffects": false,
   "repository": "fleet-sdk/fleet",
