@@ -8,8 +8,5 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   dts: { resolve: true },
-  format: ["esm", "cjs"],
-  outExtension({ format }) {
-    return { js: `.${format}.js` };
-  }
+  format: ["esm", "cjs"]
 });
