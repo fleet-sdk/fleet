@@ -9,10 +9,13 @@ import {
   NewToken,
   NonMandatoryRegisters,
   NotSupportedError,
+  orderBy,
   SignedTransaction,
+  some,
   SortingDirection,
   TokenId,
-  TransactionId
+  TransactionId,
+  uniqBy
 } from "@fleet-sdk/common";
 import { ErgoAddress, ErgoBox } from "@fleet-sdk/core";
 import { RequireExactlyOne } from "type-fest";
@@ -27,32 +30,7 @@ import {
   TransactionEvaluationSuccess,
   TransactionReductionResult
 } from "../types";
-import { DEFAULT_HEADERS, Fetcher, get, post, RequestOptions, ResponseParser } from "../utils/rest";
-
-/**
- * Get a node client
- * @param url : url of the node including the port
- * @param parser : Default JSON, parse the response text and stringify the body for post. Use json-bigint
- *                 to avoid overflow of javascript number.
- * @param fetcher : Default fetch, fetcher to reteive the data
- * @param headers : Headers for the get and post request
- * @returns ErgoNodeProvider
- */
-export function getErgoNodeProvider(
-  url: URL | string,
-  parser: ResponseParser = JSON,
-  fetcher: Fetcher = fetch,
-  headers: Headers = DEFAULT_HEADERS
-): ErgoNodeProvider {
-  const nodeOptions: RequestOptions = {
-    url: url,
-    parser: parser,
-    fetcher: fetcher,
-    headers: headers
-  };
-
-  return new ErgoNodeProvider(nodeOptions);
-}
+import { DEFAULT_HEADERS, get, post, RequestOptions } from "../utils/rest";
 
 export type TokenInfo = {
   id: TokenId;
@@ -100,18 +78,6 @@ export type NodeBoxQuery<W extends NodeBoxWhere> = BoxQuery<W> & {
   where: RequireExactlyOne<W>;
 
   /**
-   * Limit the number of outputs when applicable.
-   * @default 0
-   */
-  limit?: number;
-
-  /**
-   * Amount of result to skip from the begining.
-   * @default 0
-   */
-  offset?: number;
-
-  /**
    * Since an amount of result from the begining.
    * @default 'desc'
    */
@@ -122,6 +88,15 @@ export class ErgoNodeProvider implements IBlockchainProvider<BoxWhere> {
   private _nodeOptions: RequestOptions;
 
   constructor(nodeOptions: RequestOptions) {
+    if (!nodeOptions.fetcher) {
+      nodeOptions.fetcher = fetch;
+    }
+    if (!nodeOptions.parser) {
+      nodeOptions.parser = JSON;
+    }
+    if (!nodeOptions.headers) {
+      nodeOptions.headers = DEFAULT_HEADERS;
+    }
     this._nodeOptions = nodeOptions;
   }
 
@@ -132,16 +107,53 @@ export class ErgoNodeProvider implements IBlockchainProvider<BoxWhere> {
    * @returns {ChainProviderBox[]}
    */
   async getBoxes(query: NodeBoxQuery<NodeBoxWhere>): Promise<ChainProviderBox[]> {
-    let limit = 0,
-      offset = 0,
-      sort: SortingDirection = "desc",
+    let boxes: ChainProviderBox[] = [];
+    for await (const chunk of this.streamBoxes(query)) {
+      boxes = boxes.concat(chunk);
+    }
+
+    return orderBy(boxes, (box) => box.creationHeight, query.sort);
+  }
+
+  /**
+   * Stream the unspent boxes matching the query by chunk
+   * @param {NodeBoxQuery} query
+   */
+  async *streamBoxes(query: NodeBoxQuery<NodeBoxWhere>): AsyncIterable<ChainProviderBox[]> {
+    const returnedBoxIds = new Set<string>();
+    const CHUNK_SIZE = 50;
+    let offset = 0,
+      isEmpty = false;
+    do {
+      let boxes = await this.getBoxesChunk(query, CHUNK_SIZE, offset);
+
+      if (some(boxes)) {
+        // boxes can be moved from the mempool to the blockchain while streaming,
+        // so we need to filter out boxes that have already been returned.
+        if (boxes.some((box) => returnedBoxIds.has(box.boxId))) {
+          boxes = boxes.filter((b) => !returnedBoxIds.has(b.boxId));
+        }
+
+        if (some(boxes)) {
+          boxes = uniqBy(boxes, (box) => box.boxId);
+          boxes.forEach((box) => returnedBoxIds.add(box.boxId));
+
+          yield boxes;
+        }
+      }
+
+      isEmpty = boxes.length === 0;
+      offset += CHUNK_SIZE;
+    } while (!isEmpty);
+  }
+
+  async getBoxesChunk(
+    query: NodeBoxQuery<NodeBoxWhere>,
+    limit: number,
+    offset: number
+  ): Promise<ChainProviderBox[]> {
+    let sort: SortingDirection = "desc",
       output: ChainProviderBox[] = [];
-    if (query.limit) {
-      limit = query.limit;
-    }
-    if (query.offset) {
-      offset = query.offset;
-    }
     if (query.sort) {
       sort = query.sort;
     }
@@ -240,13 +252,6 @@ export class ErgoNodeProvider implements IBlockchainProvider<BoxWhere> {
       }
     }
     return output;
-  }
-
-  /**
-   * Not supported operation ny node client
-   */
-  streamBoxes(query: BoxQuery<BoxWhere>): AsyncIterable<ChainProviderBox[]> {
-    throw new NotSupportedError("Method not implemented." + JSON.stringify(query));
   }
 
   /**
