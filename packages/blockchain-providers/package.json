@@ -1,15 +1,23 @@
 {
   "name": "@fleet-sdk/blockchain-providers",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Blockchain data providers",
-  "main": "./dist/index.cjs.js",
-  "module": "./dist/index.esm.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    "require": "./dist/index.cjs.js",
-    "import": "./dist/index.esm.js"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
   },
-  "sideEffects": true,
+  "sideEffects": false,
   "repository": "fleet-sdk/fleet",
   "license": "MIT",
   "publishConfig": {
