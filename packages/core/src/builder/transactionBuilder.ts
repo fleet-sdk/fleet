@@ -235,7 +235,7 @@ export class TransactionBuilder {
         throw new MalformedTransaction("only one token can be minted per transaction.");
       }
 
-      if (this._isTheSameTokenBeingMintedOutsideTheMintingBox()) {
+      if (this._isTheSameTokenBeingMintedFromOutsideTheMintingBox()) {
         throw new NonStandardizedMinting(
           "EIP-4 tokens cannot be minted from outside of the minting box."
         );
@@ -355,9 +355,7 @@ export class TransactionBuilder {
 
   private _isMinting(): boolean {
     for (const output of this._outputs) {
-      if (output.minting) {
-        return true;
-      }
+      if (output.minting) return true;
     }
 
     return false;
@@ -369,26 +367,22 @@ export class TransactionBuilder {
     for (const output of this._outputs) {
       if (isDefined(output.minting)) {
         mintingCount++;
-
-        if (mintingCount > 1) {
-          return true;
-        }
+        if (mintingCount > 1) return true;
       }
     }
 
     return false;
   }
 
-  private _isTheSameTokenBeingMintedOutsideTheMintingBox(): boolean {
+  private _isTheSameTokenBeingMintedFromOutsideTheMintingBox(): boolean {
     const mintingTokenId = this._getMintingTokenId();
+    if (isUndefined(mintingTokenId)) return false;
 
-    if (isUndefined(mintingTokenId)) {
-      return false;
-    }
-
+    let count = 0;
     for (const output of this._outputs) {
       if (output.assets.contains(mintingTokenId)) {
-        return true;
+        count++;
+        if (count > 1) return true;
       }
     }
 

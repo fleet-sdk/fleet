@@ -11,6 +11,10 @@ import { OutputBuilder } from "../../builder/outputBuilder";
 import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
 
+function setsum<K>(map: Map<K, bigint>, key: K, value: bigint) {
+  return map.set(key, (map.get(key) || _0n) + value);
+}
+
 export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> {
   constructor(outputs?: OneOrMore<OutputBuilder>) {
     super();
@@ -20,13 +24,13 @@ export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> 
     }
   }
 
-  protected _map(output: OutputBuilder): OutputBuilder {
+  protected _map(output: OutputBuilder) {
     return output;
   }
 
-  public remove(output: OutputBuilder): number;
-  public remove(index: number): number;
-  public remove(outputs: OutputBuilder | number): number {
+  remove(output: OutputBuilder): number;
+  remove(index: number): number;
+  remove(outputs: OutputBuilder | number): number {
     let index = -1;
     if (typeof outputs === "number") {
       if (this._isIndexOutOfBounds(outputs)) {
@@ -49,12 +53,12 @@ export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> 
     return this.length;
   }
 
-  public clone(): OutputsCollection {
+  clone(): OutputsCollection {
     return new OutputsCollection(this._items);
   }
 
-  public sum(basis?: SelectionTarget | BoxSummary): BoxSummary {
-    const tokens: { [tokenId: string]: bigint } = {};
+  sum(basis?: SelectionTarget | BoxSummary): BoxSummary {
+    const tokens = new Map<string, bigint>();
     let nanoErgs = _0n;
 
     if (basis) {
@@ -64,11 +68,9 @@ export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> 
 
       if (some(basis.tokens)) {
         for (const token of basis.tokens) {
-          if (isUndefined(token.amount)) {
-            continue;
-          }
+          if (isUndefined(token.amount)) continue;
 
-          tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + token.amount;
+          setsum(tokens, token.tokenId, token.amount);
         }
       }
     }
@@ -76,13 +78,13 @@ export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> 
     for (const box of this._items) {
       nanoErgs += box.value;
       for (const token of box.assets) {
-        tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + token.amount;
+        if (token.tokenId) setsum(tokens, token.tokenId, token.amount);
       }
     }
 
     return {
       nanoErgs,
-      tokens: Object.keys(tokens).map((tokenId) => ({ tokenId, amount: tokens[tokenId] }))
+      tokens: Array.from(tokens, ([tokenId, amount]) => ({ tokenId, amount }))
     };
   }
 }

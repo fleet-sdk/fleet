@@ -4,6 +4,7 @@ import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 import { TokensCollection } from "./tokensCollection";
+import { Amount, FleetError, TokenAmount } from "@fleet-sdk/common";
 
 describe("Tokens collection", () => {
   const tokenA = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
@@ -81,7 +82,39 @@ describe("Tokens collection", () => {
 
     expect(() => {
       tokens.forEach((token) => collection.add(token));
-    }).toThrow(MaxTokensOverflow);
+    }).to.throw(MaxTokensOverflow);
+  });
+
+  it("Should throw if tokens without a TokenID are inserted", () => {
+    // ...on construction
+    expect(() => {
+      new TokensCollection([{ amount: 50n }] as unknown as TokenAmount<Amount>);
+    }).to.throw(FleetError, "TokenID is required.");
+
+    const collection = new TokensCollection();
+
+    // ...on add as a single token
+    expect(() => {
+      collection.add({ amount: 50n } as unknown as TokenAmount<Amount>);
+    }).to.throw(FleetError, "TokenID is required.");
+
+    // ...on add as a batch of tokens
+    expect(() => {
+      collection.add([
+        { amount: 50n },
+        { tokenId: tokenA, amount: 10 },
+        { amount: 1n }
+      ] as unknown as TokenAmount<Amount>[]);
+    }).to.throw(FleetError, "TokenID is required.");
+  });
+
+  it("Should when trying to mint more than one token", () => {
+    const collection = new TokensCollection();
+    collection.mint({ amount: 1n, name: "test" });
+
+    expect(() => {
+      collection.mint({ amount: 1n, name: "test_2" });
+    }).to.throw("Only one minting token is allowed per transaction.");
   });
 
   it("Should sum if the same tokenId is already included", () => {
