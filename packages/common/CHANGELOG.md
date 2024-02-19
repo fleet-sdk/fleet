@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.3.4
+
+### Patch Changes
+
+- 9f02ca0: Fix ESM and CJS modules export
+
 ## 0.3.2
 
 ### Patch Changes
