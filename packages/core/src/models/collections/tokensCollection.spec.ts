@@ -1,10 +1,10 @@
+import { Amount, FleetError, TokenAmount } from "@fleet-sdk/common";
 import { manyTokensBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { NotFoundError } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 import { TokensCollection } from "./tokensCollection";
-import { Amount, FleetError, TokenAmount } from "@fleet-sdk/common";
 
 describe("Tokens collection", () => {
   const tokenA = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
