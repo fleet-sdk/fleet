@@ -2,22 +2,29 @@ import {
   Amount,
   Collection,
   CollectionAddOptions,
+  FleetError,
   isDefined,
   isUndefined,
+  NewToken,
   OneOrMore,
   TokenAmount,
   TokenId
 } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
-import { NotFoundError } from "../../errors";
+import { NotFoundError, UndefinedMintingContext } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 
 export const MAX_TOKENS_PER_BOX = 120;
 
 export type TokenAddOptions = CollectionAddOptions & { sum?: boolean };
+export type OutputToken<T extends Amount = Amount> = { tokenId?: TokenId; amount: T };
 
-export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmount<Amount>> {
+type MintingData = { index: number; metadata: NewToken<Amount> };
+
+export class TokensCollection extends Collection<OutputToken<bigint>, OutputToken> {
+  #minting: MintingData | undefined;
+
   constructor();
   constructor(token: TokenAmount<Amount>);
   constructor(tokens: TokenAmount<Amount>[]);
@@ -30,38 +37,51 @@ export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmoun
     }
   }
 
-  protected override _map(token: TokenAmount<bigint> | TokenAmount<Amount>): TokenAmount<bigint> {
+  public get minting(): NewToken<bigint> | undefined {
+    if (!this.#minting) return;
+    return { ...this.#minting.metadata, amount: this._items[this.#minting.index].amount };
+  }
+
+  protected override _map(token: OutputToken): OutputToken<bigint> {
     return { tokenId: token.tokenId, amount: ensureBigInt(token.amount) };
   }
 
-  protected override _addOne(
-    token: TokenAmount<bigint> | TokenAmount<Amount>,
-    options?: TokenAddOptions
-  ): number {
-    if (isUndefined(options) || (options.sum && !isDefined(options.index))) {
-      if (this._sum(this._map(token))) {
-        return this.length;
-      }
+  protected override _addOne(token: OutputToken, options?: TokenAddOptions): number {
+    if (isUndefined(options) || (options.sum && isUndefined(options.index))) {
+      if (this._sum(this._map(token))) return this.length;
     }
 
-    if (this._items.length >= MAX_TOKENS_PER_BOX) {
-      throw new MaxTokensOverflow();
-    }
-
+    if (this._items.length >= MAX_TOKENS_PER_BOX) throw new MaxTokensOverflow();
     super._addOne(token, options);
 
     return this.length;
   }
 
   public override add(items: OneOrMore<TokenAmount<Amount>>, options?: TokenAddOptions): number {
+    if (Array.isArray(items)) {
+      if (items.some((x) => !x.tokenId)) throw new FleetError("TokenID is required.");
+    } else if (!items.tokenId) {
+      throw new FleetError("TokenID is required.");
+    }
+
     return super.add(items, options);
   }
 
-  private _sum(token: TokenAmount<bigint>): boolean {
+  public mint(token: NewToken<Amount>): number {
+    if (isDefined(this.#minting)) {
+      throw new FleetError("Only one minting token is allowed per transaction.");
+    } else {
+      const len = super.add({ tokenId: token.tokenId, amount: token.amount });
+      this.#minting = { index: len - 1, metadata: token };
+    }
+
+    return this.length;
+  }
+
+  private _sum(token: OutputToken<bigint>): boolean {
     for (const t of this._items) {
       if (t.tokenId === token.tokenId) {
         t.amount += token.amount;
-
         return true;
       }
     }
@@ -109,5 +129,21 @@ export class TokensCollection extends Collection<TokenAmount<bigint>, TokenAmoun
 
   contains(tokenId: string): boolean {
     return this._items.some((x) => x.tokenId === tokenId);
+  }
+
+  toArray(): TokenAmount<bigint>[];
+  toArray(mintingTokenId: string): TokenAmount<bigint>[];
+  toArray(mintingTokenId?: string): TokenAmount<bigint>[];
+  toArray(mintingTokenId?: string): OutputToken[] {
+    if (this.minting) {
+      if (!mintingTokenId) throw new UndefinedMintingContext();
+
+      return this._items.map((x) => ({
+        tokenId: x.tokenId ? x.tokenId : mintingTokenId,
+        amount: x.amount
+      }));
+    } else {
+      return super.toArray();
+    }
   }
 }

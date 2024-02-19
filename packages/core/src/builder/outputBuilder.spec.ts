@@ -405,18 +405,33 @@ describe("Building", () => {
     expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
+      { tokenId: tokenA, amount: 15n },
+      { tokenId: tokenB, amount: 1n },
       {
         tokenId: regularBoxes[0].boxId, // should be the same as the first input
         amount: 100n
-      },
-      { tokenId: tokenA, amount: 15n },
-      { tokenId: tokenB, amount: 1n }
+      }
     ]);
     expect(boxCandidate.additionalRegisters).toEqual({
       R4: "0e0954657374546f6b656e",
       R5: "0e00", // should be empty string
       R6: "0e0130" // should be zero
     });
+  });
+
+  it("Should keep the order of the call when minting a token", () => {
+    let boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+      .mintToken({ amount: 100n, name: "TestToken" })
+      .addTokens({ tokenId: tokenA, amount: 15n });
+
+    expect(boxCandidate.assets.at(0).tokenId).to.be.undefined;
+
+    boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+      .addTokens({ tokenId: tokenA, amount: 15n })
+      .mintToken({ amount: 100n, name: "TestToken" })
+      .addTokens({ tokenId: tokenB, amount: 10n });
+
+    expect(boxCandidate.assets.at(1).tokenId).to.be.undefined;
   });
 
   it("Should should add default values if non mandatory minting field are filled", () => {

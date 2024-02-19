@@ -8,7 +8,6 @@ import {
   BoxCandidate,
   ensureBigInt,
   ErgoTreeHex,
-  first,
   HexString,
   isDefined,
   isEmpty,
@@ -23,11 +22,7 @@ import {
 } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
 import { estimateBoxSize, SByte, SColl, SConstant } from "@fleet-sdk/serializer";
-import {
-  InvalidRegistersPacking,
-  UndefinedCreationHeight,
-  UndefinedMintingContext
-} from "../errors";
+import { InvalidRegistersPacking, UndefinedCreationHeight } from "../errors";
 import { ErgoAddress, ErgoTree } from "../models";
 import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
 
@@ -42,6 +37,8 @@ export function estimateMinBoxValue(valuePerByte = BOX_VALUE_PER_BYTE): BoxValue
   };
 }
 
+const DUMB_TOKEN_ID = "0000000000000000000000000000000000000000000000000000000000000000";
+
 export class OutputBuilder {
   private readonly _address: ErgoAddress;
   private readonly _tokens: TokensCollection;
@@ -49,7 +46,6 @@ export class OutputBuilder {
   private _valueEstimator?: BoxValueEstimationCallback;
   private _creationHeight?: number;
   private _registers: NonMandatoryRegisters;
-  private _minting?: NewToken<bigint>;
 
   constructor(
     value: Amount | BoxValueEstimationCallback,
@@ -98,7 +94,7 @@ export class OutputBuilder {
   }
 
   public get minting(): NewToken<bigint> | undefined {
-    return this._minting;
+    return this.assets.minting;
   }
 
   public setValue(value: Amount | BoxValueEstimationCallback): OutputBuilder {
@@ -136,8 +132,7 @@ export class OutputBuilder {
   }
 
   public mintToken(token: NewToken<Amount>): OutputBuilder {
-    this._minting = { ...token, amount: ensureBigInt(token.amount) };
-
+    this.assets.mint(token);
     return this;
   }
 
@@ -172,17 +167,15 @@ export class OutputBuilder {
 
   public eject(ejector: (context: { tokens: TokensCollection }) => void): OutputBuilder {
     ejector({ tokens: this._tokens });
-
     return this;
   }
 
   public build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<bigint> {
-    let tokens = this.assets.toArray();
+    let tokens: TokenAmount<bigint>[];
 
     if (this.minting) {
-      if (isEmpty(transactionInputs)) {
-        throw new UndefinedMintingContext();
-      }
+      const mintingTokenId = transactionInputs ? transactionInputs[0]?.boxId : undefined;
+      tokens = this.assets.toArray(mintingTokenId);
 
       if (isEmpty(this.additionalRegisters)) {
         this.setAdditionalRegisters({
@@ -191,28 +184,17 @@ export class OutputBuilder {
           R6: SColl(SByte, utf8.decode(this.minting.decimals?.toString() || "0"))
         });
       }
-
-      tokens = [
-        {
-          tokenId: first<UnsignedInput | Box<Amount>>(transactionInputs).boxId,
-          amount: this.minting.amount
-        },
-        ...tokens
-      ];
+    } else {
+      tokens = this.assets.toArray();
     }
 
-    if (isUndefined(this.creationHeight)) {
-      throw new UndefinedCreationHeight();
-    }
+    if (isUndefined(this.creationHeight)) throw new UndefinedCreationHeight();
 
     return {
       value: this.value,
       ergoTree: this.ergoTree,
       creationHeight: this.creationHeight,
-      assets: tokens.map((token) => ({
-        tokenId: token.tokenId,
-        amount: token.amount
-      })),
+      assets: tokens,
       additionalRegisters: this.additionalRegisters
     };
   }
@@ -220,22 +202,11 @@ export class OutputBuilder {
   estimateSize(value = SAFE_MIN_BOX_VALUE): number {
     assert(!!this.creationHeight, "Creation height must be set");
 
-    const tokens = this._tokens.toArray();
-    if (this.minting) {
-      tokens.push({
-        tokenId: "0000000000000000000000000000000000000000000000000000000000000000",
-        amount: this.minting.amount
-      });
-    }
-
     const plainBoxObject: BoxCandidate<bigint> = {
       value,
       ergoTree: this.ergoTree,
       creationHeight: this.creationHeight,
-      assets: tokens.map((token) => ({
-        tokenId: token.tokenId,
-        amount: token.amount
-      })),
+      assets: this._tokens.toArray(DUMB_TOKEN_ID),
       additionalRegisters: this.additionalRegisters
     };
 

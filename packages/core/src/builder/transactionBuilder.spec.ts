@@ -913,7 +913,6 @@ describe("Token minting", () => {
           name: "TestToken"
         })
       )
-
       .sendChangeTo(a1.address)
       .payMinFee()
       .build();
