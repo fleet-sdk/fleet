@@ -1,5 +1,17 @@
 # @fleet-sdk/compiler
 
+## 0.3.4
+
+### Patch Changes
+
+- 9f02ca0: Fix ESM and CJS modules export
+- Updated dependencies [0fbe19f]
+- Updated dependencies [9f02ca0]
+  - @fleet-sdk/core@0.3.4
+  - @fleet-sdk/serializer@0.3.4
+  - @fleet-sdk/common@0.3.4
+  - @fleet-sdk/crypto@0.3.4
+
 ## 0.3.2
 
 ### Patch Changes
