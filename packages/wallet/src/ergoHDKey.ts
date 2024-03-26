@@ -6,7 +6,7 @@ import { mnemonicToSeed, mnemonicToSeedSync } from "@scure/bip39";
 /**
  * Ergo derivation path at change level
  */
-export const ERGO_HD_CHANGE_PATH = "m/44'/429'/0'/0";
+export const ERGO_CHANGE_PATH = "m/44'/429'/0'/0";
 
 export type FromMnemonicOptions = {
   passphrase?: string;
@@ -85,11 +85,9 @@ export class ErgoHDKey {
     return this.fromMasterSeed(mnemonicToSeedSync(mnemonic, options?.passphrase), options?.path);
   }
 
-  static fromMasterSeed(seed: Uint8Array, path = ERGO_HD_CHANGE_PATH): ErgoHDKey {
+  static fromMasterSeed(seed: Uint8Array, path = ERGO_CHANGE_PATH): ErgoHDKey {
     const key = HDKey.fromMasterSeed(seed);
-    if (path !== "") {
-      return new ErgoHDKey(key.derive(path));
-    }
+    if (path !== "") return new ErgoHDKey(key.derive(path));
 
     return new ErgoHDKey(key);
   }
@@ -101,10 +99,7 @@ export class ErgoHDKey {
     const rootKey =
       typeof keyOrOptions === "string"
         ? HDKey.fromExtendedKey(keyOrOptions)
-        : new HDKey({
-            chainCode: keyOrOptions.chainCode,
-            ...keyOrOptions
-          });
+        : new HDKey({ chainCode: keyOrOptions.chainCode, ...keyOrOptions });
 
     return new ErgoHDKey(rootKey);
   }

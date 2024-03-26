@@ -4,7 +4,7 @@ import { mnemonicToSeedSync } from "@scure/bip39";
 import SigmaRust from "ergo-lib-wasm-nodejs";
 import { describe, expect, it } from "vitest";
 import { keyAddressesTestVectors } from "./_test-vectors/keyVectors";
-import { ERGO_HD_CHANGE_PATH, ErgoHDKey } from "./ergoHDKey";
+import { ERGO_CHANGE_PATH, ErgoHDKey } from "./ergoHDKey";
 import { generateMnemonic } from "./mnemonic";
 
 describe("Instantiation", () => {
@@ -155,7 +155,7 @@ describe("Key derivation", () => {
       expect(key.depth).to.be.equal(0);
       expect(key.index).to.be.equal(0);
 
-      key = key.derive(ERGO_HD_CHANGE_PATH);
+      key = key.derive(ERGO_CHANGE_PATH);
       expect(key.depth).to.be.equal(4);
       expect(key.index).to.be.equal(0);
 
@@ -170,7 +170,7 @@ describe("Key derivation", () => {
 
     const fleetKey = ErgoHDKey.fromMnemonicSync(mnemonic);
     const wasmKey = SigmaRust.ExtSecretKey.derive_master(mnemonicToSeedSync(mnemonic)).derive(
-      SigmaRust.DerivationPath.from_string(ERGO_HD_CHANGE_PATH)
+      SigmaRust.DerivationPath.from_string(ERGO_CHANGE_PATH)
     );
 
     expect(fleetKey.publicKey).to.be.deep.equal(wasmKey.public_key().pub_key_bytes());
@@ -192,7 +192,7 @@ describe("Key derivation", () => {
     const fleetKey = ErgoHDKey.fromMnemonicSync(mnemonic, { passphrase });
     const wasmKey = SigmaRust.ExtSecretKey.derive_master(
       SigmaRust.Mnemonic.to_seed(mnemonic, passphrase)
-    ).derive(SigmaRust.DerivationPath.from_string(ERGO_HD_CHANGE_PATH));
+    ).derive(SigmaRust.DerivationPath.from_string(ERGO_CHANGE_PATH));
 
     expect(fleetKey.publicKey).to.be.deep.equal(wasmKey.public_key().pub_key_bytes());
     expect(fleetKey.privateKey).to.be.deep.equal(wasmKey.secret_key_bytes());
