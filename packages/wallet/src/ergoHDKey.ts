@@ -8,8 +8,6 @@ import { mnemonicToSeed, mnemonicToSeedSync } from "@scure/bip39";
  */
 export const ERGO_HD_CHANGE_PATH = "m/44'/429'/0'/0";
 
-const VERSIONS = { private: 0x0488ade4, public: 0x0488b21e };
-
 export type FromMnemonicOptions = {
   passphrase?: string;
   path?: string;
@@ -104,9 +102,7 @@ export class ErgoHDKey {
       typeof keyOrOptions === "string"
         ? HDKey.fromExtendedKey(keyOrOptions)
         : new HDKey({
-            // todo: remove this if https://github.com/paulmillr/scure-bip32/pull/14 is merged
-            versions: VERSIONS,
-            chainCode: keyOrOptions.chainCode as unknown as Uint8Array,
+            chainCode: keyOrOptions.chainCode,
             ...keyOrOptions
           });
 

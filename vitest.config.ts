@@ -8,7 +8,6 @@ export default defineConfig({
   },
   test: {
     useAtomics: true,
-    threads: false,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

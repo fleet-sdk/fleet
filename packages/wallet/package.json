@@ -35,8 +35,8 @@
   },
   "dependencies": {
     "@fleet-sdk/core": "workspace:^",
-    "@scure/bip32": "^1.3.2",
-    "@scure/bip39": "^1.2.1"
+    "@scure/bip32": "^1.4.0",
+    "@scure/bip39": "^1.3.0"
   },
   "engines": {
     "node": ">=14"
