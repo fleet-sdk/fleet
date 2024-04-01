@@ -99,7 +99,7 @@ export class ErgoHDKey {
     const rootKey =
       typeof keyOrOptions === "string"
         ? HDKey.fromExtendedKey(keyOrOptions)
-        : new HDKey({ chainCode: keyOrOptions.chainCode, ...keyOrOptions });
+        : new HDKey(keyOrOptions);
 
     return new ErgoHDKey(rootKey);
   }
