@@ -182,9 +182,21 @@ importers:
 
   packages/wallet:
     dependencies:
+      '@fleet-sdk/common':
+        specifier: workspace:^
+        version: link:../common
       '@fleet-sdk/core':
         specifier: workspace:^
         version: link:../core
+      '@fleet-sdk/crypto':
+        specifier: workspace:^
+        version: link:../crypto
+      '@fleet-sdk/serializer':
+        specifier: workspace:^
+        version: link:../serializer
+      '@noble/curves':
+        specifier: ^1.4.0
+        version: 1.4.0
       '@scure/bip32':
         specifier: ^1.4.0
         version: 1.4.0
