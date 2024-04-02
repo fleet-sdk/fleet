@@ -4,6 +4,7 @@ import type {
   EIP12UnsignedInput,
   EIP12UnsignedTransaction,
   HexString,
+  NonMandatoryRegisters,
   SignedTransaction
 } from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
@@ -84,15 +85,18 @@ function buildKeyMapper(keys: ErgoHDKey[], mapper?: KeyMapper) {
   };
 }
 
-function includesPubKey(input: EIP12UnsignedInput, pubKey: string): boolean {
+function includesPubKey(
+  { ergoTree, additionalRegisters: registers }: EIP12UnsignedInput,
+  pubKey: string
+): boolean {
+  type RegisterKey = keyof NonMandatoryRegisters;
+
   return (
-    input.ergoTree.includes(pubKey) ||
-    (!!input.additionalRegisters?.R4 && input.additionalRegisters.R4.includes(pubKey)) ||
-    (!!input.additionalRegisters?.R5 && input.additionalRegisters.R5.includes(pubKey)) ||
-    (!!input.additionalRegisters?.R6 && input.additionalRegisters.R6.includes(pubKey)) ||
-    (!!input.additionalRegisters?.R7 && input.additionalRegisters.R7.includes(pubKey)) ||
-    (!!input.additionalRegisters?.R8 && input.additionalRegisters.R8.includes(pubKey)) ||
-    (!!input.additionalRegisters?.R9 && input.additionalRegisters.R9.includes(pubKey))
+    ergoTree.includes(pubKey) ||
+    (registers &&
+      Object.keys(registers).some((k) =>
+        registers[k as RegisterKey]?.includes(pubKey) ? true : false
+      ))
   );
 }
 

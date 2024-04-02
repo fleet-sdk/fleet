@@ -1,7 +1,7 @@
 import { hex, randomBytes } from "@fleet-sdk/crypto";
 import { secp256k1 } from "@noble/curves/secp256k1";
 import { Address, verify_signature } from "ergo-lib-wasm-nodejs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import { sign, verify } from "./proveDLogProtocol";
 
 const { getPublicKey } = secp256k1;
@@ -43,14 +43,12 @@ const testVectors = [
 ];
 
 describe("Ergo Schnorr signature schema", () => {
-  it("Should test vectors", () => {
-    testVectors.forEach((tv) => {
-      const message = hex.decode(tv.msg);
-      const signature = hex.decode(tv.signature);
-      const publicKey = getPublicKey(hex.decode(tv.sk));
+  test.each(testVectors)("Should test vectors", (tv) => {
+    const message = hex.decode(tv.msg);
+    const signature = hex.decode(tv.signature);
+    const publicKey = getPublicKey(hex.decode(tv.sk));
 
-      expect(verify(message, signature, publicKey)).toBe(tv.isValid);
-    });
+    expect(verify(message, signature, publicKey)).to.be.equal(tv.isValid);
   });
 
   it("Should generate valid signature", () => {
@@ -60,10 +58,10 @@ describe("Ergo Schnorr signature schema", () => {
       const publicKey = getPublicKey(hex.encode(secretKey));
       const signature = sign(message, secretKey);
 
-      expect(verify(message, signature, publicKey)).toBe(true);
+      expect(verify(message, signature, publicKey)).to.be.true;
 
       // verify using sigma-rust
-      expect(verify_signature(Address.from_public_key(publicKey), message, signature)).toBe(true);
+      expect(verify_signature(Address.from_public_key(publicKey), message, signature)).to.be.true;
     }
   });
 });

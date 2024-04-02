@@ -42,6 +42,103 @@ describe("Transaction signing", () => {
     expect(verify_signature(addr, txBytes, proof)).to.be.true;
   });
 
+  it("Should select corresponding key and sign a transaction with multiple secrets and a single input", async () => {
+    // generate keys
+    const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
+    const child1 = rootKey.deriveChild(1);
+    const child2 = rootKey.deriveChild(2);
+
+    // mock inputs
+    const input = mockUTxO({ value: 1_000_000_000n, ergoTree: rootKey.address.ergoTree });
+
+    // build the unsigned transaction
+    const unsignedTx = new TransactionBuilder(height)
+      .from(input)
+      .to(new OutputBuilder(10_000_000n, externalAddress))
+      .sendChangeTo(rootKey.address)
+      .payMinFee()
+      .build();
+
+    // sign
+    const prover = new Prover();
+    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [rootKey, child1, child2]);
+
+    // verify
+    const txBytes = unsignedTx.toBytes();
+    const proof = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
+
+    // verify using own verifier
+    expect(prover.verify(txBytes, proof, rootKey)).to.be.true;
+
+    // verify using sigma-rust for comparison
+    const addr = Address.from_public_key(rootKey.publicKey);
+    expect(verify_signature(addr, txBytes, proof)).to.be.true;
+  });
+
+  it("Should select corresponding key and sign a transaction with multiple secrets and multiple inputs", async () => {
+    // generate keys
+    const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
+    const child1 = rootKey.deriveChild(1);
+    const child2 = rootKey.deriveChild(2);
+
+    // mock inputs
+    const inputs = [
+      mockUTxO({ value: 1_000_000_000n, ergoTree: rootKey.address.ergoTree }),
+      mockUTxO({ value: 1_000_000_000n, ergoTree: child2.address.ergoTree })
+    ];
+
+    // build the unsigned transaction
+    const unsignedTx = new TransactionBuilder(height)
+      .from(inputs)
+      .to(new OutputBuilder(10_000_000n, externalAddress))
+      .configureSelector((selector) => selector.ensureInclusion("all")) // ensure the inclusion of all inputs
+      .sendChangeTo(rootKey.address)
+      .payMinFee()
+      .build();
+
+    // sign
+    const prover = new Prover();
+    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [rootKey, child1, child2]);
+
+    // verify
+    const txBytes = unsignedTx.toBytes();
+    const proof1 = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
+    const proof2 = hex.decode(signedTx.inputs[1].spendingProof.proofBytes);
+
+    // verify using own verifier
+    expect(prover.verify(txBytes, proof1, rootKey)).to.be.true;
+    expect(prover.verify(txBytes, proof2, child2)).to.be.true;
+
+    // verify using sigma-rust for comparison
+    const addr1 = Address.from_public_key(rootKey.publicKey);
+    expect(verify_signature(addr1, txBytes, proof1)).to.be.true;
+    const addr2 = Address.from_public_key(child2.publicKey);
+    expect(verify_signature(addr2, txBytes, proof2)).to.be.true;
+  });
+
+  it("Should throw if no corresponding key is found", async () => {
+    // generate keys
+    const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
+    const child1 = rootKey.deriveChild(1);
+    const child2 = rootKey.deriveChild(2);
+
+    // mock inputs
+    const input = mockUTxO({ value: 1_000_000_000n, ergoTree: rootKey.address.ergoTree });
+
+    // build the unsigned transaction
+    const unsignedTx = new TransactionBuilder(height)
+      .from(input)
+      .to(new OutputBuilder(10_000_000n, externalAddress))
+      .sendChangeTo(rootKey.address)
+      .payMinFee()
+      .build();
+
+    const prover = new Prover();
+    expect(() => prover.signTransaction(unsignedTx, [child1, child2])).to.throw(
+      "Unable to find the corresponding secret for the input 0:"
+    );
+  });
+
   it("Should sign a transaction with a single secret and a multiple inputs", async () => {
     // generate keys
     const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
