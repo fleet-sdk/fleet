@@ -2,7 +2,7 @@ import { OutputBuilder, TransactionBuilder } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { Address, verify_signature } from "ergo-lib-wasm-nodejs";
 import { describe, expect, it } from "vitest";
-import { mockUTxO } from "../../../mock-chain/src/objectMocking"; // let's avoid circular dependencies
+import { mockUTxO } from "../../../mock-chain/src"; // let's avoid circular dependencies
 import { ErgoHDKey } from "../ergoHDKey";
 import { generateMnemonic } from "../mnemonic";
 import { Prover } from "./prover";
