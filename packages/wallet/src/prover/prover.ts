@@ -25,7 +25,7 @@ export interface ISigmaProver {
   verify(message: Uint8Array, signature: Uint8Array, key: ErgoHDKey): boolean;
 }
 
-export class BlindProver implements ISigmaProver {
+export class Prover implements ISigmaProver {
   signTransaction(
     unsignedTx: UnsignedTransaction,
     keys: ErgoHDKey[],

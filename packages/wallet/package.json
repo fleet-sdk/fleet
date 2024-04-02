@@ -42,6 +42,9 @@
     "@scure/bip39": "^1.3.0",
     "@noble/curves": "^1.4.0"
   },
+  "devDependencies": {
+    "@fleet-sdk/mock-chain": "workspace:^"
+  },
   "engines": {
     "node": ">=14"
   },
