@@ -19,7 +19,9 @@
     "test:unit-edge": "vitest run --no-coverage --environment=edge-runtime",
     "cov:check": "vitest run --coverage",
     "cov:open": "vitest run --coverage ; open-cli coverage/index.html",
-    "bench": "vitest bench"
+    "bench": "vitest bench",
+    "snapshot:version": "changeset version --snapshot snapshot",
+    "snapshot:publish": "pnpm clear && pnpm -r build && changeset publish --no-git-tag --tag snapshot"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
