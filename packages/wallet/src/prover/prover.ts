@@ -1,11 +1,12 @@
-import type {
+import {
   Box,
   BoxCandidate,
   EIP12UnsignedInput,
   EIP12UnsignedTransaction,
   HexString,
   NonMandatoryRegisters,
-  SignedTransaction
+  SignedTransaction,
+  some
 } from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
@@ -13,26 +14,18 @@ import { serializeBox, serializeTransaction } from "@fleet-sdk/serializer";
 import { ErgoHDKey } from "../ergoHDKey";
 import { sign, verify } from "./proveDLogProtocol";
 
-type UnsignedTransaction = EIP12UnsignedTransaction | ErgoUnsignedTransaction;
-type KeyMapper = (input: EIP12UnsignedInput) => ErgoHDKey | undefined;
+type RKey = keyof NonMandatoryRegisters;
+export type UnsignedTransaction = EIP12UnsignedTransaction | ErgoUnsignedTransaction;
+export type KeyMap = Record<number, ErgoHDKey> & { _?: ErgoHDKey[] };
 
 export interface ISigmaProver {
-  signTransaction(
-    unsignedTx: UnsignedTransaction,
-    keys: ErgoHDKey[],
-    keyMapper?: KeyMapper
-  ): SignedTransaction;
-
+  signTransaction(unsignedTx: UnsignedTransaction, keys: ErgoHDKey[]): SignedTransaction;
   verify(message: Uint8Array, signature: Uint8Array, key: ErgoHDKey): boolean;
 }
 
 export class Prover implements ISigmaProver {
-  signTransaction(
-    unsignedTx: UnsignedTransaction,
-    keys: ErgoHDKey[],
-    keyMapper?: KeyMapper
-  ): SignedTransaction {
-    const getKeyFor = buildKeyMapper(keys, keyMapper);
+  signTransaction(unsignedTx: UnsignedTransaction, keys: ErgoHDKey[] | KeyMap): SignedTransaction {
+    const getKeyFor = buildKeyMapper(keys);
     const txData =
       unsignedTx instanceof ErgoUnsignedTransaction ? unsignedTx.toEIP12Object() : unsignedTx;
     const txBytes = serializeTransaction(txData).toBytes();
@@ -40,11 +33,11 @@ export class Prover implements ISigmaProver {
 
     return {
       id: txId,
-      inputs: txData.inputs.map((input) => ({
+      inputs: txData.inputs.map((input, index) => ({
         boxId: input.boxId,
         spendingProof: {
           extension: input.extension,
-          proofBytes: generateProof(txBytes, getKeyFor(input))
+          proofBytes: generateProof(txBytes, getKeyFor(input, index))
         }
       })),
       dataInputs: txData.dataInputs.map((x) => ({ boxId: x.boxId })),
@@ -57,25 +50,25 @@ export class Prover implements ISigmaProver {
   }
 }
 
-function buildKeyMapper(keys: ErgoHDKey[], mapper?: KeyMapper) {
+function buildKeyMapper(keys: ErgoHDKey[] | KeyMap) {
   const pskMap = new Map<string, ErgoHDKey>();
 
-  return (input: EIP12UnsignedInput): ErgoHDKey => {
-    if (keys.length === 1) return keys[0];
+  // cache encoded public keys
+  const k = isKeyMap(keys) ? keys._ : keys;
+  if (some(k)) k.forEach((key) => pskMap.set(hex.encode(key.publicKey), key));
 
-    if (mapper) {
-      const secret = mapper(input);
+  return (input: EIP12UnsignedInput, index: number): ErgoHDKey => {
+    if (isKeyMap(keys)) {
+      const secret = keys[index];
       if (secret) return secret;
     }
 
-    // lazily cache encoded public keys
-    if (pskMap.size === 0) {
-      keys.forEach((secret) => pskMap.set(hex.encode(secret.publicKey), secret));
+    if (pskMap.size === 1) {
+      return pskMap.values().next().value;
     }
 
     for (const pk of pskMap.keys()) {
-      // dumbly check if the public key is included in the the ErgoTree and Registers,
-      // if so, return the corresponding secret
+      // try to determine the secret key from the input by checking the ErgoTree and Registers
       if (includesPubKey(input, pk)) return pskMap.get(pk) as ErgoHDKey;
     }
 
@@ -85,18 +78,17 @@ function buildKeyMapper(keys: ErgoHDKey[], mapper?: KeyMapper) {
   };
 }
 
+function isKeyMap(keys: ErgoHDKey[] | KeyMap): keys is KeyMap {
+  return !Array.isArray(keys);
+}
+
 function includesPubKey(
   { ergoTree, additionalRegisters: registers }: EIP12UnsignedInput,
   pubKey: string
 ): boolean {
-  type RegisterKey = keyof NonMandatoryRegisters;
-
   return (
     ergoTree.includes(pubKey) ||
-    (registers &&
-      Object.keys(registers).some((k) =>
-        registers[k as RegisterKey]?.includes(pubKey) ? true : false
-      ))
+    (registers && Object.keys(registers).some((k) => registers[k as RKey]?.includes(pubKey)))
   );
 }
 

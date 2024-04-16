@@ -1,6 +1,5 @@
-import { _0n, concatBytes } from "@fleet-sdk/common";
-import type { Coder } from "@fleet-sdk/crypto";
-import { blake2b256, hex, randomBytes } from "@fleet-sdk/crypto";
+import { _0n, concatBytes, FleetError } from "@fleet-sdk/common";
+import { bigintBE, blake2b256, hex, randomBytes, validateEcPoint } from "@fleet-sdk/crypto";
 import { secp256k1 } from "@noble/curves/secp256k1";
 
 const { ProjectivePoint: ECPoint, CURVE } = secp256k1;
@@ -12,41 +11,24 @@ const ERGO_SCHNORR_SIG_LEN = BLAKE2B_256_DIGEST_LEN + ERGO_SOUNDNESS_BYTES;
 const MAX_ITERATIONS = 100;
 
 /**
- * A coder for Big Endian  `BigInt` <> `Uint8Array` conversion..
- */
-const bigint: Coder<Uint8Array, bigint> = {
-  /**
-   * Encode a `Uint8Array` to a `BigInt`.
-   */
-  encode(data) {
-    const hexInput = hex.encode(data);
-    return BigInt(hexInput == "" ? "0" : "0x" + hexInput);
-  },
-
-  /**
-   * Decode a `BigInt` to a `Uint8Array`.
-   */
-  decode(data) {
-    const hexData = data.toString(16);
-    return hex.decode(hexData.length % 2 ? "0" + hexData : hexData);
-  }
-};
-
-/**
  * Generates a Schnorr signature for the given message using the provided secret key.
  * @param message - The message to be signed.
  * @param secretKey - The secret key used for signing.
  * @returns The generated signature.
- * @throws Error if the signature generation fails after the maximum number of iterations.
+ * @throws FleetError if the signature generation fails after the maximum number of iterations.
  */
 export function sign(message: Uint8Array, secretKey: Uint8Array) {
   for (let i = 0; i < MAX_ITERATIONS; i++) {
     const signature = genSignature(message, secretKey);
     if (signature) return signature;
+    /* v8 ignore start */
   }
 
-  throw new Error("Failed to generate signature");
+  // This branch is ignored in the coverage report because it depends on randomness.
+
+  throw new FleetError("Failed to generate signature");
 }
+/* v8 ignore stop */
 
 /**
  * Generates a Schnorr signature for the given message using the provided secret key.
@@ -57,40 +39,44 @@ export function sign(message: Uint8Array, secretKey: Uint8Array) {
  * @throws Error if failed to generate commitment.
  */
 export function genSignature(message: Uint8Array, secretKey: Uint8Array): undefined | Uint8Array {
-  const sk = bigint.encode(secretKey);
-  const y = genY();
-  const w = G.multiply(y).toRawBytes();
+  const sk = bigintBE.encode(secretKey);
   const pk = G.multiply(sk).toRawBytes();
+
+  const r = genRandomSecret();
+  const w = G.multiply(r).toRawBytes();
   const s = genCommitment(pk, w, message);
   const c = fiatShamirHash(s);
-  if (c === 0n) throw new Error("Failed to generate challenge");
-  const z = umod(sk * c + y, CURVE.n);
+  // The next line is ignored in the coverage report because it depends on randomness.
+  /* v8 ignore next */
+  if (c === 0n) throw new FleetError("Failed to generate challenge");
+  const z = umod(sk * c + r, CURVE.n);
 
-  const cb = bigint.decode(c);
-  const zb = bigint.decode(z);
-  const signature = concatBytes(cb, zb);
-
+  const signature = concatBytes(bigintBE.decode(c), bigintBE.decode(z));
+  // The next line is ignored in the coverage report because it depends on randomness.
+  /* v8 ignore next */
   if (!verify(message, signature, pk)) return;
   return signature;
 }
 
 /**
- * Generates a random value y within the range [1, CURVE.n].
+ * Generates a random value within the range [1, CURVE.n].
  *
- * @returns The generated value y.
- * @throws Error if failed to generate y after reaching the maximum number of iterations.
+ * @returns The generated value.
+ * @throws FleetError if failed to generate after reaching the maximum number of iterations.
  */
-function genY() {
-  let y = 0n;
+function genRandomSecret() {
+  let r = 0n;
   let c = 0;
 
-  while (y === 0n && c < MAX_ITERATIONS) {
-    y = umod(bigint.encode(randomBytes(32)), CURVE.n);
+  while (r === 0n && c < MAX_ITERATIONS) {
+    r = umod(bigintBE.encode(randomBytes(32)), CURVE.n);
     c++;
   }
 
-  if (y === 0n) throw new Error("Failed to generate y");
-  return y;
+  // The next line is ignored in the coverage report because it depends on randomness.
+  /* v8 ignore next */
+  if (r === 0n) throw new FleetError("Failed to generate randomness");
+  return r;
 }
 
 /**
@@ -109,12 +95,14 @@ export function umod(a: bigint, b: bigint): bigint {
  * @param proof - The proof to be verified.
  * @param publicKey - The public key corresponding to the private key used to generate the signature.
  * @returns A boolean indicating whether the signature is valid or not.
+ * @throws FleetError if the public key is invalid.
  */
 export function verify(message: Uint8Array, proof: Uint8Array, publicKey: Uint8Array) {
-  if (proof.length !== ERGO_SCHNORR_SIG_LEN) return false;
+  if (!proof || proof.length !== ERGO_SCHNORR_SIG_LEN) return false;
+  if (!validateEcPoint(publicKey)) throw new FleetError("Invalid Public Key.");
 
-  const c = bigint.encode(proof.slice(0, ERGO_SOUNDNESS_BYTES));
-  const z = bigint.encode(proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN));
+  const c = bigintBE.encode(proof.slice(0, ERGO_SOUNDNESS_BYTES));
+  const z = bigintBE.encode(proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN));
 
   const t = ECPoint.fromHex(publicKey).multiply(CURVE.n - c);
   const w = G.multiply(z).add(t).toRawBytes();
@@ -127,7 +115,7 @@ export function verify(message: Uint8Array, proof: Uint8Array, publicKey: Uint8A
  * Computes the numeric Fiat-Shamir hash of a given message.
  */
 function fiatShamirHash(message: Uint8Array) {
-  return bigint.encode(blake2b256(message).slice(0, ERGO_SOUNDNESS_BYTES));
+  return bigintBE.encode(blake2b256(message).slice(0, ERGO_SOUNDNESS_BYTES));
 }
 
 const COMMITMENT_PREFIX = hex.decode("010027100108cd");

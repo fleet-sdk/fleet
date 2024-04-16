@@ -11,7 +11,6 @@ describe("Instantiation", () => {
   it("Should create from mnemonic and auto derive to ergo's default change path by default", async () => {
     const mnemonic = generateMnemonic();
     const key = await ErgoHDKey.fromMnemonic(mnemonic);
-
     expect(key.publicKey).not.to.be.empty;
     expect(key.privateKey).not.to.be.empty;
     expect(key.chainCode).not.to.be.empty;
