@@ -30,4 +30,5 @@ jobs:
         if: success() || failure()
         uses: codecov/codecov-action@v3
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/coverage-final.json
