@@ -41,20 +41,21 @@ export function sign(message: Uint8Array, secretKey: Uint8Array) {
 export function genSignature(message: Uint8Array, secretKey: Uint8Array): undefined | Uint8Array {
   const sk = bigintBE.encode(secretKey);
   const pk = G.multiply(sk).toRawBytes();
-
   const r = genRandomSecret();
   const w = G.multiply(r).toRawBytes();
-  const s = genCommitment(pk, w, message);
-  const c = fiatShamirHash(s);
+  const c = fiatShamirHash(genCommitment(pk, w, message));
+
   // The next line is ignored in the coverage report because it depends on randomness.
   /* v8 ignore next */
   if (c === 0n) throw new FleetError("Failed to generate challenge");
-  const z = umod(sk * c + r, CURVE.n);
 
+  const z = umod(sk * c + r, CURVE.n);
   const signature = concatBytes(bigintBE.decode(c), bigintBE.decode(z));
+
   // The next line is ignored in the coverage report because it depends on randomness.
   /* v8 ignore next */
   if (!verify(message, signature, pk)) return;
+
   return signature;
 }
 
@@ -76,6 +77,7 @@ function genRandomSecret() {
   // The next line is ignored in the coverage report because it depends on randomness.
   /* v8 ignore next */
   if (r === 0n) throw new FleetError("Failed to generate randomness");
+
   return r;
 }
 
@@ -101,14 +103,14 @@ export function verify(message: Uint8Array, proof: Uint8Array, publicKey: Uint8A
   if (!proof || proof.length !== ERGO_SCHNORR_SIG_LEN) return false;
   if (!validateEcPoint(publicKey)) throw new FleetError("Invalid Public Key.");
 
-  const c = bigintBE.encode(proof.slice(0, ERGO_SOUNDNESS_BYTES));
-  const z = bigintBE.encode(proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN));
+  const pc = bigintBE.encode(proof.slice(0, ERGO_SOUNDNESS_BYTES));
+  const pz = bigintBE.encode(proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN));
 
-  const t = ECPoint.fromHex(publicKey).multiply(CURVE.n - c);
-  const w = G.multiply(z).add(t).toRawBytes();
-  const s = genCommitment(publicKey, w, message);
+  const vt = ECPoint.fromHex(publicKey).multiply(CURVE.n - pc);
+  const vw = G.multiply(pz).add(vt).toRawBytes();
+  const vc = fiatShamirHash(genCommitment(publicKey, vw, message));
 
-  return fiatShamirHash(s) === c;
+  return vc === pc;
 }
 
 /**

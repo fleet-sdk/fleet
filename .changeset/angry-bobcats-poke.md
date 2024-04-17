@@ -2,4 +2,4 @@
 "@fleet-sdk/wallet": minor
 ---
 
-Add transaction signing and verifying
+Add `ProveDLog` transaction signing and verifying

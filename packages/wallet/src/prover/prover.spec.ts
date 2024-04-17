@@ -1,4 +1,4 @@
-import { OutputBuilder, TransactionBuilder } from "@fleet-sdk/core";
+import { OutputBuilder, SGroupElement, SSigmaProp, TransactionBuilder } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { Address, verify_signature } from "ergo-lib-wasm-nodejs";
 import { describe, expect, it } from "vitest";
@@ -39,6 +39,44 @@ describe("Transaction signing", () => {
 
     // verify using sigma-rust for comparison
     const addr = Address.from_public_key(rootKey.publicKey);
+    expect(verify_signature(addr, txBytes, proof)).to.be.true;
+  });
+
+  it("Should should determine key from registers", async () => {
+    // generate keys
+    const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
+    const child1 = rootKey.deriveChild(1);
+
+    // mock inputs
+    const input = mockUTxO({
+      value: 1_000_000_000n,
+      ergoTree: "190600e4c6a70408" /** SELF.R4[SigmaProp].get */,
+      additionalRegisters: {
+        R4: SSigmaProp(SGroupElement(child1.publicKey)).toHex()
+      }
+    });
+
+    // build the unsigned transaction
+    const unsignedTx = new TransactionBuilder(height)
+      .from(input)
+      .to(new OutputBuilder(10_000_000n, externalAddress))
+      .sendChangeTo(rootKey.address)
+      .payMinFee()
+      .build();
+
+    // sign
+    const prover = new Prover();
+    const signedTx = prover.signTransaction(unsignedTx, [rootKey, child1]);
+
+    // verify
+    const txBytes = unsignedTx.toBytes();
+    const proof = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
+
+    // verify using own verifier
+    expect(prover.verify(txBytes, proof, child1)).to.be.true;
+
+    // verify using sigma-rust for comparison
+    const addr = Address.from_public_key(child1.publicKey);
     expect(verify_signature(addr, txBytes, proof)).to.be.true;
   });
 

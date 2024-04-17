@@ -1,6 +1,5 @@
 {
   "private": "true",
-  "packageManager": "pnpm@8.1.1",
   "repository": "fleet-sdk/fleet",
   "license": "MIT",
   "scripts": {
