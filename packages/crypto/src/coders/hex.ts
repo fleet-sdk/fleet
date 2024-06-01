@@ -12,6 +12,10 @@ const enum HexChar {
   F_LO = 102 // f
 }
 
+/**
+ * Convert a Uint8Array to a hex string
+ * @param bytes
+ */
 function bytesToHex(bytes: Uint8Array): string {
   assertInstanceOf(bytes, Uint8Array);
 
@@ -23,6 +27,10 @@ function bytesToHex(bytes: Uint8Array): string {
   return hex;
 }
 
+/**
+ * Convert a hex string to a Uint8Array
+ * @param hex
+ */
 function hexToBytes(hex: string): Uint8Array {
   assertTypeOf(hex, "string");
   assert(hex.length % 2 === 0, "Invalid hex padding.");
@@ -38,6 +46,14 @@ function hexToBytes(hex: string): Uint8Array {
   return bytes;
 }
 
+/**
+ * Convert a hex character code to a base 16 number
+ * @param char
+ *
+ * @example
+ * charCodeToBase16(48) // 0
+ * charCodeToBase16(57) // 9
+ */
 function charCodeToBase16(char: number) {
   if (char >= HexChar.ZERO && char <= HexChar.NINE) return char - HexChar.ZERO;
   if (char >= HexChar.A_UP && char <= HexChar.F_UP) return char - (HexChar.A_UP - 10);
