@@ -1,6 +1,6 @@
-import { AddressType, Base58String, HexString, isEmpty, Network } from "@fleet-sdk/common";
+import { AddressType, Base58String, HexString, Network } from "@fleet-sdk/common";
 import { areEqual, concatBytes, endsWith, first, isDefined, startsWith } from "@fleet-sdk/common";
-import { base58, blake2b256, hex } from "@fleet-sdk/crypto";
+import { base58, blake2b256, hex, validateEcPoint } from "@fleet-sdk/crypto";
 import { InvalidAddress } from "../errors/invalidAddress";
 
 const CHECKSUM_LENGTH = 4;
@@ -42,24 +42,6 @@ function _getErgoTreeType(ergoTree: Uint8Array): AddressType {
   } else {
     return AddressType.P2S;
   }
-}
-
-/**
- * Validates a compressed Elliptic Curve point. Every non-infinity
- * compressed point must contain 33 bytes, and the first byte must
- * be equal to `0x02` or `0x03`, as described above:
- *
- * `0x02` = compressed, positive Y coordinate.
- * `0x03` = compressed, negative Y coordinate.
- *
- * @param pointBytes ECPoint bytes
- */
-function _validateCompressedEcPoint(pointBytes: Uint8Array) {
-  if (isEmpty(pointBytes) || pointBytes.length !== 33) {
-    return false;
-  }
-
-  return pointBytes[0] === 0x02 || pointBytes[0] === 0x03;
 }
 
 /**
@@ -123,7 +105,7 @@ export class ErgoAddress {
    */
   public static fromPublicKey(publicKey: HexString | Uint8Array, network?: Network): ErgoAddress {
     const bytes = _ensureBytes(publicKey);
-    if (!_validateCompressedEcPoint(bytes)) {
+    if (!validateEcPoint(bytes)) {
       throw new Error("The Public Key is invalid.");
     }
 
@@ -182,9 +164,7 @@ export class ErgoAddress {
     if (_getEncodedAddressType(bytes) === AddressType.P2PK) {
       const pk = bytes.subarray(1, bytes.length - CHECKSUM_LENGTH);
 
-      if (!_validateCompressedEcPoint(pk)) {
-        return false;
-      }
+      if (!validateEcPoint(pk)) return false;
     }
 
     const script = bytes.subarray(0, bytes.length - CHECKSUM_LENGTH);

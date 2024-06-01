@@ -1,8 +1,8 @@
 export type BytesInput = Uint8Array | string;
 
 export interface Coder<F, T> {
-  encode(from: F): T;
-  decode(to: T): F;
+  encode(decoded: F): T;
+  decode(encoded: T): F;
 }
 
 export interface BytesCoder extends Coder<Uint8Array, string> {

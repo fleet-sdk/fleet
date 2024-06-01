@@ -8,3 +8,4 @@ export const randomBytes = nobleRandomBytes as (bytesLength?: number) => Uint8Ar
 export * from "./hashes";
 export * from "./types";
 export * from "./coders";
+export * from "./ecpoint";

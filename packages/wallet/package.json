@@ -35,8 +35,12 @@
   },
   "dependencies": {
     "@fleet-sdk/core": "workspace:^",
-    "@scure/bip32": "^1.3.2",
-    "@scure/bip39": "^1.2.1"
+    "@fleet-sdk/common": "workspace:^",
+    "@fleet-sdk/serializer": "workspace:^",
+    "@fleet-sdk/crypto": "workspace:^",
+    "@scure/bip32": "^1.4.0",
+    "@scure/bip39": "^1.3.0",
+    "@noble/curves": "^1.4.0"
   },
   "engines": {
     "node": ">=14"

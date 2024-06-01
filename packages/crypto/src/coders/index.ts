@@ -12,3 +12,4 @@ export const base64 = base64Coder as BytesCoder;
 
 export { hex } from "./hex";
 export { utf8 } from "./utf8";
+export { bigintBE } from "./bigintBE";

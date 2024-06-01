@@ -20,7 +20,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
 
       - uses: actions/setup-node@v3
         with:
@@ -38,7 +38,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
 
       - uses: actions/setup-node@v3
         with:
@@ -61,7 +61,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
 
       - name: Build and test using Node.js v${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -86,7 +86,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
 
       - name: Build and test using bun ${{ matrix.bun-version }}
         uses: oven-sh/setup-bun@v1
@@ -108,7 +108,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
 
       - name: Build using Node.js v20
         uses: actions/setup-node@v3
