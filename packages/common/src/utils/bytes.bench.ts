@@ -12,11 +12,9 @@ const HEX_CHARSET = new Set("0123456789abcdefABCDEF");
 function isHexChar(value: string) {
   if (!value || value.length % 2) return false;
 
-  const valueSet = new Set(Array.from(value));
+  const valueSet = new Set(value);
   for (const c of valueSet) {
-    if (!HEX_CHARSET.has(c)) {
-      return false;
-    }
+    if (!HEX_CHARSET.has(c)) return false;
   }
 
   return true;
