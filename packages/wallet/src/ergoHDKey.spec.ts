@@ -65,7 +65,7 @@ describe("Instantiation", () => {
     expect(neuteredKey.isNeutered()).to.be.true;
     expect(neuteredKey.isExtended()).to.be.true;
 
-    const simplePk = ErgoHDKey.fromExtendedKey({ publicKey: fullKey.publicKey });
+    const simplePk = new ErgoHDKey({ publicKey: fullKey.publicKey });
     expect(simplePk.hasPrivateKey()).to.be.false;
     expect(simplePk.isNeutered()).to.be.true;
     expect(simplePk.isExtended()).to.be.false;
@@ -73,7 +73,7 @@ describe("Instantiation", () => {
 });
 
 describe("Extended keys", () => {
-  it("Should create and restore from public extended key", async () => {
+  it("Should create and restore from public encoded extended key", async () => {
     const mnemonic = generateMnemonic();
     const key = await ErgoHDKey.fromMnemonic(mnemonic);
 
@@ -88,7 +88,15 @@ describe("Extended keys", () => {
     expect(recreatedKeyFromPk.chainCode).to.be.deep.equal(key.chainCode);
   });
 
-  it("Should create and restore from private extended key", async () => {
+  it("Should create from extended public key encoded as hex string", () => {
+    const xpk =
+      "0488b21e000000000000000000412bc02c85a3499d85f985ee6068c23f2345eb1c8b3fc34309df13b6a5ac56e803cf03e43683a9b7965603a5cc222bd31fa269d12527cda358965716c794c82253";
+
+    const key = ErgoHDKey.fromExtendedKey(xpk).deriveChild(0);
+    expect(key.address.encode()).to.be.equal("9gfJXuRPGwocBsVvKc6GPp294Y3i24v3rd5GP6UXQiV1bjChoDB");
+  });
+
+  it("Should create and restore from private encoded extended key", async () => {
     const mnemonic = generateMnemonic();
     const key = await ErgoHDKey.fromMnemonic(mnemonic);
 
@@ -123,18 +131,14 @@ describe("Extended keys", () => {
     expect(fullyRecreatedKey.publicKey).to.be.deep.equal(key.publicKey);
     expect(fullyRecreatedKey.chainCode).to.be.deep.equal(key.chainCode);
 
-    const recreatedFromPrivateKey = ErgoHDKey.fromExtendedKey({
-      privateKey: key.privateKey!
-    });
+    const recreatedFromPrivateKey = new ErgoHDKey({ privateKey: key.privateKey! });
     expect(recreatedFromPrivateKey.depth).to.be.equal(0);
     expect(recreatedFromPrivateKey.index).to.be.equal(0);
     expect(recreatedFromPrivateKey.privateKey).to.deep.equal(key.privateKey);
     expect(recreatedFromPrivateKey.publicKey).to.be.deep.equal(key.publicKey);
     expect(recreatedFromPrivateKey.chainCode).to.be.undefined;
 
-    const recreatedFromPublicKey = ErgoHDKey.fromExtendedKey({
-      publicKey: key.publicKey
-    });
+    const recreatedFromPublicKey = new ErgoHDKey({ publicKey: key.publicKey });
     expect(recreatedFromPublicKey.depth).to.be.equal(0);
     expect(recreatedFromPublicKey.index).to.be.equal(0);
     expect(recreatedFromPublicKey.privateKey).to.be.undefined;
