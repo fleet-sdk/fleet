@@ -2,7 +2,7 @@ import { first } from "@fleet-sdk/common";
 import { base58check, hex } from "@fleet-sdk/crypto";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import SigmaRust from "ergo-lib-wasm-nodejs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import { keyAddressesTestVectors } from "./_test-vectors/keyVectors";
 import { ERGO_CHANGE_PATH, ErgoHDKey } from "./ergoHDKey";
 import { generateMnemonic } from "./mnemonic";
@@ -52,6 +52,23 @@ describe("Instantiation", () => {
 
     key.wipePrivateData();
     expect(key.privateKey).to.be.undefined;
+  });
+
+  test("Utility checks", () => {
+    const fullKey = ErgoHDKey.fromMnemonicSync(generateMnemonic());
+    expect(fullKey.hasPrivateKey()).to.be.true;
+    expect(fullKey.isNeutered()).to.be.false;
+    expect(fullKey.isExtended()).to.be.true;
+
+    const neuteredKey = fullKey.wipePrivateData();
+    expect(neuteredKey.hasPrivateKey()).to.be.false;
+    expect(neuteredKey.isNeutered()).to.be.true;
+    expect(neuteredKey.isExtended()).to.be.true;
+
+    const simplePk = ErgoHDKey.fromExtendedKey({ publicKey: fullKey.publicKey });
+    expect(simplePk.hasPrivateKey()).to.be.false;
+    expect(simplePk.isNeutered()).to.be.true;
+    expect(simplePk.isExtended()).to.be.false;
   });
 });
 

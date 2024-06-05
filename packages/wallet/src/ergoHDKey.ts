@@ -28,6 +28,10 @@ export type PublicKeyOptions = HDKeyOptions & {
   publicKey: Uint8Array;
 };
 
+type ExtendedErgoKey = ErgoHDKey & { chainCode: Uint8Array };
+type FullErgoKey = ExtendedErgoKey & { chainCode: Uint8Array; privateKey: Uint8Array };
+type NeuteredErgoKey = Omit<ErgoHDKey, "privateKey" | "extendedPrivateKey">;
+
 export class ErgoHDKey {
   readonly #root: HDKey;
   readonly #publicKey: Uint8Array;
@@ -112,9 +116,20 @@ export class ErgoHDKey {
     return new ErgoHDKey(this.#root.derive(path));
   }
 
-  wipePrivateData(): ErgoHDKey {
+  wipePrivateData(): NeuteredErgoKey {
     this.#root.wipePrivateData();
-
     return this;
+  }
+
+  isExtended(): this is ExtendedErgoKey {
+    return this.chainCode !== undefined;
+  }
+
+  isNeutered(): this is NeuteredErgoKey {
+    return this.privateKey === undefined;
+  }
+
+  hasPrivateKey(): this is FullErgoKey {
+    return this.privateKey !== undefined;
   }
 }
