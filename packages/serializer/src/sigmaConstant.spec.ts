@@ -1,5 +1,5 @@
 import { ensureBigInt } from "@fleet-sdk/common";
-import { hex, randomBytes } from "@fleet-sdk/crypto";
+import { hex, randomBytes, utf8 } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
 import {
   bigintVectors,
@@ -15,7 +15,7 @@ import {
 } from "./_test-vectors/constantVectors";
 import { SigmaWriter } from "./coders";
 import { DataSerializer } from "./serializers";
-import { parse, SConstant } from "./sigmaConstant";
+import { decode, parse, SConstant } from "./sigmaConstant";
 import { SGroupElementType } from "./types";
 import {
   SBigInt,
@@ -144,10 +144,15 @@ describe("SColl serialization and parsing", () => {
   });
 });
 
-describe("Data only parsing", () => {
-  it("Should parse only data", () => {
-    expect(parse("40050002")).to.deep.equal([0, 1n]);
-    expect(parse("0101")).to.deep.equal(true);
+describe("Data only decoding", () => {
+  it("Should decode only data", () => {
+    expect(decode("40050002")).to.deep.equal([0, 1n]);
+    expect(decode("0101")).to.deep.equal(true);
+  });
+
+  it("Should decode and encode using custom coder", () => {
+    expect(decode("0e0a46656d616c6520233035", utf8.encode)).to.be.equal("Female #05");
+    expect(decode(SInt(1).toHex(), (v: number) => v.toString())).to.be.equal("1");
   });
 
   it("Should throw with invalid bytes in 'strict' parsing mode", () => {
@@ -157,12 +162,12 @@ describe("Data only parsing", () => {
     expect(() => parse(undefined as unknown as string, "strict")).to.throw();
   });
 
-  it("Should not throw but return undefined with invalid bytes in 'safe' parsing mode", () => {
-    expect(() => parse("deadbeef", "safe")).not.to.throw();
-    expect(parse("deadbeef", "safe")).to.be.undefined;
-    expect(parse(undefined, "safe")).to.be.undefined;
-    expect(parse("", "safe")).to.be.undefined;
-    expect(parse("0102", "safe")).to.be.equal(false);
+  it("Should not throw but return undefined with invalid bytes", () => {
+    expect(() => decode("deadbeef")).not.to.throw();
+    expect(decode("deadbeef")).to.be.undefined;
+    expect(decode(undefined)).to.be.undefined;
+    expect(decode("")).to.be.undefined;
+    expect(decode("0102")).to.be.equal(false);
   });
 });
 
