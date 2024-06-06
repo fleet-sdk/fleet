@@ -1,4 +1,4 @@
-import { assert, isHex } from "@fleet-sdk/common";
+import { isHex } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
 import { base58check, hex } from "@fleet-sdk/crypto";
 import { HDKey } from "@scure/bip32";
@@ -38,13 +38,7 @@ export class ErgoHDKey {
   #address?: ErgoAddress;
 
   constructor(keyOrOpt: HDKey | PrivateKeyOptions | PublicKeyOptions) {
-    if (keyOrOpt instanceof HDKey) {
-      assert(!!keyOrOpt.publicKey, "Public key is not present");
-      this.#root = keyOrOpt;
-    } else {
-      const key = new HDKey(keyOrOpt);
-      this.#root = key;
-    }
+    this.#root = keyOrOpt instanceof HDKey ? keyOrOpt : new HDKey(keyOrOpt);
   }
 
   get publicKey(): Uint8Array {
