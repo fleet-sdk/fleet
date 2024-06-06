@@ -1,5 +1,24 @@
 # @fleet-sdk/wallet
 
+## 0.4.0
+
+### Minor Changes
+
+- 66b70a2: Add `ProveDLog` transaction signing and verification
+- 3fda2cc: Add hex encoding support to `ErgoHDKey#fromExtendedKey()`
+- 9ff14d9: Add `ErgoHDKey#isNeutered()`, `ErgoHDKey#isExtended()`, and `ErgoHDKey#hasPrivateKey()` utility methods.
+- 3fda2cc: Deprecate optioned arguments for `ErgoHDKey#fromExtendedKeys()` and create default constructor
+
+### Patch Changes
+
+- Updated dependencies [0089ed6]
+- Updated dependencies [70aea89]
+- Updated dependencies [253d37a]
+- Updated dependencies [0089ed6]
+  - @fleet-sdk/serializer@0.4.0
+  - @fleet-sdk/crypto@0.4.0
+  - @fleet-sdk/core@0.4.0
+
 ## 0.3.4
 
 ### Patch Changes
