@@ -1,5 +1,16 @@
 # @fleet-sdk/core
 
+## 0.4.0
+
+### Patch Changes
+
+- Updated dependencies [0089ed6]
+- Updated dependencies [70aea89]
+- Updated dependencies [253d37a]
+- Updated dependencies [0089ed6]
+  - @fleet-sdk/serializer@0.4.0
+  - @fleet-sdk/crypto@0.4.0
+
 ## 0.3.4
 
 ### Patch Changes

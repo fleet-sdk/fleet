@@ -1,5 +1,11 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.4.0
+
+### Patch Changes
+
+- @fleet-sdk/core@0.4.0
+
 ## 0.3.4
 
 ### Patch Changes

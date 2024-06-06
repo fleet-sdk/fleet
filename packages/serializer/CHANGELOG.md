@@ -1,5 +1,18 @@
 # @fleet-sdk/serializer
 
+## 0.4.0
+
+### Minor Changes
+
+- 0089ed6: Deprecate `parse()` function
+- 0089ed6: Add `decode()` function
+
+### Patch Changes
+
+- Updated dependencies [70aea89]
+- Updated dependencies [253d37a]
+  - @fleet-sdk/crypto@0.4.0
+
 ## 0.3.4
 
 ### Patch Changes

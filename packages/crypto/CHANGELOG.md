@@ -1,5 +1,12 @@
 # @fleet-sdk/crypto
 
+## 0.4.0
+
+### Minor Changes
+
+- 70aea89: Add `bigintBE` coder
+- 253d37a: Add `validateEcPoint()` function
+
 ## 0.3.4
 
 ### Patch Changes
