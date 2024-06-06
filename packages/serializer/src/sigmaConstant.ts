@@ -1,4 +1,4 @@
-import { assert } from "@fleet-sdk/common";
+import { assert, isUndefined } from "@fleet-sdk/common";
 import { BytesInput, hex } from "@fleet-sdk/crypto";
 import { SigmaReader, SigmaWriter } from "./coders";
 import { DataSerializer } from "./serializers/dataSerializer";
@@ -47,9 +47,26 @@ export class SConstant<D = unknown, T extends SType = SType> {
   }
 }
 
+export function decode<T>(value: BytesInput | undefined): T | undefined;
+export function decode<T, K>(value: BytesInput | undefined, coder: (input: T) => K): K | undefined;
+export function decode<T, K>(
+  value: BytesInput | undefined,
+  coder?: (input: T) => K
+): T | K | undefined {
+  if (isUndefined(value)) return;
+  const data = parse<T>(value, "safe");
+  if (isUndefined(data)) return;
+
+  return coder ? coder(data) : data;
+}
+
+/** @deprecated use `decode` instead */
 export function parse<T>(constant: BytesInput): T;
+/** @deprecated use `decode` instead */
 export function parse<T>(constant: BytesInput, mode: "strict"): T;
+/** @deprecated use `decode` instead */
 export function parse<T>(constant: BytesInput | undefined, mode: "safe"): T | undefined;
+/** @deprecated use `decode` instead */
 export function parse<T>(constant: BytesInput | undefined, mode: "strict" | "safe" = "strict") {
   if (mode === "strict") return SConstant.from<T>(constant ?? "").data;
   if (!constant) return;
