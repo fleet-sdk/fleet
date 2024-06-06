@@ -1,5 +1,6 @@
-import { assert } from "@fleet-sdk/common";
+import { isHex } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
+import { base58check, hex } from "@fleet-sdk/crypto";
 import { HDKey } from "@scure/bip32";
 import { mnemonicToSeed, mnemonicToSeedSync } from "@scure/bip39";
 
@@ -28,21 +29,20 @@ export type PublicKeyOptions = HDKeyOptions & {
   publicKey: Uint8Array;
 };
 
+type ExtendedErgoKey = ErgoHDKey & { chainCode: Uint8Array };
+type FullErgoKey = ExtendedErgoKey & { chainCode: Uint8Array; privateKey: Uint8Array };
+type NeuteredErgoKey = Omit<ErgoHDKey, "privateKey" | "extendedPrivateKey">;
+
 export class ErgoHDKey {
   readonly #root: HDKey;
-  readonly #publicKey: Uint8Array;
-
   #address?: ErgoAddress;
 
-  private constructor(key: HDKey) {
-    assert(!!key.publicKey, "Public key is not present");
-
-    this.#root = key;
-    this.#publicKey = key.publicKey;
+  constructor(keyOrOpt: HDKey | PrivateKeyOptions | PublicKeyOptions) {
+    this.#root = keyOrOpt instanceof HDKey ? keyOrOpt : new HDKey(keyOrOpt);
   }
 
   get publicKey(): Uint8Array {
-    return this.#publicKey;
+    return this.#root.publicKey!;
   }
 
   get privateKey(): Uint8Array | undefined {
@@ -92,16 +92,23 @@ export class ErgoHDKey {
     return new ErgoHDKey(key);
   }
 
-  static fromExtendedKey(options: PrivateKeyOptions): ErgoHDKey;
-  static fromExtendedKey(options: PublicKeyOptions): ErgoHDKey;
+  /**
+   * Create an ErgoHDKey from an extended key
+   * @param encodedKey
+   */
   static fromExtendedKey(encodedKey: string): ErgoHDKey;
+  /** @deprecated use the default constructor instead */
+  static fromExtendedKey(options: PrivateKeyOptions): ErgoHDKey;
+  /** @deprecated use the default constructor instead */
+  static fromExtendedKey(options: PublicKeyOptions): ErgoHDKey;
+  /** @deprecated use the default constructor instead */
   static fromExtendedKey(keyOrOptions: string | PrivateKeyOptions | PublicKeyOptions): ErgoHDKey {
-    const rootKey =
-      typeof keyOrOptions === "string"
-        ? HDKey.fromExtendedKey(keyOrOptions)
-        : new HDKey(keyOrOptions);
+    if (typeof keyOrOptions !== "string") {
+      return new ErgoHDKey(keyOrOptions);
+    }
 
-    return new ErgoHDKey(rootKey);
+    const xKey = isHex(keyOrOptions) ? base58check.encode(hex.decode(keyOrOptions)) : keyOrOptions;
+    return new ErgoHDKey(HDKey.fromExtendedKey(xKey));
   }
 
   deriveChild(index: number): ErgoHDKey {
@@ -112,9 +119,20 @@ export class ErgoHDKey {
     return new ErgoHDKey(this.#root.derive(path));
   }
 
-  wipePrivateData(): ErgoHDKey {
+  wipePrivateData(): NeuteredErgoKey {
     this.#root.wipePrivateData();
-
     return this;
+  }
+
+  isExtended(): this is ExtendedErgoKey {
+    return this.chainCode !== undefined;
+  }
+
+  isNeutered(): this is NeuteredErgoKey {
+    return this.privateKey === undefined;
+  }
+
+  hasPrivateKey(): this is FullErgoKey {
+    return this.privateKey !== undefined;
   }
 }
