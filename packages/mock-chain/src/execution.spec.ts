@@ -2,7 +2,7 @@ import { TransactionBuilder } from "@fleet-sdk/core";
 import { ErgoHDKey } from "@fleet-sdk/wallet";
 import { regularBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
-import { execute } from "./executor";
+import { execute } from "./execution";
 import { MockChain } from "./mockChain";
 import { mockUTxO } from "./objectMocking";
 import { KeyedMockChainParty } from "./party";

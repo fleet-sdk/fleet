@@ -1,11 +1,11 @@
 import { ensureDefaults, first, HexString, isUndefined, some } from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { utf8 } from "@fleet-sdk/crypto";
-import { parse } from "@fleet-sdk/serializer";
+import { decode } from "@fleet-sdk/serializer";
 import { bgRed, bold, red } from "picocolors";
 import { printDiff } from "./balancePrinting";
-import { BLOCKCHAIN_PARAMETERS, execute } from "./executor";
-import { mockBlockchainStateContext, mockHeaders } from "./objectMocking";
+import { BLOCKCHAIN_PARAMETERS, execute } from "./execution";
+import { mockBlockchainStateContext } from "./objectMocking";
 import { KeyedMockChainParty, MockChainParty, NonKeyedMockChainParty } from "./party";
 import { BlockchainParameters } from "sigmastate-js/main";
 
@@ -43,10 +43,10 @@ export type BlockState = {
 };
 
 export class MockChain {
-  private readonly _parties: MockChainParty[];
-  private readonly _tip: BlockState;
-  private readonly _bottom: BlockState;
-  private _assetsMetadata: AssetMetadataMap;
+  readonly #parties: MockChainParty[];
+  readonly #tip: BlockState;
+  readonly #base: BlockState;
+  #metadataMap: AssetMetadataMap;
 
   constructor();
   constructor(height?: number);
@@ -63,26 +63,26 @@ export class MockChain {
       parameters: ensureDefaults(options.parameters, BLOCKCHAIN_PARAMETERS)
     });
 
-    this._tip = state;
-    this._bottom = { ...state };
-    this._parties = [];
-    this._assetsMetadata = new Map();
+    this.#tip = state;
+    this.#base = { ...state };
+    this.#parties = [];
+    this.#metadataMap = new Map();
   }
 
   get assetsMetadata(): AssetMetadataMap {
-    return this._assetsMetadata;
+    return this.#metadataMap;
   }
 
   get height(): number {
-    return this._tip.height;
+    return this.#tip.height;
   }
 
   get timestamp(): number {
-    return this._tip.timestamp;
+    return this.#tip.timestamp;
   }
 
   get parties(): MockChainParty[] {
-    return this._parties;
+    return this.#parties;
   }
 
   newBlock() {
@@ -90,30 +90,30 @@ export class MockChain {
   }
 
   newBlocks(count: number) {
-    this._tip.height += count;
-    this._tip.timestamp += BLOCK_TIME_MS * count;
+    this.#tip.height += count;
+    this.#tip.timestamp += BLOCK_TIME_MS * count;
   }
 
   jumpTo(newHeight: number) {
-    this.newBlocks(newHeight - this._tip.height);
+    this.newBlocks(newHeight - this.#tip.height);
   }
 
   clearUTxOSet() {
-    for (const party of this._parties) {
+    for (const party of this.#parties) {
       party.utxos.clear();
     }
   }
 
   reset() {
     this.clearUTxOSet();
-    this._tip.height = this._bottom.height;
-    this._tip.timestamp = this._bottom.timestamp;
+    this.#tip.height = this.#base.height;
+    this.#tip.timestamp = this.#base.timestamp;
   }
 
   newParty(name?: string): KeyedMockChainParty;
   newParty(nonKeyedOptions?: NonKeyedMockChainPartyOptions): NonKeyedMockChainParty;
   newParty(optOrName?: string | NonKeyedMockChainPartyOptions): MockChainParty {
-    return this._pushParty(
+    return this.#pushParty(
       typeof optOrName === "string" || isUndefined(optOrName)
         ? new KeyedMockChainParty(this, optOrName)
         : new NonKeyedMockChainParty(this, optOrName.ergoTree, optOrName.name)
@@ -121,29 +121,37 @@ export class MockChain {
   }
 
   addParty(ergoTree: HexString, name?: string): NonKeyedMockChainParty {
-    return this._pushParty(new NonKeyedMockChainParty(this, ergoTree, name));
+    return this.#pushParty(new NonKeyedMockChainParty(this, ergoTree, name));
   }
 
-  private _pushParty<T extends MockChainParty>(party: T): T {
-    this._parties.push(party);
+  #pushParty<T extends MockChainParty>(party: T): T {
+    this.#parties.push(party);
 
     return party;
   }
 
   execute(
     unsignedTransaction: ErgoUnsignedTransaction,
-    options?: TransactionExecutionOptions
+    options?: TransactionExecutionOptions,
+    baseCost?: number
   ): boolean {
-    const keys = (options?.signers || this._parties)
+    const keys = (options?.signers || this.#parties)
       .filter((party): party is KeyedMockChainParty => party instanceof KeyedMockChainParty)
       .map((party) => party.key);
 
-    const context = mockBlockchainStateContext(10, {
-      fromHeight: this._tip.height,
-      fromTimestamp: this._tip.timestamp
+    const context = mockBlockchainStateContext({
+      headers: {
+        quantity: 10,
+        fromHeight: this.#tip.height,
+        fromTimestamp: this.#tip.timestamp
+      }
     });
 
-    const result = execute(unsignedTransaction, keys, context, this._tip.parameters);
+    const result = execute(unsignedTransaction, keys, {
+      context,
+      parameters: this.#tip.parameters,
+      baseCost
+    });
 
     if (!result.success) {
       if (options?.log) {
@@ -155,11 +163,11 @@ export class MockChain {
     }
 
     const preExecBalances = options?.log
-      ? this._parties.map((party) => party.toString())
+      ? this.#parties.map((party) => party.toString())
       : undefined;
 
     const { inputs, outputs } = unsignedTransaction.toPlainObject();
-    for (const party of this._parties) {
+    for (const party of this.#parties) {
       for (let i = inputs.length - 1; i >= 0; i--) {
         if (party.utxos.exists(inputs[i].boxId)) {
           party.utxos.remove(inputs[i].boxId);
@@ -177,12 +185,12 @@ export class MockChain {
       }
     }
 
-    this._pushAssetMetadata(unsignedTransaction);
+    this.#pushMetadata(unsignedTransaction);
 
     this.newBlock();
 
     if (some(preExecBalances) && result.success) {
-      const postExecBalances = this._parties.map((party) => party.toString());
+      const postExecBalances = this.#parties.map((party) => party.toString());
 
       log("State changes:\n");
       for (let i = 0; i < preExecBalances.length; i++) {
@@ -194,17 +202,17 @@ export class MockChain {
     return true;
   }
 
-  private _pushAssetMetadata(transaction: ErgoUnsignedTransaction) {
+  #pushMetadata(transaction: ErgoUnsignedTransaction) {
     const firstInputId = first(transaction.inputs).boxId;
     const box = transaction.outputs.find((output) =>
       output.assets.some((asset) => asset.tokenId === firstInputId)
     );
 
     if (box) {
-      const name = safeParseSColl(box.additionalRegisters.R4);
-      const decimals = safeParseSColl(box.additionalRegisters.R6);
+      const name = decode(box.additionalRegisters.R4, safeEncode);
+      const decimals = decode(box.additionalRegisters.R6, safeEncode);
       if (name) {
-        this._assetsMetadata.set(firstInputId, {
+        this.#metadataMap.set(firstInputId, {
           name,
           decimals: decimals ? parseInt(decimals) : undefined
         });
@@ -220,13 +228,4 @@ function log(str: string) {
   console.log(str);
 }
 
-function safeParseSColl(register: string | undefined): string | undefined {
-  if (!register) return;
-
-  const bytes = parse<Uint8Array>(register, "safe");
-  if (bytes instanceof Uint8Array) {
-    return utf8.encode(bytes);
-  }
-
-  return;
-}
+const safeEncode = (v: unknown) => (v instanceof Uint8Array ? utf8.encode(v) : undefined);

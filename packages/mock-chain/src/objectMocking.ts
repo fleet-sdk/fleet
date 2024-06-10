@@ -40,6 +40,12 @@ export type HeaderMockingOptions = {
   fromTimestamp?: number;
 };
 
+export type BlockchainContextMockingOptions = {
+  headers?: { quantity: number } & HeaderMockingOptions;
+};
+
+export type PoWSolutions = { pk: string; w: string; n: string; d: string };
+
 export type Header = {
   id: string;
   parentId: string;
@@ -51,12 +57,7 @@ export type Header = {
   timestamp: number;
   nBits: number;
   extensionHash: string;
-  powSolutions: {
-    pk: string;
-    w: string;
-    n: string;
-    d: string;
-  };
+  powSolutions: PoWSolutions;
   votes: string;
 };
 
@@ -97,26 +98,25 @@ export function mockHeaders(count: number, options?: HeaderMockingOptions) {
   return headers.reverse();
 }
 
-export function mockBlockchainStateContext(
-  count: number = 10,
-  options?: HeaderMockingOptions
-): BlockchainStateContext {
-  const headers = mockHeaders(count + 1, options).map((h) => ({
-    ...h,
-    ADProofsRoot: h.adProofsRoot,
-    stateRoot: AvlTree$.fromDigest(h.stateRoot),
-    timestamp: BigInt(h.timestamp),
-    nBits: BigInt(h.nBits),
-    extensionRoot: h.extensionHash,
-    minerPk: GroupElement$.fromPointHex(h.powSolutions.pk),
-    powOnetimePk: GroupElement$.fromPointHex(h.powSolutions.w),
-    powNonce: h.powSolutions.n,
-    powDistance: BigInt(h.powSolutions.d)
-  }));
+export function mockBlockchainStateContext(options?: BlockchainContextMockingOptions) {
+  const headers = mockHeaders((options?.headers?.quantity ?? 10) + 1, options?.headers).map(
+    (h) => ({
+      ...h,
+      ADProofsRoot: h.adProofsRoot,
+      stateRoot: AvlTree$.fromDigest(h.stateRoot),
+      timestamp: BigInt(h.timestamp),
+      nBits: BigInt(h.nBits),
+      extensionRoot: h.extensionHash,
+      minerPk: GroupElement$.fromPointHex(h.powSolutions.pk),
+      powOnetimePk: GroupElement$.fromPointHex(h.powSolutions.w),
+      powNonce: h.powSolutions.n,
+      powDistance: BigInt(h.powSolutions.d)
+    })
+  );
 
   return {
     sigmaLastHeaders: headers.slice(1),
     previousStateDigest: headers[1].stateRoot.digest,
     sigmaPreHeader: headers[0]
-  };
+  } as BlockchainStateContext;
 }
