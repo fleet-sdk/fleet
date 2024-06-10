@@ -40,4 +40,24 @@ describe("Ensure defaults", () => {
       z: 0 // defaults
     });
   });
+
+  it("Should replace undefined keys by default", () => {
+    const defaults = { a: 1, b: 2 };
+
+    expect(ensureDefaults({ a: 5, b: undefined }, defaults)).to.be.deep.equal({
+      a: 5,
+      b: 2 // it must replace undefined
+    });
+  });
+
+  it("Should optionally replace undefined keys", () => {
+    const defaults = { a: 1, b: 2 };
+
+    expect(
+      ensureDefaults({ a: 5, b: undefined }, defaults, { keepUndefinedKeys: true })
+    ).to.be.deep.equal({
+      a: 5,
+      b: undefined // it must keep undefined
+    });
+  });
 });

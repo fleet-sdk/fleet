@@ -3,6 +3,7 @@ import { SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { blake2b256, randomBytes } from "@fleet-sdk/crypto";
 import { serializeBox } from "@fleet-sdk/serializer";
+import { AvlTree$, BlockchainStateContext, GroupElement$ } from "sigmastate-js/main";
 
 type MockBoxOptions = Partial<Omit<Box<bigint>, "boxId">> & { ergoTree: string };
 
@@ -32,12 +33,18 @@ function getRandomId() {
 
 const BLOCK_TIME = 2;
 
-export type HeaderMockingParams = {
+export type HeaderMockingOptions = {
   parentId?: string;
   version?: number;
   fromHeight?: number;
   fromTimestamp?: number;
 };
+
+export type BlockchainContextMockingOptions = {
+  headers?: { quantity: number } & HeaderMockingOptions;
+};
+
+export type PoWSolutions = { pk: string; w: string; n: string; d: string };
 
 export type Header = {
   id: string;
@@ -50,28 +57,20 @@ export type Header = {
   timestamp: number;
   nBits: number;
   extensionHash: string;
-  powSolutions: {
-    pk: string;
-    w: string;
-    n: string;
-    d: string;
-  };
+  powSolutions: PoWSolutions;
   votes: string;
 };
 
-export function mockHeaders(count: number, params?: HeaderMockingParams) {
+export function mockHeaders(count: number, options?: HeaderMockingOptions) {
   const headers = new Array<Header>(count);
-  const height = (params?.fromHeight ?? 0) + count;
-  const timestamp = params?.fromTimestamp ? new Date(params.fromTimestamp) : new Date();
-  const version = params?.version ?? 3;
-
-  let parentId = params?.parentId || getRandomId();
+  const height = (options?.fromHeight ?? 0) + count;
+  const timestamp = options?.fromTimestamp ? new Date(options.fromTimestamp) : new Date();
+  const version = options?.version ?? 3;
+  let parentId = options?.parentId || getRandomId();
 
   for (let i = 0; i < count; i++) {
     const id = getRandomId();
-    if (i > 0) {
-      timestamp.setMinutes(timestamp.getMinutes() - BLOCK_TIME);
-    }
+    if (i > 0) timestamp.setMinutes(timestamp.getMinutes() - BLOCK_TIME);
 
     headers[i] = {
       id,
@@ -96,5 +95,28 @@ export function mockHeaders(count: number, params?: HeaderMockingParams) {
     parentId = id;
   }
 
-  return headers;
+  return headers.reverse();
+}
+
+export function mockBlockchainStateContext(options?: BlockchainContextMockingOptions) {
+  const headers = mockHeaders((options?.headers?.quantity ?? 10) + 1, options?.headers).map(
+    (h) => ({
+      ...h,
+      ADProofsRoot: h.adProofsRoot,
+      stateRoot: AvlTree$.fromDigest(h.stateRoot),
+      timestamp: BigInt(h.timestamp),
+      nBits: BigInt(h.nBits),
+      extensionRoot: h.extensionHash,
+      minerPk: GroupElement$.fromPointHex(h.powSolutions.pk),
+      powOnetimePk: GroupElement$.fromPointHex(h.powSolutions.w),
+      powNonce: h.powSolutions.n,
+      powDistance: BigInt(h.powSolutions.d)
+    })
+  );
+
+  return {
+    sigmaLastHeaders: headers.slice(1),
+    previousStateDigest: headers[1].stateRoot.digest,
+    sigmaPreHeader: headers[0]
+  } as BlockchainStateContext;
 }
