@@ -1,5 +1,14 @@
 # @fleet-sdk/serializer
 
+## 0.4.1
+
+### Patch Changes
+
+- d6ef248: Fix: export `decode()` function
+- Updated dependencies [28e3467]
+  - @fleet-sdk/common@0.4.1
+  - @fleet-sdk/crypto@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes

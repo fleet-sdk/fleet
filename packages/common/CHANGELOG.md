@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.4.1
+
+### Patch Changes
+
+- 28e3467: Fix `ensureDefaults()` behavior with `undefined` fields
+
 ## 0.3.4
 
 ### Patch Changes

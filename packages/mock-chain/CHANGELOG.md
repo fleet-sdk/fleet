@@ -1,5 +1,18 @@
 # @fleet-sdk/mock-chain
 
+## 0.4.1
+
+### Patch Changes
+
+- bd7dd59: Replace sigma-rust with SigmaJS as the execution backend
+- Updated dependencies [d6ef248]
+- Updated dependencies [28e3467]
+  - @fleet-sdk/serializer@0.4.1
+  - @fleet-sdk/common@0.4.1
+  - @fleet-sdk/core@0.4.1
+  - @fleet-sdk/wallet@0.4.1
+  - @fleet-sdk/crypto@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes
