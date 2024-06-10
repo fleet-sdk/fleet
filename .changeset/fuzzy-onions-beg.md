@@ -2,4 +2,4 @@
 "@fleet-sdk/serializer": minor
 ---
 
-Fix: export `decode` function
+Fix: export `decode()` function

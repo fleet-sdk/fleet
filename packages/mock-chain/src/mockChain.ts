@@ -149,8 +149,8 @@ export class MockChain {
 
     const result = execute(unsignedTransaction, keys, {
       context,
-      parameters: this.#tip.parameters,
-      baseCost
+      baseCost,
+      parameters: this.#tip.parameters
     });
 
     if (!result.success) {
@@ -209,8 +209,8 @@ export class MockChain {
     );
 
     if (box) {
-      const name = decode(box.additionalRegisters.R4, safeEncode);
-      const decimals = decode(box.additionalRegisters.R6, safeEncode);
+      const name = decode(box.additionalRegisters.R4, safeUtf8Encode);
+      const decimals = decode(box.additionalRegisters.R6, safeUtf8Encode);
       if (name) {
         this.#metadataMap.set(firstInputId, {
           name,
@@ -228,4 +228,4 @@ function log(str: string) {
   console.log(str);
 }
 
-const safeEncode = (v: unknown) => (v instanceof Uint8Array ? utf8.encode(v) : undefined);
+const safeUtf8Encode = (v: unknown) => (v instanceof Uint8Array ? utf8.encode(v) : undefined);

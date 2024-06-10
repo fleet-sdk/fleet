@@ -50,7 +50,7 @@ describe("Ensure defaults", () => {
     });
   });
 
-  it("Should optionally replace", () => {
+  it("Should optionally replace undefined keys", () => {
     const defaults = { a: 1, b: 2 };
 
     expect(

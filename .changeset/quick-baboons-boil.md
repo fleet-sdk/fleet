@@ -2,4 +2,4 @@
 "@fleet-sdk/common": minor
 ---
 
-Fix `ensureDefaults()` behavior
+Fix `ensureDefaults()` behavior with `undefined` fields
