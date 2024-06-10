@@ -4,9 +4,10 @@ import { utf8 } from "@fleet-sdk/crypto";
 import { parse } from "@fleet-sdk/serializer";
 import { bgRed, bold, red } from "picocolors";
 import { printDiff } from "./balancePrinting";
-import { execute } from "./executor";
-import { mockHeaders } from "./objectMocking";
+import { BLOCKCHAIN_PARAMETERS, execute } from "./executor";
+import { mockBlockchainStateContext, mockHeaders } from "./objectMocking";
 import { KeyedMockChainParty, MockChainParty, NonKeyedMockChainParty } from "./party";
+import { BlockchainParameters } from "sigmastate-js/main";
 
 const BLOCK_TIME_MS = 120000;
 
@@ -29,12 +30,17 @@ export type TransactionExecutionOptions = {
   log?: boolean;
 };
 
-export type MockChainParams = {
+export type MockChainOptions = {
   height?: number;
   timestamp?: number;
+  parameters?: Partial<BlockchainParameters>;
 };
 
-export type BlockState = Required<MockChainParams>;
+export type BlockState = {
+  height: number;
+  timestamp: number;
+  parameters: BlockchainParameters;
+};
 
 export class MockChain {
   private readonly _parties: MockChainParty[];
@@ -44,12 +50,18 @@ export class MockChain {
 
   constructor();
   constructor(height?: number);
-  constructor(params?: MockChainParams);
-  constructor(heightOrParams?: number | MockChainParams) {
-    const state =
-      !heightOrParams || typeof heightOrParams === "number"
-        ? { height: heightOrParams ?? 0, timestamp: new Date().getTime() }
-        : ensureDefaults(heightOrParams, { height: 0, timestamp: new Date().getTime() });
+  constructor(options?: MockChainOptions);
+  constructor(heightOrOptions?: number | MockChainOptions) {
+    const options =
+      !heightOrOptions || typeof heightOrOptions === "number"
+        ? { height: heightOrOptions ?? 0 }
+        : heightOrOptions;
+
+    const state = ensureDefaults(options, {
+      height: 0,
+      timestamp: new Date().getTime(),
+      parameters: ensureDefaults(options.parameters, BLOCKCHAIN_PARAMETERS)
+    });
 
     this._tip = state;
     this._bottom = { ...state };
@@ -126,22 +138,19 @@ export class MockChain {
       .filter((party): party is KeyedMockChainParty => party instanceof KeyedMockChainParty)
       .map((party) => party.key);
 
-    const headers = mockHeaders(10, {
+    const context = mockBlockchainStateContext(10, {
       fromHeight: this._tip.height,
       fromTimestamp: this._tip.timestamp
     });
 
-    const result = execute(unsignedTransaction, keys, headers);
+    const result = execute(unsignedTransaction, keys, context, this._tip.parameters);
 
     if (!result.success) {
       if (options?.log) {
         log(red(`${bgRed(bold(" Error "))} ${result.reason}`));
       }
 
-      if (options?.throw != false) {
-        throw new Error(result.reason);
-      }
-
+      if (options?.throw != false) throw new Error(result.reason);
       return false;
     }
 

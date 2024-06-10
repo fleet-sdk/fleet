@@ -41,8 +41,8 @@
     "@fleet-sdk/serializer": "workspace:^",
     "@fleet-sdk/wallet": "workspace:^",
     "diff": "^5.1.0",
-    "ergo-lib-wasm-nodejs": "^0.26.0",
-    "picocolors": "^1.0.0"
+    "picocolors": "^1.0.0",
+    "sigmastate-js": "0.4.5"
   },
   "engines": {
     "node": ">=10"

@@ -419,12 +419,8 @@ describe("Contract execution and chain mocking", () => {
       chain.execute(unsignedTransaction, { signers: [alice], log: true, throw: false })
     ).not.to.throw();
 
-    expect(consoleMock).toHaveBeenCalledWith(
-      red(
-        `${bgRed(
-          bold(" Error ")
-        )} Transaction signing error: Prover error (tx input index 0): Failed on step2(prover does not have enough witnesses to perform the proof)`
-      )
+    expect(consoleMock.mock.calls[0][0]).to.include(
+      "Tree root should be real but was UnprovenSchnorr"
     );
 
     // should not affect balances

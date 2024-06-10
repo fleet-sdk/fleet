@@ -1,17 +1,24 @@
-import { isEmpty } from "@fleet-sdk/common";
+import { Network, isEmpty } from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { ErgoHDKey } from "@fleet-sdk/wallet";
-import {
-  BlockHeaders,
-  ErgoBoxes,
-  ErgoStateContext,
-  PreHeader,
-  SecretKey,
-  SecretKeys,
-  UnsignedTransaction,
-  Wallet
-} from "ergo-lib-wasm-nodejs";
-import { Header, mockHeaders } from "./objectMocking";
+import { Header, mockBlockchainStateContext, mockHeaders } from "./objectMocking";
+import { BlockchainParameters, BlockchainStateContext, ProverBuilder$ } from "sigmastate-js/main";
+import { bigintBE, hex } from "@fleet-sdk/crypto";
+
+/**
+ * blockchain parameters at height 1283632
+ */
+export const BLOCKCHAIN_PARAMETERS: BlockchainParameters = {
+  storageFeeFactor: 1250000,
+  minValuePerByte: 360,
+  maxBlockSize: 1271009,
+  tokenAccessCost: 100,
+  inputCost: 2407,
+  dataInputCost: 100,
+  outputCost: 197,
+  maxBlockCost: 8001091,
+  blockVersion: 3
+};
 
 export type TransactionExecutionResult = {
   success: boolean;
@@ -21,59 +28,40 @@ export type TransactionExecutionResult = {
 export function execute(
   unsignedTransaction: ErgoUnsignedTransaction,
   keys: ErgoHDKey[],
-  headers?: Header[]
+  context?: BlockchainStateContext,
+  blockchainParameters: BlockchainParameters = BLOCKCHAIN_PARAMETERS,
+  network: Network = Network.Mainnet,
+  baseCost = 0
 ): TransactionExecutionResult {
-  if (isEmpty(headers)) {
-    headers = mockHeaders(10);
+  keys.forEach((key) => {
+    if (!key.hasPrivateKey())
+      throw new Error(`ErgoHDKey '${hex.encode(key.publicKey)}' must have a private key.`);
+  });
+
+  if (isEmpty(context)) {
+    context = mockBlockchainStateContext();
   }
 
-  const wasmContext = getWasmTransactionContext(unsignedTransaction, headers);
-  const wasmWallet = buildWasmWallet(keys);
+  const eip12Tx = unsignedTransaction.toEIP12Object();
 
   try {
-    wasmWallet.sign_transaction(
-      wasmContext.signContext,
-      wasmContext.transaction,
-      wasmContext.inputs,
-      wasmContext.dataInputs
+    const proverBuilder = ProverBuilder$.create(blockchainParameters, network);
+    keys.forEach((key) => proverBuilder.withDLogSecret(bigintBE.encode(key.privateKey!)));
+    const prover = proverBuilder.build();
+
+    const reducedTx = prover.reduce(
+      context,
+      eip12Tx,
+      eip12Tx.inputs,
+      eip12Tx.dataInputs,
+      unsignedTransaction.burning.tokens,
+      baseCost
     );
+
+    prover.signReduced(reducedTx);
 
     return { success: true };
   } catch (e) {
     return { success: false, reason: (e as Error).message };
   }
-}
-
-function buildWasmWallet(keys: ErgoHDKey[]): Wallet {
-  const sks = new SecretKeys();
-
-  for (const key of keys) {
-    if (key.privateKey) {
-      sks.add(SecretKey.dlog_from_bytes(key.privateKey));
-    }
-  }
-
-  return Wallet.from_secrets(sks);
-}
-
-function getWasmTransactionContext(
-  unsignedTransaction: ErgoUnsignedTransaction,
-  headers: Header[]
-): {
-  inputs: ErgoBoxes;
-  dataInputs: ErgoBoxes;
-  transaction: UnsignedTransaction;
-  signContext: ErgoStateContext;
-} {
-  const eip12Transaction = unsignedTransaction.toEIP12Object();
-
-  const wasmHeaders = BlockHeaders.from_json(headers);
-  const preHeader = PreHeader.from_block_header(wasmHeaders.get(0));
-
-  return {
-    inputs: ErgoBoxes.from_boxes_json(eip12Transaction.inputs),
-    dataInputs: ErgoBoxes.from_boxes_json(eip12Transaction.dataInputs),
-    transaction: UnsignedTransaction.from_json(JSON.stringify(eip12Transaction)),
-    signContext: new ErgoStateContext(preHeader, wasmHeaders)
-  };
 }

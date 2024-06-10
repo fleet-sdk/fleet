@@ -24,6 +24,18 @@ describe("Transaction executor", () => {
     expect(execute(unsigned, [bobKey])).to.contain({ success: false });
   });
 
+  it("Should throw if private key is missing", () => {
+    const key = new KeyedMockChainParty(chain, "bob").key.wipePrivateData() as ErgoHDKey;
+    const unsigned = new TransactionBuilder(1032850)
+      .from(regularBoxes)
+      .sendChangeTo("9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga")
+      .payMinFee()
+      .build();
+
+    expect(key.isNeutered()).to.be.true;
+    expect(() => execute(unsigned, [key])).to.throw();
+  });
+
   it("Should not execute transaction", () => {
     const bob = new KeyedMockChainParty(chain, "bob");
     const input = mockUTxO({
