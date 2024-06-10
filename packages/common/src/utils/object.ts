@@ -23,9 +23,11 @@ export function clearUndefined(value: Record<string, unknown>) {
   return result;
 }
 
+export type EnsureDefaultsOptions = { keepUndefinedKeys: boolean };
+
 /**
  * Ensure that the options object has all the default values
- * @param options
+ * @param partial
  * @param defaults
  *
  * @example
@@ -37,8 +39,17 @@ export function clearUndefined(value: Record<string, unknown>) {
  * ```
  */
 export function ensureDefaults<T extends object, R extends object>(
-  options: T | undefined,
-  defaults: R
+  partial: T | undefined,
+  defaults: R,
+  options?: EnsureDefaultsOptions
 ): R & T {
-  return isEmpty(options) ? (defaults as R & T) : { ...defaults, ...options };
+  if (isEmpty(partial)) return defaults as R & T;
+  if (options?.keepUndefinedKeys) return { ...defaults, ...partial };
+
+  const merged = { ...defaults, ...partial } as Record<string, unknown>;
+  for (const key in merged) {
+    merged[key] = partial[key as keyof T] ?? defaults[key as keyof R];
+  }
+
+  return merged as R & T;
 }
