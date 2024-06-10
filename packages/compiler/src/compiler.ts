@@ -1,11 +1,6 @@
 import { assert, ensureDefaults, ergoTreeHeaderFlags, isEmpty, isHex } from "@fleet-sdk/common";
 import { SConstant } from "@fleet-sdk/serializer";
-import {
-  SigmaCompilerNamedConstantsMap,
-  SigmaCompilerObj,
-  Value as SigmaValue,
-  ValueObj
-} from "sigmastate-js/main";
+import { SigmaCompilerNamedConstantsMap, SigmaCompiler$, Value$, Value } from "sigmastate-js/main";
 import { CompilerOutput } from "./compilerOutput";
 
 type CompilerOptionsBase = {
@@ -26,7 +21,7 @@ export type CompilerOptionsForErgoTreeV1 = CompilerOptionsBase & {
 export type CompilerOptions = CompilerOptionsForErgoTreeV0 | CompilerOptionsForErgoTreeV1;
 
 export type NamedConstantsMap = {
-  [key: string]: string | SigmaValue | SConstant;
+  [key: string]: string | Value | SConstant;
 };
 
 export const compilerDefaults: Required<CompilerOptions> = {
@@ -45,7 +40,7 @@ export function compile(script: string, options?: CompilerOptions): CompilerOutp
     headerFlags |= ergoTreeHeaderFlags.sizeInclusion;
   }
 
-  const tree = SigmaCompilerObj.forMainnet().compile(
+  const tree = SigmaCompiler$.forMainnet().compile(
     parseNamedConstantsMap(opt.map),
     opt.segregateConstants,
     headerFlags,
@@ -68,14 +63,14 @@ export function parseNamedConstantsMap(map: NamedConstantsMap): SigmaCompilerNam
   return sigmaMap;
 }
 
-export function toSigmaConstant(constant: string | SigmaValue | SConstant): SigmaValue {
+export function toSigmaConstant(constant: string | Value | SConstant): Value {
   if (typeof constant === "string") {
     assert(isHex(constant), `'${constant}' is not a valid hex string.`);
 
-    return ValueObj.fromHex(constant);
+    return Value$.fromHex(constant);
   } else if (constant instanceof SConstant) {
-    return ValueObj.fromHex(constant.toHex());
-  } else if (constant instanceof SigmaValue) {
+    return Value$.fromHex(constant.toHex());
+  } else if (constant instanceof Value) {
     return constant;
   }
 

@@ -1,6 +1,6 @@
 import { hex } from "@fleet-sdk/crypto";
 import { SInt } from "@fleet-sdk/serializer";
-import { HexString, Value, ValueObj } from "sigmastate-js/main";
+import { HexString, Value, Value$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import { compile, compilerDefaults, CompilerOptions, parseNamedConstantsMap } from "./compiler";
 
@@ -123,7 +123,7 @@ describe("Compiler constants map parsing", () => {
   it("Should convert types if needed", () => {
     const parsedMap = parseNamedConstantsMap({
       fleetConst: SInt(1),
-      sigmaConst: ValueObj.ofByte(1),
+      sigmaConst: Value$.ofByte(1),
       hex: "0e0102" // SConstant(SColl(SByte, [0x2]))
     });
 
