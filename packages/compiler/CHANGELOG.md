@@ -1,5 +1,16 @@
 # @fleet-sdk/compiler
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [d6ef248]
+- Updated dependencies [28e3467]
+  - @fleet-sdk/serializer@0.4.1
+  - @fleet-sdk/common@0.4.1
+  - @fleet-sdk/core@0.4.1
+  - @fleet-sdk/crypto@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes
