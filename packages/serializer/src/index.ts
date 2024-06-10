@@ -1,4 +1,4 @@
 export { estimateVLQSize } from "./coders";
-export { SConstant, parse } from "./sigmaConstant";
+export { SConstant, parse, decode } from "./sigmaConstant";
 export * from "./types";
 export * from "./serializers";
