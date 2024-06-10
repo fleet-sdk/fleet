@@ -1,10 +1,9 @@
-import { Network } from "@fleet-sdk/common";
+import { ensureDefaults, Network } from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
-import { ErgoHDKey } from "@fleet-sdk/wallet";
-import { mockBlockchainStateContext } from "./objectMocking";
-import { BlockchainParameters, BlockchainStateContext, ProverBuilder$ } from "sigmastate-js/main";
 import { bigintBE, hex } from "@fleet-sdk/crypto";
-import { ensureDefaults } from "packages/common/src";
+import { ErgoHDKey } from "@fleet-sdk/wallet";
+import { BlockchainParameters, BlockchainStateContext, ProverBuilder$ } from "sigmastate-js/main";
+import { mockBlockchainStateContext } from "./objectMocking";
 
 /**
  * blockchain parameters at height 1283632

@@ -3,11 +3,11 @@ import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { utf8 } from "@fleet-sdk/crypto";
 import { decode } from "@fleet-sdk/serializer";
 import { bgRed, bold, red } from "picocolors";
+import { BlockchainParameters } from "sigmastate-js/main";
 import { printDiff } from "./balancePrinting";
 import { BLOCKCHAIN_PARAMETERS, execute } from "./execution";
 import { mockBlockchainStateContext } from "./objectMocking";
 import { KeyedMockChainParty, MockChainParty, NonKeyedMockChainParty } from "./party";
-import { BlockchainParameters } from "sigmastate-js/main";
 
 const BLOCK_TIME_MS = 120000;
 

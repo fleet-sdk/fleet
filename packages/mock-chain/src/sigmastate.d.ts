@@ -1,8 +1,8 @@
 declare module "sigmastate-js/main" {
   import {
     Amount,
-    Box as FBox,
     EIP12UnsignedInput,
+    Box as FBox,
     NonMandatoryRegisters,
     SignedTransaction,
     TokenAmount,
@@ -72,42 +72,6 @@ declare module "sigmastate-js/main" {
     toString(): string;
   }
 
-  export declare class Address$ {
-    /** Creates JS wrapper over given [[ErgoAddress]]. */
-    static fromErgoAddress(ergoAddress: any /*org.ergoplatform.ErgoAddress*/): Address;
-
-    /** Deserializes an ErgoTree instance from an address string.
-     *
-     * @param base58String a Base58 string representing the serialized ErgoTree
-     */
-    static fromString(base58String: string): Address;
-
-    /** Creates an `Address` instance from an `ErgoTree` and a network prefix.
-     *
-     * @param ergoTree      The `ErgoTree` instance to be converted into an `Address`.
-     * @param networkPrefix The network prefix indicating the network for which the address is valid.
-     * @return An `Address` instance corresponding to the given `ErgoTree` and network prefix.
-     */
-    static fromErgoTree(ergoTree: ErgoTree, networkPrefix: number): Address;
-
-    /**
-     * Creates an `Address` from a `SigmaProp` and a network prefix.
-     *
-     * @param sigmaProp     The `SigmaProp` to be converted into an `Address`.
-     * @param networkPrefix The network prefix indicating the network for which the address is valid.
-     * @return An `Address` instance corresponding to the given `SigmaProp` and network prefix.
-     */
-    static fromSigmaProp(sigmaProp: SigmaProp, networkPrefix: number): Address;
-
-    /** Creates address from given ergovalue containing an ErgoTree proposition bytes.
-     * Use this to convert a box register containing an ErgoTree into its address.
-     *
-     * @param networkPrefix    mainnet or testnet network
-     * @param propositionBytes ErgoTree proposition bytes
-     */
-    static fromPropositionBytes(networkPrefix: number, propositionBytes: ByteArray): Address;
-  }
-
   /** Implementation of pay-to-public-key {@link Address}. */
   export declare class P2PKAddress extends Address {
     /** Converts this address to the underlying ProveDlog sigma proposition wrapped in {@link SigmaProp}. */
@@ -169,9 +133,9 @@ declare module "sigmastate-js/main" {
 
   export declare class AvlTree {
     digest: HexString;
-    insertAllowed: Boolean;
-    updateAllowed: Boolean;
-    removeAllowed: Boolean;
+    insertAllowed: boolean;
+    updateAllowed: boolean;
+    removeAllowed: boolean;
     keyLength: number;
     valueLengthOpt: number | undefined;
   }
@@ -578,9 +542,9 @@ declare module "sigmastate-js/main" {
    */
   export declare class Parameter {
     /** User readable parameter name (string bytes in UTF-8 encoding) */
-    name: String;
+    name: string;
     /** User readable parameter description (string bytes in UTF-8 encoding) */
-    description: String;
+    description: string;
     /** Index in the ErgoTree.constants array */
     constantIndex: number;
   }
@@ -634,7 +598,7 @@ declare module "sigmastate-js/main" {
     /** @return JSON representation of this contract template pretty-printed to a string
      *         indentation of two spaces.
      */
-    toJsonString(): String;
+    toJsonString(): string;
 
     /**
      * Generate the ErgoTree from the template by providing the values for parameters.
@@ -660,6 +624,6 @@ declare module "sigmastate-js/main" {
      * @param json JSON string representing a contract template.
      * @return a new contract template.
      */
-    fromJsonString(json: String): ContractTemplate;
+    fromJsonString(json: string): ContractTemplate;
   }
 }

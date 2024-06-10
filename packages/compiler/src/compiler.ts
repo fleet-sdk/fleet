@@ -1,6 +1,6 @@
 import { assert, ensureDefaults, ergoTreeHeaderFlags, isEmpty, isHex } from "@fleet-sdk/common";
 import { SConstant } from "@fleet-sdk/serializer";
-import { SigmaCompilerNamedConstantsMap, SigmaCompiler$, Value$, Value } from "sigmastate-js/main";
+import { SigmaCompiler$, SigmaCompilerNamedConstantsMap, Value, Value$ } from "sigmastate-js/main";
 import { CompilerOutput } from "./compilerOutput";
 
 type CompilerOptionsBase = {

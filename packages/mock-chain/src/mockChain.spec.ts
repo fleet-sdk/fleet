@@ -8,7 +8,6 @@ import {
 } from "@fleet-sdk/core";
 import { utf8 } from "@fleet-sdk/crypto";
 import { SBool, SByte, SColl } from "@fleet-sdk/serializer";
-import { bgRed, bold, red } from "picocolors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MockChain } from "./mockChain";
 
