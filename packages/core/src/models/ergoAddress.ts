@@ -2,9 +2,13 @@ import { AddressType, Base58String, HexString, Network } from "@fleet-sdk/common
 import { areEqual, concatBytes, endsWith, first, isDefined, startsWith } from "@fleet-sdk/common";
 import { base58, blake2b256, hex, validateEcPoint } from "@fleet-sdk/crypto";
 import { InvalidAddress } from "../errors/invalidAddress";
-
-const CHECKSUM_LENGTH = 4;
-const BLAKE_256_HASH_LENGTH = 32;
+import {
+  BLAKE_256_HASH_LENGTH,
+  CHECKSUM_LENGTH,
+  getAddressType,
+  getNetworkType,
+  unpackAddress
+} from "./utils";
 
 const P2PK_ERGOTREE_PREFIX = hex.decode("0008cd");
 const P2PK_ERGOTREE_LENGTH = 36;
@@ -13,14 +17,6 @@ const P2SH_ERGOTREE_SUFFIX = hex.decode("d40801");
 const P2SH_ERGOTREE_PREFIX = hex.decode("00ea02d193b4cbe4e3010e040004300e18");
 const P2SH_ERGOTREE_LENGTH = 44;
 const P2SH_HASH_LENGTH = 24;
-
-function _getEncodedNetworkType(addressBytes: Uint8Array): Network {
-  return first(addressBytes) & 0xf0;
-}
-
-function _getEncodedAddressType(addressBytes: Uint8Array): AddressType {
-  return first(addressBytes) & 0xf;
-}
 
 function _ensureBytes(content: HexString | Uint8Array): Uint8Array {
   if (typeof content === "string") {
@@ -134,20 +130,19 @@ export class ErgoAddress {
    */
   public static fromBase58(encodedAddress: Base58String, skipCheck = false): ErgoAddress {
     const bytes = base58.decode(encodedAddress);
-    if (!skipCheck && !ErgoAddress.validate(bytes)) {
+    if (!skipCheck && !ErgoAddress.validate(bytes)) throw new InvalidAddress(encodedAddress);
+
+    const { network, type, body } = unpackAddress(bytes);
+    const script = body.subarray(1);
+
+    if (type === AddressType.ADH) {
       throw new InvalidAddress(encodedAddress);
-    }
-
-    const network = _getEncodedNetworkType(bytes);
-    const type = _getEncodedAddressType(bytes);
-    const body = bytes.subarray(1, bytes.length - CHECKSUM_LENGTH);
-
-    if (type === AddressType.P2PK) {
-      return this.fromPublicKey(body, network);
+    } else if (type === AddressType.P2PK) {
+      return this.fromPublicKey(script, network);
     } else if (type === AddressType.P2SH) {
-      return this.fromHash(body, network);
+      return this.fromHash(script, network);
     } else {
-      return new ErgoAddress(body, network);
+      return new ErgoAddress(script, network);
     }
   }
 
@@ -156,31 +151,25 @@ export class ErgoAddress {
    * @param address Address bytes or string
    */
   public static validate(address: Uint8Array | Base58String): boolean {
-    const bytes = typeof address === "string" ? base58.decode(address) : address;
-    if (bytes.length < CHECKSUM_LENGTH) {
+    const byte = typeof address === "string" ? base58.decode(address) : address;
+    if (byte.length < CHECKSUM_LENGTH) return false;
+
+    const unpacked = unpackAddress(byte);
+    if (unpacked.type === AddressType.ADH) return false;
+    if (unpacked.type === AddressType.P2PK && !validateEcPoint(unpacked.body.subarray(1))) {
       return false;
     }
 
-    if (_getEncodedAddressType(bytes) === AddressType.P2PK) {
-      const pk = bytes.subarray(1, bytes.length - CHECKSUM_LENGTH);
-
-      if (!validateEcPoint(pk)) return false;
-    }
-
-    const script = bytes.subarray(0, bytes.length - CHECKSUM_LENGTH);
-    const checksum = bytes.subarray(bytes.length - CHECKSUM_LENGTH, bytes.length);
-    const blakeHash = blake2b256(script);
-    const calculatedChecksum = blakeHash.subarray(0, CHECKSUM_LENGTH);
-
-    return areEqual(calculatedChecksum, checksum);
+    const checksum = blake2b256(unpacked.body).subarray(0, CHECKSUM_LENGTH);
+    return areEqual(checksum, unpacked.checksum);
   }
 
   public static getNetworkType(address: Base58String): Network {
-    return _getEncodedNetworkType(base58.decode(address));
+    return getNetworkType(base58.decode(address));
   }
 
   public static getAddressType(address: Base58String): AddressType {
-    return _getEncodedAddressType(base58.decode(address));
+    return getAddressType(base58.decode(address));
   }
 
   public getPublicKeys(): Uint8Array[] {
