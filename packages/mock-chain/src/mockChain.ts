@@ -2,7 +2,7 @@ import { ensureDefaults, first, HexString, isUndefined, some } from "@fleet-sdk/
 import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { utf8 } from "@fleet-sdk/crypto";
 import { decode } from "@fleet-sdk/serializer";
-import { bgRed, bold, red } from "picocolors";
+import pc from "picocolors";
 import { BlockchainParameters } from "sigmastate-js/main";
 import { printDiff } from "./balancePrinting";
 import { BLOCKCHAIN_PARAMETERS, execute } from "./execution";
@@ -155,7 +155,7 @@ export class MockChain {
 
     if (!result.success) {
       if (options?.log) {
-        log(red(`${bgRed(bold(" Error "))} ${result.reason}`));
+        log(pc.red(`${pc.bgRed(pc.bold(" Error "))} ${result.reason}`));
       }
 
       if (options?.throw != false) throw new Error(result.reason);
