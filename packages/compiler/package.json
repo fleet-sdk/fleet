@@ -34,7 +34,7 @@
     "@fleet-sdk/core": "workspace:^",
     "@fleet-sdk/crypto": "workspace:^",
     "@fleet-sdk/serializer": "workspace:^",
-    "sigmastate-js": "0.4.5"
+    "sigmastate-js": "0.4.6"
   },
   "scripts": {
     "build": "tsup --config ../../tsup.config.ts"
