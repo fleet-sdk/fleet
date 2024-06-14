@@ -20,9 +20,8 @@ export type UnpackedAddress = {
   type: AddressType;
 };
 
-export function ensureBytes(content: BytesInput): Uint8Array {
-  if (typeof content === "string") return hex.decode(content);
-  return content;
+export function ensureBytes(input: BytesInput): Uint8Array {
+  return typeof input === "string" ? hex.decode(input) : input;
 }
 
 export function getNetworkType(addressBytes: Uint8Array): Network {
@@ -30,7 +29,7 @@ export function getNetworkType(addressBytes: Uint8Array): Network {
 }
 
 export function getAddressType(addressBytes: Uint8Array): AddressType {
-  return first(addressBytes) & 0xf;
+  return first(addressBytes) & 0x0f;
 }
 
 /**

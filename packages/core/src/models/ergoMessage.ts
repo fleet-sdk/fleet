@@ -1,47 +1,133 @@
-import { AddressType, Base58String, Network } from "@fleet-sdk/common";
-import { base58, blake2b256, BytesInput, hex } from "@fleet-sdk/crypto";
-import { concatBytes } from "packages/common/src";
-import { CHECKSUM_LENGTH, getAddressType, getNetworkType } from "./utils";
+import {
+  AddressType,
+  areEqual,
+  Base58String,
+  concatBytes,
+  isHex,
+  Network
+} from "@fleet-sdk/common";
+import { base58, blake2b256, BytesInput, hex, utf8 } from "@fleet-sdk/crypto";
+import { JsonObject } from "type-fest";
+import { CHECKSUM_LENGTH, ensureBytes, unpackAddress, validateUnpackedAddress } from "./utils";
 
-function ensureBytes(input: BytesInput): Uint8Array {
-  return typeof input === "string" ? hex.decode(input) : input;
-}
+const ENCODED_MESSAGE_LENGTH = 37; // head(1) + hash(32) + checksum(4)
+
+export type NetworkOptions = {
+  network?: Network;
+};
+
+export type ErgoMessageFromHashOptions = NetworkOptions & {
+  hash: BytesInput;
+};
+
+export type MessageData = BytesInput | string | JsonObject;
+
+export type ErgoMessageFromDataOptions = NetworkOptions & {
+  data: MessageData;
+};
+
+export type ErgoMessageOptions = ErgoMessageFromHashOptions | ErgoMessageFromDataOptions;
+
+export const MessageType = {
+  Hash: 0,
+  Binary: 1,
+  String: 2,
+  Json: 3
+} as const;
+
+export type MessageType = (typeof MessageType)[keyof typeof MessageType];
 
 export class ErgoMessage {
-  #message?: Uint8Array;
-  #hash?: Uint8Array;
+  #data?: Uint8Array;
+  #type: MessageType;
+  #hash: Uint8Array;
   #network: Network;
 
-  constructor(message?: BytesInput, network = Network.Mainnet) {
-    this.#message = ensureBytes(message ?? Uint8Array.from([]));
-    this.#network = network;
+  constructor(options: ErgoMessageOptions) {
+    if ("data" in options) {
+      [this.#data, this.#type] = this.#decodeData(options.data);
+      this.#hash = blake2b256(this.#data);
+    } else if ("hash" in options) {
+      this.#hash = ensureBytes(options.hash);
+      this.#type = MessageType.Hash;
+    } else {
+      throw new Error("Either hash or message data must be provided");
+    }
+
+    this.#network = options.network ?? Network.Mainnet;
   }
 
   get hash(): Uint8Array {
-    if (this.#hash) return this.#hash;
-    else if (this.#message) return (this.#hash = blake2b256(this.#message));
-    else throw new Error("Neither message nor hash is provided");
+    return this.#hash;
   }
 
-  encode(): string {
-    const head = Uint8Array.from([this.#network + AddressType.ADH]);
+  get type(): MessageType {
+    return this.#type;
+  }
+
+  #decodeData(data: MessageData): [Uint8Array, MessageType] {
+    if (typeof data === "string") {
+      if (isHex(data)) {
+        return [hex.decode(data), MessageType.Hash];
+      } else {
+        return [utf8.decode(data), MessageType.String];
+      }
+    } else if (data instanceof Uint8Array) {
+      return [data, MessageType.Binary];
+    } else {
+      return [utf8.decode(JSON.stringify(data)), MessageType.Json];
+    }
+  }
+
+  static decode(encodedHash: Base58String): ErgoMessage {
+    const bytes = base58.decode(encodedHash);
+    if (bytes.length !== ENCODED_MESSAGE_LENGTH) throw new Error("Invalid encoded message hash");
+
+    const unpacked = unpackAddress(base58.decode(encodedHash));
+    if (unpacked.type !== AddressType.ADH) throw new Error("Invalid message type");
+    if (!validateUnpackedAddress(unpacked)) throw new Error("Invalid encoded message hash");
+
+    return new ErgoMessage({ hash: unpacked.body, network: unpacked.network });
+  }
+
+  fromBase58(encodedHash: Base58String): ErgoMessage {
+    return ErgoMessage.decode(encodedHash);
+  }
+
+  encode(network?: Network): string {
+    const head = Uint8Array.from([(network ?? this.#network) + AddressType.ADH]);
     const body = concatBytes(head, this.hash);
     const checksum = blake2b256(body).subarray(0, CHECKSUM_LENGTH);
     return base58.encode(concatBytes(body, checksum));
   }
 
-  decode(encodedHash: Base58String): ErgoMessage {
-    const bytes = base58.decode(encodedHash);
-    const type = getAddressType(bytes);
-    if (type !== AddressType.ADH) throw new Error("Invalid message type");
-
-    const network = getNetworkType(bytes);
-    const hash = bytes.subarray(1, bytes.length - CHECKSUM_LENGTH);
-    return new ErgoMessage(hash, network);
+  toString(network?: Network): string {
+    return this.encode(network);
   }
 
-  // fromBase58Hash(hash: string): ErgoMessage {
-  //   const bytes = ensureBytes(hash);
-  //   return new ErgoMessage(hex.encode(bytes));
-  // }
+  setNetwork(network: Network): ErgoMessage {
+    this.#network = network;
+    return this;
+  }
+
+  getData<T extends MessageData = MessageData>(): T | undefined {
+    if (!this.#data) return;
+
+    switch (this.#type) {
+      case MessageType.Binary:
+        return this.#data as T;
+      case MessageType.String:
+        return utf8.encode(this.#data) as T;
+      case MessageType.Json:
+        return JSON.parse(utf8.encode(this.#data)) as T;
+      default:
+        return;
+    }
+  }
+
+  verify(message: MessageData): boolean {
+    const [data, type] = this.#decodeData(message);
+    if (type !== this.#type) return false;
+    return areEqual(this.#hash, blake2b256(ensureBytes(data)));
+  }
 }

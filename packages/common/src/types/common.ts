@@ -20,7 +20,8 @@ export enum Network {
 export enum AddressType {
   P2PK = 1,
   P2SH = 2,
-  P2S = 3
+  P2S = 3,
+  ADH = 4
 }
 
 export const ergoTreeHeaderFlags = {
