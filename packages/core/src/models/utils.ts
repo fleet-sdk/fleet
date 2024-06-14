@@ -4,10 +4,10 @@ import {
   Base58String,
   concatBytes,
   first,
+  isEmpty,
   Network
 } from "@fleet-sdk/common";
 import { base58, blake2b256, BytesInput, hex, validateEcPoint } from "@fleet-sdk/crypto";
-import { isEmpty } from "packages/common/src";
 
 export const CHECKSUM_LENGTH = 4;
 export const BLAKE_256_HASH_LENGTH = 32;

@@ -7,10 +7,10 @@ import {
   Network
 } from "@fleet-sdk/common";
 import { base58, blake2b256, BytesInput, hex, utf8 } from "@fleet-sdk/crypto";
-import { JsonObject } from "type-fest";
+import { JsonObject, JsonValue } from "type-fest";
 import { CHECKSUM_LENGTH, ensureBytes, unpackAddress, validateUnpackedAddress } from "./utils";
 
-const ENCODED_MESSAGE_LENGTH = 37; // head(1) + hash(32) + checksum(4)
+const ENCODED_HASH_LENGTH = 37; // head(1) + hash(32) + checksum(4)
 
 export type NetworkOptions = {
   network?: Network;
@@ -20,7 +20,7 @@ export type ErgoMessageFromHashOptions = NetworkOptions & {
   hash: BytesInput;
 };
 
-export type MessageData = BytesInput | string | JsonObject;
+export type MessageData = Uint8Array | JsonValue | JsonObject;
 
 export type ErgoMessageFromDataOptions = NetworkOptions & {
   data: MessageData;
@@ -67,11 +67,9 @@ export class ErgoMessage {
 
   #decodeData(data: MessageData): [Uint8Array, MessageType] {
     if (typeof data === "string") {
-      if (isHex(data)) {
-        return [hex.decode(data), MessageType.Hash];
-      } else {
-        return [utf8.decode(data), MessageType.String];
-      }
+      return isHex(data)
+        ? [hex.decode(data), MessageType.Hash]
+        : [utf8.decode(data), MessageType.String];
     } else if (data instanceof Uint8Array) {
       return [data, MessageType.Binary];
     } else {
@@ -81,7 +79,7 @@ export class ErgoMessage {
 
   static decode(encodedHash: Base58String): ErgoMessage {
     const bytes = base58.decode(encodedHash);
-    if (bytes.length !== ENCODED_MESSAGE_LENGTH) throw new Error("Invalid encoded message hash");
+    if (bytes.length !== ENCODED_HASH_LENGTH) throw new Error("Invalid encoded message hash");
 
     const unpacked = unpackAddress(base58.decode(encodedHash));
     if (unpacked.type !== AddressType.ADH) throw new Error("Invalid message type");
