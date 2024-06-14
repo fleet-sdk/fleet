@@ -205,6 +205,6 @@ export class ErgoAddress {
    * Encode address as base58 string
    */
   public toString(network?: Network): Base58String {
-    return this.encode(network);
+    return this.encode(network ?? this.#network);
   }
 }
