@@ -6,9 +6,9 @@ import {
   isHex,
   Network
 } from "@fleet-sdk/common";
-import { base58, blake2b256, BytesInput, hex, utf8 } from "@fleet-sdk/crypto";
+import { base58, blake2b256, BytesInput, ensureBytes, hex, utf8 } from "@fleet-sdk/crypto";
 import { JsonObject, JsonValue } from "type-fest";
-import { CHECKSUM_LENGTH, ensureBytes, unpackAddress, validateUnpackedAddress } from "./utils";
+import { CHECKSUM_LENGTH, unpackAddress, validateUnpackedAddress } from "./utils";
 
 const ENCODED_HASH_LENGTH = 37; // head(1) + hash(32) + checksum(4)
 
@@ -110,7 +110,6 @@ export class ErgoMessage {
 
   getData<T extends MessageData = MessageData>(): T | undefined {
     if (!this.#data) return;
-
     switch (this.#type) {
       case MessageType.Binary:
         return this.#data as T;
@@ -126,6 +125,6 @@ export class ErgoMessage {
   verify(message: MessageData): boolean {
     const [data, type] = this.#decodeData(message);
     if (type !== this.#type) return false;
-    return areEqual(this.#hash, blake2b256(ensureBytes(data)));
+    return areEqual(this.#hash, blake2b256(data));
   }
 }

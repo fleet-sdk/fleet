@@ -3,10 +3,8 @@ import { sha256 as _sha256 } from "@noble/hashes/sha256";
 import { hex } from "./coders";
 import { BytesInput } from "./types";
 
-function ensureBytes(input: BytesInput): Uint8Array {
-  if (input instanceof Uint8Array) return input;
-
-  return hex.decode(input);
+export function ensureBytes(input: BytesInput): Uint8Array {
+  return typeof input === "string" ? hex.decode(input) : input;
 }
 
 export function blake2b256(message: BytesInput): Uint8Array {

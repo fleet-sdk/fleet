@@ -1,11 +1,17 @@
 import { AddressType, Base58String, HexString, Network } from "@fleet-sdk/common";
 import { concatBytes, endsWith, first, startsWith } from "@fleet-sdk/common";
-import { base58, blake2b256, BytesInput, hex, validateEcPoint } from "@fleet-sdk/crypto";
+import {
+  base58,
+  blake2b256,
+  BytesInput,
+  ensureBytes,
+  hex,
+  validateEcPoint
+} from "@fleet-sdk/crypto";
 import { InvalidAddress } from "../errors/invalidAddress";
 import {
   BLAKE_256_HASH_LENGTH,
   encodeAddress,
-  ensureBytes,
   getAddressType,
   getNetworkType,
   unpackAddress,

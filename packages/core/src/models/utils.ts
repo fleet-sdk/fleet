@@ -7,7 +7,7 @@ import {
   isEmpty,
   Network
 } from "@fleet-sdk/common";
-import { base58, blake2b256, BytesInput, hex, validateEcPoint } from "@fleet-sdk/crypto";
+import { base58, blake2b256, validateEcPoint } from "@fleet-sdk/crypto";
 
 export const CHECKSUM_LENGTH = 4;
 export const BLAKE_256_HASH_LENGTH = 32;
@@ -19,10 +19,6 @@ export type UnpackedAddress = {
   network: Network;
   type: AddressType;
 };
-
-export function ensureBytes(input: BytesInput): Uint8Array {
-  return typeof input === "string" ? hex.decode(input) : input;
-}
 
 export function getNetworkType(addressBytes: Uint8Array): Network {
   return first(addressBytes) & 0xf0;
