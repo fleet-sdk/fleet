@@ -44,11 +44,15 @@ export function unpackAddress(bytes: Uint8Array): UnpackedAddress {
   };
 }
 
-export function encodeAddress(body: Uint8Array, type: AddressType, network: Network): Base58String {
+export function encodeAddress(
+  network: Network,
+  type: AddressType,
+  content: Uint8Array
+): Base58String {
   const head = Uint8Array.from([network + type]);
-  const headAndBody = concatBytes(head, body);
+  const headAndBody = concatBytes(head, content);
   const checksum = blake2b256(headAndBody).subarray(0, CHECKSUM_LENGTH);
-  return base58.encode(concatBytes(head, body, checksum));
+  return base58.encode(concatBytes(head, content, checksum));
 }
 
 export function validateUnpackedAddress(unpacked: UnpackedAddress): boolean {

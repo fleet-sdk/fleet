@@ -1,14 +1,7 @@
-import {
-  AddressType,
-  areEqual,
-  Base58String,
-  concatBytes,
-  isHex,
-  Network
-} from "@fleet-sdk/common";
+import { AddressType, areEqual, Base58String, isHex, Network } from "@fleet-sdk/common";
 import { base58, blake2b256, BytesInput, ensureBytes, hex, utf8 } from "@fleet-sdk/crypto";
 import { JsonObject, JsonValue } from "type-fest";
-import { CHECKSUM_LENGTH, unpackAddress, validateUnpackedAddress } from "./utils";
+import { encodeAddress, unpackAddress, validateUnpackedAddress } from "./utils";
 
 const ENCODED_HASH_LENGTH = 37; // head(1) + hash(32) + checksum(4)
 
@@ -65,10 +58,14 @@ export class ErgoMessage {
     return this.#type;
   }
 
+  get network(): Network {
+    return this.#network;
+  }
+
   #decodeData(data: MessageData): [Uint8Array, MessageType] {
     if (typeof data === "string") {
       return isHex(data)
-        ? [hex.decode(data), MessageType.Hash]
+        ? [hex.decode(data), MessageType.Binary]
         : [utf8.decode(data), MessageType.String];
     } else if (data instanceof Uint8Array) {
       return [data, MessageType.Binary];
@@ -88,15 +85,16 @@ export class ErgoMessage {
     return new ErgoMessage({ hash: unpacked.body, network: unpacked.network });
   }
 
-  fromBase58(encodedHash: Base58String): ErgoMessage {
+  static fromBase58(encodedHash: Base58String): ErgoMessage {
     return ErgoMessage.decode(encodedHash);
   }
 
+  static fromData(data: MessageData, network?: Network): ErgoMessage {
+    return new ErgoMessage({ data, network });
+  }
+
   encode(network?: Network): string {
-    const head = Uint8Array.from([(network ?? this.#network) + AddressType.ADH]);
-    const body = concatBytes(head, this.hash);
-    const checksum = blake2b256(body).subarray(0, CHECKSUM_LENGTH);
-    return base58.encode(concatBytes(body, checksum));
+    return encodeAddress(network ?? this.#network, AddressType.ADH, this.hash);
   }
 
   toString(network?: Network): string {

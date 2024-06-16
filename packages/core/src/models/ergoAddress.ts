@@ -185,7 +185,7 @@ export class ErgoAddress {
     if (this.type === AddressType.P2SH) return this.encode();
 
     const hash = blake2b256(this.#ergoTree).subarray(0, P2SH_HASH_LENGTH);
-    return encodeAddress(hash, AddressType.P2SH, network ?? this.#network);
+    return encodeAddress(network ?? this.#network, AddressType.P2SH, hash);
   }
 
   /**
@@ -204,7 +204,7 @@ export class ErgoAddress {
       body = this.#ergoTree;
     }
 
-    return encodeAddress(body, this.#type, network ?? this.#network);
+    return encodeAddress(network ?? this.#network, this.#type, body);
   }
 
   /**
