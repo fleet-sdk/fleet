@@ -3,7 +3,7 @@ import { concatBytes, endsWith, first, startsWith } from "@fleet-sdk/common";
 import {
   base58,
   blake2b256,
-  BytesInput,
+  ByteInput,
   ensureBytes,
   hex,
   validateEcPoint
@@ -93,7 +93,7 @@ export class ErgoAddress {
    * Create a new instance from an ErgoTree
    * @param ergoTree ErgoTree hex string
    */
-  public static fromErgoTree(ergoTree: BytesInput, network?: Network): ErgoAddress {
+  public static fromErgoTree(ergoTree: ByteInput, network?: Network): ErgoAddress {
     return new ErgoAddress(ensureBytes(ergoTree), network);
   }
 
@@ -101,7 +101,7 @@ export class ErgoAddress {
    * Create a new instance from a public key
    * @param publicKey Public key hex string
    */
-  public static fromPublicKey(publicKey: BytesInput, network?: Network): ErgoAddress {
+  public static fromPublicKey(publicKey: ByteInput, network?: Network): ErgoAddress {
     const bytes = ensureBytes(publicKey);
     if (!validateEcPoint(bytes)) throw new Error("The Public Key is invalid.");
 

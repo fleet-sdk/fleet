@@ -1,6 +1,6 @@
 import { HexString } from "@fleet-sdk/common";
 
-export type BytesInput = Uint8Array | HexString;
+export type ByteInput = Uint8Array | HexString;
 
 export interface Coder<F, T> {
   encode(decoded: F): T;

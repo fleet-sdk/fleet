@@ -1,5 +1,5 @@
 import { AddressType, areEqual, Base58String, isHex, Network } from "@fleet-sdk/common";
-import { base58, blake2b256, BytesInput, ensureBytes, hex, utf8 } from "@fleet-sdk/crypto";
+import { base58, blake2b256, ByteInput, ensureBytes, hex, utf8 } from "@fleet-sdk/crypto";
 import { JsonObject, JsonValue } from "type-fest";
 import { encodeAddress, unpackAddress, validateUnpackedAddress } from "./utils";
 
@@ -10,7 +10,7 @@ export type NetworkOptions = {
 };
 
 export type ErgoMessageFromHashOptions = NetworkOptions & {
-  hash: BytesInput;
+  hash: ByteInput;
 };
 
 export type MessageData = Uint8Array | JsonValue | JsonObject;
