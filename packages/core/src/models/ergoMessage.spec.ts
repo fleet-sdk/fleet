@@ -111,3 +111,12 @@ describe("ErgoMessage construction", () => {
     expect(() => ErgoMessage.decode(invalidType)).to.throw("Invalid message type");
   });
 });
+
+describe("Serialization", () => {
+  it("Should serialize to bytes", () => {
+    const message = ErgoMessage.fromData("hello world");
+    const bytes = message.serialize().toBytes();
+
+    expect(bytes).to.be.deep.equal(Uint8Array.from([0x0, message.network, ...message.hash]));
+  });
+});
