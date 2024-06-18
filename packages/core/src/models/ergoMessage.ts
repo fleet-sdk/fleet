@@ -1,7 +1,10 @@
 import { AddressType, areEqual, Base58String, isHex, Network } from "@fleet-sdk/common";
 import { base58, blake2b256, ByteInput, ensureBytes, hex, utf8 } from "@fleet-sdk/crypto";
+import { SigmaWriter } from "@fleet-sdk/serializer";
 import { JsonObject, JsonValue } from "type-fest";
 import { encodeAddress, unpackAddress, validateUnpackedAddress } from "./utils";
+
+const SERIALIZED_HASH_LENGTH = 34; // invalidation byte (1) + network type (1) + hash (32)
 
 export type NetworkOptions = {
   network?: Network;
@@ -111,6 +114,13 @@ export class ErgoMessage {
       default:
         return this.#data as T;
     }
+  }
+
+  serialize(): SigmaWriter {
+    return new SigmaWriter(SERIALIZED_HASH_LENGTH)
+      .write(0x0) // invalidation byte, see: https://github.com/ergoplatform/eips/blob/master/eip-0044.md#why-prefix-it-with-0x0
+      .write(this.#network)
+      .writeBytes(this.#hash);
   }
 
   verify(message: MessageData): boolean {
