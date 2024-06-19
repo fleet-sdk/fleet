@@ -1,5 +1,5 @@
 import { assert, first, last } from "@fleet-sdk/common";
-import { SigmaReader, SigmaWriter } from "../coders";
+import { SigmaByteReader, SigmaByteWriter } from "../coders";
 import { isColl, isTuple, SCollType, STupleType, SType } from "../types";
 import {
   constructorCode,
@@ -9,7 +9,7 @@ import {
 } from "../types/descriptors";
 
 export class TypeSerializer {
-  static serialize(type: SType, writer: SigmaWriter) {
+  static serialize(type: SType, writer: SigmaByteWriter) {
     if (type.embeddable) {
       writer.write(type.code);
     } else if (type.code === descriptors.unit.code) {
@@ -81,7 +81,7 @@ export class TypeSerializer {
     }
   }
 
-  static deserialize(r: SigmaReader): SType {
+  static deserialize(r: SigmaByteReader): SType {
     const byte = r.readByte();
     assert(byte > 0, `Parsing Error: Unexpected type code '0x${byte.toString(16)}'`);
 

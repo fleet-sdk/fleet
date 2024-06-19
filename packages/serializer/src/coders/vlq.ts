@@ -1,6 +1,6 @@
 import { _0n, _127n, _128n, _7n, ensureBigInt } from "@fleet-sdk/common";
-import { SigmaReader } from "./sigmaReader";
-import { SigmaWriter } from "./sigmaWriter";
+import { SigmaByteReader } from "./sigmaByteReader";
+import { SigmaByteWriter } from "./sigmaByteWriter";
 
 /**
  * A **variable-length quantity (VLQ)** is a universal code that uses an arbitrary number
@@ -11,12 +11,12 @@ import { SigmaWriter } from "./sigmaWriter";
  */
 
 /**
- * Write an unsigned integer value as VLQ to a `SigmaWriter`.
+ * Write an unsigned integer value as VLQ to a `SigmaByteWriter`.
  * @param value: Integer value
  * @param writer: Sigma writer
  * @returns Sigma writer passed as function argument.
  */
-export function writeVLQ(writer: SigmaWriter, value: number): SigmaWriter {
+export function writeVLQ(writer: SigmaByteWriter, value: number): SigmaByteWriter {
   // source: https://stackoverflow.com/a/3564685
 
   if (value === 0) {
@@ -44,7 +44,7 @@ export function writeVLQ(writer: SigmaWriter, value: number): SigmaWriter {
  * @param reader VLQ bytes
  * @returns Unsigned integer value
  */
-export function readVLQ(reader: SigmaReader): number {
+export function readVLQ(reader: SigmaByteReader): number {
   if (reader.isEmpty) {
     return 0;
   }
@@ -63,12 +63,12 @@ export function readVLQ(reader: SigmaReader): number {
 }
 
 /**
- * Write an unsigned integer value as VLQ to a `SigmaWriter`.
+ * Write an unsigned integer value as VLQ to a `SigmaByteWriter`.
  * @param value: Big integer value
  * @param writer: Sigma writer
  * @returns Sigma writer passed as function argument.
  */
-export function writeBigVLQ(writer: SigmaWriter, value: bigint): SigmaWriter {
+export function writeBigVLQ(writer: SigmaByteWriter, value: bigint): SigmaByteWriter {
   // source: https://stackoverflow.com/a/3564685
 
   if (value === _0n) {
@@ -96,7 +96,7 @@ export function writeBigVLQ(writer: SigmaWriter, value: bigint): SigmaWriter {
  * @param reader VLQ bytes
  * @returns Unsigned integer value
  */
-export function readBigVLQ(reader: SigmaReader): bigint {
+export function readBigVLQ(reader: SigmaByteReader): bigint {
   if (reader.isEmpty) {
     return _0n;
   }

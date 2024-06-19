@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { SigmaReader } from "./sigmaReader";
-import { SigmaWriter } from "./sigmaWriter";
+import { SigmaByteReader } from "./sigmaByteReader";
+import { SigmaByteWriter } from "./sigmaByteWriter";
 import { estimateVLQSize, readBigVLQ, readVLQ, writeBigVLQ, writeVLQ } from "./vlq";
 
 describe("VLQ encoding/decoding", () => {
@@ -20,7 +20,7 @@ describe("VLQ encoding/decoding", () => {
   ];
 
   function toVLQBytes(value: number) {
-    return writeVLQ(new SigmaWriter(5), value).toBytes();
+    return writeVLQ(new SigmaByteWriter(5), value).toBytes();
   }
 
   it("Should encode", () => {
@@ -37,19 +37,19 @@ describe("VLQ encoding/decoding", () => {
 
   it("Should decode", () => {
     testVectors.forEach((tv) => {
-      expect(readVLQ(new SigmaReader(tv.bytes))).toEqual(tv.uint);
+      expect(readVLQ(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
     });
   });
 
   it("Should decode empty Buffer to 0", () => {
-    expect(readVLQ(new SigmaReader(Uint8Array.from([])))).toEqual(0);
+    expect(readVLQ(new SigmaByteReader(Uint8Array.from([])))).toEqual(0);
   });
 
   it("Should encode/decode radom numbers", () => {
     Array.from(Array(100))
       .map(() => Math.ceil(Math.random() * 100000))
       .forEach((n) => {
-        expect(readVLQ(new SigmaReader(toVLQBytes(n)))).toBe(n);
+        expect(readVLQ(new SigmaByteReader(toVLQBytes(n)))).toBe(n);
       });
   });
 
@@ -62,7 +62,7 @@ describe("VLQ encoding/decoding", () => {
 
 describe("Big VLQ encoding/decoding", () => {
   function toBigVLQBytes(value: bigint) {
-    return writeBigVLQ(new SigmaWriter(100), value).toBytes();
+    return writeBigVLQ(new SigmaByteWriter(100), value).toBytes();
   }
 
   const testVectors = [
@@ -94,19 +94,19 @@ describe("Big VLQ encoding/decoding", () => {
 
   it("Should decode", () => {
     testVectors.forEach((tv) => {
-      expect(readBigVLQ(new SigmaReader(tv.bytes))).toEqual(tv.uint);
+      expect(readBigVLQ(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
     });
   });
 
   it("Should decode empty Buffer to 0", () => {
-    expect(readBigVLQ(new SigmaReader(Uint8Array.from([])))).toEqual(0n);
+    expect(readBigVLQ(new SigmaByteReader(Uint8Array.from([])))).toEqual(0n);
   });
 
   it("Should encode/decode radom numbers", () => {
     Array.from(Array(100))
       .map(() => BigInt(Math.ceil(Math.random() * 100000000000)) * BigInt(Number.MAX_SAFE_INTEGER))
       .forEach((n) => {
-        expect(readBigVLQ(new SigmaReader(toBigVLQBytes(n)))).toBe(n);
+        expect(readBigVLQ(new SigmaByteReader(toBigVLQBytes(n)))).toBe(n);
       });
   });
 

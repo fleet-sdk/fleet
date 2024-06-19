@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { MAX_CONSTANT_LENGTH } from "../sigmaConstant";
-import { SigmaWriter } from "./sigmaWriter";
+import { SigmaByteWriter } from "./sigmaByteWriter";
 
 describe("Sigma Writer", () => {
   it("Should put a single byte at time", () => {
-    const sigmaBuffer = new SigmaWriter(MAX_CONSTANT_LENGTH);
+    const sigmaBuffer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     sigmaBuffer.write(0x10).write(0x0f).write(0x00);
 
     expect(sigmaBuffer).toHaveLength(3);
@@ -12,7 +12,7 @@ describe("Sigma Writer", () => {
   });
 
   it("Should put multiple bytes at once", () => {
-    const sigmaBuffer = new SigmaWriter(MAX_CONSTANT_LENGTH);
+    const sigmaBuffer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     sigmaBuffer.writeBytes(Uint8Array.from([0x00, 0x00, 0x21, 0xff]));
     sigmaBuffer.writeBytes(Uint8Array.from([0x15, 0x0c]));
 
@@ -21,7 +21,7 @@ describe("Sigma Writer", () => {
   });
 
   it("Should put multiple hex string", () => {
-    const sigmaBuffer = new SigmaWriter(MAX_CONSTANT_LENGTH);
+    const sigmaBuffer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
 
     sigmaBuffer.writeHex("000021ff");
     sigmaBuffer.writeHex("150c");
@@ -31,7 +31,7 @@ describe("Sigma Writer", () => {
   });
 
   it("Should put a boolean", () => {
-    const sigmaBuffer = new SigmaWriter(MAX_CONSTANT_LENGTH);
+    const sigmaBuffer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     sigmaBuffer.writeBoolean(true);
     sigmaBuffer.writeBoolean(false);
 
@@ -63,10 +63,10 @@ describe("Sigma Writer", () => {
       { int: 950, hex: "ec0e" }
     ];
 
-    const all = new SigmaWriter(MAX_CONSTANT_LENGTH);
+    const all = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     for (const tv of testVectors) {
       all.writeShort(tv.int);
-      expect(new SigmaWriter(tv.hex.length).writeShort(tv.int).toHex()).toBe(tv.hex);
+      expect(new SigmaByteWriter(tv.hex.length).writeShort(tv.int).toHex()).toBe(tv.hex);
     }
 
     expect(all.toHex()).toEqual(testVectors.map((x) => x.hex).join(""));

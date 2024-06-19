@@ -11,24 +11,24 @@ import {
   some,
   TokenAmount
 } from "@fleet-sdk/common";
-import { estimateVLQSize, SigmaWriter } from "../coders";
+import { estimateVLQSize, SigmaByteWriter } from "../coders";
 
 const MAX_UINT16_VALUE = 65535;
 
-export function serializeBox(box: Box<Amount>): SigmaWriter;
-export function serializeBox(box: Box<Amount>, writer: SigmaWriter): SigmaWriter;
+export function serializeBox(box: Box<Amount>): SigmaByteWriter;
+export function serializeBox(box: Box<Amount>, writer: SigmaByteWriter): SigmaByteWriter;
 export function serializeBox(
   box: BoxCandidate<Amount>,
-  writer: SigmaWriter,
+  writer: SigmaByteWriter,
   distinctTokenIds: string[]
-): SigmaWriter;
+): SigmaByteWriter;
 export function serializeBox(
   box: Box<Amount> | BoxCandidate<Amount>,
-  writer?: SigmaWriter,
+  writer?: SigmaByteWriter,
   distinctTokenIds?: string[]
-): SigmaWriter {
+): SigmaByteWriter {
   if (!writer) {
-    writer = new SigmaWriter(5_0000);
+    writer = new SigmaByteWriter(5_0000);
   }
 
   writer.writeBigVLQ(ensureBigInt(box.value));
@@ -55,7 +55,7 @@ function isBox<T extends Amount>(box: Box<Amount> | BoxCandidate<Amount>): box i
 }
 
 function writeTokens(
-  writer: SigmaWriter,
+  writer: SigmaByteWriter,
   tokens: TokenAmount<Amount>[],
   tokenIds?: string[]
 ): void {
@@ -75,7 +75,7 @@ function writeTokens(
   }
 }
 
-function writeRegisters(writer: SigmaWriter, registers: NonMandatoryRegisters): void {
+function writeRegisters(writer: SigmaByteWriter, registers: NonMandatoryRegisters): void {
   const keys = Object.keys(registers).sort();
   let length = 0;
 
