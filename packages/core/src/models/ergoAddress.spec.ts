@@ -10,6 +10,8 @@ import {
 } from "../tests/testVectors/ergoAddressesTestVectors";
 import { publicKeyTestVectors } from "../tests/testVectors/ergoAddressesTestVectors";
 import { ErgoAddress } from "./ergoAddress";
+import { ErgoMessage } from "./ergoMessage";
+import { validateAddress } from "./utils";
 
 describe("Construction", () => {
   it("Should construct P2PK from ErgoTree", () => {
@@ -19,7 +21,7 @@ describe("Construction", () => {
     expect(address.type).toBe(AddressType.P2PK);
     expect(address.getPublicKeys()).toHaveLength(1);
     expect(address.ergoTree).toBe(ergoTree);
-    expect(address.network).toBeUndefined();
+    expect(address.network).to.be.equal(Network.Mainnet);
   });
 
   it("Should construct P2SH from ErgoTree", () => {
@@ -54,7 +56,7 @@ describe("Construction", () => {
     const address = ErgoAddress.fromPublicKey(publicKey);
 
     expect(address.type).toBe(AddressType.P2PK);
-    expect(address.network).toBeUndefined();
+    expect(address.network).to.be.equal(Network.Mainnet);
     expect(hex.encode(address.getPublicKeys()[0])).toBe(publicKey);
   });
 
@@ -65,7 +67,7 @@ describe("Construction", () => {
     const address = ErgoAddress.fromPublicKey(publicKey);
 
     expect(address.type).toBe(AddressType.P2PK);
-    expect(address.network).toBeUndefined();
+    expect(address.network).to.be.equal(Network.Mainnet);
     expect(address.getPublicKeys()[0]).toEqual(publicKey);
   });
 
@@ -74,7 +76,7 @@ describe("Construction", () => {
     const address = ErgoAddress.fromHash(hash);
 
     expect(address.type).toBe(AddressType.P2SH);
-    expect(address.network).toBeUndefined();
+    expect(address.network).to.be.equal(Network.Mainnet);
     expect(address.encode()).toBe("8dC5Kgb4DRXYeRxiNDizFSne24UX5BTD27LCkJB");
   });
 
@@ -83,7 +85,7 @@ describe("Construction", () => {
     const address = ErgoAddress.fromHash(hash);
 
     expect(address.type).toBe(AddressType.P2SH);
-    expect(address.network).toBeUndefined();
+    expect(address.network).to.be.equal(Network.Mainnet);
     expect(address.encode()).toBe("8dC5Kgb4DRXYeRxiNDizFSne24UX5BTD27LCkJB");
   });
 
@@ -130,13 +132,29 @@ describe("Construction", () => {
     expect(address.getPublicKeys()).toHaveLength(0);
   });
 
+  it("Should fail when an encoded ErgoMessage is passed to the constructor", () => {
+    const message = new ErgoMessage({ data: "deadbeef" });
+    expect(() => {
+      ErgoAddress.decode(message.encode(Network.Mainnet));
+    }).toThrow();
+  });
+
   const invalidAddress = "3Wx6cHkTaAvysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3";
   it("Should fail to construct invalid encoded address", () => {
     expect(() => {
       ErgoAddress.fromBase58(invalidAddress);
     }).toThrow();
+
+    expect(() => {
+      ErgoAddress.decode(invalidAddress);
+    }).toThrow();
   });
+
   it("Should construct from encoded address and bypass address validation", () => {
+    expect(() => {
+      ErgoAddress.decodeUnsafe(invalidAddress);
+    }).not.toThrow();
+
     expect(() => {
       ErgoAddress.fromBase58(invalidAddress, true);
     }).not.toThrow();
@@ -328,9 +346,10 @@ describe("ErgoTree", () => {
 });
 
 describe("Address model - ergo-ts test set", () => {
-  const testVectors = ergoTsTestVectors.map((o) => {
-    return { ...o, instance: ErgoAddress.fromBase58(o.address, true) };
-  });
+  const testVectors = ergoTsTestVectors.map((o) => ({
+    ...o,
+    instance: ErgoAddress.decodeUnsafe(o.address)
+  }));
 
   test("get ergoTree by address", () => {
     testVectors.forEach((tv) => {
@@ -360,15 +379,16 @@ describe("Address model - ergo-ts test set", () => {
   test("simple address validity test", () => {
     testVectors.forEach((tv) => {
       expect(ErgoAddress.validate(tv.address)).toBe(tv.isValid);
+      expect(validateAddress(tv.address)).toBe(tv.isValid);
     });
   });
 
   test("checked construction from base58", () => {
     testVectors.forEach((o) => {
       if (o.isValid) {
-        expect(() => ErgoAddress.fromBase58(o.address)).not.toThrow();
+        expect(() => ErgoAddress.decode(o.address)).not.toThrow();
       } else {
-        expect(() => ErgoAddress.fromBase58(o.address)).toThrow();
+        expect(() => ErgoAddress.decode(o.address)).toThrow();
       }
     });
   });

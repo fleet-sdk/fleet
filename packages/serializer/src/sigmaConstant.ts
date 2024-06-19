@@ -1,5 +1,5 @@
 import { assert, isUndefined } from "@fleet-sdk/common";
-import { BytesInput, hex } from "@fleet-sdk/crypto";
+import { ByteInput, hex } from "@fleet-sdk/crypto";
 import { SigmaReader, SigmaWriter } from "./coders";
 import { DataSerializer } from "./serializers/dataSerializer";
 import { TypeSerializer } from "./serializers/typeSerializer";
@@ -16,7 +16,7 @@ export class SConstant<D = unknown, T extends SType = SType> {
     this.#data = type.coerce(data) as D;
   }
 
-  static from<D, T extends SType = SType>(bytes: BytesInput): SConstant<D, T> {
+  static from<D, T extends SType = SType>(bytes: ByteInput): SConstant<D, T> {
     assert(bytes.length > 0, "Empty constant bytes.");
 
     const reader = new SigmaReader(bytes);
@@ -47,10 +47,10 @@ export class SConstant<D = unknown, T extends SType = SType> {
   }
 }
 
-export function decode<T>(value: BytesInput | undefined): T | undefined;
-export function decode<T, K>(value: BytesInput | undefined, coder: (input: T) => K): K | undefined;
+export function decode<T>(value: ByteInput | undefined): T | undefined;
+export function decode<T, K>(value: ByteInput | undefined, coder: (input: T) => K): K | undefined;
 export function decode<T, K>(
-  value: BytesInput | undefined,
+  value: ByteInput | undefined,
   coder?: (input: T) => K
 ): T | K | undefined {
   if (isUndefined(value)) return;
@@ -61,13 +61,13 @@ export function decode<T, K>(
 }
 
 /** @deprecated use `decode` instead */
-export function parse<T>(constant: BytesInput): T;
+export function parse<T>(constant: ByteInput): T;
 /** @deprecated use `decode` instead */
-export function parse<T>(constant: BytesInput, mode: "strict"): T;
+export function parse<T>(constant: ByteInput, mode: "strict"): T;
 /** @deprecated use `decode` instead */
-export function parse<T>(constant: BytesInput | undefined, mode: "safe"): T | undefined;
+export function parse<T>(constant: ByteInput | undefined, mode: "safe"): T | undefined;
 /** @deprecated use `decode` instead */
-export function parse<T>(constant: BytesInput | undefined, mode: "strict" | "safe" = "strict") {
+export function parse<T>(constant: ByteInput | undefined, mode: "strict" | "safe" = "strict") {
   if (mode === "strict") return SConstant.from<T>(constant ?? "").data;
   if (!constant) return;
 
