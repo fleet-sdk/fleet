@@ -6,7 +6,7 @@ import {
   isDefined,
   UnsignedInput
 } from "@fleet-sdk/common";
-import { SigmaWriter } from "../coders";
+import { SigmaByteWriter } from "../coders";
 import { serializeBox } from "./boxSerializer";
 
 export type MinimalUnsignedTransaction = {
@@ -15,8 +15,8 @@ export type MinimalUnsignedTransaction = {
   outputs: readonly BoxCandidate<Amount>[];
 };
 
-export function serializeTransaction(transaction: MinimalUnsignedTransaction): SigmaWriter {
-  const writer = new SigmaWriter(100_000);
+export function serializeTransaction(transaction: MinimalUnsignedTransaction): SigmaByteWriter {
+  const writer = new SigmaByteWriter(100_000);
 
   // write inputs
   writer.writeVLQ(transaction.inputs.length);
@@ -38,13 +38,13 @@ export function serializeTransaction(transaction: MinimalUnsignedTransaction): S
   return writer;
 }
 
-function writeInput(writer: SigmaWriter, input: UnsignedInput): void {
+function writeInput(writer: SigmaByteWriter, input: UnsignedInput): void {
   writer.writeHex(input.boxId);
   writer.write(0); // empty proof
   writeExtension(writer, input.extension);
 }
 
-function writeExtension(writer: SigmaWriter, extension: ContextExtension): void {
+function writeExtension(writer: SigmaByteWriter, extension: ContextExtension): void {
   const keys = Object.keys(extension);
   let length = 0;
 

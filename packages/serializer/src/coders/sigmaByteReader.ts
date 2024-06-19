@@ -1,10 +1,10 @@
-import { HexString, isEmpty } from "@fleet-sdk/common";
-import { hex } from "@fleet-sdk/crypto";
+import { isEmpty } from "@fleet-sdk/common";
+import { ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { hexToBigInt } from "./bigint";
 import { readBigVLQ, readVLQ } from "./vlq";
 import { zigZagDecode, zigZagDecodeBigInt } from "./zigZag";
 
-export class SigmaReader {
+export class SigmaByteReader {
   readonly #bytes: Uint8Array;
   #cursor: number;
 
@@ -12,13 +12,8 @@ export class SigmaReader {
     return isEmpty(this.#bytes);
   }
 
-  constructor(bytes: HexString | Uint8Array) {
-    if (typeof bytes === "string") {
-      this.#bytes = hex.decode(bytes);
-    } else {
-      this.#bytes = bytes;
-    }
-
+  constructor(bytes: ByteInput) {
+    this.#bytes = ensureBytes(bytes);
     this.#cursor = 0;
   }
 
@@ -40,9 +35,7 @@ export class SigmaReader {
       }
     }
 
-    if (bitOffset > 0) {
-      this.#cursor++;
-    }
+    if (bitOffset > 0) this.#cursor++;
 
     return bits;
   }
@@ -64,9 +57,7 @@ export class SigmaReader {
   }
 
   public readInt(): number {
-    const int = this.readLong();
-
-    return Number(int);
+    return Number(this.readLong());
   }
 
   public readLong(): bigint {
@@ -75,7 +66,6 @@ export class SigmaReader {
 
   public readBigInt(): bigint {
     const len = readVLQ(this);
-
     return hexToBigInt(hex.encode(this.readBytes(len)));
   }
 }
