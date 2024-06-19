@@ -1,4 +1,5 @@
 import { Box, byteSizeOf, ensureBigInt, first } from "@fleet-sdk/common";
+import { hex } from "@fleet-sdk/crypto";
 import { manyTokensBoxes, regularBoxes, validBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { boxVectors } from "../_test-vectors/boxVectors";
@@ -6,7 +7,7 @@ import { estimateBoxSize, serializeBox } from "./boxSerializer";
 
 describe("Serialize ErgoBox", () => {
   it.each(boxVectors)("Should serialize [$json.boxId]", (tv) => {
-    expect(serializeBox(tv.json).toHex()).toBe(tv.hex);
+    expect(serializeBox(tv.json).encode(hex)).toBe(tv.hex);
   });
 
   it("Should fail with BoxCandidate without distinct tokens list", () => {

@@ -1,4 +1,4 @@
-import { hex } from "@fleet-sdk/crypto";
+import { blake2b256, Coder, hex } from "@fleet-sdk/crypto";
 import { bigIntToHex } from "./bigint";
 import { writeBigVLQ, writeVLQ } from "./vlq";
 import { zigZagEncode, zigZagEncodeBigInt } from "./zigZag";
@@ -50,7 +50,7 @@ export class SigmaByteWriter {
     return this;
   }
 
-  public writeBytes(bytes: Uint8Array): SigmaByteWriter {
+  public writeBytes(bytes: ArrayLike<number>): SigmaByteWriter {
     this.#bytes.set(bytes, this.#cursor);
     this.#cursor += bytes.length;
     return this;
@@ -83,17 +83,20 @@ export class SigmaByteWriter {
 
   public writeBigInt(value: bigint): SigmaByteWriter {
     const hex = bigIntToHex(value);
-    this.writeVLQ(hex.length / 2);
-    this.writeHex(hex);
-
-    return this;
+    return this.writeVLQ(hex.length / 2).writeHex(hex);
   }
 
-  public toHex(): string {
-    return hex.encode(this.toBytes());
+  public writeChecksum(length = 4, hashFn = blake2b256): SigmaByteWriter {
+    const hash = hashFn(this.toBytes());
+    return this.writeBytes(length ? hash.subarray(0, length) : hash);
+  }
+
+  public encode<T>(coder: Coder<Uint8Array, T>): T {
+    return coder.encode(this.toBytes());
   }
 
   public toBytes(): Uint8Array {
+    if (this.#cursor === this.#bytes.length) return this.#bytes;
     return this.#bytes.subarray(0, this.#cursor);
   }
 }
