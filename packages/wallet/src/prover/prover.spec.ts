@@ -1,4 +1,11 @@
-import { OutputBuilder, SGroupElement, SSigmaProp, TransactionBuilder } from "@fleet-sdk/core";
+import {
+  ErgoMessage,
+  Network,
+  OutputBuilder,
+  SGroupElement,
+  SSigmaProp,
+  TransactionBuilder
+} from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { Address, verify_signature } from "ergo-lib-wasm-nodejs";
 import { describe, expect, it } from "vitest";
@@ -7,10 +14,10 @@ import { ErgoHDKey } from "../ergoHDKey";
 import { generateMnemonic } from "../mnemonic";
 import { Prover } from "./prover";
 
-describe("Transaction signing", () => {
-  const height = 1234209;
-  const externalAddress = "9gN8gmyaDBuWPZLn8zj9uZxnLUj4TE9rtedtLGNjf6cUhTmoTwc";
+const height = 1234209;
+const externalAddress = "9gN8gmyaDBuWPZLn8zj9uZxnLUj4TE9rtedtLGNjf6cUhTmoTwc";
 
+describe("Transaction signing", () => {
   it("Should sign a transaction with a single secret and a single input", async () => {
     // generate keys
     const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
@@ -31,13 +38,13 @@ describe("Transaction signing", () => {
     const signedTx = prover.signTransaction(unsignedTx, [rootKey]);
 
     // verify
-    const txBytes = unsignedTx.toBytes();
     const proof = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
 
     // verify using own verifier
-    expect(prover.verify(txBytes, proof, rootKey)).to.be.true;
+    expect(prover.verify(unsignedTx, proof, rootKey)).to.be.true;
 
     // verify using sigma-rust for comparison
+    const txBytes = unsignedTx.toBytes();
     const addr = Address.from_public_key(rootKey.publicKey);
     expect(verify_signature(addr, txBytes, proof)).to.be.true;
   });
@@ -69,13 +76,13 @@ describe("Transaction signing", () => {
     const signedTx = prover.signTransaction(unsignedTx, [rootKey, child1]);
 
     // verify
-    const txBytes = unsignedTx.toBytes();
     const proof = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
 
     // verify using own verifier
-    expect(prover.verify(txBytes, proof, child1)).to.be.true;
+    expect(prover.verify(unsignedTx, proof, child1)).to.be.true;
 
     // verify using sigma-rust for comparison
+    const txBytes = unsignedTx.toBytes();
     const addr = Address.from_public_key(child1.publicKey);
     expect(verify_signature(addr, txBytes, proof)).to.be.true;
   });
@@ -102,13 +109,13 @@ describe("Transaction signing", () => {
     const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [rootKey, child1, child2]);
 
     // verify
-    const txBytes = unsignedTx.toBytes();
     const proof = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
 
     // verify using own verifier
-    expect(prover.verify(txBytes, proof, rootKey)).to.be.true;
+    expect(prover.verify(unsignedTx, proof, rootKey)).to.be.true;
 
     // verify using sigma-rust for comparison
+    const txBytes = unsignedTx.toBytes();
     const addr = Address.from_public_key(rootKey.publicKey);
     expect(verify_signature(addr, txBytes, proof)).to.be.true;
   });
@@ -321,7 +328,172 @@ describe("Transaction signing", () => {
 
     // sign
     const prover = new Prover();
-    expect(() => prover.signTransaction(unsignedTx.toEIP12Object(), [neuteredKey])).to.throw(
+    expect(() =>
+      prover.signTransaction(unsignedTx.toEIP12Object(), [neuteredKey as ErgoHDKey])
+    ).to.throw("Private key is not present");
+  });
+});
+
+describe("Transaction proof verification", () => {
+  // generate keys
+  const rootKey = ErgoHDKey.fromMnemonicSync(generateMnemonic());
+
+  // mock inputs
+  const input = mockUTxO({ value: 1_000_000_000n, ergoTree: rootKey.address.ergoTree });
+
+  // build the unsigned transaction
+  const unsignedTx = new TransactionBuilder(height)
+    .from(input)
+    .to(new OutputBuilder(10_000_000n, externalAddress))
+    .sendChangeTo(rootKey.address)
+    .payMinFee()
+    .build();
+
+  // sign
+  const signedTx = new Prover().signTransaction(unsignedTx, [rootKey]);
+
+  it("Should verify from bytes", () => {
+    const prover = new Prover();
+    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+
+    expect(prover.verify(unsignedTx.toBytes(), proof, rootKey)).to.be.true;
+  });
+
+  it("Should verify from hex", () => {
+    const prover = new Prover();
+    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+
+    expect(prover.verify(hex.encode(unsignedTx.toBytes()), proof, rootKey)).to.be.true;
+  });
+
+  it("Should verify from SignedTransaction", () => {
+    const prover = new Prover();
+    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+
+    expect(prover.verify(signedTx, proof, rootKey)).to.be.true;
+  });
+
+  it("Should verify from ErgoUnsignedTransaction", () => {
+    const prover = new Prover();
+    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+
+    expect(prover.verify(unsignedTx, proof, rootKey)).to.be.true;
+  });
+
+  it("Should verify from EIP12UnsignedTransaction", () => {
+    const prover = new Prover();
+    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+
+    expect(prover.verify(unsignedTx.toEIP12Object(), proof, rootKey)).to.be.true;
+  });
+
+  it("Should verify from PlainObject", () => {
+    const prover = new Prover();
+    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+
+    expect(prover.verify(unsignedTx.toPlainObject(), proof, rootKey)).to.be.true;
+  });
+});
+
+describe("Message proof verification", () => {
+  const key = ErgoHDKey.fromMnemonicSync(generateMnemonic());
+
+  it("Should verify from bytes", () => {
+    const prover = new Prover();
+    const message = ErgoMessage.fromData("hello world");
+    const proof = prover.signMessage(message, key);
+
+    expect(prover.verify(message.serialize().toBytes(), proof, key)).to.be.true;
+  });
+
+  it("Should verify from hex", () => {
+    const prover = new Prover();
+    const message = ErgoMessage.fromData("hello world");
+    const proof = prover.signMessage(message, key);
+
+    expect(prover.verify(message.serialize().toHex(), hex.encode(proof), key)).to.be.true;
+  });
+
+  it("Should verify from ErgoMessage", () => {
+    const prover = new Prover();
+    const message = ErgoMessage.fromData("hello world");
+    const proof = prover.signMessage(message, key);
+
+    expect(prover.verify(message, proof, key)).to.be.true;
+  });
+
+  it("Should verify from Base58String", () => {
+    const prover = new Prover();
+    const message = ErgoMessage.fromData("hello world");
+    const proof = prover.signMessage(message, key);
+
+    expect(prover.verify(message.encode(), hex.encode(proof), key)).to.be.true;
+  });
+});
+
+describe("Message signing", () => {
+  const encodedMainnet = "A4dg6hh8QVypCj6gu17ufkPE9Rq1dx6drurLQGnVNJBYb2FBTc";
+  const encodedTestnet = "hAYVotCmDKbyL2PCAw7AoLmsyHKQuS7E63aEoH8PrQPSVHZ9gJ";
+
+  it("Should sign a message from data", async () => {
+    // generate keys
+    const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
+
+    // build the message
+    const message = ErgoMessage.fromData("hello world");
+
+    // sign
+    const prover = new Prover();
+    const signature = prover.signMessage(message, rootKey);
+
+    // verify
+    expect(prover.verify(message, signature, rootKey)).to.be.true;
+  });
+
+  it("Should sign a message from encoded hash", async () => {
+    // generate keys
+    const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
+
+    // build the message
+    const message = ErgoMessage.decode(encodedMainnet);
+
+    // sign
+    const prover = new Prover();
+    const signature = prover.signMessage(message, rootKey);
+
+    // verify
+    expect(prover.verify(encodedMainnet, signature, rootKey)).to.be.true;
+    expect(prover.verify(encodedTestnet, signature, rootKey)).to.be.false;
+  });
+
+  it("Should fail to verify a message when network is changed", async () => {
+    // generate keys
+    const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
+
+    // build the message
+    const mainnetMessage = ErgoMessage.decode(encodedMainnet);
+
+    // sign
+    const prover = new Prover();
+    const signature = prover.signMessage(mainnetMessage, rootKey);
+
+    // change the network
+    mainnetMessage.setNetwork(Network.Testnet);
+
+    // verify
+    expect(prover.verify(mainnetMessage, signature, rootKey)).to.be.false;
+  });
+
+  it("Should throw when trying to sign without a secret key", async () => {
+    const key = await ErgoHDKey.fromMnemonic(generateMnemonic());
+    const neuteredKey = key.wipePrivateData();
+
+    // build the message
+    const message = ErgoMessage.fromData("hello world");
+
+    // sign
+    const prover = new Prover();
+    expect(() => prover.signMessage(message, neuteredKey as ErgoHDKey)).to.throw(
       "Private key is not present"
     );
   });
