@@ -419,7 +419,7 @@ describe("Message proof verification", () => {
     const message = ErgoMessage.fromData("hello world");
     const proof = prover.signMessage(message, key);
 
-    expect(prover.verify(message, proof, key)).to.be.true;
+    expect(prover.verify(message, proof, key.publicKey)).to.be.true;
   });
 
   it("Should verify from Base58String", () => {

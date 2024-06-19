@@ -23,7 +23,7 @@ type RKey = keyof NonMandatoryRegisters;
 export type UnsignedTransaction = EIP12UnsignedTransaction | ErgoUnsignedTransaction;
 export type KeyMap = Record<number, ErgoHDKey> & { _?: ErgoHDKey[] };
 
-export type VerifiableMessage =
+export type Message =
   | SignedTransaction
   | ErgoUnsignedTransaction
   | MinimalUnsignedTransaction
@@ -34,7 +34,7 @@ export type VerifiableMessage =
 export interface ISigmaProver {
   signTransaction(unsignedTx: UnsignedTransaction, keys: ErgoHDKey[]): SignedTransaction;
   signMessage(message: ErgoMessage, key: ErgoHDKey): Uint8Array;
-  verify(message: VerifiableMessage, signature: Uint8Array, key: ErgoHDKey): boolean;
+  verify(message: Message, proof: Uint8Array, publicKey: ErgoHDKey | Uint8Array): boolean;
 }
 
 export class Prover implements ISigmaProver {
@@ -62,7 +62,7 @@ export class Prover implements ISigmaProver {
     return generateProof(message.serialize().toBytes(), key);
   }
 
-  verify(message: VerifiableMessage, proof: ByteInput, key: ErgoHDKey): boolean {
+  verify(message: Message, proof: ByteInput, publicKey: ErgoHDKey | Uint8Array): boolean {
     let bytes: Uint8Array;
 
     if (typeof message === "string") {
@@ -85,7 +85,8 @@ export class Prover implements ISigmaProver {
       }).toBytes();
     }
 
-    return verify(bytes, ensureBytes(proof), key.publicKey);
+    const pubKey = publicKey instanceof Uint8Array ? publicKey : publicKey.publicKey;
+    return verify(bytes, ensureBytes(proof), pubKey);
   }
 }
 
