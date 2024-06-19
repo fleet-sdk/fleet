@@ -4,13 +4,12 @@ import {
   BoxCandidate,
   EIP12UnsignedInput,
   EIP12UnsignedTransaction,
-  first,
   isHex,
   NonMandatoryRegisters,
   SignedTransaction,
   some
 } from "@fleet-sdk/common";
-import { ErgoAddress, ErgoMessage, ErgoUnsignedTransaction } from "@fleet-sdk/core";
+import { ErgoMessage, ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { blake2b256, ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import {
   MinimalUnsignedTransaction,
@@ -35,7 +34,7 @@ export type VerifiableMessage =
 export interface ISigmaProver {
   signTransaction(unsignedTx: UnsignedTransaction, keys: ErgoHDKey[]): SignedTransaction;
   signMessage(message: ErgoMessage, key: ErgoHDKey): Uint8Array;
-  verify(message: VerifiableMessage, signature: Uint8Array, key: ErgoHDKey | ErgoAddress): boolean;
+  verify(message: VerifiableMessage, signature: Uint8Array, key: ErgoHDKey): boolean;
 }
 
 export class Prover implements ISigmaProver {
@@ -63,7 +62,7 @@ export class Prover implements ISigmaProver {
     return generateProof(message.serialize().toBytes(), key);
   }
 
-  verify(message: VerifiableMessage, proof: ByteInput, key: ErgoHDKey | ErgoAddress): boolean {
+  verify(message: VerifiableMessage, proof: ByteInput, key: ErgoHDKey): boolean {
     let bytes: Uint8Array;
 
     if (typeof message === "string") {
@@ -86,7 +85,7 @@ export class Prover implements ISigmaProver {
       }).toBytes();
     }
 
-    return verify(bytes, ensureBytes(proof), getPk(key));
+    return verify(bytes, ensureBytes(proof), key.publicKey);
   }
 }
 
@@ -151,9 +150,4 @@ function mapOutput(txId: string) {
 
 function flattenTransactionObject(tx: UnsignedTransaction): EIP12UnsignedTransaction {
   return tx instanceof ErgoUnsignedTransaction ? tx.toEIP12Object() : tx;
-}
-
-function getPk(keyOrAddress: ErgoHDKey | ErgoAddress): Uint8Array {
-  if (keyOrAddress instanceof ErgoHDKey) return keyOrAddress.publicKey;
-  return first(keyOrAddress.getPublicKeys());
 }

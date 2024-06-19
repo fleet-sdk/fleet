@@ -414,20 +414,12 @@ describe("Message proof verification", () => {
     expect(prover.verify(message.serialize().toHex(), hex.encode(proof), key)).to.be.true;
   });
 
-  it("Should verify from bytes", () => {
+  it("Should verify from ErgoMessage", () => {
     const prover = new Prover();
     const message = ErgoMessage.fromData("hello world");
     const proof = prover.signMessage(message, key);
 
-    expect(prover.verify(message.serialize().toBytes(), proof, key)).to.be.true;
-  });
-
-  it("Should verify from bytes and ErgoAddress as public key", () => {
-    const prover = new Prover();
-    const message = ErgoMessage.fromData("hello world");
-    const proof = prover.signMessage(message, key);
-
-    expect(prover.verify(message.serialize().toBytes(), proof, key.address)).to.be.true;
+    expect(prover.verify(message, proof, key)).to.be.true;
   });
 
   it("Should verify from Base58String", () => {
