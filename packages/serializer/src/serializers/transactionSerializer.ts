@@ -56,9 +56,7 @@ function writeExtension(writer: SigmaByteWriter, extension: ContextExtension): v
   }
 
   writer.writeVLQ(length);
-  if (length == 0) {
-    return;
-  }
+  if (length === 0) return;
 
   for (const key of keys) {
     const ext = extension[key as unknown as keyof ContextExtension];

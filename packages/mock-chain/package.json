@@ -24,13 +24,7 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": [
-    "ergo",
-    "blockchain",
-    "transactions",
-    "serialization",
-    "tests"
-  ],
+  "keywords": ["ergo", "blockchain", "transactions", "serialization", "tests"],
   "scripts": {
     "build": "tsup --config ../../tsup.config.ts"
   },
@@ -47,13 +41,5 @@
   "engines": {
     "node": ">=10"
   },
-  "files": [
-    "dist",
-    "!**/*.spec.*",
-    "!**/*.json",
-    "!tests",
-    "CHANGELOG.md",
-    "LICENSE",
-    "README.md"
-  ]
+  "files": ["dist", "!**/*.spec.*", "!**/*.json", "!tests", "CHANGELOG.md", "LICENSE", "README.md"]
 }

@@ -24,11 +24,7 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": [
-    "ergo",
-    "blockchain",
-    "compiler"
-  ],
+  "keywords": ["ergo", "blockchain", "compiler"],
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/core": "workspace:^",
@@ -40,15 +36,7 @@
     "build": "tsup --config ../../tsup.config.ts"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
-  "files": [
-    "dist",
-    "!**/*.spec.*",
-    "!**/*.json",
-    "!tests",
-    "CHANGELOG.md",
-    "LICENSE",
-    "README.md"
-  ]
+  "files": ["dist", "!**/*.spec.*", "!**/*.json", "!tests", "CHANGELOG.md", "LICENSE", "README.md"]
 }

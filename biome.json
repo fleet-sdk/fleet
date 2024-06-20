@@ -3,6 +3,22 @@
   "organizeImports": {
     "enabled": true
   },
+  "formatter": {
+    "ignore": [
+      "**/coverage/*",
+      "**/dist/*",
+      "**/node_modules/*",
+      "**/_test-vectors/mockedGraphQLBoxResponses.json"
+    ],
+    "indentStyle": "space",
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "trailingCommas": "none",
+      "lineWidth": 100
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {

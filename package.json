@@ -49,8 +49,6 @@
     "pnpm": ">=8"
   },
   "pnpm": {
-    "requiredScripts": [
-      "build"
-    ]
+    "requiredScripts": ["build"]
   }
 }

@@ -24,29 +24,17 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": [
-    "ergo",
-    "blockchain",
-    "crypto"
-  ],
+  "keywords": ["ergo", "blockchain", "crypto"],
   "scripts": {
     "build": "tsup --config ../../tsup.config.ts"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
     "@noble/hashes": "^1.4.0",
     "@scure/base": "^1.1.6"
   },
-  "files": [
-    "dist",
-    "!**/*.spec.*",
-    "!**/*.json",
-    "!tests",
-    "CHANGELOG.md",
-    "LICENSE",
-    "README.md"
-  ]
+  "files": ["dist", "!**/*.spec.*", "!**/*.json", "!tests", "CHANGELOG.md", "LICENSE", "README.md"]
 }
