@@ -32,6 +32,8 @@ describe("isHex() test", () => {
         "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7"
       )
     ).toBeTruthy();
+
+    expect(isHex("0xdeadbeef")).toBeTruthy();
   });
 
   it("Should fail with INVALID hex strings", () => {
