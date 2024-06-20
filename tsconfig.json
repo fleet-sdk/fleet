@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    // "incremental": true,
     "target": "ESNext",
     "moduleResolution": "Node",
     "module": "ESNext",
