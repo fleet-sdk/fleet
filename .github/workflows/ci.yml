@@ -30,7 +30,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run test:lint
 
-  prettier:
+  format:
     name: Format
     runs-on: ubuntu-latest
     steps:
@@ -46,7 +46,7 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run test:prettier
+      - run: pnpm run test:format
 
   build-and-test-node:
     name: "[node] build and test"
