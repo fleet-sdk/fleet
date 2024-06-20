@@ -1,13 +1,13 @@
 import {
-  Box,
+  type Box,
   isDefined,
   some,
-  TokenId,
-  TokenTargetAmount
+  type TokenId,
+  type TokenTargetAmount
 } from "@fleet-sdk/common";
 import { _0n, isEmpty, isUndefined, sumBy, utxoSum } from "@fleet-sdk/common";
-import { SelectionTarget } from "../boxSelector";
-import { ISelectionStrategy } from "./ISelectionStrategy";
+import type { SelectionTarget } from "../boxSelector";
+import type { ISelectionStrategy } from "./ISelectionStrategy";
 
 /**
  * Accumulative selection strategy accumulates inputs until the target amounts

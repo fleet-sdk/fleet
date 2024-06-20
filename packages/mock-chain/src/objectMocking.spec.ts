@@ -1,4 +1,4 @@
-import { BoxCandidate, hasDuplicatesBy } from "@fleet-sdk/common";
+import { type BoxCandidate, hasDuplicatesBy } from "@fleet-sdk/common";
 import { ErgoBox, SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { hex, randomBytes } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";

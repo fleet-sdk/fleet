@@ -1,11 +1,11 @@
-import {
+import type {
   Amount,
   Box,
   CollectionAddOptions,
   OneOrMore,
   TokenAmount
 } from "@fleet-sdk/common";
-import { NotAllowedTokenBurning, OutputBuilder, TransactionBuilder } from "..";
+import { NotAllowedTokenBurning, type OutputBuilder, type TransactionBuilder } from "..";
 
 export type FleetPluginContext = {
   /**

@@ -1,5 +1,5 @@
 import { some } from "@fleet-sdk/common";
-import { SelectionTarget } from "../builder/selector/boxSelector";
+import type { SelectionTarget } from "../builder/selector/boxSelector";
 
 export class InsufficientInputs extends Error {
   readonly unreached: SelectionTarget;

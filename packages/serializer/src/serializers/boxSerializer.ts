@@ -1,15 +1,15 @@
 import {
-  Amount,
-  Box,
-  BoxCandidate,
+  type Amount,
+  type Box,
+  type BoxCandidate,
   byteSizeOf,
   ensureBigInt,
   isDefined,
   isEmpty,
   isUndefined,
-  NonMandatoryRegisters,
+  type NonMandatoryRegisters,
   some,
-  TokenAmount
+  type TokenAmount
 } from "@fleet-sdk/common";
 import { estimateVLQSize, SigmaByteWriter } from "../coders";
 

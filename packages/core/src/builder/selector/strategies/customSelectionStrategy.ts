@@ -1,6 +1,6 @@
-import { Box } from "@fleet-sdk/common";
-import { SelectionTarget } from "../boxSelector";
-import { ISelectionStrategy } from "./ISelectionStrategy";
+import type { Box } from "@fleet-sdk/common";
+import type { SelectionTarget } from "../boxSelector";
+import type { ISelectionStrategy } from "./ISelectionStrategy";
 
 export type SelectorFunction = (
   inputs: Box<bigint>[],

@@ -1,4 +1,4 @@
-import { Box } from "@fleet-sdk/common";
+import type { Box } from "@fleet-sdk/common";
 import { first, sumBy, utxoSum } from "@fleet-sdk/common";
 import { regularBoxes } from "_test-vectors";
 import { describe, expect, it, vi } from "vitest";
@@ -6,7 +6,7 @@ import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelecti
 import { InsufficientInputs } from "../../errors/insufficientInputs";
 import { SAFE_MIN_BOX_VALUE } from "../outputBuilder";
 import { BoxSelector } from "./boxSelector";
-import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
+import type { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 
 describe("Construction", () => {
   it("Should construct with an array of inputs", () => {

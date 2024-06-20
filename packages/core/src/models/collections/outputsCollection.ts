@@ -1,14 +1,14 @@
 import {
   _0n,
-  BoxSummary,
+  type BoxSummary,
   Collection,
   isDefined,
   isUndefined,
-  OneOrMore,
+  type OneOrMore,
   some
 } from "@fleet-sdk/common";
-import { OutputBuilder } from "../../builder/outputBuilder";
-import { SelectionTarget } from "../../builder/selector/boxSelector";
+import type { OutputBuilder } from "../../builder/outputBuilder";
+import type { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
 
 function setSum<K>(map: Map<K, bigint>, key: K, value: bigint) {

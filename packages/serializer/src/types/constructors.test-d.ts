@@ -1,12 +1,12 @@
 import { describe, expectTypeOf, it } from "vitest";
-import { SConstant } from "../sigmaConstant";
+import type { SConstant } from "../sigmaConstant";
 import {
-  ByteInput,
+  type ByteInput,
   SBigInt,
   SBool,
   SByte,
   SColl,
-  SConstructor,
+  type SConstructor,
   SGroupElement,
   SInt,
   SLong,
@@ -15,8 +15,8 @@ import {
   SSigmaProp,
   SUnit
 } from "./constructors";
-import { SUnitType } from "./monomorphics";
-import {
+import type { SUnitType } from "./monomorphics";
+import type {
   SBigIntType,
   SBoolType,
   SByteType,

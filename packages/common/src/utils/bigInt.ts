@@ -1,4 +1,4 @@
-import { Amount } from "../types";
+import type { Amount } from "../types";
 import { first } from "./array";
 import { isEmpty, isUndefined } from "./assertions";
 

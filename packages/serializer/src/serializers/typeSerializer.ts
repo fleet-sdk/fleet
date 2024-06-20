@@ -1,6 +1,6 @@
 import { assert, first, last } from "@fleet-sdk/common";
-import { SigmaByteReader, SigmaByteWriter } from "../coders";
-import { isColl, isTuple, SCollType, STupleType, SType } from "../types";
+import type { SigmaByteReader, SigmaByteWriter } from "../coders";
+import { isColl, isTuple, SCollType, STupleType, type SType } from "../types";
 import {
   constructorCode,
   descriptors,

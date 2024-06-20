@@ -1,4 +1,4 @@
-import { NonMandatoryRegisters } from "@fleet-sdk/common";
+import type { NonMandatoryRegisters } from "@fleet-sdk/common";
 import { SBool, SInt } from "@fleet-sdk/serializer";
 import { regularBoxes } from "_test-vectors";
 import { beforeEach, describe, expect, it } from "vitest";

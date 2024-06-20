@@ -1,10 +1,10 @@
 import { describe, expectTypeOf, it } from "vitest";
 import {
   createGqlOperation,
-  GraphQLOperation,
-  GraphQLResponse,
-  GraphQLSuccessResponse,
-  GraphQLVariables
+  type GraphQLOperation,
+  type GraphQLResponse,
+  type GraphQLSuccessResponse,
+  type GraphQLVariables
 } from "./graphql";
 
 describe("createGqlOperation() types", () => {

@@ -8,7 +8,7 @@ import {
 import { SConstant } from "@fleet-sdk/serializer";
 import {
   SigmaCompiler$,
-  SigmaCompilerNamedConstantsMap,
+  type SigmaCompilerNamedConstantsMap,
   Value,
   Value$
 } from "sigmastate-js/main";

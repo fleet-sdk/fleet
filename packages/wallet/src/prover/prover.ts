@@ -1,22 +1,22 @@
 import {
-  Base58String,
-  Box,
-  BoxCandidate,
-  EIP12UnsignedInput,
-  EIP12UnsignedTransaction,
+  type Base58String,
+  type Box,
+  type BoxCandidate,
+  type EIP12UnsignedInput,
+  type EIP12UnsignedTransaction,
   isHex,
-  NonMandatoryRegisters,
-  SignedTransaction,
+  type NonMandatoryRegisters,
+  type SignedTransaction,
   some
 } from "@fleet-sdk/common";
 import { ErgoMessage, ErgoUnsignedTransaction } from "@fleet-sdk/core";
-import { blake2b256, ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
+import { blake2b256, type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import {
-  MinimalUnsignedTransaction,
+  type MinimalUnsignedTransaction,
   serializeBox,
   serializeTransaction
 } from "@fleet-sdk/serializer";
-import { ErgoHDKey } from "../ergoHDKey";
+import type { ErgoHDKey } from "../ergoHDKey";
 import { sign, verify } from "./proveDLogProtocol";
 
 type RKey = keyof NonMandatoryRegisters;

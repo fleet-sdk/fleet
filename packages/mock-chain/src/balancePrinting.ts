@@ -1,8 +1,8 @@
-import { Amount, decimalize, some } from "@fleet-sdk/common";
-import { ArrayChange, diffArrays } from "diff";
+import { type Amount, decimalize, some } from "@fleet-sdk/common";
+import { type ArrayChange, diffArrays } from "diff";
 import pc from "picocolors";
-import { AssetMetadataMap } from "./mockChain";
-import { PartyBalance } from "./party/mockChainParty";
+import type { AssetMetadataMap } from "./mockChain";
+import type { PartyBalance } from "./party/mockChainParty";
 
 const ELLIPSIS = "...";
 

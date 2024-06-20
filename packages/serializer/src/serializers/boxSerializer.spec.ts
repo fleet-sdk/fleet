@@ -1,4 +1,4 @@
-import { Box, byteSizeOf, ensureBigInt, first } from "@fleet-sdk/common";
+import { type Box, byteSizeOf, ensureBigInt, first } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { manyTokensBoxes, regularBoxes, validBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";

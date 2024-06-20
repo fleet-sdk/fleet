@@ -1,6 +1,6 @@
 import { ErgoTree } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
-import {
+import type {
   ErgoTree as SigmaErgoTree,
   Value as SigmaValue
 } from "sigmastate-js/main";

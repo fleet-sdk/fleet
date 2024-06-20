@@ -1,4 +1,4 @@
-import {
+import type {
   Base58String,
   BlockHeader,
   Box,
@@ -9,8 +9,8 @@ import {
   TransactionId,
   UnsignedTransaction
 } from "@fleet-sdk/common";
-import { ErgoAddress } from "@fleet-sdk/core";
-import { RequireAtLeastOne } from "type-fest";
+import type { ErgoAddress } from "@fleet-sdk/core";
+import type { RequireAtLeastOne } from "type-fest";
 
 export type BoxSource = "blockchain" | "mempool" | "blockchain+mempool";
 

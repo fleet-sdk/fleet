@@ -1,4 +1,4 @@
-import { UnsignedTransaction } from "@fleet-sdk/common";
+import type { UnsignedTransaction } from "@fleet-sdk/common";
 
 export const unsignedTransactionVectors: {
   name: string;

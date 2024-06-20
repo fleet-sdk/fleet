@@ -1,11 +1,11 @@
 import { hex } from "@fleet-sdk/crypto";
 import { SInt } from "@fleet-sdk/serializer";
-import { HexString, Value, Value$ } from "sigmastate-js/main";
+import { type HexString, Value, Value$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import {
   compile,
   compilerDefaults,
-  CompilerOptions,
+  type CompilerOptions,
   parseNamedConstantsMap
 } from "./compiler";
 

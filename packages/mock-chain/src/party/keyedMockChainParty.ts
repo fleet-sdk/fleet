@@ -1,6 +1,6 @@
 import { randomBytes } from "@fleet-sdk/crypto";
 import { ErgoHDKey } from "@fleet-sdk/wallet";
-import { MockChain } from "../mockChain";
+import type { MockChain } from "../mockChain";
 import { MockChainParty } from "./mockChainParty";
 
 export class KeyedMockChainParty extends MockChainParty {

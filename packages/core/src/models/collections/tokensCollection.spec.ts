@@ -1,4 +1,4 @@
-import { Amount, FleetError, TokenAmount } from "@fleet-sdk/common";
+import { type Amount, FleetError, type TokenAmount } from "@fleet-sdk/common";
 import { manyTokensBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { NotFoundError } from "../../errors";

@@ -1,10 +1,10 @@
 import {
-  Amount,
-  BoxCandidate,
-  ContextExtension,
-  DataInput,
+  type Amount,
+  type BoxCandidate,
+  type ContextExtension,
+  type DataInput,
   isDefined,
-  UnsignedInput
+  type UnsignedInput
 } from "@fleet-sdk/common";
 import { SigmaByteWriter } from "../coders";
 import { serializeBox } from "./boxSerializer";

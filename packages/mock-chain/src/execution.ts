@@ -1,10 +1,10 @@
 import { ensureDefaults, Network } from "@fleet-sdk/common";
-import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
+import type { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { bigintBE, hex } from "@fleet-sdk/crypto";
-import { ErgoHDKey } from "@fleet-sdk/wallet";
+import type { ErgoHDKey } from "@fleet-sdk/wallet";
 import {
-  BlockchainParameters,
-  BlockchainStateContext,
+  type BlockchainParameters,
+  type BlockchainStateContext,
   ProverBuilder$
 } from "sigmastate-js/main";
 import { mockBlockchainStateContext } from "./objectMocking";

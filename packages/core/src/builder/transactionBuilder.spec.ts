@@ -1,4 +1,4 @@
-import { Amount, BoxCandidate, Network } from "@fleet-sdk/common";
+import { type Amount, type BoxCandidate, Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
 import { estimateBoxSize, SByte, SColl } from "@fleet-sdk/serializer";

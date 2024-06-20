@@ -1,31 +1,31 @@
 import {
   _0n,
-  Amount,
-  Box,
-  BoxCandidate,
-  BoxId,
+  type Amount,
+  type Box,
+  type BoxCandidate,
+  type BoxId,
   ensureBigInt,
-  FilterPredicate,
+  type FilterPredicate,
   first,
   hasDuplicatesBy,
   isEmpty,
   isUndefined,
-  OneOrMore,
+  type OneOrMore,
   orderBy,
   some,
-  SortingDirection,
-  SortingSelector,
+  type SortingDirection,
+  type SortingSelector,
   sumBy,
-  TokenTargetAmount,
+  type TokenTargetAmount,
   utxoSum
 } from "@fleet-sdk/common";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientInputs } from "../../errors/insufficientInputs";
-import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
+import type { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
 import {
   CustomSelectionStrategy,
-  SelectorFunction
+  type SelectorFunction
 } from "./strategies/customSelectionStrategy";
 
 export type SelectionTarget = {

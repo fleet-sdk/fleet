@@ -1,4 +1,4 @@
-import { Box, QueryBoxesArgs, State } from "@ergo-graphql/types";
+import type { Box, QueryBoxesArgs, State } from "@ergo-graphql/types";
 import { BlockchainProviderError } from "@fleet-sdk/common";
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { mockResponse } from "./_tests";
@@ -7,9 +7,9 @@ import {
   DEFAULT_HEADERS,
   getOpName,
   gql,
-  GraphQLOperation,
-  GraphQLSuccessResponse,
-  GraphQLVariables,
+  type GraphQLOperation,
+  type GraphQLSuccessResponse,
+  type GraphQLVariables,
   isRequestParam
 } from "./graphql";
 

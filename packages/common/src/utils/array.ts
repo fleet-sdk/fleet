@@ -1,4 +1,4 @@
-import { SortingDirection, SortingSelector } from "../types";
+import type { SortingDirection, SortingSelector } from "../types";
 import { assert, isEmpty } from "./assertions";
 
 type ObjectSelector<T> = (item: T) => T[keyof T];

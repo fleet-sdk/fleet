@@ -7,7 +7,7 @@ import { MockChain } from "@fleet-sdk/mock-chain";
 import { parse } from "@fleet-sdk/serializer";
 import { beforeEach, describe, expect, it } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_tests/mocking";
-import { AgeUSDBankBox } from "./ageUsdBank";
+import type { AgeUSDBankBox } from "./ageUsdBank";
 import { AgeUSDExchangePlugin } from "./exchangePlugin";
 import { SigmaUSDBank } from "./sigmaUsdBank";
 import { SIGMA_USD_PARAMETERS } from "./sigmaUsdParameters";

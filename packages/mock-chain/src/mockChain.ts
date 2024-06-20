@@ -1,21 +1,21 @@
 import {
   ensureDefaults,
   first,
-  HexString,
+  type HexString,
   isUndefined,
   some
 } from "@fleet-sdk/common";
-import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
+import type { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { utf8 } from "@fleet-sdk/crypto";
 import { decode } from "@fleet-sdk/serializer";
 import pc from "picocolors";
-import { BlockchainParameters } from "sigmastate-js/main";
+import type { BlockchainParameters } from "sigmastate-js/main";
 import { printDiff } from "./balancePrinting";
 import { BLOCKCHAIN_PARAMETERS, execute } from "./execution";
 import { mockBlockchainStateContext } from "./objectMocking";
 import {
   KeyedMockChainParty,
-  MockChainParty,
+  type MockChainParty,
   NonKeyedMockChainParty
 } from "./party";
 

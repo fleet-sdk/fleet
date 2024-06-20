@@ -1,19 +1,19 @@
 import {
   _0n,
   _1n,
-  Amount,
+  type Amount,
   assert,
   ensureBigInt as big,
-  Box,
+  type Box,
   isDefined,
   max,
   min,
   percent,
-  TokenAmount
+  type TokenAmount
 } from "@fleet-sdk/common";
-import { OnlyR4Register, R4ToR5Registers } from "@fleet-sdk/core";
+import type { OnlyR4Register, R4ToR5Registers } from "@fleet-sdk/core";
 import { parse, SConstant, SLong } from "@fleet-sdk/serializer";
-import { AgeUSDBankParameters } from "./sigmaUsdParameters";
+import type { AgeUSDBankParameters } from "./sigmaUsdParameters";
 
 const _2n = BigInt(2);
 const _3n = BigInt(3);

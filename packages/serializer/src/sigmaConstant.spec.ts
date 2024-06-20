@@ -16,7 +16,7 @@ import {
 import { SigmaByteWriter } from "./coders";
 import { dataSerializer } from "./serializers";
 import { decode, parse, SConstant } from "./sigmaConstant";
-import { SGroupElementType } from "./types";
+import type { SGroupElementType } from "./types";
 import {
   SBigInt,
   SBool,

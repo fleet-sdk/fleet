@@ -1,14 +1,14 @@
 import {
   AddressType,
-  Base58String,
-  HexString,
+  type Base58String,
+  type HexString,
   Network
 } from "@fleet-sdk/common";
 import { concatBytes, endsWith, first, startsWith } from "@fleet-sdk/common";
 import {
   base58,
   blake2b256,
-  ByteInput,
+  type ByteInput,
   ensureBytes,
   hex,
   validateEcPoint
@@ -20,7 +20,7 @@ import {
   getAddressType,
   getNetworkType,
   unpackAddress,
-  UnpackedAddress,
+  type UnpackedAddress,
   validateAddress,
   validateUnpackedAddress
 } from "./utils";

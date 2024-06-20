@@ -1,4 +1,4 @@
-import { ergoTreeHeaderFlags, HexString, Network } from "@fleet-sdk/common";
+import { ergoTreeHeaderFlags, type HexString, Network } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { ErgoAddress } from "./ergoAddress";
 

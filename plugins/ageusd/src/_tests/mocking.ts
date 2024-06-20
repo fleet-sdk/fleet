@@ -1,6 +1,6 @@
 import { mockUTxO } from "@fleet-sdk/mock-chain";
 import { SLong } from "@fleet-sdk/serializer";
-import { AgeUSDBankBox, OracleBox } from "../ageUsdBank";
+import type { AgeUSDBankBox, OracleBox } from "../ageUsdBank";
 
 export function mockOracleBox(rate: bigint): OracleBox {
   return mockUTxO({

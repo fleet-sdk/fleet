@@ -1,5 +1,5 @@
 import { assert, assertInstanceOf, assertTypeOf } from "@fleet-sdk/common";
-import { BytesCoder } from "../types";
+import type { BytesCoder } from "../types";
 
 const HEXES = Array.from({ length: 256 }, (_, i) =>
   i.toString(16).padStart(2, "0")

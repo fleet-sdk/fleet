@@ -1,20 +1,20 @@
 import {
   AddressType,
   areEqual,
-  Base58String,
+  type Base58String,
   isHex,
   Network
 } from "@fleet-sdk/common";
 import {
   base58,
   blake2b256,
-  ByteInput,
+  type ByteInput,
   ensureBytes,
   hex,
   utf8
 } from "@fleet-sdk/crypto";
 import { SigmaByteWriter } from "@fleet-sdk/serializer";
-import { JsonObject, JsonValue } from "type-fest";
+import type { JsonObject, JsonValue } from "type-fest";
 import { encodeAddress, unpackAddress, validateUnpackedAddress } from "./utils";
 
 const SERIALIZED_HASH_LENGTH = 34; // invalidation byte (1) + network type (1) + hash (32)

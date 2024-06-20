@@ -1,15 +1,15 @@
 import {
-  BoxCandidate,
-  BoxSummary,
-  BuildOutputType,
-  EIP12UnsignedTransaction,
-  UnsignedTransaction,
+  type BoxCandidate,
+  type BoxSummary,
+  type BuildOutputType,
+  type EIP12UnsignedTransaction,
+  type UnsignedTransaction,
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeTransaction } from "@fleet-sdk/serializer";
-import { ErgoUnsignedInput } from "./ergoUnsignedInput";
+import type { ErgoUnsignedInput } from "./ergoUnsignedInput";
 
 type Input = ErgoUnsignedInput;
 type Output = BoxCandidate<bigint>;

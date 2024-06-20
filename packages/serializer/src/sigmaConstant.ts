@@ -1,9 +1,9 @@
 import { assert, isUndefined } from "@fleet-sdk/common";
-import { ByteInput, hex } from "@fleet-sdk/crypto";
+import { type ByteInput, hex } from "@fleet-sdk/crypto";
 import { SigmaByteReader, SigmaByteWriter } from "./coders";
 import { dataSerializer } from "./serializers/dataSerializer";
 import { typeSerializer } from "./serializers/typeSerializer";
-import { SType } from "./types";
+import type { SType } from "./types";
 
 export const MAX_CONSTANT_LENGTH = 4096;
 

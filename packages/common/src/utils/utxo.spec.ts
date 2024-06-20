@@ -5,7 +5,7 @@ import { isEmpty } from "./assertions";
 import { sumBy } from "./bigInt";
 import {
   areRegistersDenselyPacked,
-  BoxSummary,
+  type BoxSummary,
   ensureUTxOBigInt,
   utxoDiff,
   utxoFilter,

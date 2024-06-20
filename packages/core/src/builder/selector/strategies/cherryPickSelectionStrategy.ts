@@ -1,5 +1,5 @@
-import { Box, orderBy } from "@fleet-sdk/common";
-import { SelectionTarget } from "../boxSelector";
+import { type Box, orderBy } from "@fleet-sdk/common";
+import type { SelectionTarget } from "../boxSelector";
 import { AccumulativeSelectionStrategy } from "./accumulativeSelectionStrategy";
 
 /**

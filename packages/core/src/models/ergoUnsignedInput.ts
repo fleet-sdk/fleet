@@ -1,4 +1,4 @@
-import {
+import type {
   Amount,
   Box,
   BuildOutputType,
@@ -9,7 +9,7 @@ import {
   NonMandatoryRegisters,
   UnsignedInput
 } from "@fleet-sdk/common";
-import { ConstantInput } from "../builder";
+import type { ConstantInput } from "../builder";
 import { ErgoBox } from "./ergoBox";
 
 type InputType<T> = T extends "default" ? UnsignedInput : EIP12UnsignedInput;

@@ -1,4 +1,4 @@
-import { blake2b256, Coder, hex } from "@fleet-sdk/crypto";
+import { blake2b256, type Coder, hex } from "@fleet-sdk/crypto";
 import { bigIntToHex } from "./bigint";
 import { writeBigVLQ, writeVLQ } from "./vlq";
 import { zigZagEncode, zigZagEncodeBigInt } from "./zigZag";

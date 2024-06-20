@@ -1,21 +1,21 @@
 import {
   _0n,
-  Amount,
-  Base58String,
-  Box,
+  type Amount,
+  type Base58String,
+  type Box,
   byteSizeOf,
   chunk,
-  CollectionAddOptions,
+  type CollectionAddOptions,
   ensureBigInt,
   first,
-  HexString,
+  type HexString,
   isDefined,
   isHex,
   isUndefined,
   Network,
-  OneOrMore,
+  type OneOrMore,
   some,
-  TokenAmount,
+  type TokenAmount,
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
@@ -39,7 +39,7 @@ import {
   OutputBuilder,
   SAFE_MIN_BOX_VALUE
 } from "./outputBuilder";
-import { createPluginContext, FleetPluginContext } from "./pluginContext";
+import { createPluginContext, type FleetPluginContext } from "./pluginContext";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 

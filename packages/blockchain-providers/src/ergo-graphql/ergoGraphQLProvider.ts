@@ -1,25 +1,25 @@
-import {
+import type {
   Box,
   QueryBoxesArgs,
   Header,
   QueryBlockHeadersArgs
 } from "@ergo-graphql/types";
 import {
-  Base58String,
-  BlockHeader,
+  type Base58String,
+  type BlockHeader,
   ensureDefaults,
-  HexString,
+  type HexString,
   isEmpty,
   isUndefined,
   NotSupportedError,
   orderBy,
-  SignedTransaction,
+  type SignedTransaction,
   some,
   uniq,
   uniqBy
 } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
-import {
+import type {
   BoxQuery,
   BoxWhere,
   ChainProviderBox,
@@ -30,11 +30,11 @@ import {
 } from "../types/blockchainProvider";
 import {
   createGqlOperation,
-  GraphQLOperation,
-  GraphQLRequestOptions,
-  GraphQLSuccessResponse,
-  GraphQLThrowableOptions,
-  GraphQLVariables,
+  type GraphQLOperation,
+  type GraphQLRequestOptions,
+  type GraphQLSuccessResponse,
+  type GraphQLThrowableOptions,
+  type GraphQLVariables,
   isRequestParam
 } from "../utils";
 import {

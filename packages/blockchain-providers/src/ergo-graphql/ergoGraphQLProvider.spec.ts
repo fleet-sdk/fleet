@@ -1,9 +1,9 @@
-import { Header } from "@ergo-graphql/types";
+import type { Header } from "@ergo-graphql/types";
 import { chunk, hasDuplicatesBy, NotSupportedError } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
 import { mockedGraphQLBoxes } from "_test-vectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ChainProviderBox } from "../types/blockchainProvider";
+import type { ChainProviderBox } from "../types/blockchainProvider";
 import { mockChunkedResponse, mockResponse } from "../utils";
 import { ErgoGraphQLProvider } from "./ergoGraphQLProvider";
 import {

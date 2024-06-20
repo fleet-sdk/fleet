@@ -1,5 +1,5 @@
 import { TransactionBuilder } from "@fleet-sdk/core";
-import { ErgoHDKey } from "@fleet-sdk/wallet";
+import type { ErgoHDKey } from "@fleet-sdk/wallet";
 import { regularBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import { execute } from "./execution";

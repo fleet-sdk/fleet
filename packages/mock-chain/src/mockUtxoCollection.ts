@@ -1,17 +1,17 @@
 import {
-  Amount,
-  Box,
-  BoxCandidate,
-  BoxId,
+  type Amount,
+  type Box,
+  type BoxCandidate,
+  type BoxId,
   Collection,
   ensureUTxOBigInt,
   isUndefined,
-  OneOrMore
+  type OneOrMore
 } from "@fleet-sdk/common";
 import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "@fleet-sdk/core";
 import { mockUTxO } from "./objectMocking";
-import { MockUTxOInput } from "./party/mockChainParty";
+import type { MockUTxOInput } from "./party/mockChainParty";
 
 function isUTxOCandidate(
   candidate: BoxCandidate<Amount> | Box<Amount>

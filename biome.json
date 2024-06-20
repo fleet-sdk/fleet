@@ -25,7 +25,6 @@
     "rules": {
       "recommended": true,
       "style": {
-        "useImportType": { "level": "off" },
         "noParameterAssign": { "level": "off" }
       },
       "suspicious": {

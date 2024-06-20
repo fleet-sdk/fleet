@@ -1,5 +1,5 @@
 import { isDefined, isHex, isUndefined } from "@fleet-sdk/common";
-import { Amount, Box, R4ToR5Registers } from "@fleet-sdk/core";
+import type { Amount, Box, R4ToR5Registers } from "@fleet-sdk/core";
 import { parse } from "@fleet-sdk/serializer";
 import { BABEL_ERGOTREE_PREFIX, BABEL_ERGOTREE_SUFFIX } from "./constants";
 

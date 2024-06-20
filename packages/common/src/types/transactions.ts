@@ -1,6 +1,6 @@
-import { Box, BoxCandidate } from "./boxes";
-import { Amount } from "./common";
-import {
+import type { Box, BoxCandidate } from "./boxes";
+import type { Amount } from "./common";
+import type {
   DataInput,
   EIP12UnsignedDataInput,
   EIP12UnsignedInput,

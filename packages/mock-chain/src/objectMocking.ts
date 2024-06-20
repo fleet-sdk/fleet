@@ -1,11 +1,11 @@
-import { Box } from "@fleet-sdk/common";
+import type { Box } from "@fleet-sdk/common";
 import { SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { blake2b256, randomBytes } from "@fleet-sdk/crypto";
 import { serializeBox } from "@fleet-sdk/serializer";
 import {
   AvlTree$,
-  BlockchainStateContext,
+  type BlockchainStateContext,
   GroupElement$
 } from "sigmastate-js/main";
 

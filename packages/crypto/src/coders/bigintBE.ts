@@ -1,5 +1,5 @@
 import { hex } from "@scure/base";
-import { Coder } from "../types";
+import type { Coder } from "../types";
 
 /**
  * A coder for Big Endian  `BigInt` <> `Uint8Array` conversion..

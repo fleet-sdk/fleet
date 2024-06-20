@@ -1,6 +1,6 @@
 import { isEmpty } from "@fleet-sdk/common";
 import { SConstant } from "../sigmaConstant";
-import { SType } from "./base";
+import type { SType } from "./base";
 import { descriptors } from "./descriptors";
 import { SCollType, STupleType } from "./generics";
 import { SUnitType } from "./monomorphics";

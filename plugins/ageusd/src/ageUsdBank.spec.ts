@@ -1,11 +1,11 @@
 import { percent } from "@fleet-sdk/common";
-import { Amount, Box, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/core";
+import { type Amount, type Box, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/core";
 import { parse, SBool } from "@fleet-sdk/serializer";
 import { describe, expect, it, test } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_tests/mocking";
 import { AgeUSDBank } from "./ageUsdBank";
 import {
-  AgeUSDBankParameters,
+  type AgeUSDBankParameters,
   SIGMA_USD_PARAMETERS
 } from "./sigmaUsdParameters";
 

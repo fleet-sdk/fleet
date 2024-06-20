@@ -1,7 +1,7 @@
 import { assert } from "@fleet-sdk/common";
-import { SigmaByteReader, SigmaByteWriter } from "../coders";
-import { SConstant } from "../sigmaConstant";
-import { isColl, isTuple, SCollType, STupleType, SType } from "../types";
+import type { SigmaByteReader, SigmaByteWriter } from "../coders";
+import type { SConstant } from "../sigmaConstant";
+import { isColl, isTuple, type SCollType, type STupleType, type SType } from "../types";
 import { descriptors } from "../types/descriptors";
 
 const GROUP_ELEMENT_LENGTH = 33;

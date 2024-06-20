@@ -1,4 +1,4 @@
-import { HexString } from "@fleet-sdk/common";
+import type { HexString } from "@fleet-sdk/common";
 
 export type ByteInput = Uint8Array | HexString;
 

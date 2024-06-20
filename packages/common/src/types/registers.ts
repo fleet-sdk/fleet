@@ -1,4 +1,4 @@
-import { HexString } from "./common";
+import type { HexString } from "./common";
 
 export type NonMandatoryRegisters<T = HexString> = {
   R4?: T;

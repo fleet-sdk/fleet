@@ -1,4 +1,4 @@
-import { OneOrMore } from "../types";
+import type { OneOrMore } from "../types";
 import { isDefined } from "../utils";
 
 export type CollectionAddOptions = { index?: number };

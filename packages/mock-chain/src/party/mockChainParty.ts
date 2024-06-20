@@ -1,14 +1,14 @@
 import {
-  Amount,
-  BoxCandidate,
-  NonMandatoryRegisters,
-  OneOrMore,
-  TokenAmount,
+  type Amount,
+  type BoxCandidate,
+  type NonMandatoryRegisters,
+  type OneOrMore,
+  type TokenAmount,
   utxoSum
 } from "@fleet-sdk/common";
-import { Box, ErgoAddress, SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
+import { type Box, type ErgoAddress, SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { stringifyBalance } from "../balancePrinting";
-import { MockChain } from "../mockChain";
+import type { MockChain } from "../mockChain";
 import { MockUTxOCollection } from "../mockUtxoCollection";
 
 export type MockUTxOInput =

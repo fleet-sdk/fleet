@@ -1,4 +1,4 @@
-import { Amount, Box } from "@fleet-sdk/common";
+import type { Amount, Box } from "@fleet-sdk/common";
 
 export const boxVectors: {
   hex: string;

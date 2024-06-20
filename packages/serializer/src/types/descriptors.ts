@@ -1,5 +1,5 @@
-import { SType } from "./base";
-import { SCollType, STupleType } from "./generics";
+import type { SType } from "./base";
+import type { SCollType, STupleType } from "./generics";
 import { SUnitType } from "./monomorphics";
 import {
   SBigIntType,

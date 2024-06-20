@@ -1,12 +1,12 @@
 import { ensureBigInt } from "@fleet-sdk/common";
 import {
-  Amount,
-  Box,
+  type Amount,
+  type Box,
   ErgoUnsignedInput,
-  FleetPlugin,
+  type FleetPlugin,
   OutputBuilder,
   SAFE_MIN_BOX_VALUE,
-  TokenAmount
+  type TokenAmount
 } from "@fleet-sdk/core";
 import { SByte, SColl, SInt } from "@fleet-sdk/serializer";
 import {

@@ -1,13 +1,13 @@
 import { _0n, assert, ensureBigInt as big, isDefined } from "@fleet-sdk/common";
 import {
-  Amount,
-  ErgoAddress,
-  FleetPlugin,
+  type Amount,
+  type ErgoAddress,
+  type FleetPlugin,
   OutputBuilder,
   SAFE_MIN_BOX_VALUE
 } from "@fleet-sdk/core";
 import { SConstant, SLong } from "@fleet-sdk/serializer";
-import { ActionType, AgeUSDBank, CoinType } from "./ageUsdBank";
+import type { ActionType, AgeUSDBank, CoinType } from "./ageUsdBank";
 
 export type AgeUSDActionBase = {
   amount: Amount;
