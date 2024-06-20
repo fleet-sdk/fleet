@@ -1,5 +1,5 @@
 import { assert } from "@fleet-sdk/common";
-import { SigmaReader, SigmaWriter } from "../coders";
+import { SigmaByteReader, SigmaByteWriter } from "../coders";
 import { SConstant } from "../sigmaConstant";
 import { isColl, isTuple, SCollType, STupleType, SType } from "../types";
 import { descriptors } from "../types/descriptors";
@@ -8,7 +8,7 @@ const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
 
 export class DataSerializer {
-  public static serialize(data: unknown, type: SType, writer: SigmaWriter): SigmaWriter {
+  public static serialize(data: unknown, type: SType, writer: SigmaByteWriter): SigmaByteWriter {
     if (type.embeddable) {
       switch (type.code) {
         case descriptors.bool.code:
@@ -81,7 +81,7 @@ export class DataSerializer {
     throw Error(`Serialization error: '0x${type.code.toString(16)}' type not implemented.`);
   }
 
-  static deserialize(type: SType, reader: SigmaReader): unknown {
+  static deserialize(type: SType, reader: SigmaByteReader): unknown {
     if (type.embeddable) {
       switch (type.code) {
         case descriptors.bool.code:

@@ -8,6 +8,7 @@ import {
   Network
 } from "@fleet-sdk/common";
 import { base58, blake2b256, validateEcPoint } from "@fleet-sdk/crypto";
+import { SigmaByteWriter } from "@fleet-sdk/serializer";
 
 export const CHECKSUM_LENGTH = 4;
 export const BLAKE_256_HASH_LENGTH = 32;
@@ -49,10 +50,11 @@ export function encodeAddress(
   type: AddressType,
   content: Uint8Array
 ): Base58String {
-  const head = Uint8Array.from([network + type]);
-  const headAndBody = concatBytes(head, content);
-  const checksum = blake2b256(headAndBody).subarray(0, CHECKSUM_LENGTH);
-  return base58.encode(concatBytes(head, content, checksum));
+  return new SigmaByteWriter(1 /** head */ + content.length + CHECKSUM_LENGTH)
+    .write(network + type)
+    .writeBytes(content)
+    .writeChecksum(CHECKSUM_LENGTH)
+    .encode(base58);
 }
 
 export function validateUnpackedAddress(unpacked: UnpackedAddress): boolean {

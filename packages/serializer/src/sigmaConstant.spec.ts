@@ -13,7 +13,7 @@ import {
   sigmaPropVectors,
   tupleTestVectors
 } from "./_test-vectors/constantVectors";
-import { SigmaWriter } from "./coders";
+import { SigmaByteWriter } from "./coders";
 import { DataSerializer } from "./serializers";
 import { decode, parse, SConstant } from "./sigmaConstant";
 import { SGroupElementType } from "./types";
@@ -190,7 +190,7 @@ describe("Not implemented types", () => {
 
     // not implemented SSigmaProp expression
     expect(() => {
-      DataSerializer.serialize("", unimplementedType, new SigmaWriter(1));
+      DataSerializer.serialize("", unimplementedType, new SigmaByteWriter(1));
     }).to.throw("Serialization error: '0x64' type not implemented.");
   });
 

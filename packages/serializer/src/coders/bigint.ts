@@ -7,16 +7,12 @@ import { _0n, first } from "@fleet-sdk/common";
  */
 export function hexToBigInt(hex: string): bigint {
   // https://coolaj86.com/articles/convert-hex-to-decimal-with-js-bigints/
-  if (hex.length % 2) {
-    hex = "0" + hex;
-  }
+  if (hex.length % 2) hex = "0" + hex;
 
   const value = BigInt("0x" + hex);
   const highByte = parseInt(hex.slice(0, 2), 16);
 
-  if (0x80 & highByte) {
-    return -_bitNegate(value); // add two's complement and invert the number to negative
-  }
+  if (0x80 & highByte) return -negateAndMask(value);
 
   return value;
 }
@@ -30,15 +26,10 @@ export function bigIntToHex(value: bigint): string {
   // implementation inspired on
   // https://coolaj86.com/articles/convert-decimal-to-hex-with-js-bigints/
   const positive = value >= _0n;
-  if (!positive) {
-    value = _bitNegate(value);
-  }
+  if (!positive) value = negateAndMask(value);
 
   let hex = value.toString(16);
-  if (hex.length % 2) {
-    hex = "0" + hex;
-  }
-
+  if (hex.length % 2) hex = "0" + hex;
   if (positive && 0x80 & parseInt(hex.slice(0, 2), 16)) {
     hex = "00" + hex;
   }
@@ -51,23 +42,20 @@ export function bigIntToHex(value: bigint): string {
  * @param value The bigint value to negate.
  * @returns The two’s complement of `number` as a bigint.
  */
-export function _bitNegate(value: bigint): bigint {
+export function negateAndMask(value: bigint): bigint {
   const negative = value < _0n;
-  if (negative) {
-    value = -value; // turn into a positive number
-  }
+  if (negative) value = -value; // turn into a positive number
 
   const bits = value.toString(2);
-  let bitLen = bits.length; // convert to binary
+  let len = bits.length; // convert to binary
+  const mod = len % 8;
 
-  const mod = bitLen % 8;
   if (mod > 0) {
-    bitLen += 8 - mod;
+    len += 8 - mod;
   } else if (negative && first(bits) === "1" && bits.indexOf("1", 1) !== -1) {
-    bitLen += 8;
+    len += 8;
   }
 
-  const mask = (1n << BigInt(bitLen)) - 1n; // create a mask
-
+  const mask = (1n << BigInt(len)) - 1n; // create a mask
   return (~value & mask) + 1n; // invert bits, mask it, and add one
 }
