@@ -1,4 +1,8 @@
-import { ergoTreeHeaderFlags, HexString, Network } from "@fleet-sdk/common";
+import {
+  ergoTreeHeaderFlags,
+  type HexString,
+  Network
+} from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { ErgoAddress } from "./ergoAddress";
 
@@ -24,11 +28,11 @@ export class ErgoTree {
   }
 
   get hasSegregatedConstants(): boolean {
-    return (this.header & ergoTreeHeaderFlags.constantSegregation) != 0;
+    return (this.header & ergoTreeHeaderFlags.constantSegregation) !== 0;
   }
 
   get hasSize(): boolean {
-    return (this.header & ergoTreeHeaderFlags.sizeInclusion) != 0;
+    return (this.header & ergoTreeHeaderFlags.sizeInclusion) !== 0;
   }
 
   toBytes(): Uint8Array {

@@ -1,5 +1,5 @@
-import { HexString } from "./common";
-import { SignedTransaction } from "./transactions";
+import type { HexString } from "./common";
+import type { SignedTransaction } from "./transactions";
 
 export type PoWSolution = {
   pk: HexString;

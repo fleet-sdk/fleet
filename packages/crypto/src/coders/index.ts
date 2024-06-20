@@ -4,7 +4,7 @@ import {
   base64 as base64Coder
 } from "@scure/base";
 import { sha256 } from "../hashes";
-import { BytesCoder } from "../types";
+import type { BytesCoder } from "../types";
 
 export const base58check = base58checkCoder(sha256);
 export const base58 = base58Coder as BytesCoder;

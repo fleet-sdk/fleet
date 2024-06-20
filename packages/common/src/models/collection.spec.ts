@@ -2,21 +2,19 @@ import { describe, expect, it } from "vitest";
 import { Collection } from "./collection";
 
 class MockCollection extends Collection<number, number> {
-  constructor() {
-    super();
-  }
-
   protected override _map(item: number): number {
     return item;
   }
 
   public remove(item: number): number {
-    throw Error("Not implemented for " + item);
+    throw Error(`Not implemented for ${item}`);
   }
 }
 
 describe("collection base", () => {
-  const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+  const numbers = [
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+  ];
 
   it("Should create an empty collection", () => {
     const collection = new MockCollection();

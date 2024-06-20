@@ -5,7 +5,7 @@ import { isEmpty } from "./assertions";
 import { sumBy } from "./bigInt";
 import {
   areRegistersDenselyPacked,
-  BoxSummary,
+  type BoxSummary,
   ensureUTxOBigInt,
   utxoDiff,
   utxoFilter,
@@ -23,14 +23,20 @@ describe("UTxO sum", () => {
     );
 
     expect(
-      utxoSum(inputs, "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
+      utxoSum(
+        inputs,
+        "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b"
+      )
     ).toBe(3819n);
   });
 
   it("Should not return undefined results for empty arrays", () => {
-    expect(utxoSum([], "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")).toBe(
-      0n
-    );
+    expect(
+      utxoSum(
+        [],
+        "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b"
+      )
+    ).toBe(0n);
 
     expect(utxoSum([]).nanoErgs).toBe(0n);
     expect(utxoSum([]).tokens).toStrictEqual([]);
@@ -50,11 +56,13 @@ describe("UTxO sum", () => {
       nanoErgs: sumBy(boxes, (x) => x.value),
       tokens: [
         {
-          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId:
+            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 226652336n
         },
         {
-          tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
+          tokenId:
+            "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
           amount: 10n
         }
       ]
@@ -141,7 +149,10 @@ describe("utxoDiff()", () => {
 
     expect(diff.nanoErgs).to.be.equal(regularBoxes[5].value);
     expect(diff.tokens).to.be.deep.equal(regularBoxes[5].assets);
-    expect(utxoDiff(regularBoxes, summary)).to.be.deep.equal({ nanoErgs: 0n, tokens: [] });
+    expect(utxoDiff(regularBoxes, summary)).to.be.deep.equal({
+      nanoErgs: 0n,
+      tokens: []
+    });
   });
 });
 
@@ -217,13 +228,15 @@ describe("Densely pack check - areRegistersDenselyPacked()", () => {
 describe("UTxO filter", () => {
   it("Should filter by max UTxO count", () => {
     expect(utxoFilter(regularBoxes, { max: { count: 2 } })).to.has.length(2);
-    expect(utxoFilter(regularBoxes, { max: { count: regularBoxes.length } })).to.has.length(
-      regularBoxes.length
-    );
+    expect(
+      utxoFilter(regularBoxes, { max: { count: regularBoxes.length } })
+    ).to.has.length(regularBoxes.length);
   });
 
   it("Should filter by max distinct tokens count", () => {
-    const filtered = utxoFilter(regularBoxes, { max: { aggregatedDistinctTokens: 3 } });
+    const filtered = utxoFilter(regularBoxes, {
+      max: { aggregatedDistinctTokens: 3 }
+    });
 
     expect(filtered).to.have.length(5);
     expect(filtered.some((x) => isEmpty(x.assets))).to.be.true;
@@ -234,7 +247,9 @@ describe("UTxO filter", () => {
   });
 
   it("Should filter by predicate", () => {
-    const filtered = utxoFilter(regularBoxes, { by: (box) => isEmpty(box.assets) });
+    const filtered = utxoFilter(regularBoxes, {
+      by: (box) => isEmpty(box.assets)
+    });
 
     expect(filtered).to.have.length(2);
     expect(filtered.every((x) => isEmpty(x.assets))).to.be.true;
@@ -276,7 +291,8 @@ describe("UTxO filter", () => {
   });
 
   it("Should should return empty array for empty inputs and non-matching filters", () => {
-    expect(utxoFilter(regularBoxes, { by: (box) => box.value === 0n })).to.be.empty;
+    expect(utxoFilter(regularBoxes, { by: (box) => box.value === 0n })).to.be
+      .empty;
     expect(utxoFilter([], { max: { count: 10 } })).to.be.empty;
   });
 });
@@ -285,14 +301,17 @@ describe("ensureUTxOBigInt()", () => {
   it("Shoudl bigint value properties for nanoergs and tokens", () => {
     const stringAmountsUTxO = {
       boxId: "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
-      transactionId: "22525acc8b9438ded1e0fef41bb38ac57b8be23c650c82dd8ba545ccdc0b97c2",
+      transactionId:
+        "22525acc8b9438ded1e0fef41bb38ac57b8be23c650c82dd8ba545ccdc0b97c2",
       index: 0,
-      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      ergoTree:
+        "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
       creationHeight: 804138,
       value: "1000000",
       assets: [
         {
-          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId:
+            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: "10000"
         }
       ],
@@ -301,21 +320,28 @@ describe("ensureUTxOBigInt()", () => {
 
     const bigIntAmountsUTxO = {
       boxId: "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
-      transactionId: "22525acc8b9438ded1e0fef41bb38ac57b8be23c650c82dd8ba545ccdc0b97c2",
+      transactionId:
+        "22525acc8b9438ded1e0fef41bb38ac57b8be23c650c82dd8ba545ccdc0b97c2",
       index: 0,
-      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      ergoTree:
+        "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
       creationHeight: 804138,
       value: 1000000n,
       assets: [
         {
-          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId:
+            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 10000n
         }
       ],
       additionalRegisters: {}
     };
 
-    expect(ensureUTxOBigInt(stringAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
-    expect(ensureUTxOBigInt(bigIntAmountsUTxO)).to.be.deep.equal(bigIntAmountsUTxO);
+    expect(ensureUTxOBigInt(stringAmountsUTxO)).to.be.deep.equal(
+      bigIntAmountsUTxO
+    );
+    expect(ensureUTxOBigInt(bigIntAmountsUTxO)).to.be.deep.equal(
+      bigIntAmountsUTxO
+    );
   });
 });

@@ -40,7 +40,11 @@ describe("outputs collection", () => {
     expect(collection.at(0)).toBe(first);
     expect(collection.at(1)).toBe(second);
 
-    const placedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, address, height);
+    const placedOutput = new OutputBuilder(
+      SAFE_MIN_BOX_VALUE * 3n,
+      address,
+      height
+    );
     const newLen = collection.add(placedOutput, { index: 1 });
     expect(newLen).toBe(3);
 
@@ -57,9 +61,19 @@ describe("outputs collection", () => {
     expect(collection.at(0)).toBe(first);
     expect(collection.at(1)).toBe(second);
 
-    const fistPlacedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, address, height);
-    const secondPlacedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 4n, address, height);
-    const newLen = collection.add([fistPlacedOutput, secondPlacedOutput], { index: 1 });
+    const fistPlacedOutput = new OutputBuilder(
+      SAFE_MIN_BOX_VALUE * 3n,
+      address,
+      height
+    );
+    const secondPlacedOutput = new OutputBuilder(
+      SAFE_MIN_BOX_VALUE * 4n,
+      address,
+      height
+    );
+    const newLen = collection.add([fistPlacedOutput, secondPlacedOutput], {
+      index: 1
+    });
     expect(newLen).toBe(4);
 
     expect(collection.at(0)).toBe(first); // should remain unchanged
@@ -76,7 +90,11 @@ describe("outputs collection", () => {
       new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, address, height)
     ]);
 
-    const placedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, address, height);
+    const placedOutput = new OutputBuilder(
+      SAFE_MIN_BOX_VALUE * 3n,
+      address,
+      height
+    );
 
     expect(() => {
       collection.add(placedOutput, { index: 5 /* out of range value */ });
@@ -139,7 +157,11 @@ describe("outputs collection", () => {
   });
 
   it("Should throw if not found", () => {
-    const notIncludedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, address, height);
+    const notIncludedOutput = new OutputBuilder(
+      SAFE_MIN_BOX_VALUE * 3n,
+      address,
+      height
+    );
 
     const collection = new OutputsCollection([
       new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height),
@@ -173,10 +195,14 @@ describe("outputs collection", () => {
 });
 
 describe("Target building", () => {
-  const tokenA = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
-  const tokenB = "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
-  const tokenC = "4bdafc19f427fde7e335a38b1fac384143721249f037e0c2e2716631fdcc6741";
-  const tokenD = "5614535ba46927145c3d30fed8f14b08bd48a143b24136809f9e47afc40643c4";
+  const tokenA =
+    "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
+  const tokenB =
+    "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
+  const tokenC =
+    "4bdafc19f427fde7e335a38b1fac384143721249f037e0c2e2716631fdcc6741";
+  const tokenD =
+    "5614535ba46927145c3d30fed8f14b08bd48a143b24136809f9e47afc40643c4";
 
   it("Should sum amounts", () => {
     const collection = new OutputsCollection();

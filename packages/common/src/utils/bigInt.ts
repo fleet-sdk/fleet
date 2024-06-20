@@ -1,4 +1,4 @@
-import { Amount } from "../types";
+import type { Amount } from "../types";
 import { first } from "./array";
 import { isEmpty, isUndefined } from "./assertions";
 
@@ -35,7 +35,7 @@ type ParsingOptions = {
 
 /**
  * Parse a decimal string into a bigint with options
- * @param decimalStr
+ * @param input
  * @param options
  *
  * @example
@@ -43,12 +43,13 @@ type ParsingOptions = {
  * undecimalize("1", { decimals: 2 }) // 100n
  * undecimalize("1", 2) // 100n
  */
-export function undecimalize(decimalStr: string, options?: ParsingOptions | number): bigint {
-  if (!decimalStr) {
-    return _0n;
-  }
+export function undecimalize(
+  input: string,
+  options?: ParsingOptions | number
+): bigint {
+  if (!input) return _0n;
 
-  options = typeof options == "number" ? { decimals: options } : options;
+  options = typeof options === "number" ? { decimals: options } : options;
   if (isUndefined(options)) {
     options = {};
   }
@@ -56,13 +57,13 @@ export function undecimalize(decimalStr: string, options?: ParsingOptions | numb
   options.decimals = options.decimals || 0;
   options.decimalMark = options.decimalMark || ".";
 
-  const fragments = decimalStr.split(options.decimalMark);
+  const fragments = input.split(options.decimalMark);
   if (fragments.length > 2) {
     throw new Error("Invalid numeric string.");
   }
 
   let [integer, decimal] = fragments;
-  integer = _removeLeadingZeros(integer);
+  integer = removeLeadingZeros(integer);
   const negative = integer.startsWith("-") ? "-" : "";
 
   if (!decimal) {
@@ -109,13 +110,16 @@ type FormattingOptions = {
  * decimalize(129837918300n, { decimals: 9 }) // "129.8379183"
  * decimalize(100n, { decimals: 2 }) // "1"
  */
-export function decimalize(value: Amount, options?: FormattingOptions | number): string {
+export function decimalize(
+  value: Amount,
+  options?: FormattingOptions | number
+): string {
   value = ensureBigInt(value);
   if (!options) {
     return value.toString();
   }
 
-  options = typeof options == "number" ? { decimals: options } : options;
+  options = typeof options === "number" ? { decimals: options } : options;
   options.decimals = options.decimals || 0;
   options.decimalMark = options.decimalMark || ".";
 
@@ -123,7 +127,11 @@ export function decimalize(value: Amount, options?: FormattingOptions | number):
   const integer = value / pow;
   const decimal = value - integer * pow;
 
-  return _buildFormattedDecimal(integer.toString(10), decimal.toString(10), options);
+  return buildFormattedDecimal(
+    integer.toString(10),
+    decimal.toString(10),
+    options
+  );
 }
 
 /**
@@ -144,22 +152,18 @@ export function percent(value: bigint, percentage: bigint, precision = 2n) {
   return (value * percentage) / 10n ** precision;
 }
 
-function _buildFormattedDecimal(
+function buildFormattedDecimal(
   integer: string,
   decimal: string,
   options: FormattingOptions
 ): string {
-  const integerPart = _addThousandMarks(integer, options.thousandMark);
-  const decimalPart = _stripTrailingZeros(decimal.padStart(options.decimals, "0"));
-
-  if (decimalPart) {
-    return `${integerPart}${options.decimalMark}${decimalPart}`;
-  } else {
-    return integerPart;
-  }
+  const int = addThousandMarks(integer, options.thousandMark);
+  const dec = stripTrailingZeros(decimal.padStart(options.decimals, "0"));
+  if (dec) return `${int}${options.decimalMark}${dec}`;
+  return int;
 }
 
-function _addThousandMarks(value: string, mark?: string): string {
+function addThousandMarks(value: string, mark?: string): string {
   if (!mark) {
     return value;
   }
@@ -167,7 +171,7 @@ function _addThousandMarks(value: string, mark?: string): string {
   return value.replace(/\B(?=(\d{3})+(?!\d))/g, mark);
 }
 
-function _stripTrailingZeros(value: string): string {
+function stripTrailingZeros(value: string): string {
   if (!value.endsWith("0")) {
     return value;
   }
@@ -175,7 +179,7 @@ function _stripTrailingZeros(value: string): string {
   return value.replace(/\.?0+$/, "");
 }
 
-function _removeLeadingZeros(value: string): string {
+function removeLeadingZeros(value: string): string {
   if (!value.startsWith("0")) {
     return value;
   }

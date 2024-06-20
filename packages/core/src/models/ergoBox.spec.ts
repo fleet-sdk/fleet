@@ -1,4 +1,4 @@
-import { NonMandatoryRegisters } from "@fleet-sdk/common";
+import type { NonMandatoryRegisters } from "@fleet-sdk/common";
 import {
   invalidBoxes,
   manyTokensBoxes,

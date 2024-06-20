@@ -24,9 +24,18 @@ describe("Construction", () => {
 describe("Tweaking", () => {
   it("Should set extension", () => {
     const input = new ErgoUnsignedInput(regularBoxes[0]);
-    input.setContextExtension({ 0: "0402", 1: "0580c0fc82aa02", 2: undefined, 3: SBool(true) });
+    input.setContextExtension({
+      0: "0402",
+      1: "0580c0fc82aa02",
+      2: undefined,
+      3: SBool(true)
+    });
 
-    expect(input.extension).toEqual({ 0: "0402", 1: "0580c0fc82aa02", 3: "0101" });
+    expect(input.extension).toEqual({
+      0: "0402",
+      1: "0580c0fc82aa02",
+      3: "0101"
+    });
 
     input.setContextVars({ 0: SBool(false) });
     expect(input.extension).toEqual({ 0: "0100" });
@@ -36,7 +45,9 @@ describe("Tweaking", () => {
 describe("Unsigned input object conversion", () => {
   it("Should convert to default unsigned input object and set empty extension", () => {
     for (const box of regularBoxes) {
-      expect(new ErgoUnsignedInput(box).toUnsignedInputObject("default")).toEqual({
+      expect(
+        new ErgoUnsignedInput(box).toUnsignedInputObject("default")
+      ).toEqual({
         boxId: box.boxId,
         extension: {}
       });
@@ -66,7 +77,10 @@ describe("Unsigned input object conversion", () => {
         boxId: box.boxId,
         value: box.value.toString(),
         ergoTree: box.ergoTree,
-        assets: box.assets.map((x) => ({ tokenId: x.tokenId, amount: x.amount.toString() })),
+        assets: box.assets.map((x) => ({
+          tokenId: x.tokenId,
+          amount: x.amount.toString()
+        })),
         creationHeight: box.creationHeight,
         additionalRegisters: box.additionalRegisters,
         transactionId: box.transactionId,
@@ -108,7 +122,10 @@ describe("Unsigned data input object conversion", () => {
         boxId: box.boxId,
         value: box.value.toString(),
         ergoTree: box.ergoTree,
-        assets: box.assets.map((x) => ({ tokenId: x.tokenId, amount: x.amount.toString() })),
+        assets: box.assets.map((x) => ({
+          tokenId: x.tokenId,
+          amount: x.amount.toString()
+        })),
         creationHeight: box.creationHeight,
         additionalRegisters: box.additionalRegisters,
         transactionId: box.transactionId,

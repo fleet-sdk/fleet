@@ -1,7 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import { SigmaByteReader } from "./sigmaByteReader";
 import { SigmaByteWriter } from "./sigmaByteWriter";
-import { estimateVLQSize, readBigVLQ, readVLQ, writeBigVLQ, writeVLQ } from "./vlq";
+import {
+  estimateVLQSize,
+  readBigVLQ,
+  readVLQ,
+  writeBigVLQ,
+  writeVLQ
+} from "./vlq";
+import fc from "fast-check";
 
 describe("VLQ encoding/decoding", () => {
   const testVectors = [
@@ -23,10 +30,8 @@ describe("VLQ encoding/decoding", () => {
     return writeVLQ(new SigmaByteWriter(5), value).toBytes();
   }
 
-  it("Should encode", () => {
-    testVectors.forEach((tv) => {
-      expect(toVLQBytes(tv.uint)).toEqual(tv.bytes);
-    });
+  test.each(testVectors)("Should encode", (tv) => {
+    expect(toVLQBytes(tv.uint)).toEqual(tv.bytes);
   });
 
   it("Should fail trying to encode negative values", () => {
@@ -35,28 +40,26 @@ describe("VLQ encoding/decoding", () => {
     }).toThrow();
   });
 
-  it("Should decode", () => {
-    testVectors.forEach((tv) => {
-      expect(readVLQ(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
-    });
+  test.each(testVectors)("Should decode", (tv) => {
+    expect(readVLQ(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
   });
 
   it("Should decode empty Buffer to 0", () => {
     expect(readVLQ(new SigmaByteReader(Uint8Array.from([])))).toEqual(0);
   });
 
-  it("Should encode/decode radom numbers", () => {
-    Array.from(Array(100))
-      .map(() => Math.ceil(Math.random() * 100000))
-      .forEach((n) => {
-        expect(readVLQ(new SigmaByteReader(toVLQBytes(n)))).toBe(n);
-      });
-  });
-
   it("Should estimate the byte size of numbers", () => {
     for (const tv of testVectors) {
       expect(estimateVLQSize(tv.uint)).toBe(tv.bytes.length);
     }
+  });
+
+  it("Should encode/decode radom numbers", () => {
+    fc.assert(
+      fc.property(fc.integer({ min: 0, max: 100000000 }), (n) => {
+        expect(readVLQ(new SigmaByteReader(toVLQBytes(n)))).to.be.equal(n);
+      })
+    );
   });
 });
 
@@ -77,13 +80,14 @@ describe("Big VLQ encoding/decoding", () => {
     { uint: 2097151n, bytes: Uint8Array.from([0xff, 0xff, 0x7f]) },
     { uint: 2097152n, bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x01]) },
     { uint: 268435455n, bytes: Uint8Array.from([0xff, 0xff, 0xff, 0x7f]) },
-    { uint: 268435456n, bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x01]) }
+    {
+      uint: 268435456n,
+      bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x01])
+    }
   ];
 
-  it("Should encode", () => {
-    testVectors.forEach((tv) => {
-      expect(toBigVLQBytes(tv.uint)).toEqual(tv.bytes);
-    });
+  test.each(testVectors)("Should encode", (tv) => {
+    expect(toBigVLQBytes(tv.uint)).toEqual(tv.bytes);
   });
 
   it("Should fail trying to encode negative values", () => {
@@ -92,27 +96,28 @@ describe("Big VLQ encoding/decoding", () => {
     }).toThrow();
   });
 
-  it("Should decode", () => {
-    testVectors.forEach((tv) => {
-      expect(readBigVLQ(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
-    });
+  test.each(testVectors)("Should decode", (tv) => {
+    expect(readBigVLQ(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
   });
 
   it("Should decode empty Buffer to 0", () => {
     expect(readBigVLQ(new SigmaByteReader(Uint8Array.from([])))).toEqual(0n);
   });
 
-  it("Should encode/decode radom numbers", () => {
-    Array.from(Array(100))
-      .map(() => BigInt(Math.ceil(Math.random() * 100000000000)) * BigInt(Number.MAX_SAFE_INTEGER))
-      .forEach((n) => {
-        expect(readBigVLQ(new SigmaByteReader(toBigVLQBytes(n)))).toBe(n);
-      });
+  test.each(testVectors)("Should estimate the byte size of numbers", (tv) => {
+    expect(estimateVLQSize(tv.uint)).toBe(tv.bytes.length);
   });
 
-  it("Should estimate the byte size of numbers", () => {
-    for (const tv of testVectors) {
-      expect(estimateVLQSize(tv.uint)).toBe(tv.bytes.length);
-    }
+  it("Should encode/decode radom numbers", () => {
+    fc.assert(
+      fc.property(
+        fc.bigInt({ min: 0n, max: BigInt(Number.MAX_SAFE_INTEGER) }),
+        (n) => {
+          expect(readBigVLQ(new SigmaByteReader(toBigVLQBytes(n)))).to.be.equal(
+            n
+          );
+        }
+      )
+    );
   });
 });

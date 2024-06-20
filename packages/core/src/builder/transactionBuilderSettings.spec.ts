@@ -39,7 +39,10 @@ describe("Transaction builder settings", () => {
     expect(setting.canBurnTokensFromPlugins).toBeFalsy();
     expect(setting.shouldIsolateErgOnChange).toBeFalsy();
 
-    setting.allowTokenBurning().allowTokenBurningFromPlugins().isolateErgOnChange();
+    setting
+      .allowTokenBurning()
+      .allowTokenBurningFromPlugins()
+      .isolateErgOnChange();
     expect(setting.canBurnTokens).toBeTruthy();
     expect(setting.canBurnTokensFromPlugins).toBeTruthy();
     expect(setting.shouldIsolateErgOnChange).toBeTruthy();
@@ -53,7 +56,8 @@ describe("Transaction builder settings", () => {
   });
 
   it("Should allow token burning only from plugins context", () => {
-    const settings = new TransactionBuilderSettings().allowTokenBurningFromPlugins(true);
+    const settings =
+      new TransactionBuilderSettings().allowTokenBurningFromPlugins(true);
 
     expect(settings.canBurnTokens).toBe(false);
     expect(settings.canBurnTokensFromPlugins).toBe(true);

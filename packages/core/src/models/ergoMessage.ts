@@ -1,7 +1,20 @@
-import { AddressType, areEqual, Base58String, isHex, Network } from "@fleet-sdk/common";
-import { base58, blake2b256, ByteInput, ensureBytes, hex, utf8 } from "@fleet-sdk/crypto";
+import {
+  AddressType,
+  areEqual,
+  type Base58String,
+  isHex,
+  Network
+} from "@fleet-sdk/common";
+import {
+  base58,
+  blake2b256,
+  type ByteInput,
+  ensureBytes,
+  hex,
+  utf8
+} from "@fleet-sdk/crypto";
 import { SigmaByteWriter } from "@fleet-sdk/serializer";
-import { JsonObject, JsonValue } from "type-fest";
+import type { JsonObject, JsonValue } from "type-fest";
 import { encodeAddress, unpackAddress, validateUnpackedAddress } from "./utils";
 
 const SERIALIZED_HASH_LENGTH = 34; // invalidation byte (1) + network type (1) + hash (32)
@@ -20,7 +33,9 @@ export type ErgoMessageFromDataOptions = NetworkOptions & {
   data: MessageData;
 };
 
-export type ErgoMessageOptions = ErgoMessageFromHashOptions | ErgoMessageFromDataOptions;
+export type ErgoMessageOptions =
+  | ErgoMessageFromHashOptions
+  | ErgoMessageFromDataOptions;
 
 export const MessageType = {
   Hash: 0,
@@ -68,17 +83,17 @@ export class ErgoMessage {
       return isHex(data)
         ? [hex.decode(data), MessageType.Binary]
         : [utf8.decode(data), MessageType.String];
-    } else if (data instanceof Uint8Array) {
-      return [data, MessageType.Binary];
-    } else {
-      return [utf8.decode(JSON.stringify(data)), MessageType.Json];
     }
+    if (data instanceof Uint8Array) return [data, MessageType.Binary];
+    return [utf8.decode(JSON.stringify(data)), MessageType.Json];
   }
 
   static decode(encodedHash: Base58String): ErgoMessage {
     const unpacked = unpackAddress(base58.decode(encodedHash));
-    if (unpacked.type !== AddressType.ADH) throw new Error("Invalid message type");
-    if (!validateUnpackedAddress(unpacked)) throw new Error("Invalid encoded message hash");
+    if (unpacked.type !== AddressType.ADH)
+      throw new Error("Invalid message type");
+    if (!validateUnpackedAddress(unpacked))
+      throw new Error("Invalid encoded message hash");
 
     return new ErgoMessage({ hash: unpacked.body, network: unpacked.network });
   }

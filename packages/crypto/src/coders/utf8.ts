@@ -1,5 +1,5 @@
 import { assertInstanceOf, assertTypeOf } from "@fleet-sdk/common";
-import { BytesCoder } from "../types";
+import type { BytesCoder } from "../types";
 
 function bytesToUtf8(bytes: Uint8Array): string {
   assertInstanceOf(bytes, Uint8Array);

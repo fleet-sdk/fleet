@@ -1,31 +1,37 @@
 import {
   _0n,
-  Amount,
-  Box,
-  BoxCandidate,
-  BoxId,
+  type Amount,
+  type Box,
+  type BoxCandidate,
+  type BoxId,
   ensureBigInt,
-  FilterPredicate,
+  type FilterPredicate,
   first,
   hasDuplicatesBy,
   isEmpty,
   isUndefined,
-  OneOrMore,
+  type OneOrMore,
   orderBy,
   some,
-  SortingDirection,
-  SortingSelector,
+  type SortingDirection,
+  type SortingSelector,
   sumBy,
-  TokenTargetAmount,
+  type TokenTargetAmount,
   utxoSum
 } from "@fleet-sdk/common";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
 import { InsufficientInputs } from "../../errors/insufficientInputs";
-import { ISelectionStrategy } from "./strategies/ISelectionStrategy";
+import type { ISelectionStrategy } from "./strategies/ISelectionStrategy";
 import { AccumulativeSelectionStrategy } from "./strategies/accumulativeSelectionStrategy";
-import { CustomSelectionStrategy, SelectorFunction } from "./strategies/customSelectionStrategy";
+import {
+  CustomSelectionStrategy,
+  type SelectorFunction
+} from "./strategies/customSelectionStrategy";
 
-export type SelectionTarget = { nanoErgs?: bigint; tokens?: TokenTargetAmount<bigint>[] };
+export type SelectionTarget = {
+  nanoErgs?: bigint;
+  tokens?: TokenTargetAmount<bigint>[];
+};
 
 export class BoxSelector<T extends Box<bigint>> {
   private readonly _inputs: Box<bigint>[];
@@ -39,7 +45,9 @@ export class BoxSelector<T extends Box<bigint>> {
     this._inputs = inputs;
   }
 
-  public defineStrategy(strategy: ISelectionStrategy | SelectorFunction): BoxSelector<T> {
+  public defineStrategy(
+    strategy: ISelectionStrategy | SelectorFunction
+  ): BoxSelector<T> {
     if (this._isISelectionStrategyImplementation(strategy)) {
       this._strategy = strategy;
     } else {
@@ -63,7 +71,9 @@ export class BoxSelector<T extends Box<bigint>> {
 
     if (predicate) {
       if (inclusion) {
-        selected = unselected.filter((box) => predicate(box) || inclusion.has(box.boxId));
+        selected = unselected.filter(
+          (box) => predicate(box) || inclusion.has(box.boxId)
+        );
       } else {
         selected = unselected.filter(predicate);
       }
@@ -72,13 +82,18 @@ export class BoxSelector<T extends Box<bigint>> {
     }
 
     if (some(selected)) {
-      unselected = unselected.filter((box) => !selected.some((sel) => sel.boxId === box.boxId));
+      unselected = unselected.filter(
+        (box) => !selected.some((sel) => sel.boxId === box.boxId)
+      );
 
       if (remaining.nanoErgs && remaining.nanoErgs > _0n) {
         remaining.nanoErgs -= sumBy(selected, (input) => input.value);
       }
 
-      if (some(remaining.tokens) && selected.some((input) => !isEmpty(input.assets))) {
+      if (
+        some(remaining.tokens) &&
+        selected.some((input) => !isEmpty(input.assets))
+      ) {
         for (const t of remaining.tokens) {
           if (t.amount && t.amount > _0n) {
             t.amount -= utxoSum(selected, t.tokenId);
@@ -88,7 +103,11 @@ export class BoxSelector<T extends Box<bigint>> {
     }
 
     if (this._selector) {
-      unselected = orderBy(unselected, this._selector, this._sortDirection || "asc");
+      unselected = orderBy(
+        unselected,
+        this._selector,
+        this._sortDirection || "asc"
+      );
     }
 
     selected = selected.concat(this._strategy.select(unselected, remaining));
@@ -114,8 +133,14 @@ export class BoxSelector<T extends Box<bigint>> {
     };
   }
 
-  private _getUnreachedTargets(inputs: Box<bigint>[], target: SelectionTarget): SelectionTarget {
-    const unreached: SelectionTarget = { nanoErgs: undefined, tokens: undefined };
+  private _getUnreachedTargets(
+    inputs: Box<bigint>[],
+    target: SelectionTarget
+  ): SelectionTarget {
+    const unreached: SelectionTarget = {
+      nanoErgs: undefined,
+      tokens: undefined
+    };
     const selectedNanoergs = sumBy(inputs, (input) => input.value);
 
     if (target.nanoErgs && target.nanoErgs > selectedNanoergs) {
@@ -147,7 +172,9 @@ export class BoxSelector<T extends Box<bigint>> {
     return unreached;
   }
 
-  public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector<T>;
+  public ensureInclusion(
+    predicate: FilterPredicate<Box<bigint>>
+  ): BoxSelector<T>;
   public ensureInclusion(boxIds: OneOrMore<BoxId>): BoxSelector<T>;
   public ensureInclusion(filter: "all"): BoxSelector<T>;
   public ensureInclusion(
@@ -184,7 +211,9 @@ export class BoxSelector<T extends Box<bigint>> {
     return this;
   }
 
-  private _isISelectionStrategyImplementation(obj: unknown): obj is ISelectionStrategy {
+  private _isISelectionStrategyImplementation(
+    obj: unknown
+  ): obj is ISelectionStrategy {
     if ((obj as ISelectionStrategy).select) {
       return true;
     }
@@ -192,20 +221,26 @@ export class BoxSelector<T extends Box<bigint>> {
     return false;
   }
 
-  public static buildTargetFrom(boxes: Box<Amount>[] | BoxCandidate<Amount>[]): SelectionTarget {
+  public static buildTargetFrom(
+    boxes: Box<Amount>[] | BoxCandidate<Amount>[]
+  ): SelectionTarget {
     const tokens: { [tokenId: string]: bigint } = {};
     let nanoErgs = _0n;
 
     for (const box of boxes) {
       nanoErgs += ensureBigInt(box.value);
       for (const token of box.assets) {
-        tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + ensureBigInt(token.amount);
+        tokens[token.tokenId] =
+          (tokens[token.tokenId] || _0n) + ensureBigInt(token.amount);
       }
     }
 
     return {
       nanoErgs,
-      tokens: Object.keys(tokens).map((tokenId) => ({ tokenId, amount: tokens[tokenId] }))
+      tokens: Object.keys(tokens).map((tokenId) => ({
+        tokenId,
+        amount: tokens[tokenId]
+      }))
     };
   }
 }

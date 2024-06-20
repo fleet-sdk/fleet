@@ -363,7 +363,10 @@ declare module "sigmastate-js/main" {
      *         - private, containing secret randomness
      *         - public, containing only commitments
      */
-    generateCommitmentsFor(sigmaTree: SigmaProp, generateFor: SigmaProp[]): ProverHints;
+    generateCommitmentsFor(
+      sigmaTree: SigmaProp,
+      generateFor: SigmaProp[]
+    ): ProverHints;
 
     /**
      * A method which is extracting partial proofs of secret knowledge for particular secrets with their
@@ -396,7 +399,11 @@ declare module "sigmastate-js/main" {
      * @param hintsBag  - additional hints for a signer (useful for distributed signing)
      * @return - signature or error
      */
-    signMessage(sigmaProp: SigmaProp, message: Int8Array, hintsBag: ProverHints): Int8Array;
+    signMessage(
+      sigmaProp: SigmaProp,
+      message: Int8Array,
+      hintsBag: ProverHints
+    ): Int8Array;
   }
 
   export declare class SigmaPropProver$ {
@@ -420,7 +427,11 @@ declare module "sigmastate-js/main" {
      * @param signature signature for the message
      * @return whether signature is valid or not (valid signature contains proofs for the sigma proposition)
      */
-    verifySignature(sigmaProp: SigmaProp, message: Int8Array, signature: Int8Array): boolean;
+    verifySignature(
+      sigmaProp: SigmaProp,
+      message: Int8Array,
+      signature: Int8Array
+    ): boolean;
   }
   export declare class SigmaPropVerifier$ {
     /** Create a new instance of [[SigmaPropVerifier]]. */
@@ -487,7 +498,10 @@ declare module "sigmastate-js/main" {
      * @param mnemonicPhrase          secret seed phrase to be used in prover for generating proofs.
      * @param mnemonicPass            password to protect secret seed phrase.
      */
-    withMnemonic(mnemonicPhrase: HexString, mnemonicPass: HexString): ProverBuilder;
+    withMnemonic(
+      mnemonicPhrase: HexString,
+      mnemonicPass: HexString
+    ): ProverBuilder;
 
     /** Configure this builder to derive the new EIP-3 secret key with the given index.
      * The derivation uses master key derived from the mnemonic configured using
@@ -517,7 +531,13 @@ declare module "sigmastate-js/main" {
      * @see
      * <a href="https://github.com/ScorexFoundation/sigmastate-interpreter/blob/b54a173865a532de09bbcbf10da32ee2a491c8f9/sigmastate/src/main/scala/sigmastate/basics/DiffieHellmanTupleProtocol.scala#L58">implementation</a>
      */
-    withDHTSecret(g: HexString, h: HexString, u: HexString, v: HexString, x: bigint): ProverBuilder;
+    withDHTSecret(
+      g: HexString,
+      h: HexString,
+      u: HexString,
+      v: HexString,
+      x: bigint
+    ): ProverBuilder;
 
     /** This allows adding additional secret for use in proveDlog, when the secret is not
      * part of the wallet.
@@ -534,7 +554,10 @@ declare module "sigmastate-js/main" {
   }
 
   export declare class ProverBuilder$ {
-    static create(parameters: BlockchainParameters, network: number): ProverBuilder;
+    static create(
+      parameters: BlockchainParameters,
+      network: number
+    ): ProverBuilder;
   }
 
   /**

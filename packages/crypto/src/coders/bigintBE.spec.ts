@@ -6,7 +6,9 @@ describe("Big Endian BigInt coder", () => {
     expect(bigintBE.encode(Uint8Array.from([1]))).to.be.equal(1n);
     expect(bigintBE.encode(Uint8Array.from([0]))).to.be.equal(0n);
     expect(bigintBE.encode(Uint8Array.from([]))).to.be.equal(0n);
-    expect(bigintBE.encode(Uint8Array.from([0xde, 0xad, 0xbe, 0xef]))).to.be.equal(3735928559n);
+    expect(
+      bigintBE.encode(Uint8Array.from([0xde, 0xad, 0xbe, 0xef]))
+    ).to.be.equal(3735928559n);
   });
 
   it("Should decode bigint to Uint8Array", () => {

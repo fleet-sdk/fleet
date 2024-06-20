@@ -1,6 +1,6 @@
 import { assert, first, last } from "@fleet-sdk/common";
-import { SigmaByteReader, SigmaByteWriter } from "../coders";
-import { isColl, isTuple, SCollType, STupleType, SType } from "../types";
+import type { SigmaByteReader, SigmaByteWriter } from "../coders";
+import { isColl, isTuple, SCollType, STupleType, type SType } from "../types";
 import {
   constructorCode,
   descriptors,
@@ -8,19 +8,23 @@ import {
   PRIMITIVE_TYPE_RANGE
 } from "../types/descriptors";
 
-export class TypeSerializer {
-  static serialize(type: SType, writer: SigmaByteWriter) {
+export const typeSerializer = {
+  serialize(type: SType, writer: SigmaByteWriter) {
     if (type.embeddable) {
       writer.write(type.code);
     } else if (type.code === descriptors.unit.code) {
       writer.write(type.code);
     } else if (isColl(type)) {
       if (type.elementsType.embeddable) {
-        writer.write(descriptors.coll.simpleCollTypeCode + type.elementsType.code);
+        writer.write(
+          descriptors.coll.simpleCollTypeCode + type.elementsType.code
+        );
       } else if (isColl(type.elementsType)) {
         const nestedColl = type.elementsType;
         if (nestedColl.elementsType.embeddable) {
-          writer.write(descriptors.coll.nestedCollTypeCode + nestedColl.elementsType.code);
+          writer.write(
+            descriptors.coll.nestedCollTypeCode + nestedColl.elementsType.code
+          );
         } else {
           writer.write(descriptors.coll.simpleCollTypeCode);
           this.serialize(nestedColl, writer);
@@ -65,7 +69,10 @@ export class TypeSerializer {
           break;
         default: {
           const len = type.elementsType.length;
-          assert(len >= 2 && len <= 255, "Invalid type: tuples must have between 2 and 255 items.");
+          assert(
+            len >= 2 && len <= 255,
+            "Invalid type: tuples must have between 2 and 255 items."
+          );
 
           // Generic tuple
           writer.write(descriptors.tuple.genericTupleTypeCode);
@@ -79,11 +86,14 @@ export class TypeSerializer {
     } else {
       throw new Error("Serialization error: type not implemented.");
     }
-  }
+  },
 
-  static deserialize(r: SigmaByteReader): SType {
+  deserialize(r: SigmaByteReader): SType {
     const byte = r.readByte();
-    assert(byte > 0, `Parsing Error: Unexpected type code '0x${byte.toString(16)}'`);
+    assert(
+      byte > 0,
+      `Parsing Error: Unexpected type code '0x${byte.toString(16)}'`
+    );
 
     if (byte < descriptors.tuple.genericTupleTypeCode) {
       const ctorCode = Math.floor(byte / PRIMITIVE_TYPE_RANGE);
@@ -94,7 +104,8 @@ export class TypeSerializer {
           return getPrimitiveType(embdCode);
         }
         case constructorCode.simpleColl: {
-          const internal = embdCode === 0 ? this.deserialize(r) : getPrimitiveType(embdCode);
+          const internal =
+            embdCode === 0 ? this.deserialize(r) : getPrimitiveType(embdCode);
 
           return new SCollType(internal);
         }
@@ -120,29 +131,34 @@ export class TypeSerializer {
         case constructorCode.symmetricPair: {
           const internal =
             embdCode === 0
-              ? [this.deserialize(r), this.deserialize(r), this.deserialize(r), this.deserialize(r)] // Quadruple of types
+              ? [
+                  this.deserialize(r),
+                  this.deserialize(r),
+                  this.deserialize(r),
+                  this.deserialize(r)
+                ] // Quadruple of types
               : [getPrimitiveType(embdCode), getPrimitiveType(embdCode)]; // Symmetric pair of primitive types (`(Int, Int)`, `(Byte,Byte)`, etc.)
 
           return new STupleType(internal);
         }
       }
-    } else {
-      switch (byte) {
-        case descriptors.tuple.genericTupleTypeCode: {
-          const len = r.readVlq();
-          const wrapped = new Array<SType>(len);
-          for (let i = 0; i < len; i++) {
-            wrapped[i] = this.deserialize(r);
-          }
+    }
 
-          return new STupleType(wrapped);
+    switch (byte) {
+      case descriptors.tuple.genericTupleTypeCode: {
+        const len = r.readVlq();
+        const wrapped = new Array<SType>(len);
+        for (let i = 0; i < len; i++) {
+          wrapped[i] = this.deserialize(r);
         }
-        case descriptors.unit.code: {
-          return descriptors.unit;
-        }
+
+        return new STupleType(wrapped);
+      }
+      case descriptors.unit.code: {
+        return descriptors.unit;
       }
     }
 
     throw new Error("Not implemented.");
   }
-}
+};

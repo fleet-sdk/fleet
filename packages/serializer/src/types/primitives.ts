@@ -1,8 +1,8 @@
 import { ensureBigInt } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
-import { SConstant } from "../sigmaConstant";
+import type { SConstant } from "../sigmaConstant";
 import { SPrimitiveType } from "./base";
-import { BigIntInput, ByteInput } from "./constructors";
+import type { BigIntInput, ByteInput } from "./constructors";
 
 export class SBoolType extends SPrimitiveType<boolean> {
   get code(): 0x01 {

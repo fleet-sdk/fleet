@@ -9,13 +9,13 @@ describe("Bytes concatenation", () => {
       ui8([0xde, 0xad, 0xbe, 0xef])
     );
 
-    expect(concatBytes(ui8([0xde, 0xad, 0xbe, 0xef]), ui8([]))).to.be.deep.equal(
-      ui8([0xde, 0xad, 0xbe, 0xef])
-    );
+    expect(
+      concatBytes(ui8([0xde, 0xad, 0xbe, 0xef]), ui8([]))
+    ).to.be.deep.equal(ui8([0xde, 0xad, 0xbe, 0xef]));
 
-    expect(concatBytes(ui8([]), ui8([0xde, 0xad, 0xbe, 0xef]))).to.be.deep.equal(
-      ui8([0xde, 0xad, 0xbe, 0xef])
-    );
+    expect(
+      concatBytes(ui8([]), ui8([0xde, 0xad, 0xbe, 0xef]))
+    ).to.be.deep.equal(ui8([0xde, 0xad, 0xbe, 0xef]));
   });
 
   it("Should fail with invalid inputs", () => {
@@ -28,14 +28,20 @@ describe("Bytes concatenation", () => {
 describe("isHex() test", () => {
   it("Should pass with VALID hex strings", () => {
     expect(
-      isHex("0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7")
+      isHex(
+        "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7"
+      )
     ).toBeTruthy();
+
+    expect(isHex("0xdeadbeef")).toBeTruthy();
   });
 
   it("Should fail with INVALID hex strings", () => {
     expect(isHex("this is a non hex string")).toBeFalsy();
     expect(
-      isHex("n 0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7")
+      isHex(
+        "n 0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7"
+      )
     ).toBeFalsy();
 
     expect(isHex("deadbee")).toBeFalsy();
@@ -48,7 +54,9 @@ describe("isHex() test", () => {
 
   it("Should return the byte size of a hex string", () => {
     expect(
-      byteSizeOf("0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7")
+      byteSizeOf(
+        "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7"
+      )
     ).toBe(36);
   });
 });

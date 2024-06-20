@@ -15,7 +15,8 @@ import { validateAddress } from "./utils";
 
 describe("Construction", () => {
   it("Should construct P2PK from ErgoTree", () => {
-    const ergoTree = "0008cd0278011ec0cf5feb92d61adb51dcb75876627ace6fd9446ab4cabc5313ab7b39a7";
+    const ergoTree =
+      "0008cd0278011ec0cf5feb92d61adb51dcb75876627ace6fd9446ab4cabc5313ab7b39a7";
     const address = ErgoAddress.fromErgoTree(ergoTree);
 
     expect(address.type).toBe(AddressType.P2PK);
@@ -47,12 +48,15 @@ describe("Construction", () => {
 
   it("Should fail if passing an encoded address in place of an ErgoTree", () => {
     expect(() => {
-      ErgoAddress.fromErgoTree("3Wx6cHkTaAvysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3");
+      ErgoAddress.fromErgoTree(
+        "3Wx6cHkTaAvysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3"
+      );
     }).toThrow();
   });
 
   it("Should construct P2PK from public key hex string", () => {
-    const publicKey = "038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63";
+    const publicKey =
+      "038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63";
     const address = ErgoAddress.fromPublicKey(publicKey);
 
     expect(address.type).toBe(AddressType.P2PK);
@@ -107,7 +111,8 @@ describe("Construction", () => {
   });
 
   it("Should construct P2PK from encoded address", () => {
-    const encodedAddress = "3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3";
+    const encodedAddress =
+      "3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3";
     const address = ErgoAddress.fromBase58(encodedAddress);
 
     expect(address.type).toBe(AddressType.P2PK);
@@ -163,42 +168,68 @@ describe("Construction", () => {
 
 describe("Encoding", () => {
   it("Should encode for mainnet by default", () => {
-    expect(ErgoAddress.getNetworkType(ErgoAddress.fromErgoTree(FEE_CONTRACT).encode())).toBe(
-      Network.Mainnet
-    );
+    expect(
+      ErgoAddress.getNetworkType(
+        ErgoAddress.fromErgoTree(FEE_CONTRACT).encode()
+      )
+    ).toBe(Network.Mainnet);
   });
 
   it("Should encode on demand", () => {
     const address = ErgoAddress.fromErgoTree(FEE_CONTRACT);
 
-    expect(ErgoAddress.getNetworkType(address.encode(Network.Mainnet))).toBe(Network.Mainnet);
-    expect(ErgoAddress.getNetworkType(address.encode(Network.Testnet))).toBe(Network.Testnet);
+    expect(ErgoAddress.getNetworkType(address.encode(Network.Mainnet))).toBe(
+      Network.Mainnet
+    );
+    expect(ErgoAddress.getNetworkType(address.encode(Network.Testnet))).toBe(
+      Network.Testnet
+    );
   });
 });
 
 describe("Address validation", () => {
   it("Should not validate address (valid encoding but invalid PK)", () => {
-    expect(ErgoAddress.validate("9dg7gpByCWzoXdx5VeCvHeQYjx3q2TuTjzHqHfrsMsHszG49Rfj")).to.be.false;
-    expect(ErgoAddress.validate("2xgTiYUcGDwvJ41XhN2nxGajWkFa3xy9pXCMEKS8fwT8QpR19R")).to.be.false;
+    expect(
+      ErgoAddress.validate(
+        "9dg7gpByCWzoXdx5VeCvHeQYjx3q2TuTjzHqHfrsMsHszG49Rfj"
+      )
+    ).to.be.false;
+    expect(
+      ErgoAddress.validate("2xgTiYUcGDwvJ41XhN2nxGajWkFa3xy9pXCMEKS8fwT8QpR19R")
+    ).to.be.false;
   });
 
   it("Should validate VALID address from encoded address string", () => {
     expect(
-      ErgoAddress.validate("9iPgSVU3yrRnTxtJC6hYA7bS5mMqZtjeJHrT3fNdLV7JZVpY5By")
+      ErgoAddress.validate(
+        "9iPgSVU3yrRnTxtJC6hYA7bS5mMqZtjeJHrT3fNdLV7JZVpY5By"
+      )
     ).toBeTruthy();
 
     expect(
-      ErgoAddress.validate("3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3")
+      ErgoAddress.validate(
+        "3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3"
+      )
     ).toBeTruthy();
     expect(ErgoAddress.validate(FEE_TESTNET_ADDRESS_TV)).toBeTruthy();
     expect(ErgoAddress.validate(FEE_MAINNET_ADDRESS_TV)).toBeTruthy();
-    expect(ErgoAddress.validate("8sZ2fVu5VUQKEmWt4xRRDBYzuw5aevhhziPBDGB")).toBeTruthy();
-    expect(ErgoAddress.validate("7g5LhysK7mxX8xmZdPLtFE42wwxGFjpp8VofStb")).toBeTruthy();
-    expect(ErgoAddress.validate("8UApt8czfFVuTgQmMwtsRBZ4nfWquNiSwCWUjMg")).toBeTruthy();
+    expect(
+      ErgoAddress.validate("8sZ2fVu5VUQKEmWt4xRRDBYzuw5aevhhziPBDGB")
+    ).toBeTruthy();
+    expect(
+      ErgoAddress.validate("7g5LhysK7mxX8xmZdPLtFE42wwxGFjpp8VofStb")
+    ).toBeTruthy();
+    expect(
+      ErgoAddress.validate("8UApt8czfFVuTgQmMwtsRBZ4nfWquNiSwCWUjMg")
+    ).toBeTruthy();
   });
 
   it("Should not validate INVALID address from address string", () => {
-    expect(ErgoAddress.validate("9i3g6d958MpZAqwn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin")).toBeFalsy();
+    expect(
+      ErgoAddress.validate(
+        "9i3g6d958MpZAqwn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+      )
+    ).toBeFalsy();
   });
 
   it("Should not validate too small address string", () => {
@@ -206,34 +237,50 @@ describe("Address validation", () => {
   });
 
   it("Should get network type", () => {
-    expect(ErgoAddress.getNetworkType(FEE_MAINNET_ADDRESS_TV)).toBe(Network.Mainnet);
-    expect(ErgoAddress.getNetworkType(FEE_TESTNET_ADDRESS_TV)).toBe(Network.Testnet);
-    expect(ErgoAddress.getNetworkType("9iPgSVU3yrRnTxtJC6hYA7bS5mMqZtjeJHrT3fNdLV7JZVpY5By")).toBe(
+    expect(ErgoAddress.getNetworkType(FEE_MAINNET_ADDRESS_TV)).toBe(
       Network.Mainnet
     );
-    expect(ErgoAddress.getNetworkType("3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3")).toBe(
+    expect(ErgoAddress.getNetworkType(FEE_TESTNET_ADDRESS_TV)).toBe(
       Network.Testnet
     );
+    expect(
+      ErgoAddress.getNetworkType(
+        "9iPgSVU3yrRnTxtJC6hYA7bS5mMqZtjeJHrT3fNdLV7JZVpY5By"
+      )
+    ).toBe(Network.Mainnet);
+    expect(
+      ErgoAddress.getNetworkType(
+        "3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3"
+      )
+    ).toBe(Network.Testnet);
   });
 
   it("Should get address type", () => {
-    expect(ErgoAddress.getAddressType("9iPgSVU3yrRnTxtJC6hYA7bS5mMqZtjeJHrT3fNdLV7JZVpY5By")).toBe(
-      AddressType.P2PK
+    expect(
+      ErgoAddress.getAddressType(
+        "9iPgSVU3yrRnTxtJC6hYA7bS5mMqZtjeJHrT3fNdLV7JZVpY5By"
+      )
+    ).toBe(AddressType.P2PK);
+    expect(
+      ErgoAddress.getAddressType(
+        "3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3"
+      )
+    ).toBe(AddressType.P2PK);
+    expect(ErgoAddress.getAddressType(FEE_TESTNET_ADDRESS_TV)).toBe(
+      AddressType.P2S
     );
-    expect(ErgoAddress.getAddressType("3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3")).toBe(
-      AddressType.P2PK
+    expect(ErgoAddress.getAddressType(FEE_MAINNET_ADDRESS_TV)).toBe(
+      AddressType.P2S
     );
-    expect(ErgoAddress.getAddressType(FEE_TESTNET_ADDRESS_TV)).toBe(AddressType.P2S);
-    expect(ErgoAddress.getAddressType(FEE_MAINNET_ADDRESS_TV)).toBe(AddressType.P2S);
-    expect(ErgoAddress.getAddressType("8sZ2fVu5VUQKEmWt4xRRDBYzuw5aevhhziPBDGB")).toBe(
-      AddressType.P2SH
-    );
-    expect(ErgoAddress.getAddressType("7g5LhysK7mxX8xmZdPLtFE42wwxGFjpp8VofStb")).toBe(
-      AddressType.P2SH
-    );
-    expect(ErgoAddress.getAddressType("8UApt8czfFVuTgQmMwtsRBZ4nfWquNiSwCWUjMg")).toBe(
-      AddressType.P2SH
-    );
+    expect(
+      ErgoAddress.getAddressType("8sZ2fVu5VUQKEmWt4xRRDBYzuw5aevhhziPBDGB")
+    ).toBe(AddressType.P2SH);
+    expect(
+      ErgoAddress.getAddressType("7g5LhysK7mxX8xmZdPLtFE42wwxGFjpp8VofStb")
+    ).toBe(AddressType.P2SH);
+    expect(
+      ErgoAddress.getAddressType("8UApt8czfFVuTgQmMwtsRBZ4nfWquNiSwCWUjMg")
+    ).toBe(AddressType.P2SH);
   });
 });
 
@@ -247,7 +294,10 @@ describe("P2SH", () => {
 
   it("Should encode arbitrary ErgoTree to P2SH", () => {
     const testVectors = [
-      { ergoTree: FEE_CONTRACT, p2sh: "8dC5Kgb4DRXYeRxiNDizFSne24UX5BTD27LCkJB" },
+      {
+        ergoTree: FEE_CONTRACT,
+        p2sh: "8dC5Kgb4DRXYeRxiNDizFSne24UX5BTD27LCkJB"
+      },
       {
         ergoTree:
           "100604000e2003faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf040400040005000500d803d601e30004d602e4c6a70408d603e4c6a7050595e67201d804d604b2a5e4720100d605b2db63087204730000d606db6308a7d60799c1a7c17204d1968302019683050193c27204c2a7938c720501730193e4c672040408720293e4c672040505720393e4c67204060ec5a796830201929c998c7205029591b1720673028cb272067303000273047203720792720773057202",
@@ -259,10 +309,18 @@ describe("P2SH", () => {
       const address = ErgoAddress.fromErgoTree(tv.ergoTree);
 
       expect(address.toP2SH()).toBe(tv.p2sh);
-      expect(ErgoAddress.getAddressType(address.toP2SH())).toBe(AddressType.P2SH);
-      expect(ErgoAddress.getNetworkType(address.toP2SH())).toBe(Network.Mainnet);
-      expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Mainnet))).toBe(Network.Mainnet);
-      expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Testnet))).toBe(Network.Testnet);
+      expect(ErgoAddress.getAddressType(address.toP2SH())).toBe(
+        AddressType.P2SH
+      );
+      expect(ErgoAddress.getNetworkType(address.toP2SH())).toBe(
+        Network.Mainnet
+      );
+      expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Mainnet))).toBe(
+        Network.Mainnet
+      );
+      expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Testnet))).toBe(
+        Network.Testnet
+      );
     }
   });
 
@@ -279,25 +337,31 @@ describe("P2SH", () => {
 describe("Public key", () => {
   it("Should get public key from P2PK address", () => {
     expect(
-      ErgoAddress.fromBase58("3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3").getPublicKeys()
+      ErgoAddress.fromBase58(
+        "3Wx6cHkTaavysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3"
+      ).getPublicKeys()
     ).not.toHaveLength(0);
   });
 
   it("Should return an empty buffer for P2S addresses", () => {
-    expect(ErgoAddress.fromBase58(FEE_MAINNET_ADDRESS_TV).getPublicKeys()).toHaveLength(0);
+    expect(
+      ErgoAddress.fromBase58(FEE_MAINNET_ADDRESS_TV).getPublicKeys()
+    ).toHaveLength(0);
   });
 
   it("Should create from public key hex string", () => {
     for (const testVector of publicKeyTestVectors) {
-      expect(ErgoAddress.fromPublicKey(testVector.publicKey).toString()).toBe(testVector.base58);
+      expect(ErgoAddress.fromPublicKey(testVector.publicKey).toString()).toBe(
+        testVector.base58
+      );
     }
   });
 
   it("Should create from public key bytes", () => {
     for (const testVector of publicKeyTestVectors) {
-      expect(ErgoAddress.fromPublicKey(hex.decode(testVector.publicKey)).toString()).toBe(
-        testVector.base58
-      );
+      expect(
+        ErgoAddress.fromPublicKey(hex.decode(testVector.publicKey)).toString()
+      ).toBe(testVector.base58);
     }
   });
 
@@ -311,15 +375,17 @@ describe("Public key", () => {
     ];
 
     for (const pk of invalidPKs) {
-      expect(() => ErgoAddress.fromPublicKey(pk)).to.throw("The Public Key is invalid.");
+      expect(() => ErgoAddress.fromPublicKey(pk)).to.throw(
+        "The Public Key is invalid."
+      );
     }
   });
 
   it("Should generate the right public key from base58 encoded string", () => {
     for (const testVector of publicKeyTestVectors) {
-      expect(hex.encode(ErgoAddress.fromBase58(testVector.base58).getPublicKeys()[0])).toBe(
-        testVector.publicKey
-      );
+      expect(
+        hex.encode(ErgoAddress.fromBase58(testVector.base58).getPublicKeys()[0])
+      ).toBe(testVector.publicKey);
     }
   });
 });
@@ -327,8 +393,12 @@ describe("Public key", () => {
 describe("ErgoTree", () => {
   it("Should convert P2PK address to equivalent ErgoTree", () => {
     expect(
-      ErgoAddress.fromBase58("9fRusAarL1KkrWQVsxSRVYnvWxaAT2A96cKtNn9tvPh5XUyCisr").ergoTree
-    ).toBe("0008cd0278011ec0cf5feb92d61adb51dcb75876627ace6fd9446ab4cabc5313ab7b39a7");
+      ErgoAddress.fromBase58(
+        "9fRusAarL1KkrWQVsxSRVYnvWxaAT2A96cKtNn9tvPh5XUyCisr"
+      ).ergoTree
+    ).toBe(
+      "0008cd0278011ec0cf5feb92d61adb51dcb75876627ace6fd9446ab4cabc5313ab7b39a7"
+    );
   });
 
   it("Should convert P2S address to equivalent ErgoTree", () => {
@@ -340,8 +410,12 @@ describe("ErgoTree", () => {
       "101004020e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a7017300730110010204020404040004c0fd4f05808c82f5f6030580b8c9e5ae040580f882ad16040204c0944004c0f407040004000580f882ad16d19683030191a38cc7a7019683020193c2b2a57300007473017302830108cdeeac93a38cc7b2a573030001978302019683040193b1a5730493c2a7c2b2a573050093958fa3730673079973089c73097e9a730a9d99a3730b730c0599c1a7c1b2a5730d00938cc7b2a5730e0001a390c1a7730f"
     );
 
-    expect(ErgoAddress.fromBase58(FEE_MAINNET_ADDRESS_TV).ergoTree).toBe(FEE_CONTRACT);
-    expect(ErgoAddress.fromBase58(FEE_TESTNET_ADDRESS_TV).ergoTree).toBe(FEE_CONTRACT);
+    expect(ErgoAddress.fromBase58(FEE_MAINNET_ADDRESS_TV).ergoTree).toBe(
+      FEE_CONTRACT
+    );
+    expect(ErgoAddress.fromBase58(FEE_TESTNET_ADDRESS_TV).ergoTree).toBe(
+      FEE_CONTRACT
+    );
   });
 });
 
@@ -351,45 +425,35 @@ describe("Address model - ergo-ts test set", () => {
     instance: ErgoAddress.decodeUnsafe(o.address)
   }));
 
-  test("get ergoTree by address", () => {
-    testVectors.forEach((tv) => {
-      if (tv.ergoTree) {
-        expect(tv.instance.ergoTree).toBe(tv.ergoTree);
-      }
-    });
+  test.each(testVectors)("get ergoTree by address", (tv) => {
+    if (tv.ergoTree) {
+      expect(tv.instance.ergoTree).toBe(tv.ergoTree);
+    }
   });
 
-  test("get address by ergoTree", () => {
-    testVectors.forEach((tv) => {
-      if (tv.ergoTree) {
-        const address = ErgoAddress.fromErgoTree(tv.ergoTree, tv.network);
-        expect(address.toString()).toBe(tv.address);
-      }
-    });
+  test.each(testVectors)("get address by ergoTree", (tv) => {
+    if (tv.ergoTree) {
+      const address = ErgoAddress.fromErgoTree(tv.ergoTree, tv.network);
+      expect(address.toString()).toBe(tv.address);
+    }
   });
 
-  test("check network/testnet", () => {
-    testVectors.forEach((tv) => {
-      if (tv.network) {
-        expect(tv.instance.network).toBe(tv.network);
-      }
-    });
+  test.each(testVectors)("check network/testnet", (tv) => {
+    if (tv.network) {
+      expect(tv.instance.network).toBe(tv.network);
+    }
   });
 
-  test("simple address validity test", () => {
-    testVectors.forEach((tv) => {
-      expect(ErgoAddress.validate(tv.address)).toBe(tv.isValid);
-      expect(validateAddress(tv.address)).toBe(tv.isValid);
-    });
+  test.each(testVectors)("simple address validity test", (tv) => {
+    expect(ErgoAddress.validate(tv.address)).toBe(tv.isValid);
+    expect(validateAddress(tv.address)).toBe(tv.isValid);
   });
 
-  test("checked construction from base58", () => {
-    testVectors.forEach((o) => {
-      if (o.isValid) {
-        expect(() => ErgoAddress.decode(o.address)).not.toThrow();
-      } else {
-        expect(() => ErgoAddress.decode(o.address)).toThrow();
-      }
-    });
+  test.each(testVectors)("checked construction from base58", (tv) => {
+    if (tv.isValid) {
+      expect(() => ErgoAddress.decode(tv.address)).not.toThrow();
+    } else {
+      expect(() => ErgoAddress.decode(tv.address)).toThrow();
+    }
   });
 });

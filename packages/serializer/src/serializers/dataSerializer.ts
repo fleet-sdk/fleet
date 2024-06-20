@@ -1,14 +1,24 @@
 import { assert } from "@fleet-sdk/common";
-import { SigmaByteReader, SigmaByteWriter } from "../coders";
-import { SConstant } from "../sigmaConstant";
-import { isColl, isTuple, SCollType, STupleType, SType } from "../types";
+import type { SigmaByteReader, SigmaByteWriter } from "../coders";
+import type { SConstant } from "../sigmaConstant";
+import {
+  isColl,
+  isTuple,
+  type SCollType,
+  type STupleType,
+  type SType
+} from "../types";
 import { descriptors } from "../types/descriptors";
 
 const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
 
-export class DataSerializer {
-  public static serialize(data: unknown, type: SType, writer: SigmaByteWriter): SigmaByteWriter {
+export const dataSerializer = {
+  serialize(
+    data: unknown,
+    type: SType,
+    writer: SigmaByteWriter
+  ): SigmaByteWriter {
     if (type.embeddable) {
       switch (type.code) {
         case descriptors.bool.code:
@@ -21,29 +31,35 @@ export class DataSerializer {
           return writer.writeInt(data as number);
         case descriptors.long.code:
           return writer.writeLong(data as bigint);
-        case descriptors.bigInt.code: {
+        case descriptors.bigInt.code:
           return writer.writeBigInt(data as bigint);
-        }
         case descriptors.groupElement.code:
           return writer.writeBytes(data as Uint8Array);
         case descriptors.sigmaProp.code: {
           const node = data as SConstant<SConstant<Uint8Array>>;
-
           if (node.type === descriptors.groupElement) {
             writer.write(PROVE_DLOG_OP);
-
-            return DataSerializer.serialize(node.data, node.type, writer);
-          } else {
-            throw Error("Serialization error: SigmaProp operation not implemented.");
+            return dataSerializer.serialize(node.data, node.type, writer);
           }
+
+          throw Error(
+            "Serialization error: SigmaProp operation not implemented."
+          );
         }
       }
-    } else if (isColl(type)) {
+    }
+
+    if (isColl(type)) {
       if (type.elementsType.code === descriptors.byte.code) {
-        const isUint8Array = data instanceof Uint8Array;
-        assert(isUint8Array, `SColl[Byte] expected an UInt8Array, got ${typeof data}.`);
+        assert(
+          data instanceof Uint8Array,
+          `SColl[Byte] expected an UInt8Array, got ${typeof data}.`
+        );
       } else {
-        assert(Array.isArray(data), `SColl expected an array, got ${typeof data}.`);
+        assert(
+          Array.isArray(data),
+          `SColl expected an array, got ${typeof data}.`
+        );
       }
 
       writer.writeVLQ(data.length);
@@ -56,13 +72,15 @@ export class DataSerializer {
         }
         default: {
           for (let i = 0; i < data.length; i++) {
-            DataSerializer.serialize(data[i], type.elementsType, writer);
+            dataSerializer.serialize(data[i], type.elementsType, writer);
           }
 
           return writer;
         }
       }
-    } else if (isTuple(type)) {
+    }
+
+    if (isTuple(type)) {
       assert(
         Array.isArray(data),
         `STupleType serialization expected an array, got ${typeof data}.`
@@ -70,18 +88,20 @@ export class DataSerializer {
 
       const len = type.elementsType.length;
       for (let i = 0; i < len; i++) {
-        DataSerializer.serialize(data[i], type.elementsType[i], writer);
+        dataSerializer.serialize(data[i], type.elementsType[i], writer);
       }
 
       return writer;
-    } else if (type.code === descriptors.unit.code) {
-      return writer;
     }
 
-    throw Error(`Serialization error: '0x${type.code.toString(16)}' type not implemented.`);
-  }
+    if (type.code === descriptors.unit.code) return writer;
 
-  static deserialize(type: SType, reader: SigmaByteReader): unknown {
+    throw Error(
+      `Serialization error: '0x${type.code.toString(16)}' type not implemented.`
+    );
+  },
+
+  deserialize(type: SType, reader: SigmaByteReader): unknown {
     if (type.embeddable) {
       switch (type.code) {
         case descriptors.bool.code:
@@ -128,14 +148,17 @@ export class DataSerializer {
           }
         }
         case descriptors.tuple.code: {
-          return (type as STupleType).elementsType.map((t) => this.deserialize(t, reader));
+          return (type as STupleType).elementsType.map((t) =>
+            this.deserialize(t, reader)
+          );
         }
-        case descriptors.unit.code: {
+        case descriptors.unit.code:
           return undefined;
-        }
       }
     }
 
-    throw new Error(`Parsing error: '0x${type.code.toString(16)}' type not implemented.`);
+    throw new Error(
+      `Parsing error: '0x${type.code.toString(16)}' type not implemented.`
+    );
   }
-}
+};

@@ -1,4 +1,4 @@
-import {
+import type {
   Base58String,
   BlockHeader,
   Box,
@@ -9,8 +9,8 @@ import {
   TransactionId,
   UnsignedTransaction
 } from "@fleet-sdk/common";
-import { ErgoAddress } from "@fleet-sdk/core";
-import { RequireAtLeastOne } from "type-fest";
+import type { ErgoAddress } from "@fleet-sdk/core";
+import type { RequireAtLeastOne } from "type-fest";
 
 export type BoxSource = "blockchain" | "mempool" | "blockchain+mempool";
 
@@ -63,8 +63,12 @@ export type TransactionReductionSuccess = {
   reducedTransaction: HexString;
 };
 
-export type TransactionEvaluationResult = TransactionEvaluationError | TransactionEvaluationSuccess;
-export type TransactionReductionResult = TransactionEvaluationError | TransactionReductionSuccess;
+export type TransactionEvaluationResult =
+  | TransactionEvaluationError
+  | TransactionEvaluationSuccess;
+export type TransactionReductionResult =
+  | TransactionEvaluationError
+  | TransactionReductionSuccess;
 
 /**
  * Represents a blockchain provider that can interact with the blockchain.
@@ -89,15 +93,21 @@ export interface IBlockchainProvider<B extends BoxWhere> {
   /**
    * Check for transaction validity without broadcasting it to the network.
    */
-  checkTransaction(transaction: SignedTransaction): Promise<TransactionEvaluationResult>;
+  checkTransaction(
+    transaction: SignedTransaction
+  ): Promise<TransactionEvaluationResult>;
 
   /**
    * Broadcast a transaction to the network.
    */
-  submitTransaction(transaction: SignedTransaction): Promise<TransactionEvaluationResult>;
+  submitTransaction(
+    transaction: SignedTransaction
+  ): Promise<TransactionEvaluationResult>;
 
   /**
    * Evaluate a transaction and return Base16-encoded evaluation result.
    */
-  reduceTransaction(transaction: UnsignedTransaction): Promise<TransactionReductionResult>;
+  reduceTransaction(
+    transaction: UnsignedTransaction
+  ): Promise<TransactionReductionResult>;
 }

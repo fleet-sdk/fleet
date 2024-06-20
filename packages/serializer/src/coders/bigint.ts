@@ -7,11 +7,8 @@ import { _0n, first } from "@fleet-sdk/common";
  */
 export function hexToBigInt(hex: string): bigint {
   // https://coolaj86.com/articles/convert-hex-to-decimal-with-js-bigints/
-  if (hex.length % 2) hex = "0" + hex;
-
-  const value = BigInt("0x" + hex);
-  const highByte = parseInt(hex.slice(0, 2), 16);
-
+  const value = BigInt(hex.length % 2 ? `0x0${hex}` : `0x${hex}`);
+  const highByte = Number.parseInt(hex.slice(0, 2), 16);
   if (0x80 & highByte) return -negateAndMask(value);
 
   return value;
@@ -26,12 +23,11 @@ export function bigIntToHex(value: bigint): string {
   // implementation inspired on
   // https://coolaj86.com/articles/convert-decimal-to-hex-with-js-bigints/
   const positive = value >= _0n;
-  if (!positive) value = negateAndMask(value);
+  let hex = (positive ? value : negateAndMask(value)).toString(16);
+  if (hex.length % 2) hex = `0${hex}`;
 
-  let hex = value.toString(16);
-  if (hex.length % 2) hex = "0" + hex;
-  if (positive && 0x80 & parseInt(hex.slice(0, 2), 16)) {
-    hex = "00" + hex;
+  if (positive && 0x80 & Number.parseInt(hex.slice(0, 2), 16)) {
+    return `00${hex}`;
   }
 
   return hex;
@@ -43,10 +39,11 @@ export function bigIntToHex(value: bigint): string {
  * @returns The two’s complement of `number` as a bigint.
  */
 export function negateAndMask(value: bigint): bigint {
-  const negative = value < _0n;
-  if (negative) value = -value; // turn into a positive number
+  let val = value;
+  const negative = val < _0n;
+  if (negative) val = -val; // turn into a positive number
 
-  const bits = value.toString(2);
+  const bits = val.toString(2);
   let len = bits.length; // convert to binary
   const mod = len % 8;
 
@@ -57,5 +54,5 @@ export function negateAndMask(value: bigint): bigint {
   }
 
   const mask = (1n << BigInt(len)) - 1n; // create a mask
-  return (~value & mask) + 1n; // invert bits, mask it, and add one
+  return (~val & mask) + 1n; // invert bits, mask it, and add one
 }

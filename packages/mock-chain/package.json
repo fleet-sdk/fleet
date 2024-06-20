@@ -24,13 +24,7 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": [
-    "ergo",
-    "blockchain",
-    "transactions",
-    "serialization",
-    "tests"
-  ],
+  "keywords": ["ergo", "blockchain", "transactions", "serialization", "tests"],
   "scripts": {
     "build": "tsup --config ../../tsup.config.ts"
   },

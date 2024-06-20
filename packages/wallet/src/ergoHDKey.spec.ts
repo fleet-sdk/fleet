@@ -93,7 +93,9 @@ describe("Extended keys", () => {
       "0488b21e000000000000000000412bc02c85a3499d85f985ee6068c23f2345eb1c8b3fc34309df13b6a5ac56e803cf03e43683a9b7965603a5cc222bd31fa269d12527cda358965716c794c82253";
 
     const key = ErgoHDKey.fromExtendedKey(xpk).deriveChild(0);
-    expect(key.address.encode()).to.be.equal("9gfJXuRPGwocBsVvKc6GPp294Y3i24v3rd5GP6UXQiV1bjChoDB");
+    expect(key.address.encode()).to.be.equal(
+      "9gfJXuRPGwocBsVvKc6GPp294Y3i24v3rd5GP6UXQiV1bjChoDB"
+    );
   });
 
   it("Should create and restore from private encoded extended key", async () => {
@@ -104,7 +106,9 @@ describe("Extended keys", () => {
     expect(key.publicKey).not.to.be.undefined;
     expect(key.chainCode).not.to.be.undefined;
 
-    const recreatedKeyFromPk = ErgoHDKey.fromExtendedKey(key.extendedPrivateKey);
+    const recreatedKeyFromPk = ErgoHDKey.fromExtendedKey(
+      key.extendedPrivateKey
+    );
 
     expect(recreatedKeyFromPk.privateKey).to.deep.equal(key.privateKey);
     expect(recreatedKeyFromPk.publicKey).to.be.deep.equal(key.publicKey);
@@ -122,8 +126,8 @@ describe("Extended keys", () => {
     const fullyRecreatedKey = ErgoHDKey.fromExtendedKey({
       depth: key.depth,
       index: key.index,
-      privateKey: key.privateKey!,
-      chainCode: key.chainCode!
+      privateKey: key.privateKey as Uint8Array,
+      chainCode: key.chainCode as Uint8Array
     });
     expect(fullyRecreatedKey.depth).to.be.equal(key.depth);
     expect(fullyRecreatedKey.index).to.be.equal(key.index);
@@ -131,7 +135,9 @@ describe("Extended keys", () => {
     expect(fullyRecreatedKey.publicKey).to.be.deep.equal(key.publicKey);
     expect(fullyRecreatedKey.chainCode).to.be.deep.equal(key.chainCode);
 
-    const recreatedFromPrivateKey = new ErgoHDKey({ privateKey: key.privateKey! });
+    const recreatedFromPrivateKey = new ErgoHDKey({
+      privateKey: key.privateKey as Uint8Array
+    });
     expect(recreatedFromPrivateKey.depth).to.be.equal(0);
     expect(recreatedFromPrivateKey.index).to.be.equal(0);
     expect(recreatedFromPrivateKey.privateKey).to.deep.equal(key.privateKey);
@@ -153,8 +159,12 @@ describe("Extended keys", () => {
       )
     );
 
-    const key = ErgoHDKey.fromExtendedKey(encodedXPriv).derive("m/44'/429'/0'/0").deriveChild(0);
-    expect(key.address.encode()).to.be.equal("9i13CmR9JpR2F6S81kokfApsWEpZsfoTPw7gRCjhX433VEsfBqq");
+    const key = ErgoHDKey.fromExtendedKey(encodedXPriv)
+      .derive("m/44'/429'/0'/0")
+      .deriveChild(0);
+    expect(key.address.encode()).to.be.equal(
+      "9i13CmR9JpR2F6S81kokfApsWEpZsfoTPw7gRCjhX433VEsfBqq"
+    );
   });
 });
 
@@ -164,7 +174,9 @@ describe("Key derivation", () => {
       const key = await ErgoHDKey.fromMnemonic(tv.mnemonic);
 
       for (let i = 0; i < keyAddressesTestVectors.length; i++) {
-        expect(key.deriveChild(i).address.encode()).to.be.equal(tv.addresses[i]);
+        expect(key.deriveChild(i).address.encode()).to.be.equal(
+          tv.addresses[i]
+        );
       }
     }
   });
@@ -180,7 +192,9 @@ describe("Key derivation", () => {
       expect(key.index).to.be.equal(0);
 
       for (let i = 0; i < keyAddressesTestVectors.length; i++) {
-        expect(key.deriveChild(i).address.encode()).to.be.equal(tv.addresses[i]);
+        expect(key.deriveChild(i).address.encode()).to.be.equal(
+          tv.addresses[i]
+        );
       }
     }
   });
@@ -189,19 +203,25 @@ describe("Key derivation", () => {
     const mnemonic = generateMnemonic();
 
     const fleetKey = ErgoHDKey.fromMnemonicSync(mnemonic);
-    const wasmKey = SigmaRust.ExtSecretKey.derive_master(mnemonicToSeedSync(mnemonic)).derive(
-      SigmaRust.DerivationPath.from_string(ERGO_CHANGE_PATH)
-    );
+    const wasmKey = SigmaRust.ExtSecretKey.derive_master(
+      mnemonicToSeedSync(mnemonic)
+    ).derive(SigmaRust.DerivationPath.from_string(ERGO_CHANGE_PATH));
 
-    expect(fleetKey.publicKey).to.be.deep.equal(wasmKey.public_key().pub_key_bytes());
+    expect(fleetKey.publicKey).to.be.deep.equal(
+      wasmKey.public_key().pub_key_bytes()
+    );
     expect(fleetKey.privateKey).to.be.deep.equal(wasmKey.secret_key_bytes());
 
     for (let i = 0; i < 100; i++) {
       const fleetChild = fleetKey.deriveChild(i);
       const wasmChild = wasmKey.child(i.toString());
 
-      expect(fleetChild.publicKey).to.be.deep.equal(wasmChild.public_key().pub_key_bytes());
-      expect(fleetChild.privateKey).to.be.deep.equal(wasmChild.secret_key_bytes());
+      expect(fleetChild.publicKey).to.be.deep.equal(
+        wasmChild.public_key().pub_key_bytes()
+      );
+      expect(fleetChild.privateKey).to.be.deep.equal(
+        wasmChild.secret_key_bytes()
+      );
     }
   });
 
@@ -214,15 +234,21 @@ describe("Key derivation", () => {
       SigmaRust.Mnemonic.to_seed(mnemonic, passphrase)
     ).derive(SigmaRust.DerivationPath.from_string(ERGO_CHANGE_PATH));
 
-    expect(fleetKey.publicKey).to.be.deep.equal(wasmKey.public_key().pub_key_bytes());
+    expect(fleetKey.publicKey).to.be.deep.equal(
+      wasmKey.public_key().pub_key_bytes()
+    );
     expect(fleetKey.privateKey).to.be.deep.equal(wasmKey.secret_key_bytes());
 
     for (let i = 0; i < 100; i++) {
       const fleetChild = fleetKey.deriveChild(i);
       const wasmChild = wasmKey.child(i.toString());
 
-      expect(fleetChild.publicKey).to.be.deep.equal(wasmChild.public_key().pub_key_bytes());
-      expect(fleetChild.privateKey).to.be.deep.equal(wasmChild.secret_key_bytes());
+      expect(fleetChild.publicKey).to.be.deep.equal(
+        wasmChild.public_key().pub_key_bytes()
+      );
+      expect(fleetChild.privateKey).to.be.deep.equal(
+        wasmChild.secret_key_bytes()
+      );
     }
   });
 });

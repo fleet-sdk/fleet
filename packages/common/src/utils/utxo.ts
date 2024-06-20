@@ -1,4 +1,11 @@
-import { Amount, Box, BoxCandidate, NonMandatoryRegisters, TokenAmount, TokenId } from "../types";
+import type {
+  Amount,
+  Box,
+  BoxCandidate,
+  NonMandatoryRegisters,
+  TokenAmount,
+  TokenId
+} from "../types";
 import { isDefined, isEmpty, isUndefined } from "./assertions";
 import { ensureBigInt } from "./bigInt";
 import { _0n } from "./bigInt";
@@ -21,14 +28,15 @@ const NANOERGS_TOKEN_ID = "nanoErgs";
  * // { nanoErgs: 30n, tokens: [{ tokenId: "test", amount: 50n }] }
  * ```
  */
-export function utxoSum(boxes: MinimalBoxAmountsArray): BoxSummary;
-export function utxoSum(boxes: MinimalBoxAmountsArray, tokenId: TokenId): bigint;
-export function utxoSum(boxes: MinimalBoxAmountsArray, tokenId?: TokenId): BoxSummary | bigint {
+export function utxoSum(boxes: readonly BoxAmounts[]): BoxSummary;
+export function utxoSum(boxes: readonly BoxAmounts[], tokenId: TokenId): bigint;
+export function utxoSum(boxes: readonly BoxAmounts[], tokenId?: TokenId) {
   const balances: { [tokenId: string]: bigint } = {};
 
   for (const box of boxes) {
     if (isUndefined(tokenId) || tokenId === NANOERGS_TOKEN_ID) {
-      balances[NANOERGS_TOKEN_ID] = (balances[NANOERGS_TOKEN_ID] || _0n) + ensureBigInt(box.value);
+      balances[NANOERGS_TOKEN_ID] =
+        (balances[NANOERGS_TOKEN_ID] || _0n) + ensureBigInt(box.value);
     }
 
     if (tokenId !== NANOERGS_TOKEN_ID) {
@@ -37,7 +45,8 @@ export function utxoSum(boxes: MinimalBoxAmountsArray, tokenId?: TokenId): BoxSu
           continue;
         }
 
-        balances[token.tokenId] = (balances[token.tokenId] || _0n) + ensureBigInt(token.amount);
+        balances[token.tokenId] =
+          (balances[token.tokenId] || _0n) + ensureBigInt(token.amount);
       }
     }
   }
@@ -85,7 +94,9 @@ export function utxoDiff(
 
   for (const token of minuend.tokens) {
     const balance =
-      token.amount - (subtrahend.tokens.find((t) => t.tokenId === token.tokenId)?.amount || _0n);
+      token.amount -
+      (subtrahend.tokens.find((t) => t.tokenId === token.tokenId)?.amount ||
+        _0n);
 
     if (balance !== _0n) {
       tokens.push({ tokenId: token.tokenId, amount: balance });
@@ -112,9 +123,15 @@ const MAX_NON_MANDATORY_REGISTER_INDEX = 9;
  * console.log(result);
  * // false
  */
-export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boolean {
+export function areRegistersDenselyPacked(
+  registers: NonMandatoryRegisters
+): boolean {
   let lastIndex = 0;
-  for (let i = MIN_NON_MANDATORY_REGISTER_INDEX; i <= MAX_NON_MANDATORY_REGISTER_INDEX; i++) {
+  for (
+    let i = MIN_NON_MANDATORY_REGISTER_INDEX;
+    i <= MAX_NON_MANDATORY_REGISTER_INDEX;
+    i++
+  ) {
     const key = `R${i}` as keyof NonMandatoryRegisters;
     if (registers[key]) {
       if (i === MIN_NON_MANDATORY_REGISTER_INDEX) {
@@ -138,7 +155,10 @@ export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boo
  * @param utxos
  * @param filterParams
  */
-export function utxoFilter<T extends Amount>(utxos: Box<T>[], filterParams: UTxOFilterParams<T>) {
+export function utxoFilter<T extends Amount>(
+  utxos: Box<T>[],
+  filterParams: UTxOFilterParams<T>
+) {
   if (isEmpty(filterParams) || isEmpty(utxos)) {
     return utxos;
   }
@@ -158,9 +178,14 @@ export function utxoFilter<T extends Amount>(utxos: Box<T>[], filterParams: UTxO
   }
 
   if (isDefined(max.aggregatedDistinctTokens)) {
-    const tokenIds = _getDistinctTokenIds(filtered, max.aggregatedDistinctTokens);
+    const tokenIds = _getDistinctTokenIds(
+      filtered,
+      max.aggregatedDistinctTokens
+    );
     filtered = filtered.filter(
-      (utxo) => isEmpty(utxo.assets) || utxo.assets.every((token) => tokenIds.has(token.tokenId))
+      (utxo) =>
+        isEmpty(utxo.assets) ||
+        utxo.assets.every((token) => tokenIds.has(token.tokenId))
     );
   }
 
@@ -215,17 +240,19 @@ export type BoxSummary = {
   tokens: TokenAmount<bigint>[];
 };
 
-export type MinimalBoxAmountsArray = readonly {
+export type BoxAmounts = {
   value: Amount;
   assets: TokenAmount<Amount>[];
-}[];
+};
 
 /**
  * Ensures that the value and asset amounts of a given box are represented as BigInts.
  * @returns A new box object with BigInt representation for the value and asset amounts.
  */
 export function ensureUTxOBigInt(box: Box<Amount>): Box<bigint>;
-export function ensureUTxOBigInt(candidate: BoxCandidate<Amount>): BoxCandidate<bigint>;
+export function ensureUTxOBigInt(
+  candidate: BoxCandidate<Amount>
+): BoxCandidate<bigint>;
 export function ensureUTxOBigInt(
   box: Box<Amount> | BoxCandidate<Amount>
 ): BoxCandidate<bigint> | Box<bigint> {

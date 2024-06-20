@@ -24,12 +24,7 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": [
-    "ergo",
-    "blockchain",
-    "transactions",
-    "serialization"
-  ],
+  "keywords": ["ergo", "blockchain", "transactions", "serialization"],
   "scripts": {
     "build": "tsup --config ../../tsup.config.ts"
   },
@@ -39,7 +34,7 @@
     "@fleet-sdk/serializer": "workspace:^"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "files": [
     "dist",

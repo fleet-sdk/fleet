@@ -1,4 +1,4 @@
-import { blake2b256, Coder, hex } from "@fleet-sdk/crypto";
+import { blake2b256, type Coder, hex } from "@fleet-sdk/crypto";
 import { bigIntToHex } from "./bigint";
 import { writeBigVLQ, writeVLQ } from "./vlq";
 import { zigZagEncode, zigZagEncodeBigInt } from "./zigZag";
@@ -70,7 +70,7 @@ export class SigmaByteWriter {
         this.#bytes[this.#cursor] &= ~(1 << bitOffset++);
       }
 
-      if (bitOffset == 8) {
+      if (bitOffset === 8) {
         bitOffset = 0;
         this.#cursor++;
       }

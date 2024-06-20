@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEmpty } from "@fleet-sdk/common";
 import { SConstant } from "../sigmaConstant";
-import { SType } from "./base";
+import type { SType } from "./base";
 import { descriptors } from "./descriptors";
 import { SCollType, STupleType } from "./generics";
 import { SUnitType } from "./monomorphics";
@@ -19,10 +18,18 @@ import {
 export type BigIntInput = string | bigint;
 export type ByteInput = Uint8Array | string;
 
-export type SConstructor<T = unknown, S extends SType = SType | SCollType<SType>> = (arg?: T) => S;
+export type SConstructor<
+  T = unknown,
+  S extends SType = SType | SCollType<SType>
+> = (arg?: T) => S;
 
-type Constructable<T = any> = { new (...args: any): T };
-type GenericProxyArgs<R> = R extends (...args: any) => unknown ? Parameters<R> : [];
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+type Any = any;
+
+type Constructable<T = Any> = { new (...args: Any): T };
+type GenericProxyArgs<R> = R extends (...args: Any) => unknown
+  ? Parameters<R>
+  : [];
 
 type SProxy<T extends SType, I, O = I> = {
   (value: I): SConstant<O, T>;
@@ -57,7 +64,7 @@ function monoProxy<T extends SType, I, O = I>(
 
       return new (SConstant as Constructable)(instance, ...args);
     }
-  }) as any;
+  }) as Any;
 }
 
 /**
@@ -65,7 +72,11 @@ function monoProxy<T extends SType, I, O = I>(
  */
 function genericProxy<T extends SType, R>(
   ctor: Constructable<T>,
-  handler: (target: Constructable<T>, thisArgs: unknown, args: GenericProxyArgs<R>) => unknown
+  handler: (
+    target: Constructable<T>,
+    thisArgs: unknown,
+    args: GenericProxyArgs<R>
+  ) => unknown
 ) {
   return new Proxy(ctor, {
     apply: handler
@@ -76,18 +87,28 @@ export const SByte = monoProxy<SByteType, number>(SByteType, descriptors.byte);
 
 export const SBool = monoProxy<SBoolType, boolean>(SBoolType, descriptors.bool);
 
-export const SShort = monoProxy<SShortType, number>(SShortType, descriptors.short);
+export const SShort = monoProxy<SShortType, number>(
+  SShortType,
+  descriptors.short
+);
 
 export const SInt = monoProxy<SIntType, number>(SIntType, descriptors.int);
 
-export const SLong = monoProxy<SLongType, BigIntInput, bigint>(SLongType, descriptors.long);
-
-export const SBigInt = monoProxy<SBigIntType, BigIntInput, bigint>(SBigIntType, descriptors.bigInt);
-
-export const SGroupElement = monoProxy<SGroupElementType, ByteInput, Uint8Array>(
-  SGroupElementType,
-  descriptors.groupElement
+export const SLong = monoProxy<SLongType, BigIntInput, bigint>(
+  SLongType,
+  descriptors.long
 );
+
+export const SBigInt = monoProxy<SBigIntType, BigIntInput, bigint>(
+  SBigIntType,
+  descriptors.bigInt
+);
+
+export const SGroupElement = monoProxy<
+  SGroupElementType,
+  ByteInput,
+  Uint8Array
+>(SGroupElementType, descriptors.groupElement);
 
 export const SSigmaProp = monoProxy<SSigmaPropType, SConstant<Uint8Array>>(
   SSigmaPropType,
@@ -103,16 +124,22 @@ type SColl = {
     type: SConstructor<D, T>,
     elements: ByteInput | D[]
   ): SConstant<Uint8Array, T>;
-  <D, T extends SType>(type: SConstructor<D, T>, elements: D[]): SConstant<D[], T>;
+  <D, T extends SType>(
+    type: SConstructor<D, T>,
+    elements: D[]
+  ): SConstant<D[], T>;
 };
 
-export const SColl = genericProxy<SCollType, SColl>(SCollType, (target, _, args) => {
-  const [type, elements] = args;
-  const elementsType = type();
-  if (!elements) return () => new target(elementsType);
+export const SColl = genericProxy<SCollType, SColl>(
+  SCollType,
+  (target, _, args) => {
+    const [type, elements] = args;
+    const elementsType = type();
+    if (!elements) return () => new target(elementsType);
 
-  return new SConstant(new target(elementsType), elements);
-});
+    return new SConstant(new target(elementsType), elements);
+  }
+);
 
 export function STuple(...items: SConstant[]) {
   return new SConstant(
@@ -123,21 +150,32 @@ export function STuple(...items: SConstant[]) {
 
 type ByteInputOr<D, T extends SType> = T extends SByteType ? ByteInput | D : D;
 type SPair = {
-  <L, R>(left: SConstant<L>, right: SConstant<R>): SConstant<[L, R], STupleType>;
+  <L, R>(
+    left: SConstant<L>,
+    right: SConstant<R>
+  ): SConstant<[L, R], STupleType>;
   <LD, RD, LT extends SType, RT extends SType>(
     left: SConstructor<LD, LT>,
     right: SConstructor<RD, RT>
   ): SConstructor<[ByteInputOr<LD, LT>, ByteInputOr<RD, RT>]>;
 };
 
-export const SPair = genericProxy<STupleType, SPair>(STupleType, (target, _, args) => {
-  const [left, right] = args;
+export const SPair = genericProxy<STupleType, SPair>(
+  STupleType,
+  (target, _, args) => {
+    const [left, right] = args;
 
-  if (typeof left === "function" && typeof right === "function") {
-    return () => new target([left(), right()]);
-  } else if (left instanceof SConstant && right instanceof SConstant) {
-    return new SConstant(new target([left.type, right.type]), [left.data, right.data]);
+    if (typeof left === "function" && typeof right === "function") {
+      return () => new target([left(), right()]);
+    }
+
+    if (left instanceof SConstant && right instanceof SConstant) {
+      return new SConstant(new target([left.type, right.type]), [
+        left.data,
+        right.data
+      ]);
+    }
+
+    throw new Error("Invalid tuple declaration.");
   }
-
-  throw new Error("Invalid tuple declaration.");
-});
+);

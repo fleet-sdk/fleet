@@ -30,7 +30,10 @@ export type PublicKeyOptions = HDKeyOptions & {
 };
 
 type ExtendedErgoKey = ErgoHDKey & { chainCode: Uint8Array };
-type FullErgoKey = ExtendedErgoKey & { chainCode: Uint8Array; privateKey: Uint8Array };
+type FullErgoKey = ExtendedErgoKey & {
+  chainCode: Uint8Array;
+  privateKey: Uint8Array;
+};
 type NeuteredErgoKey = Omit<ErgoHDKey, "privateKey" | "extendedPrivateKey">;
 
 export class ErgoHDKey {
@@ -42,7 +45,7 @@ export class ErgoHDKey {
   }
 
   get publicKey(): Uint8Array {
-    return this.#root.publicKey!;
+    return this.#root.publicKey as Uint8Array;
   }
 
   get privateKey(): Uint8Array | undefined {
@@ -77,12 +80,24 @@ export class ErgoHDKey {
     return this.#address;
   }
 
-  static async fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<ErgoHDKey> {
-    return this.fromMasterSeed(await mnemonicToSeed(mnemonic, options?.passphrase), options?.path);
+  static async fromMnemonic(
+    mnemonic: string,
+    options?: FromMnemonicOptions
+  ): Promise<ErgoHDKey> {
+    return ErgoHDKey.fromMasterSeed(
+      await mnemonicToSeed(mnemonic, options?.passphrase),
+      options?.path
+    );
   }
 
-  static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): ErgoHDKey {
-    return this.fromMasterSeed(mnemonicToSeedSync(mnemonic, options?.passphrase), options?.path);
+  static fromMnemonicSync(
+    mnemonic: string,
+    options?: FromMnemonicOptions
+  ): ErgoHDKey {
+    return ErgoHDKey.fromMasterSeed(
+      mnemonicToSeedSync(mnemonic, options?.passphrase),
+      options?.path
+    );
   }
 
   static fromMasterSeed(seed: Uint8Array, path = ERGO_CHANGE_PATH): ErgoHDKey {
@@ -102,12 +117,16 @@ export class ErgoHDKey {
   /** @deprecated use the default constructor instead */
   static fromExtendedKey(options: PublicKeyOptions): ErgoHDKey;
   /** @deprecated use the default constructor instead */
-  static fromExtendedKey(keyOrOptions: string | PrivateKeyOptions | PublicKeyOptions): ErgoHDKey {
+  static fromExtendedKey(
+    keyOrOptions: string | PrivateKeyOptions | PublicKeyOptions
+  ): ErgoHDKey {
     if (typeof keyOrOptions !== "string") {
       return new ErgoHDKey(keyOrOptions);
     }
 
-    const xKey = isHex(keyOrOptions) ? base58check.encode(hex.decode(keyOrOptions)) : keyOrOptions;
+    const xKey = isHex(keyOrOptions)
+      ? base58check.encode(hex.decode(keyOrOptions))
+      : keyOrOptions;
     return new ErgoHDKey(HDKey.fromExtendedKey(xKey));
   }
 

@@ -24,15 +24,12 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": [
-    "ergo",
-    "blockchain"
-  ],
+  "keywords": ["ergo", "blockchain"],
   "scripts": {
     "build": "tsup --config ../../tsup.config.ts"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "files": [
     "dist",

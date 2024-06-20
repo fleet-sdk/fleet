@@ -1,7 +1,7 @@
-import { Amount, ErgoTreeHex } from "./common";
-import { NonMandatoryRegisters } from "./registers";
-import { TokenAmount } from "./token";
-import { TransactionId } from "./transactions";
+import type { Amount, ErgoTreeHex } from "./common";
+import type { NonMandatoryRegisters } from "./registers";
+import type { TokenAmount } from "./token";
+import type { TransactionId } from "./transactions";
 
 export type BoxId = string;
 

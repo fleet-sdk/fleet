@@ -1,28 +1,37 @@
 import {
   _0n,
-  Amount,
-  Base58String,
-  Box,
+  type Amount,
+  type Base58String,
+  type Box,
   byteSizeOf,
   chunk,
-  CollectionAddOptions,
+  type CollectionAddOptions,
   ensureBigInt,
   first,
-  HexString,
+  type HexString,
   isDefined,
   isHex,
   isUndefined,
   Network,
-  OneOrMore,
+  type OneOrMore,
   some,
-  TokenAmount,
+  type TokenAmount,
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
 import { estimateVLQSize } from "@fleet-sdk/serializer";
-import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
+import {
+  InvalidInput,
+  MalformedTransaction,
+  NotAllowedTokenBurning
+} from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
-import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
+import {
+  ErgoAddress,
+  InputsCollection,
+  OutputsCollection,
+  TokensCollection
+} from "../models";
 import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
 import {
   BOX_VALUE_PER_BYTE,
@@ -30,7 +39,7 @@ import {
   OutputBuilder,
   SAFE_MIN_BOX_VALUE
 } from "./outputBuilder";
-import { createPluginContext, FleetPluginContext } from "./pluginContext";
+import { createPluginContext, type FleetPluginContext } from "./pluginContext";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
@@ -121,17 +130,17 @@ export class TransactionBuilder {
     return this;
   }
 
-  public from(inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>): TransactionBuilder {
-    if (isCollectionLike(inputs)) {
-      inputs = inputs.toArray();
-    }
-
-    this._inputs.add(inputs);
-
+  public from(
+    inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>
+  ): TransactionBuilder {
+    this._inputs.add(isCollectionLike(inputs) ? inputs.toArray() : inputs);
     return this;
   }
 
-  public to(outputs: OneOrMore<OutputBuilder>, options?: CollectionAddOptions): TransactionBuilder {
+  public to(
+    outputs: OneOrMore<OutputBuilder>,
+    options?: CollectionAddOptions
+  ): TransactionBuilder {
     this._outputs.add(outputs, options);
 
     return this;
@@ -146,7 +155,9 @@ export class TransactionBuilder {
     return this;
   }
 
-  public sendChangeTo(address: ErgoAddress | Base58String | HexString): TransactionBuilder {
+  public sendChangeTo(
+    address: ErgoAddress | Base58String | HexString
+  ): TransactionBuilder {
     if (typeof address === "string") {
       this._changeAddress = isHex(address)
         ? ErgoAddress.fromErgoTree(address, Network.Mainnet)
@@ -170,7 +181,9 @@ export class TransactionBuilder {
     return this;
   }
 
-  public burnTokens(tokens: OneOrMore<TokenAmount<Amount>>): TransactionBuilder {
+  public burnTokens(
+    tokens: OneOrMore<TokenAmount<Amount>>
+  ): TransactionBuilder {
     if (!this._burning) {
       this._burning = new TokensCollection();
     }
@@ -185,7 +198,9 @@ export class TransactionBuilder {
     return this;
   }
 
-  public configureSelector(selectorCallback: SelectorCallback): TransactionBuilder {
+  public configureSelector(
+    selectorCallback: SelectorCallback
+  ): TransactionBuilder {
     if (isUndefined(this._selectorCallbacks)) {
       this._selectorCallbacks = [];
     }
@@ -232,7 +247,9 @@ export class TransactionBuilder {
 
     if (this._isMinting()) {
       if (this._isMoreThanOneTokenBeingMinted()) {
-        throw new MalformedTransaction("only one token can be minted per transaction.");
+        throw new MalformedTransaction(
+          "only one token can be minted per transaction."
+        );
       }
 
       if (this._isTheSameTokenBeingMintedFromOutsideTheMintingBox()) {
@@ -244,7 +261,9 @@ export class TransactionBuilder {
 
     this.outputs
       .toArray()
-      .map((output) => output.setCreationHeight(this._creationHeight, { replace: false }));
+      .map((output) =>
+        output.setCreationHeight(this._creationHeight, { replace: false })
+      );
     const outputs = this.outputs.clone();
 
     if (isDefined(this._feeAmount)) {
@@ -292,7 +311,10 @@ export class TransactionBuilder {
           });
         }
 
-        const chunkedTokens = chunk(change.tokens, this._settings.maxTokensPerChangeBox);
+        const chunkedTokens = chunk(
+          change.tokens,
+          this._settings.maxTokensPerChangeBox
+        );
         for (const tokens of chunkedTokens) {
           const output = new OutputBuilder(
             estimateMinBoxValue(),
@@ -308,7 +330,9 @@ export class TransactionBuilder {
       if (change.nanoErgs > _0n) {
         if (some(changeBoxes)) {
           if (this.settings.shouldIsolateErgOnChange) {
-            outputs.add(new OutputBuilder(change.nanoErgs, this._changeAddress));
+            outputs.add(
+              new OutputBuilder(change.nanoErgs, this._changeAddress)
+            );
           } else {
             const firstChangeBox = first(changeBoxes);
             firstChangeBox.setValue(firstChangeBox.value + change.nanoErgs);
@@ -333,7 +357,9 @@ export class TransactionBuilder {
       outputs
         .toArray()
         .map((output) =>
-          output.setCreationHeight(this._creationHeight, { replace: false }).build(inputs)
+          output
+            .setCreationHeight(this._creationHeight, { replace: false })
+            .build(inputs)
         )
     );
 
@@ -343,7 +369,10 @@ export class TransactionBuilder {
     }
 
     if (some(burning.tokens) && some(this._burning)) {
-      burning = utxoDiff(burning, { nanoErgs: _0n, tokens: this._burning.toArray() });
+      burning = utxoDiff(burning, {
+        nanoErgs: _0n,
+        tokens: this._burning.toArray()
+      });
     }
 
     if (!this._settings.canBurnTokens && some(burning.tokens)) {
@@ -440,14 +469,15 @@ function estimateChangeSize({
     size += estimateVLQSize(baseIndex + i);
   }
 
-  size += tokens.reduce(
-    (acc: number, curr) => (acc += byteSizeOf(curr.tokenId) + estimateVLQSize(curr.amount)),
-    0
-  );
+  for (const token of tokens) {
+    size += byteSizeOf(token.tokenId) + estimateVLQSize(token.amount);
+  }
 
   if (tokens.length > maxTokensPerBox) {
     if (tokens.length % maxTokensPerBox > 0) {
-      size += estimateVLQSize(maxTokensPerBox) * Math.floor(tokens.length / maxTokensPerBox);
+      size +=
+        estimateVLQSize(maxTokensPerBox) *
+        Math.floor(tokens.length / maxTokensPerBox);
       size += estimateVLQSize(tokens.length % maxTokensPerBox);
     } else {
       size += estimateVLQSize(maxTokensPerBox) * neededBoxes;

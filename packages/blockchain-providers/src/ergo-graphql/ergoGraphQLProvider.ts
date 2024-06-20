@@ -1,25 +1,25 @@
-import {
+import type {
   Box,
-  QueryBoxesArgs as BoxesArgs,
+  QueryBoxesArgs,
   Header,
-  QueryBlockHeadersArgs as HeadersArgs
+  QueryBlockHeadersArgs
 } from "@ergo-graphql/types";
 import {
-  Base58String,
-  BlockHeader,
+  type Base58String,
+  type BlockHeader,
   ensureDefaults,
-  HexString,
+  type HexString,
   isEmpty,
   isUndefined,
   NotSupportedError,
   orderBy,
-  SignedTransaction,
+  type SignedTransaction,
   some,
   uniq,
   uniqBy
 } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
-import {
+import type {
   BoxQuery,
   BoxWhere,
   ChainProviderBox,
@@ -30,11 +30,11 @@ import {
 } from "../types/blockchainProvider";
 import {
   createGqlOperation,
-  GraphQLOperation,
-  GraphQLRequestOptions,
-  GraphQLSuccessResponse,
-  GraphQLThrowableOptions,
-  GraphQLVariables,
+  type GraphQLOperation,
+  type GraphQLRequestOptions,
+  type GraphQLSuccessResponse,
+  type GraphQLThrowableOptions,
+  type GraphQLVariables,
   isRequestParam
 } from "../utils";
 import {
@@ -58,14 +58,17 @@ export type GraphQLBoxWhere = BoxWhere & {
 };
 
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
-export type ErgoGraphQLRequestOptions = Omit<GraphQLRequestOptions, "throwOnNonNetworkError">;
+export type ErgoGraphQLRequestOptions = Omit<
+  GraphQLRequestOptions,
+  "throwOnNonNetworkError"
+>;
 
-type ConfBoxesResp = { boxes: Box[] };
-type UnconfBoxesResp = { mempool: { boxes: Box[] } };
-type AllBoxesResp = ConfBoxesResp & UnconfBoxesResp;
-type HeadersResp = { blockHeaders: Header[] };
-type CheckTxResp = { checkTransaction: string };
-type SendTxResp = { submitTransaction: string };
+type ConfirmedBoxesResponse = { boxes: Box[] };
+type UnconfirmedBoxesResponse = { mempool: { boxes: Box[] } };
+type CombinedBoxesResponse = ConfirmedBoxesResponse & UnconfirmedBoxesResponse;
+type BlockHeadersResponse = { blockHeaders: Header[] };
+type CheckTransactionResponse = { checkTransaction: string };
+type TransactionSubmissionResponse = { submitTransaction: string };
 type SignedTxArgsResp = { signedTransaction: SignedTransaction };
 
 const PAGE_SIZE = 50;
@@ -88,25 +91,48 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
       throwOnNonNetworkErrors: true
     };
 
-    this.#getConfBoxes = this.createOperation<ConfBoxesResp, BoxesArgs>(CONF_BOXES_QUERY);
-    this.#getUnconfBoxes = this.createOperation<UnconfBoxesResp, BoxesArgs>(UNCONF_BOXES_QUERY);
-    this.#getAllBoxes = this.createOperation<AllBoxesResp, BoxesArgs>(ALL_BOXES_QUERY);
-    this.#getHeaders = this.createOperation<HeadersResp, HeadersArgs>(HEADERS_QUERY);
-    this.#checkTx = this.createOperation<CheckTxResp, SignedTxArgsResp>(CHECK_TX_MUTATION);
-    this.#sendTx = this.createOperation<SendTxResp, SignedTxArgsResp>(SEND_TX_MUTATION);
+    this.#getConfBoxes = this.createOperation<
+      ConfirmedBoxesResponse,
+      QueryBoxesArgs
+    >(CONF_BOXES_QUERY);
+
+    this.#getUnconfBoxes = this.createOperation<
+      UnconfirmedBoxesResponse,
+      QueryBoxesArgs
+    >(UNCONF_BOXES_QUERY);
+
+    this.#getAllBoxes = this.createOperation<
+      CombinedBoxesResponse,
+      QueryBoxesArgs
+    >(ALL_BOXES_QUERY);
+
+    this.#getHeaders = this.createOperation<
+      BlockHeadersResponse,
+      QueryBlockHeadersArgs
+    >(HEADERS_QUERY);
+
+    this.#checkTx = this.createOperation<
+      CheckTransactionResponse,
+      SignedTxArgsResp
+    >(CHECK_TX_MUTATION);
+
+    this.#sendTx = this.createOperation<
+      TransactionSubmissionResponse,
+      SignedTxArgsResp
+    >(SEND_TX_MUTATION);
   }
 
-  #fetchBoxes(args: BoxesArgs, inclConf: boolean, inclUnconf: boolean) {
-    if (inclConf && inclUnconf) {
-      return this.#getAllBoxes(args);
-    } else if (inclUnconf) {
-      return this.#getUnconfBoxes(args);
-    } else {
-      return this.#getConfBoxes(args);
-    }
+  #fetchBoxes(args: QueryBoxesArgs, inclConf: boolean, inclUnconf: boolean) {
+    return inclConf && inclUnconf
+      ? this.#getAllBoxes(args)
+      : inclUnconf
+        ? this.#getUnconfBoxes(args)
+        : this.#getConfBoxes(args);
   }
 
-  async *streamBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainProviderBox[]> {
+  async *streamBoxes(
+    query: GraphQLBoxQuery
+  ): AsyncGenerator<ChainProviderBox[]> {
     if (isEmpty(query.where)) {
       throw new Error("Cannot fetch unspent boxes without a where clause.");
     }
@@ -116,17 +142,17 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
     const { where, from } = query;
     const args = buildGqlBoxQueryArgs(where);
 
-    let fetchFromChain = from !== "mempool";
-    let fetchFromMempool = from !== "blockchain";
-    const isMempoolAware = fetchFromMempool;
+    let inclChain = from !== "mempool";
+    let inclPool = from !== "blockchain";
+    const isMempoolAware = inclPool;
 
     do {
-      const response = await this.#fetchBoxes(args, fetchFromChain, fetchFromMempool);
+      const response = await this.#fetchBoxes(args, inclChain, inclPool);
 
       const { data } = response;
       let boxes: ChainProviderBox[] = [];
 
-      if (fetchFromChain && hasConfirmed(data)) {
+      if (inclChain && hasConfirmed(data)) {
         if (some(data.boxes)) {
           const confirmedBoxes = (
             isMempoolAware ? data.boxes.filter(notBeingSpent) : data.boxes
@@ -135,16 +161,18 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
           boxes = boxes.concat(confirmedBoxes);
         }
 
-        fetchFromChain = data.boxes.length === PAGE_SIZE;
+        inclChain = data.boxes.length === PAGE_SIZE;
       }
 
       if (isMempoolAware && hasMempool(data)) {
         if (some(data.mempool.boxes)) {
-          const mempoolBoxes = data.mempool.boxes.filter(notBeingSpent).map(asConfirmed(false));
+          const mempoolBoxes = data.mempool.boxes
+            .filter(notBeingSpent)
+            .map(asConfirmed(false));
           boxes = boxes.concat(mempoolBoxes);
         }
 
-        fetchFromMempool = data.mempool.boxes.length === PAGE_SIZE;
+        inclPool = data.mempool.boxes.length === PAGE_SIZE;
       }
 
       if (some(boxes)) {
@@ -156,14 +184,13 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
 
         if (some(boxes)) {
           boxes = uniqBy(boxes, (box) => box.boxId);
-          boxes.forEach((box) => returnedBoxIds.add(box.boxId));
-
+          for (const box of boxes) returnedBoxIds.add(box.boxId);
           yield boxes;
         }
       }
 
-      if (fetchFromChain || fetchFromMempool) args.skip += PAGE_SIZE;
-    } while (fetchFromChain || fetchFromMempool);
+      if (inclChain || inclPool) args.skip += PAGE_SIZE;
+    } while (inclChain || inclPool);
   }
 
   async getBoxes(query: GraphQLBoxQuery): Promise<ChainProviderBox[]> {
@@ -224,7 +251,9 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   }
 
   reduceTransaction(): Promise<TransactionReductionResult> {
-    throw new NotSupportedError("Transaction reducing is not supported by ergo-graphql.");
+    throw new NotSupportedError(
+      "Transaction reducing is not supported by ergo-graphql."
+    );
   }
 }
 
@@ -237,15 +266,19 @@ function buildGqlBoxQueryArgs(where: GraphQLBoxWhere) {
     tokenId: where.tokenId,
     skip: 0,
     take: PAGE_SIZE
-  } satisfies BoxesArgs;
+  } satisfies QueryBoxesArgs;
 
   const addresses = merge(where.addresses, where.address);
   if (some(addresses)) {
     const trees = addresses.map((address) =>
-      typeof address === "string" ? ErgoAddress.fromBase58(address).ergoTree : address.ergoTree
+      typeof address === "string"
+        ? ErgoAddress.fromBase58(address).ergoTree
+        : address.ergoTree
     );
 
-    args.ergoTrees = uniq(some(args.ergoTrees) ? args.ergoTrees.concat(trees) : trees);
+    args.ergoTrees = uniq(
+      some(args.ergoTrees) ? args.ergoTrees.concat(trees) : trees
+    );
   }
 
   return args;
@@ -259,12 +292,12 @@ function merge<T>(array?: T[], el?: T) {
   return Array.from(set.values());
 }
 
-function hasMempool(data: AllBoxesResp | ConfBoxesResp | UnconfBoxesResp): data is UnconfBoxesResp {
-  return !!(data as UnconfBoxesResp)?.mempool?.boxes;
+function hasMempool(data: unknown): data is UnconfirmedBoxesResponse {
+  return !!(data as UnconfirmedBoxesResponse)?.mempool?.boxes;
 }
 
-function hasConfirmed(data: AllBoxesResp | ConfBoxesResp | UnconfBoxesResp): data is ConfBoxesResp {
-  return !!(data as ConfBoxesResp)?.boxes;
+function hasConfirmed(data: unknown): data is ConfirmedBoxesResponse {
+  return !!(data as ConfirmedBoxesResponse)?.boxes;
 }
 
 function asConfirmed(confirmed: boolean) {

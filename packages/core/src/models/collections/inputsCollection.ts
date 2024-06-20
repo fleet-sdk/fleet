@@ -1,9 +1,18 @@
-import { Amount, Box, BoxId, Collection, OneOrMore } from "@fleet-sdk/common";
+import {
+  type Amount,
+  type Box,
+  type BoxId,
+  Collection,
+  type OneOrMore
+} from "@fleet-sdk/common";
 import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "../../errors";
 import { ErgoUnsignedInput } from "../ergoUnsignedInput";
 
-export class InputsCollection extends Collection<ErgoUnsignedInput, Box<Amount>> {
+export class InputsCollection extends Collection<
+  ErgoUnsignedInput,
+  Box<Amount>
+> {
   constructor();
   constructor(box: Box<Amount>);
   constructor(boxes: Box<Amount>[]);
@@ -15,8 +24,12 @@ export class InputsCollection extends Collection<ErgoUnsignedInput, Box<Amount>>
     }
   }
 
-  protected override _map(input: Box<Amount> | ErgoUnsignedInput): ErgoUnsignedInput {
-    return input instanceof ErgoUnsignedInput ? input : new ErgoUnsignedInput(input);
+  protected override _map(
+    input: Box<Amount> | ErgoUnsignedInput
+  ): ErgoUnsignedInput {
+    return input instanceof ErgoUnsignedInput
+      ? input
+      : new ErgoUnsignedInput(input);
   }
 
   protected override _addOne(box: Box<Amount>): number {

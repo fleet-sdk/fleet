@@ -1,7 +1,7 @@
 import { blake2b } from "@noble/hashes/blake2b";
 import { sha256 as _sha256 } from "@noble/hashes/sha256";
 import { hex } from "./coders";
-import { ByteInput } from "./types";
+import type { ByteInput } from "./types";
 
 export function ensureBytes(input: ByteInput): Uint8Array {
   return typeof input === "string" ? hex.decode(input) : input;

@@ -17,13 +17,20 @@ describe("assert() function", () => {
   const b = 2;
 
   it("Should not throw if condition is met", () => {
-    expect(() => assert(a + b == 3, "error message in case of failure")).not.to.throw;
+    expect(() => assert(a + b === 3, "error message in case of failure")).not.to
+      .throw;
   });
 
   it("Should throw if condition is not met", () => {
-    expect(() => assert(a + b > 3, "string error msg")).to.throw("string error msg");
-    expect(() => assert(a + b > 3, new Error("Error instance msg"))).to.throw("Error instance msg");
-    expect(() => assert(a + b > 3, () => "function error msg")).to.throw("function error msg");
+    expect(() => assert(a + b > 3, "string error msg")).to.throw(
+      "string error msg"
+    );
+    expect(() => assert(a + b > 3, new Error("Error instance msg"))).to.throw(
+      "Error instance msg"
+    );
+    expect(() => assert(a + b > 3, () => "function error msg")).to.throw(
+      "function error msg"
+    );
   });
 
   it("Should lazily build error message", () => {
@@ -33,7 +40,9 @@ describe("assert() function", () => {
     expect(() => assert(a + b === 3, errorMsgMock.getErrorMsg)).not.to.throw;
     expect(mock).not.toBeCalled();
 
-    expect(() => assert(a + b > 3, errorMsgMock.getErrorMsg)).to.throw("error msg test");
+    expect(() => assert(a + b > 3, errorMsgMock.getErrorMsg)).to.throw(
+      "error msg test"
+    );
     expect(mock).toBeCalledTimes(1);
   });
 });
@@ -99,7 +108,7 @@ describe("assertInstanceOf() function", () => {
 
 describe("Assertions isTruthy and isFalsy assertions", () => {
   const truthy = [true, 1, 1n, [], {}, [1]];
-  const falsy = [false, 0, 0n, null, undefined, NaN];
+  const falsy = [false, 0, 0n, null, undefined, Number.NaN];
 
   it("Should return true for truthy inputs", () => {
     expect(truthy.every((val) => isTruthy(val))).to.be.true;
@@ -170,7 +179,7 @@ describe("isUndefined()", () => {
   it("Should return true for undefined or null objects", () => {
     expect(isUndefined(undefined)).toBeTruthy();
     expect(isUndefined(null)).toBeTruthy();
-    expect(isUndefined(NaN)).toBeTruthy();
+    expect(isUndefined(Number.NaN)).toBeTruthy();
   });
 });
 
@@ -184,7 +193,7 @@ describe("isDefined()", () => {
   it("Should return false for undefined or null objects", () => {
     expect(isDefined(undefined)).toBeFalsy();
     expect(isDefined(null)).toBeFalsy();
-    expect(isDefined(NaN)).toBeFalsy();
+    expect(isDefined(Number.NaN)).toBeFalsy();
   });
 });
 
@@ -193,7 +202,7 @@ describe("hasKey()", () => {
     undefinedKey: undefined,
     complexObjKey: { a: 1, b: 2 },
     nullKey: null,
-    nanKey: NaN,
+    nanKey: Number.NaN,
     stringKey: "test",
     functionKey: () => "test"
   };

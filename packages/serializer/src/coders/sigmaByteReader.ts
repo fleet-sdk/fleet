@@ -1,5 +1,5 @@
 import { isEmpty } from "@fleet-sdk/common";
-import { ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
+import { type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { hexToBigInt } from "./bigint";
 import { readBigVLQ, readVLQ } from "./vlq";
 import { zigZagDecode, zigZagDecodeBigInt } from "./zigZag";
@@ -29,7 +29,7 @@ export class SigmaByteReader {
       const bit = (this.#bytes[this.#cursor] >> bitOffset++) & 1;
       bits[i] = bit === 1;
 
-      if (bitOffset == 8) {
+      if (bitOffset === 8) {
         bitOffset = 0;
         this.#cursor++;
       }

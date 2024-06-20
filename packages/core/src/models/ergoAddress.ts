@@ -1,9 +1,14 @@
-import { AddressType, Base58String, HexString, Network } from "@fleet-sdk/common";
+import {
+  AddressType,
+  type Base58String,
+  type HexString,
+  Network
+} from "@fleet-sdk/common";
 import { concatBytes, endsWith, first, startsWith } from "@fleet-sdk/common";
 import {
   base58,
   blake2b256,
-  ByteInput,
+  type ByteInput,
   ensureBytes,
   hex,
   validateEcPoint
@@ -15,7 +20,7 @@ import {
   getAddressType,
   getNetworkType,
   unpackAddress,
-  UnpackedAddress,
+  type UnpackedAddress,
   validateAddress,
   validateUnpackedAddress
 } from "./utils";
@@ -29,17 +34,22 @@ const P2SH_ERGOTREE_LENGTH = 44;
 const P2SH_HASH_LENGTH = 24;
 
 function getErgoTreeType(ergoTree: Uint8Array): AddressType {
-  if (ergoTree.length === P2PK_ERGOTREE_LENGTH && startsWith(ergoTree, P2PK_ERGOTREE_PREFIX)) {
+  if (
+    ergoTree.length === P2PK_ERGOTREE_LENGTH &&
+    startsWith(ergoTree, P2PK_ERGOTREE_PREFIX)
+  ) {
     return AddressType.P2PK;
-  } else if (
+  }
+
+  if (
     ergoTree.length === P2SH_ERGOTREE_LENGTH &&
     startsWith(ergoTree, P2SH_ERGOTREE_PREFIX) &&
     endsWith(ergoTree, P2SH_ERGOTREE_SUFFIX)
   ) {
     return AddressType.P2SH;
-  } else {
-    return AddressType.P2S;
   }
+
+  return AddressType.P2S;
 }
 
 /**
@@ -93,7 +103,10 @@ export class ErgoAddress {
    * Create a new instance from an ErgoTree
    * @param ergoTree ErgoTree hex string
    */
-  public static fromErgoTree(ergoTree: ByteInput, network?: Network): ErgoAddress {
+  public static fromErgoTree(
+    ergoTree: ByteInput,
+    network?: Network
+  ): ErgoAddress {
     return new ErgoAddress(ensureBytes(ergoTree), network);
   }
 
@@ -101,7 +114,10 @@ export class ErgoAddress {
    * Create a new instance from a public key
    * @param publicKey Public key hex string
    */
-  public static fromPublicKey(publicKey: ByteInput, network?: Network): ErgoAddress {
+  public static fromPublicKey(
+    publicKey: ByteInput,
+    network?: Network
+  ): ErgoAddress {
     const bytes = ensureBytes(publicKey);
     if (!validateEcPoint(bytes)) throw new Error("The Public Key is invalid.");
 
@@ -109,16 +125,23 @@ export class ErgoAddress {
     return new ErgoAddress(ergoTree, network);
   }
 
-  public static fromHash(hash: HexString | Uint8Array, network?: Network): ErgoAddress {
-    hash = ensureBytes(hash);
+  public static fromHash(
+    hash: HexString | Uint8Array,
+    network?: Network
+  ): ErgoAddress {
+    let bytes = ensureBytes(hash);
 
-    if (hash.length === BLAKE_256_HASH_LENGTH) {
-      hash = hash.subarray(0, P2SH_HASH_LENGTH);
-    } else if (hash.length != P2SH_HASH_LENGTH) {
-      throw Error(`Invalid hash length: ${hash.length}`);
+    if (bytes.length === BLAKE_256_HASH_LENGTH) {
+      bytes = bytes.subarray(0, P2SH_HASH_LENGTH);
+    } else if (bytes.length !== P2SH_HASH_LENGTH) {
+      throw Error(`Invalid hash length: ${bytes.length}`);
     }
 
-    const ergoTree = concatBytes(P2SH_ERGOTREE_PREFIX, hash, P2SH_ERGOTREE_SUFFIX);
+    const ergoTree = concatBytes(
+      P2SH_ERGOTREE_PREFIX,
+      bytes,
+      P2SH_ERGOTREE_SUFFIX
+    );
 
     return new ErgoAddress(ergoTree, network);
   }
@@ -130,17 +153,22 @@ export class ErgoAddress {
   public static decode(encodedAddress: Base58String): ErgoAddress {
     const bytes = base58.decode(encodedAddress);
     const unpacked = unpackAddress(bytes);
-    if (!validateUnpackedAddress(unpacked)) throw new InvalidAddress(encodedAddress);
+    if (!validateUnpackedAddress(unpacked))
+      throw new InvalidAddress(encodedAddress);
 
-    return this.#fromUnpacked(unpacked);
+    return ErgoAddress.#fromUnpacked(unpacked);
   }
 
   public static decodeUnsafe(encodedAddress: Base58String): ErgoAddress {
-    return this.#fromUnpacked(unpackAddress(base58.decode(encodedAddress)));
+    return ErgoAddress.#fromUnpacked(
+      unpackAddress(base58.decode(encodedAddress))
+    );
   }
 
   static fromBase58(address: Base58String, unsafe = false): ErgoAddress {
-    return unsafe ? this.decodeUnsafe(address) : this.decode(address);
+    return unsafe
+      ? ErgoAddress.decodeUnsafe(address)
+      : ErgoAddress.decode(address);
   }
 
   static #fromUnpacked(unpacked: UnpackedAddress) {

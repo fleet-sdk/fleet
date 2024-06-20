@@ -1,13 +1,23 @@
-import { ensureDefaults, first, HexString, isUndefined, some } from "@fleet-sdk/common";
-import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
+import {
+  ensureDefaults,
+  first,
+  type HexString,
+  isUndefined,
+  some
+} from "@fleet-sdk/common";
+import type { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { utf8 } from "@fleet-sdk/crypto";
 import { decode } from "@fleet-sdk/serializer";
 import pc from "picocolors";
-import { BlockchainParameters } from "sigmastate-js/main";
+import type { BlockchainParameters } from "sigmastate-js/main";
 import { printDiff } from "./balancePrinting";
 import { BLOCKCHAIN_PARAMETERS, execute } from "./execution";
 import { mockBlockchainStateContext } from "./objectMocking";
-import { KeyedMockChainParty, MockChainParty, NonKeyedMockChainParty } from "./party";
+import {
+  KeyedMockChainParty,
+  type MockChainParty,
+  NonKeyedMockChainParty
+} from "./party";
 
 const BLOCK_TIME_MS = 120000;
 
@@ -111,7 +121,9 @@ export class MockChain {
   }
 
   newParty(name?: string): KeyedMockChainParty;
-  newParty(nonKeyedOptions?: NonKeyedMockChainPartyOptions): NonKeyedMockChainParty;
+  newParty(
+    nonKeyedOptions?: NonKeyedMockChainPartyOptions
+  ): NonKeyedMockChainParty;
   newParty(optOrName?: string | NonKeyedMockChainPartyOptions): MockChainParty {
     return this.#pushParty(
       typeof optOrName === "string" || isUndefined(optOrName)
@@ -136,8 +148,8 @@ export class MockChain {
     baseCost?: number
   ): boolean {
     const keys = (options?.signers || this.#parties)
-      .filter((party): party is KeyedMockChainParty => party instanceof KeyedMockChainParty)
-      .map((party) => party.key);
+      .filter((p): p is KeyedMockChainParty => p instanceof KeyedMockChainParty)
+      .map((p) => p.key);
 
     const context = mockBlockchainStateContext({
       headers: {
@@ -158,7 +170,7 @@ export class MockChain {
         log(pc.red(`${pc.bgRed(pc.bold(" Error "))} ${result.reason}`));
       }
 
-      if (options?.throw != false) throw new Error(result.reason);
+      if (options?.throw !== false) throw new Error(result.reason);
       return false;
     }
 
@@ -214,7 +226,7 @@ export class MockChain {
       if (name) {
         this.#metadataMap.set(firstInputId, {
           name,
-          decimals: decimals ? parseInt(decimals) : undefined
+          decimals: decimals ? Number.parseInt(decimals) : undefined
         });
       }
     }
@@ -224,8 +236,9 @@ export class MockChain {
 }
 
 function log(str: string) {
-  // eslint-disable-next-line no-console
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log(str);
 }
 
-const safeUtf8Encode = (v: unknown) => (v instanceof Uint8Array ? utf8.encode(v) : undefined);
+const safeUtf8Encode = (v: unknown) =>
+  v instanceof Uint8Array ? utf8.encode(v) : undefined;

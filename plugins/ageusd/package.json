@@ -24,12 +24,7 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": [
-    "ergo",
-    "blockchain",
-    "babel fees",
-    "plugins"
-  ],
+  "keywords": ["ergo", "blockchain", "babel fees", "plugins"],
   "dependencies": {
     "@fleet-sdk/core": "workspace:^",
     "@fleet-sdk/common": "workspace:^",
@@ -42,7 +37,7 @@
     "build": "tsup --config ../../tsup.config.ts"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "files": [
     "src",

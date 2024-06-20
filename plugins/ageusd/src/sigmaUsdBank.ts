@@ -1,4 +1,4 @@
-import { AgeUSDBank, AgeUSDBankBox, OracleBox } from "./ageUsdBank";
+import { AgeUSDBank, type AgeUSDBankBox, type OracleBox } from "./ageUsdBank";
 import { SIGMA_USD_PARAMETERS } from "./sigmaUsdParameters";
 
 export class SigmaUSDBank extends AgeUSDBank {

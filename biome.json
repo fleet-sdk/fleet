@@ -1,0 +1,36 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.8.2/schema.json",
+  "files": {
+    "ignore": [
+      "**/coverage/*",
+      "**/dist/*",
+      "**/node_modules/*",
+      "**/_test-vectors/mockedGraphQLBoxResponses.json"
+    ]
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "formatter": {
+    "indentStyle": "space"
+  },
+  "javascript": {
+    "formatter": {
+      "trailingCommas": "none"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "ignore": ["**/sigmastate*.d.ts"],
+    "rules": {
+      "recommended": true,
+      "style": {
+        "noParameterAssign": { "level": "off" }
+      },
+      "suspicious": {
+        "noConsoleLog": { "level": "error" },
+        "noAssignInExpressions": { "level": "off" }
+      }
+    }
+  }
+}

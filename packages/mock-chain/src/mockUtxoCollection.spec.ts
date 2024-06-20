@@ -45,12 +45,14 @@ describe("UTxO Collection", () => {
     const collection = new MockUTxOCollection();
 
     const candidate = {
-      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      ergoTree:
+        "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
       creationHeight: 804138,
       value: "1000000000",
       assets: [
         {
-          tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
+          tokenId:
+            "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
           amount: "10"
         }
       ],

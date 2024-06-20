@@ -1,7 +1,13 @@
-import { Box, isDefined, some, TokenId, TokenTargetAmount } from "@fleet-sdk/common";
+import {
+  type Box,
+  isDefined,
+  some,
+  type TokenId,
+  type TokenTargetAmount
+} from "@fleet-sdk/common";
 import { _0n, isEmpty, isUndefined, sumBy, utxoSum } from "@fleet-sdk/common";
-import { SelectionTarget } from "../boxSelector";
-import { ISelectionStrategy } from "./ISelectionStrategy";
+import type { SelectionTarget } from "../boxSelector";
+import type { ISelectionStrategy } from "./ISelectionStrategy";
 
 /**
  * Accumulative selection strategy accumulates inputs until the target amounts
@@ -58,7 +64,9 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
 
     if (isUndefined(target)) {
       if (tokenId) {
-        selection = inputs.filter((x) => x.assets.some((asset) => asset.tokenId === tokenId));
+        selection = inputs.filter((x) =>
+          x.assets.some((asset) => asset.tokenId === tokenId)
+        );
       } else {
         selection = inputs;
       }

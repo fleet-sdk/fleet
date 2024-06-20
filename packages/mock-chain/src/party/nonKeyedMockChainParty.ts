@@ -1,6 +1,6 @@
-import { assert, HexString } from "@fleet-sdk/common";
+import { assert, type HexString } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
-import { MockChain } from "../mockChain";
+import type { MockChain } from "../mockChain";
 import { MockChainParty } from "./mockChainParty";
 
 export class NonKeyedMockChainParty extends MockChainParty {

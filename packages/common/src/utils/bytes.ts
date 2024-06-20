@@ -16,12 +16,7 @@ export function concatBytes(...arrays: Uint8Array[]): Uint8Array {
 
 export function isHex(value?: string) {
   if (!value || value.length % 2) return false;
-
-  if (!value.startsWith("0x")) {
-    value = "0x" + value;
-  }
-
-  return !isNaN(Number(value));
+  return !Number.isNaN(Number(value.startsWith("0x") ? value : `0x${value}`));
 }
 
 /**

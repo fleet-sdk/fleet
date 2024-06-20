@@ -1,5 +1,15 @@
-import { Amount, Box, CollectionAddOptions, OneOrMore, TokenAmount } from "@fleet-sdk/common";
-import { NotAllowedTokenBurning, OutputBuilder, TransactionBuilder } from "..";
+import type {
+  Amount,
+  Box,
+  CollectionAddOptions,
+  OneOrMore,
+  TokenAmount
+} from "@fleet-sdk/common";
+import {
+  NotAllowedTokenBurning,
+  type OutputBuilder,
+  type TransactionBuilder
+} from "..";
 
 export type FleetPluginContext = {
   /**
@@ -14,7 +24,10 @@ export type FleetPluginContext = {
    * @param dataInputs
    * @returns new list length
    */
-  addDataInputs: (dataInputs: OneOrMore<Box<Amount>>, options?: CollectionAddOptions) => number;
+  addDataInputs: (
+    dataInputs: OneOrMore<Box<Amount>>,
+    options?: CollectionAddOptions
+  ) => number;
 
   /**
    * Add one or more outputs to the outputs list
@@ -22,7 +35,10 @@ export type FleetPluginContext = {
    * @param options
    * @returns new list length
    */
-  addOutputs: (outputs: OneOrMore<OutputBuilder>, options?: CollectionAddOptions) => number;
+  addOutputs: (
+    outputs: OneOrMore<OutputBuilder>,
+    options?: CollectionAddOptions
+  ) => number;
 
   /**
    * Burn tokens
@@ -40,17 +56,22 @@ export type FleetPluginContext = {
   setFee: (amount: Amount) => void;
 };
 
-export function createPluginContext(transactionBuilder: TransactionBuilder): FleetPluginContext {
+export function createPluginContext(
+  transactionBuilder: TransactionBuilder
+): FleetPluginContext {
   return {
     addInputs: (inputs) =>
       transactionBuilder
         .from(inputs)
         .configureSelector((selector) =>
           selector.ensureInclusion(
-            Array.isArray(inputs) ? inputs.map((input) => input.boxId) : inputs.boxId
+            Array.isArray(inputs)
+              ? inputs.map((input) => input.boxId)
+              : inputs.boxId
           )
         ).inputs.length,
-    addOutputs: (outputs, options) => transactionBuilder.to(outputs, options).outputs.length,
+    addOutputs: (outputs, options) =>
+      transactionBuilder.to(outputs, options).outputs.length,
     addDataInputs: (dataInputs, options) =>
       transactionBuilder.withDataFrom(dataInputs, options).dataInputs.length,
     burnTokens: (tokens) => {

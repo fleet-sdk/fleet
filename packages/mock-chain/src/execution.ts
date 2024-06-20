@@ -1,8 +1,12 @@
 import { ensureDefaults, Network } from "@fleet-sdk/common";
-import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
+import type { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { bigintBE, hex } from "@fleet-sdk/crypto";
-import { ErgoHDKey } from "@fleet-sdk/wallet";
-import { BlockchainParameters, BlockchainStateContext, ProverBuilder$ } from "sigmastate-js/main";
+import type { ErgoHDKey } from "@fleet-sdk/wallet";
+import {
+  type BlockchainParameters,
+  type BlockchainStateContext,
+  ProverBuilder$
+} from "sigmastate-js/main";
 import { mockBlockchainStateContext } from "./objectMocking";
 
 /**
@@ -37,10 +41,13 @@ export function execute(
   keys: ErgoHDKey[],
   parameters?: ExecutionParameters
 ): TransactionExecutionResult {
-  keys.forEach((key) => {
-    if (!key.hasPrivateKey())
-      throw new Error(`ErgoHDKey '${hex.encode(key.publicKey)}' must have a private key.`);
-  });
+  for (const key of keys) {
+    if (!key.hasPrivateKey()) {
+      throw new Error(
+        `ErgoHDKey '${hex.encode(key.publicKey)}' must have a private key.`
+      );
+    }
+  }
 
   const eip12Tx = unsigned.toEIP12Object();
   const params = ensureDefaults(parameters, {
@@ -51,9 +58,11 @@ export function execute(
   });
 
   try {
-    const proverBuilder = ProverBuilder$.create(params.parameters, params.network);
-    keys.forEach((key) => proverBuilder.withDLogSecret(bigintBE.encode(key.privateKey!)));
-    const prover = proverBuilder.build();
+    const builder = ProverBuilder$.create(params.parameters, params.network);
+    for (const key of keys) {
+      builder.withDLogSecret(bigintBE.encode(key.privateKey as Uint8Array));
+    }
+    const prover = builder.build();
 
     const reducedTx = prover.reduce(
       params.context,

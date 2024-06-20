@@ -24,16 +24,12 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": [
-    "ergo",
-    "blockchain",
-    "crypto"
-  ],
+  "keywords": ["ergo", "blockchain", "crypto"],
   "scripts": {
     "build": "tsup --config ../../tsup.config.ts"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",

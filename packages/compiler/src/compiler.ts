@@ -1,6 +1,17 @@
-import { assert, ensureDefaults, ergoTreeHeaderFlags, isEmpty, isHex } from "@fleet-sdk/common";
+import {
+  assert,
+  ensureDefaults,
+  ergoTreeHeaderFlags,
+  isEmpty,
+  isHex
+} from "@fleet-sdk/common";
 import { SConstant } from "@fleet-sdk/serializer";
-import { SigmaCompiler$, SigmaCompilerNamedConstantsMap, Value, Value$ } from "sigmastate-js/main";
+import {
+  SigmaCompiler$,
+  type SigmaCompilerNamedConstantsMap,
+  Value,
+  Value$
+} from "sigmastate-js/main";
 import { CompilerOutput } from "./compilerOutput";
 
 type CompilerOptionsBase = {
@@ -18,7 +29,9 @@ export type CompilerOptionsForErgoTreeV1 = CompilerOptionsBase & {
   version?: 1;
 };
 
-export type CompilerOptions = CompilerOptionsForErgoTreeV0 | CompilerOptionsForErgoTreeV1;
+export type CompilerOptions =
+  | CompilerOptionsForErgoTreeV0
+  | CompilerOptionsForErgoTreeV1;
 
 export type NamedConstantsMap = {
   [key: string]: string | Value | SConstant;
@@ -30,13 +43,16 @@ export const compilerDefaults: Required<CompilerOptions> = {
   segregateConstants: true
 };
 
-export function compile(script: string, options?: CompilerOptions): CompilerOutput {
+export function compile(
+  script: string,
+  options?: CompilerOptions
+): CompilerOutput {
   const opt = ensureDefaults(options, compilerDefaults);
   assert(opt.version < 8, `Version should be lower than 8, got ${opt.version}`);
 
   let headerFlags = 0x00 | opt.version;
 
-  if (opt.version > 0 || (opt.version == 0 && opt.includeSize)) {
+  if (opt.version > 0 || (opt.version === 0 && opt.includeSize)) {
     headerFlags |= ergoTreeHeaderFlags.sizeInclusion;
   }
 
@@ -50,7 +66,9 @@ export function compile(script: string, options?: CompilerOptions): CompilerOutp
   return new CompilerOutput(tree);
 }
 
-export function parseNamedConstantsMap(map: NamedConstantsMap): SigmaCompilerNamedConstantsMap {
+export function parseNamedConstantsMap(
+  map: NamedConstantsMap
+): SigmaCompilerNamedConstantsMap {
   if (isEmpty(map)) {
     return map;
   }
@@ -66,13 +84,10 @@ export function parseNamedConstantsMap(map: NamedConstantsMap): SigmaCompilerNam
 export function toSigmaConstant(constant: string | Value | SConstant): Value {
   if (typeof constant === "string") {
     assert(isHex(constant), `'${constant}' is not a valid hex string.`);
-
     return Value$.fromHex(constant);
-  } else if (constant instanceof SConstant) {
-    return Value$.fromHex(constant.toHex());
-  } else if (constant instanceof Value) {
-    return constant;
   }
+  if (constant instanceof SConstant) return Value$.fromHex(constant.toHex());
+  if (constant instanceof Value) return constant;
 
   throw new Error("Unsupported constant object mapping.");
 }
