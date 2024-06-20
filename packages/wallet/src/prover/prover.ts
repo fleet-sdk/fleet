@@ -10,7 +10,12 @@ import {
   some
 } from "@fleet-sdk/common";
 import { ErgoMessage, ErgoUnsignedTransaction } from "@fleet-sdk/core";
-import { blake2b256, type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
+import {
+  blake2b256,
+  type ByteInput,
+  ensureBytes,
+  hex
+} from "@fleet-sdk/crypto";
 import {
   type MinimalUnsignedTransaction,
   serializeBox,

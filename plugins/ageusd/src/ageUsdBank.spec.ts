@@ -1,5 +1,9 @@
 import { percent } from "@fleet-sdk/common";
-import { type Amount, type Box, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/core";
+import {
+  type Amount,
+  type Box,
+  RECOMMENDED_MIN_FEE_VALUE
+} from "@fleet-sdk/core";
 import { parse, SBool } from "@fleet-sdk/serializer";
 import { describe, expect, it, test } from "vitest";
 import { mockBankBox, mockOracleBox } from "./_tests/mocking";

@@ -1,7 +1,11 @@
 import { Network } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
-import { ErgoMessage, type ErgoMessageOptions, MessageType } from "./ergoMessage";
+import {
+  ErgoMessage,
+  type ErgoMessageOptions,
+  MessageType
+} from "./ergoMessage";
 
 const testVectors = [
   {
