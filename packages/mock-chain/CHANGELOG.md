@@ -1,5 +1,12 @@
 # @fleet-sdk/mock-chain
 
+## 0.4.2
+
+### Patch Changes
+
+- 42f03aa: Fix `picocolors` imports
+- 42f03aa: Bump SigmaJS to v0.4.6
+
 ## 0.4.1
 
 ### Patch Changes

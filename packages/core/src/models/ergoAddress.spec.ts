@@ -10,6 +10,7 @@ import {
 } from "../tests/testVectors/ergoAddressesTestVectors";
 import { publicKeyTestVectors } from "../tests/testVectors/ergoAddressesTestVectors";
 import { ErgoAddress } from "./ergoAddress";
+import { ErgoMessage } from "./ergoMessage";
 import { validateAddress } from "./utils";
 
 describe("Construction", () => {
@@ -129,6 +130,13 @@ describe("Construction", () => {
     expect(address.type).toBe(AddressType.P2S);
     expect(address.network).toBe(Network.Mainnet);
     expect(address.getPublicKeys()).toHaveLength(0);
+  });
+
+  it("Should fail when an encoded ErgoMessage is passed to the constructor", () => {
+    const message = new ErgoMessage({ data: "deadbeef" });
+    expect(() => {
+      ErgoAddress.decode(message.encode(Network.Mainnet));
+    }).toThrow();
   });
 
   const invalidAddress = "3Wx6cHkTaAvysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3";

@@ -66,8 +66,8 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       sigmastate-js:
-        specifier: 0.4.5
-        version: 0.4.5
+        specifier: 0.4.6
+        version: 0.4.6
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.9.0)(typescript@5.4.5)
@@ -120,8 +120,8 @@ importers:
         specifier: workspace:^
         version: link:../serializer
       sigmastate-js:
-        specifier: 0.4.5
-        version: 0.4.5
+        specifier: 0.4.6
+        version: 0.4.6
 
   packages/core:
     dependencies:
@@ -171,8 +171,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       sigmastate-js:
-        specifier: 0.4.5
-        version: 0.4.5
+        specifier: 0.4.6
+        version: 0.4.6
 
   packages/serializer:
     dependencies:
@@ -2494,8 +2494,8 @@ packages:
     resolution: {integrity: sha512-4XK8ZS9NKAbo8aGnU6o5GkBW6Upl8+OK8A1KreVDMAamfvZ0iq4LoVH8rHaeEPf9moVtaC4QZY5RYI+0OwiydA==}
     engines: {node: '>=10'}
 
-  sigmastate-js@0.4.5:
-    resolution: {integrity: sha512-FFdVP3LvsO6c4AnB3vYMSQXB8uGllG8QY4j6ixnV7yn6thwGLgjnNgPW8BwBwETk8M8JN5WKU2U/nQ62EYhHhg==}
+  sigmastate-js@0.4.6:
+    resolution: {integrity: sha512-Vo/TSFbkKrG28eiWn7EmoaBNgyabC6En6B7cKjb3z2ivBpFBMCGxUZgmKu83GgJboRvCikZ3/vvWFfbxpbloig==}
 
   signal-exit@3.0.7:
     resolution: {integrity: sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==}
@@ -5416,7 +5416,7 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.4.0
 
-  sigmastate-js@0.4.5:
+  sigmastate-js@0.4.6:
     dependencies:
       '@fleet-sdk/common': 0.1.3
       '@noble/hashes': 1.1.4

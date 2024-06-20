@@ -4,10 +4,10 @@ import {
   Base58String,
   concatBytes,
   first,
+  isEmpty,
   Network
 } from "@fleet-sdk/common";
-import { base58, blake2b256, BytesInput, hex, validateEcPoint } from "@fleet-sdk/crypto";
-import { isEmpty } from "packages/common/src";
+import { base58, blake2b256, validateEcPoint } from "@fleet-sdk/crypto";
 
 export const CHECKSUM_LENGTH = 4;
 export const BLAKE_256_HASH_LENGTH = 32;
@@ -20,17 +20,12 @@ export type UnpackedAddress = {
   type: AddressType;
 };
 
-export function ensureBytes(content: BytesInput): Uint8Array {
-  if (typeof content === "string") return hex.decode(content);
-  return content;
-}
-
 export function getNetworkType(addressBytes: Uint8Array): Network {
   return first(addressBytes) & 0xf0;
 }
 
 export function getAddressType(addressBytes: Uint8Array): AddressType {
-  return first(addressBytes) & 0xf;
+  return first(addressBytes) & 0x0f;
 }
 
 /**
@@ -49,11 +44,15 @@ export function unpackAddress(bytes: Uint8Array): UnpackedAddress {
   };
 }
 
-export function encodeAddress(body: Uint8Array, type: AddressType, network: Network): Base58String {
+export function encodeAddress(
+  network: Network,
+  type: AddressType,
+  content: Uint8Array
+): Base58String {
   const head = Uint8Array.from([network + type]);
-  const headAndBody = concatBytes(head, body);
+  const headAndBody = concatBytes(head, content);
   const checksum = blake2b256(headAndBody).subarray(0, CHECKSUM_LENGTH);
-  return base58.encode(concatBytes(head, body, checksum));
+  return base58.encode(concatBytes(head, content, checksum));
 }
 
 export function validateUnpackedAddress(unpacked: UnpackedAddress): boolean {

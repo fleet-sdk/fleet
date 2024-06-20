@@ -1,11 +1,17 @@
 import { AddressType, Base58String, HexString, Network } from "@fleet-sdk/common";
 import { concatBytes, endsWith, first, startsWith } from "@fleet-sdk/common";
-import { base58, blake2b256, BytesInput, hex, validateEcPoint } from "@fleet-sdk/crypto";
+import {
+  base58,
+  blake2b256,
+  ByteInput,
+  ensureBytes,
+  hex,
+  validateEcPoint
+} from "@fleet-sdk/crypto";
 import { InvalidAddress } from "../errors/invalidAddress";
 import {
   BLAKE_256_HASH_LENGTH,
   encodeAddress,
-  ensureBytes,
   getAddressType,
   getNetworkType,
   unpackAddress,
@@ -87,7 +93,7 @@ export class ErgoAddress {
    * Create a new instance from an ErgoTree
    * @param ergoTree ErgoTree hex string
    */
-  public static fromErgoTree(ergoTree: BytesInput, network?: Network): ErgoAddress {
+  public static fromErgoTree(ergoTree: ByteInput, network?: Network): ErgoAddress {
     return new ErgoAddress(ensureBytes(ergoTree), network);
   }
 
@@ -95,7 +101,7 @@ export class ErgoAddress {
    * Create a new instance from a public key
    * @param publicKey Public key hex string
    */
-  public static fromPublicKey(publicKey: BytesInput, network?: Network): ErgoAddress {
+  public static fromPublicKey(publicKey: ByteInput, network?: Network): ErgoAddress {
     const bytes = ensureBytes(publicKey);
     if (!validateEcPoint(bytes)) throw new Error("The Public Key is invalid.");
 
@@ -179,7 +185,7 @@ export class ErgoAddress {
     if (this.type === AddressType.P2SH) return this.encode();
 
     const hash = blake2b256(this.#ergoTree).subarray(0, P2SH_HASH_LENGTH);
-    return encodeAddress(hash, AddressType.P2SH, network ?? this.#network);
+    return encodeAddress(network ?? this.#network, AddressType.P2SH, hash);
   }
 
   /**
@@ -198,13 +204,13 @@ export class ErgoAddress {
       body = this.#ergoTree;
     }
 
-    return encodeAddress(body, this.#type, network ?? this.#network);
+    return encodeAddress(network ?? this.#network, this.#type, body);
   }
 
   /**
    * Encode address as base58 string
    */
   public toString(network?: Network): Base58String {
-    return this.encode(network);
+    return this.encode(network ?? this.#network);
   }
 }

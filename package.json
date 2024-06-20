@@ -43,7 +43,7 @@
     "npm-run-all": "^4.1.5",
     "open-cli": "^7.2.0",
     "prettier": "^3.0.3",
-    "sigmastate-js": "0.4.5",
+    "sigmastate-js": "0.4.6",
     "ts-node": "^10.9.1",
     "tsup": "^7.2.0",
     "type-fest": "^4.20.0",
