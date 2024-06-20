@@ -126,8 +126,8 @@ describe("Extended keys", () => {
     const fullyRecreatedKey = ErgoHDKey.fromExtendedKey({
       depth: key.depth,
       index: key.index,
-      privateKey: key.privateKey!,
-      chainCode: key.chainCode!
+      privateKey: key.privateKey as Uint8Array,
+      chainCode: key.chainCode as Uint8Array
     });
     expect(fullyRecreatedKey.depth).to.be.equal(key.depth);
     expect(fullyRecreatedKey.index).to.be.equal(key.index);
@@ -136,7 +136,7 @@ describe("Extended keys", () => {
     expect(fullyRecreatedKey.chainCode).to.be.deep.equal(key.chainCode);
 
     const recreatedFromPrivateKey = new ErgoHDKey({
-      privateKey: key.privateKey!
+      privateKey: key.privateKey as Uint8Array
     });
     expect(recreatedFromPrivateKey.depth).to.be.equal(0);
     expect(recreatedFromPrivateKey.index).to.be.equal(0);

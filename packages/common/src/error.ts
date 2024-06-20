@@ -7,14 +7,6 @@ export class FleetError extends Error {
   }
 }
 
-export class NotSupportedError extends FleetError {
-  constructor(message?: string) {
-    super(message);
-  }
-}
+export class NotSupportedError extends FleetError {}
 
-export class BlockchainProviderError extends FleetError {
-  constructor(message?: string, options?: ErrorOptions) {
-    super(message, options);
-  }
-}
+export class BlockchainProviderError extends FleetError {}

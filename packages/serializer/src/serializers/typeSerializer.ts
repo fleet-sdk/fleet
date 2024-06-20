@@ -8,8 +8,8 @@ import {
   PRIMITIVE_TYPE_RANGE
 } from "../types/descriptors";
 
-export class TypeSerializer {
-  static serialize(type: SType, writer: SigmaByteWriter) {
+export const typeSerializer = {
+  serialize(type: SType, writer: SigmaByteWriter) {
     if (type.embeddable) {
       writer.write(type.code);
     } else if (type.code === descriptors.unit.code) {
@@ -86,9 +86,9 @@ export class TypeSerializer {
     } else {
       throw new Error("Serialization error: type not implemented.");
     }
-  }
+  },
 
-  static deserialize(r: SigmaByteReader): SType {
+  deserialize(r: SigmaByteReader): SType {
     const byte = r.readByte();
     assert(
       byte > 0,
@@ -142,23 +142,23 @@ export class TypeSerializer {
           return new STupleType(internal);
         }
       }
-    } else {
-      switch (byte) {
-        case descriptors.tuple.genericTupleTypeCode: {
-          const len = r.readVlq();
-          const wrapped = new Array<SType>(len);
-          for (let i = 0; i < len; i++) {
-            wrapped[i] = this.deserialize(r);
-          }
+    }
 
-          return new STupleType(wrapped);
+    switch (byte) {
+      case descriptors.tuple.genericTupleTypeCode: {
+        const len = r.readVlq();
+        const wrapped = new Array<SType>(len);
+        for (let i = 0; i < len; i++) {
+          wrapped[i] = this.deserialize(r);
         }
-        case descriptors.unit.code: {
-          return descriptors.unit;
-        }
+
+        return new STupleType(wrapped);
+      }
+      case descriptors.unit.code: {
+        return descriptors.unit;
       }
     }
 
     throw new Error("Not implemented.");
   }
-}
+};

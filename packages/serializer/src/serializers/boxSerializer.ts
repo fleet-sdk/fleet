@@ -27,28 +27,18 @@ export function serializeBox(
 ): SigmaByteWriter;
 export function serializeBox(
   box: Box<Amount> | BoxCandidate<Amount>,
-  writer?: SigmaByteWriter,
+  writer = new SigmaByteWriter(5_0000),
   distinctTokenIds?: string[]
 ): SigmaByteWriter {
-  if (!writer) {
-    writer = new SigmaByteWriter(5_0000);
-  }
-
   writer.writeBigVLQ(ensureBigInt(box.value));
   writer.writeHex(box.ergoTree);
   writer.writeVLQ(box.creationHeight);
   writeTokens(writer, box.assets, distinctTokenIds);
   writeRegisters(writer, box.additionalRegisters);
 
-  if (isDefined(distinctTokenIds)) {
-    return writer;
-  } else {
-    if (!isBox(box)) {
-      throw new Error("Invalid box type.");
-    }
-
-    return writer.writeHex(box.transactionId).writeVLQ(box.index);
-  }
+  if (isDefined(distinctTokenIds)) return writer;
+  if (!isBox(box)) throw new Error("Invalid box type.");
+  return writer.writeHex(box.transactionId).writeVLQ(box.index);
 }
 
 function isBox<T extends Amount>(
@@ -92,21 +82,15 @@ function writeRegisters(
   let length = 0;
 
   for (const key of keys) {
-    if (registers[key as keyof NonMandatoryRegisters]) {
-      length++;
-    }
+    if (registers[key as keyof NonMandatoryRegisters]) length++;
   }
 
   writer.writeVLQ(length);
-  if (length == 0) {
-    return;
-  }
+  if (length === 0) return;
 
   for (const key of keys) {
     const register = registers[key as keyof NonMandatoryRegisters];
-    if (isDefined(register)) {
-      writer.writeHex(register);
-    }
+    if (isDefined(register)) writer.writeHex(register);
   }
 }
 
@@ -129,11 +113,9 @@ export function estimateBoxSize(
   size += estimateVLQSize(box.creationHeight);
 
   size += estimateVLQSize(box.assets.length);
-  size += box.assets.reduce(
-    (acc: number, curr) =>
-      (acc += byteSizeOf(curr.tokenId) + estimateVLQSize(curr.amount)),
-    0
-  );
+  for (const asset of box.assets) {
+    size += byteSizeOf(asset.tokenId) + estimateVLQSize(asset.amount);
+  }
 
   let registersLength = 0;
   for (const key in box.additionalRegisters) {
@@ -144,8 +126,8 @@ export function estimateBoxSize(
       registersLength++;
     }
   }
-  size += estimateVLQSize(registersLength);
 
+  size += estimateVLQSize(registersLength);
   size += 32; // transaction id (BLAKE2b 256 hash)
   size += estimateVLQSize(isBox(box) ? box.index : MAX_UINT16_VALUE);
 

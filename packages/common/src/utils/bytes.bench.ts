@@ -2,9 +2,8 @@ import { bench, describe } from "vitest";
 import { isHex } from "./bytes";
 
 const HEX_PATTERN = /^[0-9A-Fa-f]+$/s;
-export function isHexRegex(value?: string) {
+function isHexRegex(value?: string) {
   if (!value || value.length % 2) return false;
-
   return HEX_PATTERN.test(value);
 }
 

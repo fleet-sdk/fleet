@@ -1,6 +1,6 @@
 export type ErrorMessage = string | Error | (() => string);
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// biome-ignore lint/complexity/noBannedTypes: <explanation>
 type Constructable = Function;
 
 type JSPrimitive =
@@ -42,13 +42,12 @@ export function assertTypeOf<T>(obj: T, expected: JSPrimitive): asserts obj {
   }
 }
 
-const toString = (value: unknown) => Object.prototype.toString.call(value);
 function getTypeName(value: unknown): string {
   if (value === null) return "null";
   const type = typeof value;
 
   return type === "object" || type === "function"
-    ? toString(value).slice(8, -1)
+    ? Object.prototype.toString.call(value).slice(8, -1)
     : type;
 }
 

@@ -425,45 +425,35 @@ describe("Address model - ergo-ts test set", () => {
     instance: ErgoAddress.decodeUnsafe(o.address)
   }));
 
-  test("get ergoTree by address", () => {
-    testVectors.forEach((tv) => {
-      if (tv.ergoTree) {
-        expect(tv.instance.ergoTree).toBe(tv.ergoTree);
-      }
-    });
+  test.each(testVectors)("get ergoTree by address", (tv) => {
+    if (tv.ergoTree) {
+      expect(tv.instance.ergoTree).toBe(tv.ergoTree);
+    }
   });
 
-  test("get address by ergoTree", () => {
-    testVectors.forEach((tv) => {
-      if (tv.ergoTree) {
-        const address = ErgoAddress.fromErgoTree(tv.ergoTree, tv.network);
-        expect(address.toString()).toBe(tv.address);
-      }
-    });
+  test.each(testVectors)("get address by ergoTree", (tv) => {
+    if (tv.ergoTree) {
+      const address = ErgoAddress.fromErgoTree(tv.ergoTree, tv.network);
+      expect(address.toString()).toBe(tv.address);
+    }
   });
 
-  test("check network/testnet", () => {
-    testVectors.forEach((tv) => {
-      if (tv.network) {
-        expect(tv.instance.network).toBe(tv.network);
-      }
-    });
+  test.each(testVectors)("check network/testnet", (tv) => {
+    if (tv.network) {
+      expect(tv.instance.network).toBe(tv.network);
+    }
   });
 
-  test("simple address validity test", () => {
-    testVectors.forEach((tv) => {
-      expect(ErgoAddress.validate(tv.address)).toBe(tv.isValid);
-      expect(validateAddress(tv.address)).toBe(tv.isValid);
-    });
+  test.each(testVectors)("simple address validity test", (tv) => {
+    expect(ErgoAddress.validate(tv.address)).toBe(tv.isValid);
+    expect(validateAddress(tv.address)).toBe(tv.isValid);
   });
 
-  test("checked construction from base58", () => {
-    testVectors.forEach((o) => {
-      if (o.isValid) {
-        expect(() => ErgoAddress.decode(o.address)).not.toThrow();
-      } else {
-        expect(() => ErgoAddress.decode(o.address)).toThrow();
-      }
-    });
+  test.each(testVectors)("checked construction from base58", (tv) => {
+    if (tv.isValid) {
+      expect(() => ErgoAddress.decode(tv.address)).not.toThrow();
+    } else {
+      expect(() => ErgoAddress.decode(tv.address)).toThrow();
+    }
   });
 });

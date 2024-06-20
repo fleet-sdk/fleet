@@ -83,11 +83,9 @@ export class ErgoMessage {
       return isHex(data)
         ? [hex.decode(data), MessageType.Binary]
         : [utf8.decode(data), MessageType.String];
-    } else if (data instanceof Uint8Array) {
-      return [data, MessageType.Binary];
-    } else {
-      return [utf8.decode(JSON.stringify(data)), MessageType.Json];
     }
+    if (data instanceof Uint8Array) return [data, MessageType.Binary];
+    return [utf8.decode(JSON.stringify(data)), MessageType.Json];
   }
 
   static decode(encodedHash: Base58String): ErgoMessage {

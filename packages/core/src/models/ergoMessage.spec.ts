@@ -52,7 +52,7 @@ describe("ErgoMessage construction", () => {
       "Should default to Mainnet"
     );
     if (tv.type === MessageType.Binary && typeof tv.data === "string") {
-      expect(hex.encode(message.getData()!)).to.be.equal(tv.data);
+      expect(hex.encode(message.getData() as Uint8Array)).to.be.equal(tv.data);
     } else {
       expect(message.getData()).to.be.deep.equal(tv.data);
     }

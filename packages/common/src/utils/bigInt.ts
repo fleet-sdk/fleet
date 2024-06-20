@@ -49,7 +49,7 @@ export function undecimalize(
 ): bigint {
   if (!input) return _0n;
 
-  options = typeof options == "number" ? { decimals: options } : options;
+  options = typeof options === "number" ? { decimals: options } : options;
   if (isUndefined(options)) {
     options = {};
   }
@@ -63,7 +63,7 @@ export function undecimalize(
   }
 
   let [integer, decimal] = fragments;
-  integer = _removeLeadingZeros(integer);
+  integer = removeLeadingZeros(integer);
   const negative = integer.startsWith("-") ? "-" : "";
 
   if (!decimal) {
@@ -119,7 +119,7 @@ export function decimalize(
     return value.toString();
   }
 
-  options = typeof options == "number" ? { decimals: options } : options;
+  options = typeof options === "number" ? { decimals: options } : options;
   options.decimals = options.decimals || 0;
   options.decimalMark = options.decimalMark || ".";
 
@@ -127,7 +127,7 @@ export function decimalize(
   const integer = value / pow;
   const decimal = value - integer * pow;
 
-  return _buildFormattedDecimal(
+  return buildFormattedDecimal(
     integer.toString(10),
     decimal.toString(10),
     options
@@ -152,24 +152,18 @@ export function percent(value: bigint, percentage: bigint, precision = 2n) {
   return (value * percentage) / 10n ** precision;
 }
 
-function _buildFormattedDecimal(
+function buildFormattedDecimal(
   integer: string,
   decimal: string,
   options: FormattingOptions
 ): string {
-  const integerPart = _addThousandMarks(integer, options.thousandMark);
-  const decimalPart = _stripTrailingZeros(
-    decimal.padStart(options.decimals, "0")
-  );
-
-  if (decimalPart) {
-    return `${integerPart}${options.decimalMark}${decimalPart}`;
-  } else {
-    return integerPart;
-  }
+  const int = addThousandMarks(integer, options.thousandMark);
+  const dec = stripTrailingZeros(decimal.padStart(options.decimals, "0"));
+  if (dec) return `${int}${options.decimalMark}${dec}`;
+  return int;
 }
 
-function _addThousandMarks(value: string, mark?: string): string {
+function addThousandMarks(value: string, mark?: string): string {
   if (!mark) {
     return value;
   }
@@ -177,7 +171,7 @@ function _addThousandMarks(value: string, mark?: string): string {
   return value.replace(/\B(?=(\d{3})+(?!\d))/g, mark);
 }
 
-function _stripTrailingZeros(value: string): string {
+function stripTrailingZeros(value: string): string {
   if (!value.endsWith("0")) {
     return value;
   }
@@ -185,7 +179,7 @@ function _stripTrailingZeros(value: string): string {
   return value.replace(/\.?0+$/, "");
 }
 
-function _removeLeadingZeros(value: string): string {
+function removeLeadingZeros(value: string): string {
   if (!value.startsWith("0")) {
     return value;
   }

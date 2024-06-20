@@ -52,7 +52,7 @@ export function compile(
 
   let headerFlags = 0x00 | opt.version;
 
-  if (opt.version > 0 || (opt.version == 0 && opt.includeSize)) {
+  if (opt.version > 0 || (opt.version === 0 && opt.includeSize)) {
     headerFlags |= ergoTreeHeaderFlags.sizeInclusion;
   }
 
@@ -84,13 +84,10 @@ export function parseNamedConstantsMap(
 export function toSigmaConstant(constant: string | Value | SConstant): Value {
   if (typeof constant === "string") {
     assert(isHex(constant), `'${constant}' is not a valid hex string.`);
-
     return Value$.fromHex(constant);
-  } else if (constant instanceof SConstant) {
-    return Value$.fromHex(constant.toHex());
-  } else if (constant instanceof Value) {
-    return constant;
   }
+  if (constant instanceof SConstant) return Value$.fromHex(constant.toHex());
+  if (constant instanceof Value) return constant;
 
   throw new Error("Unsupported constant object mapping.");
 }

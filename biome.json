@@ -1,15 +1,17 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.2/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
-  "formatter": {
+  "files": {
     "ignore": [
       "**/coverage/*",
       "**/dist/*",
       "**/node_modules/*",
       "**/_test-vectors/mockedGraphQLBoxResponses.json"
-    ],
+    ]
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "formatter": {
     "indentStyle": "space"
   },
   "javascript": {
@@ -19,8 +21,17 @@
   },
   "linter": {
     "enabled": true,
+    "ignore": ["**/sigmastate*.d.ts"],
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "style": {
+        "useImportType": { "level": "off" },
+        "noParameterAssign": { "level": "off" }
+      },
+      "suspicious": {
+        "noConsoleLog": { "level": "error" },
+        "noAssignInExpressions": { "level": "off" }
+      }
     }
   }
 }

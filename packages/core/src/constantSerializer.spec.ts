@@ -17,10 +17,10 @@ import {
 
 describe("Serialize -> Parse roundtrip", () => {
   function randomInt(min: number, max: number) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
+    const mn = Math.ceil(min);
+    const mx = Math.floor(max);
 
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(Math.random() * (mx - mn + 1)) + mn;
   }
 
   function getRandomBigInt(bytes: number) {

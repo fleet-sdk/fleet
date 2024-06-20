@@ -85,7 +85,7 @@ describe("Tokens collection", () => {
     const collection = new TokensCollection();
 
     expect(() => {
-      tokens.forEach((token) => collection.add(token));
+      for (const token of tokens) collection.add(token);
     }).to.throw(MaxTokensOverflow);
   });
 

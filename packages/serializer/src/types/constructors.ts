@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEmpty } from "@fleet-sdk/common";
 import { SConstant } from "../sigmaConstant";
 import { SType } from "./base";
@@ -24,8 +23,11 @@ export type SConstructor<
   S extends SType = SType | SCollType<SType>
 > = (arg?: T) => S;
 
-type Constructable<T = any> = { new (...args: any): T };
-type GenericProxyArgs<R> = R extends (...args: any) => unknown
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+type Any = any;
+
+type Constructable<T = Any> = { new (...args: Any): T };
+type GenericProxyArgs<R> = R extends (...args: Any) => unknown
   ? Parameters<R>
   : [];
 
@@ -62,7 +64,7 @@ function monoProxy<T extends SType, I, O = I>(
 
       return new (SConstant as Constructable)(instance, ...args);
     }
-  }) as any;
+  }) as Any;
 }
 
 /**
@@ -165,7 +167,9 @@ export const SPair = genericProxy<STupleType, SPair>(
 
     if (typeof left === "function" && typeof right === "function") {
       return () => new target([left(), right()]);
-    } else if (left instanceof SConstant && right instanceof SConstant) {
+    }
+
+    if (left instanceof SConstant && right instanceof SConstant) {
       return new SConstant(new target([left.type, right.type]), [
         left.data,
         right.data

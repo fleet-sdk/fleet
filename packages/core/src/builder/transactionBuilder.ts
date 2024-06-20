@@ -133,12 +133,7 @@ export class TransactionBuilder {
   public from(
     inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>
   ): TransactionBuilder {
-    if (isCollectionLike(inputs)) {
-      inputs = inputs.toArray();
-    }
-
-    this._inputs.add(inputs);
-
+    this._inputs.add(isCollectionLike(inputs) ? inputs.toArray() : inputs);
     return this;
   }
 
@@ -474,11 +469,9 @@ function estimateChangeSize({
     size += estimateVLQSize(baseIndex + i);
   }
 
-  size += tokens.reduce(
-    (acc: number, curr) =>
-      (acc += byteSizeOf(curr.tokenId) + estimateVLQSize(curr.amount)),
-    0
-  );
+  for (const token of tokens) {
+    size += byteSizeOf(token.tokenId) + estimateVLQSize(token.amount);
+  }
 
   if (tokens.length > maxTokensPerBox) {
     if (tokens.length % maxTokensPerBox > 0) {

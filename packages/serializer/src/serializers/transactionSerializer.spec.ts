@@ -4,7 +4,7 @@ import { unsignedTransactionVectors } from "../_test-vectors/transactionVectors"
 import { serializeTransaction } from "./transactionSerializer";
 
 describe("Transaction serializer", () => {
-  it.each(unsignedTransactionVectors)(`Should serialize [$name]`, (tv) => {
+  it.each(unsignedTransactionVectors)("Should serialize [$name]", (tv) => {
     const bytes = serializeTransaction(tv.json).toBytes();
 
     expect(hex.encode(bytes)).toBe(tv.hex);

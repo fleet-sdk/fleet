@@ -39,15 +39,17 @@ function getErgoTreeType(ergoTree: Uint8Array): AddressType {
     startsWith(ergoTree, P2PK_ERGOTREE_PREFIX)
   ) {
     return AddressType.P2PK;
-  } else if (
+  }
+
+  if (
     ergoTree.length === P2SH_ERGOTREE_LENGTH &&
     startsWith(ergoTree, P2SH_ERGOTREE_PREFIX) &&
     endsWith(ergoTree, P2SH_ERGOTREE_SUFFIX)
   ) {
     return AddressType.P2SH;
-  } else {
-    return AddressType.P2S;
   }
+
+  return AddressType.P2S;
 }
 
 /**
@@ -127,17 +129,17 @@ export class ErgoAddress {
     hash: HexString | Uint8Array,
     network?: Network
   ): ErgoAddress {
-    hash = ensureBytes(hash);
+    let bytes = ensureBytes(hash);
 
-    if (hash.length === BLAKE_256_HASH_LENGTH) {
-      hash = hash.subarray(0, P2SH_HASH_LENGTH);
-    } else if (hash.length != P2SH_HASH_LENGTH) {
-      throw Error(`Invalid hash length: ${hash.length}`);
+    if (bytes.length === BLAKE_256_HASH_LENGTH) {
+      bytes = bytes.subarray(0, P2SH_HASH_LENGTH);
+    } else if (bytes.length !== P2SH_HASH_LENGTH) {
+      throw Error(`Invalid hash length: ${bytes.length}`);
     }
 
     const ergoTree = concatBytes(
       P2SH_ERGOTREE_PREFIX,
-      hash,
+      bytes,
       P2SH_ERGOTREE_SUFFIX
     );
 
@@ -154,15 +156,19 @@ export class ErgoAddress {
     if (!validateUnpackedAddress(unpacked))
       throw new InvalidAddress(encodedAddress);
 
-    return this.#fromUnpacked(unpacked);
+    return ErgoAddress.#fromUnpacked(unpacked);
   }
 
   public static decodeUnsafe(encodedAddress: Base58String): ErgoAddress {
-    return this.#fromUnpacked(unpackAddress(base58.decode(encodedAddress)));
+    return ErgoAddress.#fromUnpacked(
+      unpackAddress(base58.decode(encodedAddress))
+    );
   }
 
   static fromBase58(address: Base58String, unsafe = false): ErgoAddress {
-    return unsafe ? this.decodeUnsafe(address) : this.decode(address);
+    return unsafe
+      ? ErgoAddress.decodeUnsafe(address)
+      : ErgoAddress.decode(address);
   }
 
   static #fromUnpacked(unpacked: UnpackedAddress) {

@@ -1,10 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import {
   zigZagDecode,
   zigZagDecodeBigInt,
   zigZagEncode,
   zigZagEncodeBigInt
 } from "./zigZag";
+import fc from "fast-check";
 
 describe("ZigZag encoding", () => {
   it("Should encode", () => {
@@ -32,11 +33,11 @@ describe("ZigZag encoding", () => {
   });
 
   it("Should encode/decode radom numbers", () => {
-    Array.from(Array(100))
-      .map(() => Math.ceil(Math.random() * 100000))
-      .forEach((n) => {
-        expect(zigZagDecode(zigZagEncode(n))).toBe(n);
-      });
+    fc.assert(
+      fc.property(fc.integer({ min: 0, max: 1000000000 }), (n) => {
+        expect(zigZagDecode(zigZagEncode(n))).to.be.equal(n);
+      })
+    );
   });
 });
 
@@ -65,14 +66,13 @@ describe("BigInt ZigZag encoding", () => {
   });
 
   it("Should encode/decode radom numbers", () => {
-    Array.from(Array(100))
-      .map(
-        () =>
-          BigInt(Math.ceil(Math.random() * 1000)) *
-          BigInt(Number.MAX_SAFE_INTEGER)
+    fc.assert(
+      fc.property(
+        fc.bigInt({ min: 0n, max: BigInt(Number.MAX_SAFE_INTEGER) }),
+        (n) => {
+          expect(zigZagDecodeBigInt(zigZagEncodeBigInt(n))).to.be.equal(n);
+        }
       )
-      .forEach((n) => {
-        expect(zigZagDecodeBigInt(zigZagEncodeBigInt(n))).toBe(n);
-      });
+    );
   });
 });

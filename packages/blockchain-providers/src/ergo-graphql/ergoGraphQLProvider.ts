@@ -1,8 +1,8 @@
 import {
   Box,
-  QueryBoxesArgs as QueryBoxesArgs,
+  QueryBoxesArgs,
   Header,
-  QueryBlockHeadersArgs as QueryBlockHeadersArgs
+  QueryBlockHeadersArgs
 } from "@ergo-graphql/types";
 import {
   Base58String,
@@ -123,13 +123,11 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   }
 
   #fetchBoxes(args: QueryBoxesArgs, inclConf: boolean, inclUnconf: boolean) {
-    if (inclConf && inclUnconf) {
-      return this.#getAllBoxes(args);
-    } else if (inclUnconf) {
-      return this.#getUnconfBoxes(args);
-    } else {
-      return this.#getConfBoxes(args);
-    }
+    return inclConf && inclUnconf
+      ? this.#getAllBoxes(args)
+      : inclUnconf
+        ? this.#getUnconfBoxes(args)
+        : this.#getConfBoxes(args);
   }
 
   async *streamBoxes(
@@ -186,8 +184,7 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
 
         if (some(boxes)) {
           boxes = uniqBy(boxes, (box) => box.boxId);
-          boxes.forEach((box) => returnedBoxIds.add(box.boxId));
-
+          for (const box of boxes) returnedBoxIds.add(box.boxId);
           yield boxes;
         }
       }

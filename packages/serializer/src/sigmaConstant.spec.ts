@@ -14,7 +14,7 @@ import {
   tupleTestVectors
 } from "./_test-vectors/constantVectors";
 import { SigmaByteWriter } from "./coders";
-import { DataSerializer } from "./serializers";
+import { dataSerializer } from "./serializers";
 import { decode, parse, SConstant } from "./sigmaConstant";
 import { SGroupElementType } from "./types";
 import {
@@ -214,7 +214,7 @@ describe("Not implemented types", () => {
 
     // not implemented SSigmaProp expression
     expect(() => {
-      DataSerializer.serialize("", unimplementedType, new SigmaByteWriter(1));
+      dataSerializer.serialize("", unimplementedType, new SigmaByteWriter(1));
     }).to.throw("Serialization error: '0x64' type not implemented.");
   });
 
@@ -303,10 +303,9 @@ describe("Tuple serialization", () => {
 
 describe("Positive fuzzy tests", () => {
   function randomInt(min: number, max: number) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    const mn = Math.ceil(min);
+    const mx = Math.floor(max);
+    return Math.floor(Math.random() * (mx - mn + 1)) + mn;
   }
 
   function getRandomBigInt(bytes: number) {

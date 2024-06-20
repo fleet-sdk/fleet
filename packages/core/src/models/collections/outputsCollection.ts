@@ -11,7 +11,7 @@ import { OutputBuilder } from "../../builder/outputBuilder";
 import { SelectionTarget } from "../../builder/selector/boxSelector";
 import { NotFoundError } from "../../errors";
 
-function setsum<K>(map: Map<K, bigint>, key: K, value: bigint) {
+function setSum<K>(map: Map<K, bigint>, key: K, value: bigint) {
   return map.set(key, (map.get(key) || _0n) + value);
 }
 
@@ -73,7 +73,7 @@ export class OutputsCollection extends Collection<
         for (const token of basis.tokens) {
           if (isUndefined(token.amount)) continue;
 
-          setsum(tokens, token.tokenId, token.amount);
+          setSum(tokens, token.tokenId, token.amount);
         }
       }
     }
@@ -81,7 +81,7 @@ export class OutputsCollection extends Collection<
     for (const box of this._items) {
       nanoErgs += box.value;
       for (const token of box.assets) {
-        if (token.tokenId) setsum(tokens, token.tokenId, token.amount);
+        if (token.tokenId) setSum(tokens, token.tokenId, token.amount);
       }
     }
 

@@ -86,10 +86,8 @@ export class ErgoUnsignedInput<
         transactionId: this.transactionId,
         index: this.index
       } as DataInputType<T>;
-    } else {
-      return {
-        boxId: this.boxId
-      } as DataInputType<T>;
     }
+
+    return { boxId: this.boxId } as DataInputType<T>;
   }
 }

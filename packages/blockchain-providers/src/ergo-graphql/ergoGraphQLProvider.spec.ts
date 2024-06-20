@@ -3,7 +3,7 @@ import { chunk, hasDuplicatesBy, NotSupportedError } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
 import { mockedGraphQLBoxes } from "_test-vectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ChainProviderBox } from "../types";
+import { ChainProviderBox } from "../types/blockchainProvider";
 import { mockChunkedResponse, mockResponse } from "../utils";
 import { ErgoGraphQLProvider } from "./ergoGraphQLProvider";
 import {
@@ -50,7 +50,7 @@ describe("ergo-graphql provider", () => {
         }
       });
 
-      let call = JSON.parse(fetchSpy.mock.lastCall![1]!.body as string);
+      let call = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(call.variables).to.be.deep.equal({
         spent: false,
         boxIds: ["boxId"],
@@ -68,7 +68,7 @@ describe("ergo-graphql provider", () => {
         }
       });
 
-      call = JSON.parse(fetchSpy.mock.lastCall![1]!.body as string);
+      call = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(call.variables).to.be.deep.equal({
         spent: false,
         boxIds: ["boxId_1", "boxId_2"],
@@ -97,7 +97,7 @@ describe("ergo-graphql provider", () => {
         }
       });
 
-      const call = JSON.parse(fetchSpy.mock.lastCall![1]!.body as string);
+      const call = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(call.variables).to.be.deep.equal({
         spent: false,
         boxIds: ["boxId_0", "boxId_1"],
@@ -138,7 +138,7 @@ describe("ergo-graphql provider", () => {
         }
       });
 
-      let call = JSON.parse(fetchSpy.mock.lastCall![1]!.body as string);
+      let call = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(call.variables.ergoTrees).to.have.all.members(ergoTrees);
 
       await _client.getBoxes({
@@ -153,7 +153,7 @@ describe("ergo-graphql provider", () => {
         }
       });
 
-      call = JSON.parse(fetchSpy.mock.lastCall![1]!.body as string);
+      call = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(call.variables.ergoTrees).to.have.all.members(ergoTrees);
     });
 
@@ -168,7 +168,7 @@ describe("ergo-graphql provider", () => {
       );
 
       await expect(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         async () => await _client.getBoxes({ where: undefined } as any)
       ).rejects.toThrowError(
         "Cannot fetch unspent boxes without a where clause."
@@ -300,7 +300,7 @@ describe("ergo-graphql provider", () => {
 
       expect(fetchSpy).toHaveBeenCalledOnce();
 
-      const call = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+      const call = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string);
       expect(call.query).to.be.equal(CONF_BOXES_QUERY); // from: "blockchain"
     });
 
@@ -332,7 +332,7 @@ describe("ergo-graphql provider", () => {
       );
 
       expect(fetchSpy).toHaveBeenCalledOnce();
-      const call = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+      const call = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string);
       expect(call.query).to.be.equal(UNCONF_BOXES_QUERY); // from: "mempool"
     });
 
@@ -373,7 +373,7 @@ describe("ergo-graphql provider", () => {
       expect(fetchSpy).toBeCalledTimes(4);
 
       const [firstCall, secondCall, thirdCall, fourthCall] =
-        fetchSpy.mock.calls.map((call) => JSON.parse(call[1]!.body as string));
+        fetchSpy.mock.calls.map((call) => JSON.parse(call[1]?.body as string));
       expect(firstCall.query).to.be.equal(ALL_BOXES_QUERY);
       expect(firstCall.variables.skip).to.be.equal(0);
 
@@ -424,7 +424,7 @@ describe("ergo-graphql provider", () => {
       expect(fetchSpy).toBeCalledTimes(4);
 
       const [firstCall, secondCall, thirdCall, fourthCall] =
-        fetchSpy.mock.calls.map((call) => JSON.parse(call[1]!.body as string));
+        fetchSpy.mock.calls.map((call) => JSON.parse(call[1]?.body as string));
       expect(firstCall.query).to.be.equal(ALL_BOXES_QUERY);
       expect(firstCall.variables.skip).to.be.equal(0);
 

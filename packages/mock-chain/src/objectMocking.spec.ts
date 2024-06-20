@@ -91,7 +91,7 @@ describe("mockHeaders()", () => {
     expect(hasDuplicatesBy(headers, (x) => x.parentId)).to.be.false;
 
     for (let i = 0; i < headers.length - 1; i++) {
-      if (i == headers.length) {
+      if (i === headers.length) {
         expect(headers[i].version).to.be.equal(params.version);
         expect(headers[i].height).to.be.equal(params.fromHeight);
         expect(headers[i].timestamp).to.be.equal(params.fromTimeStamp);

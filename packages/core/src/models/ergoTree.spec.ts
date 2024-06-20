@@ -38,7 +38,9 @@ describe("ErgoTree model", () => {
     const tree = new ErgoTree(tv.tree);
 
     expect(tree.toHex()).to.be.equal(tv.tree);
-    expect(tree.header).to.be.equal(parseInt(tv.tree.substring(0, 2), 16));
+    expect(tree.header).to.be.equal(
+      Number.parseInt(tv.tree.substring(0, 2), 16)
+    );
     expect(tree.version).to.be.equal(tv.version);
     expect(tree.hasSize).to.be.equal(tv.size);
     expect(tree.hasSegregatedConstants).to.be.equal(tv.segregatedConstants);

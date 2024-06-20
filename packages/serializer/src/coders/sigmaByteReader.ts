@@ -29,7 +29,7 @@ export class SigmaByteReader {
       const bit = (this.#bytes[this.#cursor] >> bitOffset++) & 1;
       bits[i] = bit === 1;
 
-      if (bitOffset == 8) {
+      if (bitOffset === 8) {
         bitOffset = 0;
         this.#cursor++;
       }

@@ -121,13 +121,9 @@ export function orderBy<T>(
   order: SortingDirection = "asc"
 ): T[] {
   return [...array].sort((a: T, b: T) => {
-    if (iteratee(a) > iteratee(b)) {
-      return order === "asc" ? 1 : -1;
-    } else if (iteratee(a) < iteratee(b)) {
-      return order === "asc" ? -1 : 1;
-    } else {
-      return 0;
-    }
+    if (iteratee(a) > iteratee(b)) return order === "asc" ? 1 : -1;
+    if (iteratee(a) < iteratee(b)) return order === "asc" ? -1 : 1;
+    return 0;
   });
 }
 
@@ -155,7 +151,7 @@ export function areEqual<T>(
     return true;
   }
 
-  if (array1.length != array2.length) {
+  if (array1.length !== array2.length) {
     return false;
   }
 
@@ -193,7 +189,7 @@ export function areEqualBy<T>(
     return true;
   }
 
-  if (array1.length != array2.length) {
+  if (array1.length !== array2.length) {
     return false;
   }
 

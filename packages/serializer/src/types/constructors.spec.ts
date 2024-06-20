@@ -65,11 +65,11 @@ describe("Constructor proxies", () => {
 
 describe("SPair constructor", () => {
   it("Should throw if params contains different types", () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     expect(() => SPair(SBool(true) as any, SBool() as any)).to.throw(
       "Invalid tuple declaration."
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     expect(() => SPair(SBool() as any, SBool(true)) as any).to.throw(
       "Invalid tuple declaration."
     );

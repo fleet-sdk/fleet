@@ -1,5 +1,1 @@
-export class NonStandardizedMinting extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
+export class NonStandardizedMinting extends Error {}

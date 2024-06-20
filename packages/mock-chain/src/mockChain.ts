@@ -170,7 +170,7 @@ export class MockChain {
         log(pc.red(`${pc.bgRed(pc.bold(" Error "))} ${result.reason}`));
       }
 
-      if (options?.throw != false) throw new Error(result.reason);
+      if (options?.throw !== false) throw new Error(result.reason);
       return false;
     }
 
@@ -226,7 +226,7 @@ export class MockChain {
       if (name) {
         this.#metadataMap.set(firstInputId, {
           name,
-          decimals: decimals ? parseInt(decimals) : undefined
+          decimals: decimals ? Number.parseInt(decimals) : undefined
         });
       }
     }
@@ -236,7 +236,7 @@ export class MockChain {
 }
 
 function log(str: string) {
-  // eslint-disable-next-line no-console
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log(str);
 }
 

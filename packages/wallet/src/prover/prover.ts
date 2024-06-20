@@ -116,8 +116,10 @@ function buildKeyMapper(keys: ErgoHDKey[] | KeyMap) {
   const pskMap = new Map<string, ErgoHDKey>();
 
   // cache encoded public keys
-  const k = isKeyMap(keys) ? keys._ : keys;
-  if (some(k)) k.forEach((key) => pskMap.set(hex.encode(key.publicKey), key));
+  const keyMap = isKeyMap(keys) ? keys._ : keys;
+  if (some(keyMap)) {
+    for (const key of keyMap) pskMap.set(hex.encode(key.publicKey), key);
+  }
 
   return (input: EIP12UnsignedInput, index: number): ErgoHDKey => {
     if (isKeyMap(keys)) {

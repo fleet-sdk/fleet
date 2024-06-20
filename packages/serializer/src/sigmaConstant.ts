@@ -1,8 +1,8 @@
 import { assert, isUndefined } from "@fleet-sdk/common";
 import { ByteInput, hex } from "@fleet-sdk/crypto";
 import { SigmaByteReader, SigmaByteWriter } from "./coders";
-import { DataSerializer } from "./serializers/dataSerializer";
-import { TypeSerializer } from "./serializers/typeSerializer";
+import { dataSerializer } from "./serializers/dataSerializer";
+import { typeSerializer } from "./serializers/typeSerializer";
 import { SType } from "./types";
 
 export const MAX_CONSTANT_LENGTH = 4096;
@@ -20,8 +20,8 @@ export class SConstant<D = unknown, T extends SType = SType> {
     assert(bytes.length > 0, "Empty constant bytes.");
 
     const reader = new SigmaByteReader(bytes);
-    const type = TypeSerializer.deserialize(reader);
-    const data = DataSerializer.deserialize(type, reader);
+    const type = typeSerializer.deserialize(reader);
+    const data = dataSerializer.deserialize(type, reader);
 
     return new SConstant(type as T, data as D);
   }
@@ -36,8 +36,8 @@ export class SConstant<D = unknown, T extends SType = SType> {
 
   toBytes(): Uint8Array {
     const writer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
-    TypeSerializer.serialize(this.type, writer);
-    DataSerializer.serialize(this.data, this.type, writer);
+    typeSerializer.serialize(this.type, writer);
+    dataSerializer.serialize(this.data, this.type, writer);
 
     return writer.toBytes();
   }

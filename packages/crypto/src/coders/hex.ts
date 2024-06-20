@@ -5,14 +5,14 @@ const HEXES = Array.from({ length: 256 }, (_, i) =>
   i.toString(16).padStart(2, "0")
 );
 
-const enum HexChar {
-  ZERO = 48, // 0
-  NINE = 57, // 9
-  A_UP = 65, // A
-  F_UP = 70, // F
-  A_LO = 97, // a
-  F_LO = 102 // f
-}
+const HexChar = {
+  ZERO: 48, // 0
+  NINE: 57, // 9
+  A_UP: 65, // A
+  F_UP: 70, // F
+  A_LO: 97, // a
+  F_LO: 102 // f
+} as const;
 
 function bytesToHex(bytes: Uint8Array): string {
   assertInstanceOf(bytes, Uint8Array);

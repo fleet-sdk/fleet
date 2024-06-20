@@ -41,13 +41,13 @@ export function execute(
   keys: ErgoHDKey[],
   parameters?: ExecutionParameters
 ): TransactionExecutionResult {
-  keys.forEach((key) => {
+  for (const key of keys) {
     if (!key.hasPrivateKey()) {
       throw new Error(
         `ErgoHDKey '${hex.encode(key.publicKey)}' must have a private key.`
       );
     }
-  });
+  }
 
   const eip12Tx = unsigned.toEIP12Object();
   const params = ensureDefaults(parameters, {
@@ -59,9 +59,9 @@ export function execute(
 
   try {
     const builder = ProverBuilder$.create(params.parameters, params.network);
-    keys.forEach((key) =>
-      builder.withDLogSecret(bigintBE.encode(key.privateKey!))
-    );
+    for (const key of keys) {
+      builder.withDLogSecret(bigintBE.encode(key.privateKey as Uint8Array));
+    }
     const prover = builder.build();
 
     const reducedTx = prover.reduce(

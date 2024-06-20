@@ -318,17 +318,17 @@ describe("Transaction signing", () => {
     const txBytes = unsignedTx.toBytes();
 
     // verify all inputs using own verifier
-    signedTx.inputs.forEach((input) => {
+    for (const input of signedTx.inputs) {
       const proof = hex.decode(input.spendingProof.proofBytes);
       expect(prover.verify(txBytes, proof, rootKey)).to.be.true;
-    });
+    }
 
     // verify all inputs using sigma-rust for comparison
     const addr = Address.from_public_key(rootKey.publicKey);
-    signedTx.inputs.forEach((input) => {
+    for (const input of signedTx.inputs) {
       const proof = hex.decode(input.spendingProof.proofBytes);
       expect(verify_signature(addr, txBytes, proof)).to.be.true;
-    });
+    }
   });
 
   it("Should throw when trying to sign without a secret key", async () => {

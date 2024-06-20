@@ -28,9 +28,9 @@ const NANOERGS_TOKEN_ID = "nanoErgs";
  * // { nanoErgs: 30n, tokens: [{ tokenId: "test", amount: 50n }] }
  * ```
  */
-export function utxoSum(boxes: BoxAmounts[]): BoxSummary;
-export function utxoSum(boxes: BoxAmounts[], tokenId: TokenId): bigint;
-export function utxoSum(boxes: BoxAmounts[], tokenId?: TokenId) {
+export function utxoSum(boxes: readonly BoxAmounts[]): BoxSummary;
+export function utxoSum(boxes: readonly BoxAmounts[], tokenId: TokenId): bigint;
+export function utxoSum(boxes: readonly BoxAmounts[], tokenId?: TokenId) {
   const balances: { [tokenId: string]: bigint } = {};
 
   for (const box of boxes) {

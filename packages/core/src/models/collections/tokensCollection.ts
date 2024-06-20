@@ -47,7 +47,7 @@ export class TokensCollection extends Collection<
   }
 
   public get minting(): NewToken<bigint> | undefined {
-    if (!this.#minting) return;
+    if (!this.#minting) return undefined;
     return {
       ...this.#minting.metadata,
       amount: this._items[this.#minting.index].amount
@@ -91,11 +91,10 @@ export class TokensCollection extends Collection<
       throw new FleetError(
         "Only one minting token is allowed per transaction."
       );
-    } else {
-      const len = super.add({ tokenId: token.tokenId, amount: token.amount });
-      this.#minting = { index: len - 1, metadata: token };
     }
 
+    const len = super.add({ tokenId: token.tokenId, amount: token.amount });
+    this.#minting = { index: len - 1, metadata: token };
     return this.length;
   }
 
@@ -138,17 +137,17 @@ export class TokensCollection extends Collection<
 
       if (bigAmount > token.amount) {
         throw new InsufficientTokenAmount(
-          `Insufficient token amount to perform a subtraction operation.`
+          "Insufficient token amount to perform a subtraction operation."
         );
-      } else if (bigAmount < token.amount) {
-        token.amount -= bigAmount;
+      }
 
+      if (bigAmount < token.amount) {
+        token.amount -= bigAmount;
         return this.length;
       }
     }
 
     this._items.splice(index, 1);
-
     return this.length;
   }
 
@@ -167,8 +166,8 @@ export class TokensCollection extends Collection<
         tokenId: x.tokenId ? x.tokenId : mintingTokenId,
         amount: x.amount
       }));
-    } else {
-      return super.toArray();
     }
+
+    return super.toArray();
   }
 }

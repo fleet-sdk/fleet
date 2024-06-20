@@ -29,7 +29,7 @@ export const constructorCode = Object.freeze({
 
 const MAX_PRIMITIVE_TYPE_CODE = 0x0b;
 export const PRIMITIVE_TYPE_RANGE = MAX_PRIMITIVE_TYPE_CODE + 0x01;
-const typeCodeOf = (constructor: number) => PRIMITIVE_TYPE_RANGE * constructor;
+const typeCodeOf = (ctor: number) => PRIMITIVE_TYPE_RANGE * ctor;
 
 type Descriptor = { code: number; embeddable: boolean };
 

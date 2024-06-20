@@ -2,16 +2,12 @@ import { describe, expect, it } from "vitest";
 import { Collection } from "./collection";
 
 class MockCollection extends Collection<number, number> {
-  constructor() {
-    super();
-  }
-
   protected override _map(item: number): number {
     return item;
   }
 
   public remove(item: number): number {
-    throw Error("Not implemented for " + item);
+    throw Error(`Not implemented for ${item}`);
   }
 }
 

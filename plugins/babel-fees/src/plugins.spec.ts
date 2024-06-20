@@ -1,4 +1,4 @@
-import { fail } from "assert";
+import { fail } from "node:assert";
 import { ensureBigInt, first } from "@fleet-sdk/common";
 import { TransactionBuilder } from "@fleet-sdk/core";
 import { parse, SByte, SColl } from "@fleet-sdk/serializer";

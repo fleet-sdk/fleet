@@ -24,11 +24,11 @@ export class ErgoTree {
   }
 
   get hasSegregatedConstants(): boolean {
-    return (this.header & ergoTreeHeaderFlags.constantSegregation) != 0;
+    return (this.header & ergoTreeHeaderFlags.constantSegregation) !== 0;
   }
 
   get hasSize(): boolean {
-    return (this.header & ergoTreeHeaderFlags.sizeInclusion) != 0;
+    return (this.header & ergoTreeHeaderFlags.sizeInclusion) !== 0;
   }
 
   toBytes(): Uint8Array {

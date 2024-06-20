@@ -70,7 +70,7 @@ export class SigmaByteWriter {
         this.#bytes[this.#cursor] &= ~(1 << bitOffset++);
       }
 
-      if (bitOffset == 8) {
+      if (bitOffset === 8) {
         bitOffset = 0;
         this.#cursor++;
       }

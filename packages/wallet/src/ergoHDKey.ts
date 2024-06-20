@@ -45,7 +45,7 @@ export class ErgoHDKey {
   }
 
   get publicKey(): Uint8Array {
-    return this.#root.publicKey!;
+    return this.#root.publicKey as Uint8Array;
   }
 
   get privateKey(): Uint8Array | undefined {
@@ -84,7 +84,7 @@ export class ErgoHDKey {
     mnemonic: string,
     options?: FromMnemonicOptions
   ): Promise<ErgoHDKey> {
-    return this.fromMasterSeed(
+    return ErgoHDKey.fromMasterSeed(
       await mnemonicToSeed(mnemonic, options?.passphrase),
       options?.path
     );
@@ -94,7 +94,7 @@ export class ErgoHDKey {
     mnemonic: string,
     options?: FromMnemonicOptions
   ): ErgoHDKey {
-    return this.fromMasterSeed(
+    return ErgoHDKey.fromMasterSeed(
       mnemonicToSeedSync(mnemonic, options?.passphrase),
       options?.path
     );

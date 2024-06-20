@@ -84,16 +84,14 @@ export function printDiff(oldVal: string, newVal: string) {
 }
 
 function log<T>(value: string, part: ArrayChange<T>) {
-  if (part.added) {
-    value = pc.green("+ " + value);
-  } else if (part.removed) {
-    value = pc.red("- " + value);
-  } else {
-    value = pc.gray("  " + value);
-  }
+  const colored = part.added
+    ? pc.green(`+ ${value}`)
+    : part.removed
+      ? pc.red(`- ${value}`)
+      : pc.gray(`  ${value}`);
 
-  // eslint-disable-next-line no-console
-  console.log(value);
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log(colored);
 }
 
 export function line(char: string, length: number): string {
@@ -122,24 +120,15 @@ export function center(str: string, length: number): string {
   }
 
   const half = (length + str.length) / 2;
-  str = str.padStart(half).padEnd(length);
-
-  return str;
+  return str.padStart(half).padEnd(length);
 }
 
 export function compact(val: string, length: number): string {
-  if (length >= val.length) {
-    return val;
-  }
-
-  if (length <= 0) {
-    return "";
-  } else if (length <= ELLIPSIS.length + 2) {
-    return maxLength(val, length);
-  }
+  if (length >= val.length) return val;
+  if (length <= 0) return "";
+  if (length <= ELLIPSIS.length + 2) return maxLength(val, length);
 
   const fragmentSize = Math.trunc((length - ELLIPSIS.length) / 2);
-
   return maxLength(
     `${val.slice(0, fragmentSize).trimEnd()}${ELLIPSIS}${val
       .slice(val.length - fragmentSize)
