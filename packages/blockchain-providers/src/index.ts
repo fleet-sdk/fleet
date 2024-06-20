@@ -1,1 +1,1 @@
-export * from "./ergo-graphql";
+export * from "./ergo-graphql/ergoGraphQLProvider";

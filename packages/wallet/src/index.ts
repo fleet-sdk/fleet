@@ -1,3 +1,3 @@
 export * from "./ergoHDKey";
 export * from "./mnemonic";
-export * from "./prover";
+export * from "./prover/prover";

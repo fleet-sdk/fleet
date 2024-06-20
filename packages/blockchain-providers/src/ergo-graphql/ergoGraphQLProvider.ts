@@ -27,7 +27,7 @@ import {
   IBlockchainProvider,
   TransactionEvaluationResult,
   TransactionReductionResult
-} from "../types";
+} from "../types/blockchainProvider";
 import {
   createGqlOperation,
   GraphQLOperation,

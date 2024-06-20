@@ -262,13 +262,13 @@ export type SequentialNonMandatoryRegisters<T extends AdditionalRegistersInput> 
 }
   ? R4ToR9Registers<ConstantInput>
   : T extends { R8: ConstantInput }
-  ? R4ToR8Registers<ConstantInput>
-  : T extends { R7: ConstantInput }
-  ? R4ToR7Registers<ConstantInput>
-  : T extends { R6: ConstantInput }
-  ? R4ToR6Registers<ConstantInput>
-  : T extends { R5: ConstantInput }
-  ? R4ToR5Registers<ConstantInput>
-  : T extends { R4: ConstantInput }
-  ? OnlyR4Register<ConstantInput>
-  : T;
+    ? R4ToR8Registers<ConstantInput>
+    : T extends { R7: ConstantInput }
+      ? R4ToR7Registers<ConstantInput>
+      : T extends { R6: ConstantInput }
+        ? R4ToR6Registers<ConstantInput>
+        : T extends { R5: ConstantInput }
+          ? R4ToR5Registers<ConstantInput>
+          : T extends { R4: ConstantInput }
+            ? OnlyR4Register<ConstantInput>
+            : T;
