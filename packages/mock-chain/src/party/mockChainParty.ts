@@ -11,7 +11,9 @@ import { stringifyBalance } from "../balancePrinting";
 import { MockChain } from "../mockChain";
 import { MockUTxOCollection } from "../mockUtxoCollection";
 
-export type MockUTxOInput = OneOrMore<BoxCandidate<Amount>> | OneOrMore<Box<Amount>>;
+export type MockUTxOInput =
+  | OneOrMore<BoxCandidate<Amount>>
+  | OneOrMore<Box<Amount>>;
 
 export type AddBalance = {
   nanoergs?: Amount;
@@ -80,7 +82,10 @@ export abstract class MockChainParty {
     return this.addUTxOs(utxos);
   }
 
-  addBalance(balance: AddBalance, additionalRegisters?: NonMandatoryRegisters): MockChainParty {
+  addBalance(
+    balance: AddBalance,
+    additionalRegisters?: NonMandatoryRegisters
+  ): MockChainParty {
     this.addUTxOs({
       value: balance.nanoergs || SAFE_MIN_BOX_VALUE,
       assets: balance.tokens || [],
@@ -97,11 +102,19 @@ export abstract class MockChainParty {
    * @param utxos
    * @returns
    */
-  withBalance(balance: AddBalance, additionalRegisters?: NonMandatoryRegisters): MockChainParty {
+  withBalance(
+    balance: AddBalance,
+    additionalRegisters?: NonMandatoryRegisters
+  ): MockChainParty {
     return this.addBalance(balance, additionalRegisters);
   }
 
   toString(width = 50): string {
-    return stringifyBalance(this.balance, this.name, width, this._chain.assetsMetadata);
+    return stringifyBalance(
+      this.balance,
+      this.name,
+      width,
+      this._chain.assetsMetadata
+    );
   }
 }

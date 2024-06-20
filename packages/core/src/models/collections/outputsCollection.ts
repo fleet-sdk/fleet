@@ -15,7 +15,10 @@ function setsum<K>(map: Map<K, bigint>, key: K, value: bigint) {
   return map.set(key, (map.get(key) || _0n) + value);
 }
 
-export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> {
+export class OutputsCollection extends Collection<
+  OutputBuilder,
+  OutputBuilder
+> {
   constructor(outputs?: OneOrMore<OutputBuilder>) {
     super();
 

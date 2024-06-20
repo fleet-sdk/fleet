@@ -23,7 +23,10 @@ describe("Transaction signing", () => {
     const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
 
     // mock inputs
-    const input = mockUTxO({ value: 1_000_000_000n, ergoTree: rootKey.address.ergoTree });
+    const input = mockUTxO({
+      value: 1_000_000_000n,
+      ergoTree: rootKey.address.ergoTree
+    });
 
     // build the unsigned transaction
     const unsignedTx = new TransactionBuilder(height)
@@ -94,7 +97,10 @@ describe("Transaction signing", () => {
     const child2 = rootKey.deriveChild(2);
 
     // mock inputs
-    const input = mockUTxO({ value: 1_000_000_000n, ergoTree: rootKey.address.ergoTree });
+    const input = mockUTxO({
+      value: 1_000_000_000n,
+      ergoTree: rootKey.address.ergoTree
+    });
 
     // build the unsigned transaction
     const unsignedTx = new TransactionBuilder(height)
@@ -106,7 +112,11 @@ describe("Transaction signing", () => {
 
     // sign
     const prover = new Prover();
-    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [rootKey, child1, child2]);
+    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [
+      rootKey,
+      child1,
+      child2
+    ]);
 
     // verify
     const proof = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
@@ -143,7 +153,11 @@ describe("Transaction signing", () => {
 
     // sign
     const prover = new Prover();
-    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [rootKey, child1, child2]);
+    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [
+      rootKey,
+      child1,
+      child2
+    ]);
 
     // verify
     const txBytes = unsignedTx.toBytes();
@@ -253,7 +267,10 @@ describe("Transaction signing", () => {
     const child2 = rootKey.deriveChild(2);
 
     // mock inputs
-    const input = mockUTxO({ value: 1_000_000_000n, ergoTree: rootKey.address.ergoTree });
+    const input = mockUTxO({
+      value: 1_000_000_000n,
+      ergoTree: rootKey.address.ergoTree
+    });
 
     // build the unsigned transaction
     const unsignedTx = new TransactionBuilder(height)
@@ -275,7 +292,10 @@ describe("Transaction signing", () => {
 
     // mock inputs
     const inputs = Array.from({ length: 10 }).map((_, index) =>
-      mockUTxO({ value: 1_000_000_000n * BigInt(index + 1), ergoTree: rootKey.address.ergoTree })
+      mockUTxO({
+        value: 1_000_000_000n * BigInt(index + 1),
+        ergoTree: rootKey.address.ergoTree
+      })
     );
 
     // build the unsigned transaction
@@ -316,7 +336,10 @@ describe("Transaction signing", () => {
     const neuteredKey = key.wipePrivateData();
 
     // mock inputs
-    const input = mockUTxO({ value: 1_000_000_000n, ergoTree: neuteredKey.address.ergoTree });
+    const input = mockUTxO({
+      value: 1_000_000_000n,
+      ergoTree: neuteredKey.address.ergoTree
+    });
 
     // build the unsigned transaction
     const unsignedTx = new TransactionBuilder(height)
@@ -329,7 +352,9 @@ describe("Transaction signing", () => {
     // sign
     const prover = new Prover();
     expect(() =>
-      prover.signTransaction(unsignedTx.toEIP12Object(), [neuteredKey as ErgoHDKey])
+      prover.signTransaction(unsignedTx.toEIP12Object(), [
+        neuteredKey as ErgoHDKey
+      ])
     ).to.throw("Private key is not present");
   });
 });
@@ -339,7 +364,10 @@ describe("Transaction proof verification", () => {
   const rootKey = ErgoHDKey.fromMnemonicSync(generateMnemonic());
 
   // mock inputs
-  const input = mockUTxO({ value: 1_000_000_000n, ergoTree: rootKey.address.ergoTree });
+  const input = mockUTxO({
+    value: 1_000_000_000n,
+    ergoTree: rootKey.address.ergoTree
+  });
 
   // build the unsigned transaction
   const unsignedTx = new TransactionBuilder(height)
@@ -363,7 +391,8 @@ describe("Transaction proof verification", () => {
     const prover = new Prover();
     const proof = signedTx.inputs[0].spendingProof.proofBytes;
 
-    expect(prover.verify(hex.encode(unsignedTx.toBytes()), proof, rootKey)).to.be.true;
+    expect(prover.verify(hex.encode(unsignedTx.toBytes()), proof, rootKey)).to
+      .be.true;
   });
 
   it("Should verify from SignedTransaction", () => {
@@ -384,14 +413,16 @@ describe("Transaction proof verification", () => {
     const prover = new Prover();
     const proof = signedTx.inputs[0].spendingProof.proofBytes;
 
-    expect(prover.verify(unsignedTx.toEIP12Object(), proof, rootKey)).to.be.true;
+    expect(prover.verify(unsignedTx.toEIP12Object(), proof, rootKey)).to.be
+      .true;
   });
 
   it("Should verify from PlainObject", () => {
     const prover = new Prover();
     const proof = signedTx.inputs[0].spendingProof.proofBytes;
 
-    expect(prover.verify(unsignedTx.toPlainObject(), proof, rootKey)).to.be.true;
+    expect(prover.verify(unsignedTx.toPlainObject(), proof, rootKey)).to.be
+      .true;
   });
 });
 
@@ -411,7 +442,9 @@ describe("Message proof verification", () => {
     const message = ErgoMessage.fromData("hello world");
     const proof = prover.signMessage(message, key);
 
-    expect(prover.verify(message.serialize().encode(hex), hex.encode(proof), key)).to.be.true;
+    expect(
+      prover.verify(message.serialize().encode(hex), hex.encode(proof), key)
+    ).to.be.true;
   });
 
   it("Should verify from ErgoMessage", () => {
@@ -493,8 +526,8 @@ describe("Message signing", () => {
 
     // sign
     const prover = new Prover();
-    expect(() => prover.signMessage(message, neuteredKey as ErgoHDKey)).to.throw(
-      "Private key is not present"
-    );
+    expect(() =>
+      prover.signMessage(message, neuteredKey as ErgoHDKey)
+    ).to.throw("Private key is not present");
   });
 });

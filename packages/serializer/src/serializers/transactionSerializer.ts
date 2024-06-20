@@ -15,7 +15,9 @@ export type MinimalUnsignedTransaction = {
   outputs: readonly BoxCandidate<Amount>[];
 };
 
-export function serializeTransaction(transaction: MinimalUnsignedTransaction): SigmaByteWriter {
+export function serializeTransaction(
+  transaction: MinimalUnsignedTransaction
+): SigmaByteWriter {
   const writer = new SigmaByteWriter(100_000);
 
   // write inputs
@@ -33,7 +35,9 @@ export function serializeTransaction(transaction: MinimalUnsignedTransaction): S
 
   // write outputs
   writer.writeVLQ(transaction.outputs.length);
-  transaction.outputs.map((output) => serializeBox(output, writer, distinctTokenIds));
+  transaction.outputs.map((output) =>
+    serializeBox(output, writer, distinctTokenIds)
+  );
 
   return writer;
 }
@@ -44,7 +48,10 @@ function writeInput(writer: SigmaByteWriter, input: UnsignedInput): void {
   writeExtension(writer, input.extension);
 }
 
-function writeExtension(writer: SigmaByteWriter, extension: ContextExtension): void {
+function writeExtension(
+  writer: SigmaByteWriter,
+  extension: ContextExtension
+): void {
   const keys = Object.keys(extension);
   let length = 0;
 
@@ -68,7 +75,9 @@ function writeExtension(writer: SigmaByteWriter, extension: ContextExtension): v
 
 function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {
   const tokenIds = new Set<string>();
-  outputs.flatMap((output) => output.assets.map((asset) => tokenIds.add(asset.tokenId)));
+  outputs.flatMap((output) =>
+    output.assets.map((asset) => tokenIds.add(asset.tokenId))
+  );
 
   return Array.from(tokenIds);
 }

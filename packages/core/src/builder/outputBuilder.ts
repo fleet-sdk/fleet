@@ -21,23 +21,36 @@ import {
   UnsignedInput
 } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
-import { estimateBoxSize, SByte, SColl, SConstant } from "@fleet-sdk/serializer";
+import {
+  estimateBoxSize,
+  SByte,
+  SColl,
+  SConstant
+} from "@fleet-sdk/serializer";
 import { InvalidRegistersPacking, UndefinedCreationHeight } from "../errors";
 import { ErgoAddress, ErgoTree } from "../models";
-import { TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
+import {
+  TokenAddOptions,
+  TokensCollection
+} from "../models/collections/tokensCollection";
 
 export const BOX_VALUE_PER_BYTE = BigInt(360);
 export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 
-export type BoxValueEstimationCallback = (outputBuilder: OutputBuilder) => bigint;
+export type BoxValueEstimationCallback = (
+  outputBuilder: OutputBuilder
+) => bigint;
 
-export function estimateMinBoxValue(valuePerByte = BOX_VALUE_PER_BYTE): BoxValueEstimationCallback {
+export function estimateMinBoxValue(
+  valuePerByte = BOX_VALUE_PER_BYTE
+): BoxValueEstimationCallback {
   return (output) => {
     return BigInt(output.estimateSize()) * valuePerByte;
   };
 }
 
-const DUMB_TOKEN_ID = "0000000000000000000000000000000000000000000000000000000000000000";
+const DUMB_TOKEN_ID =
+  "0000000000000000000000000000000000000000000000000000000000000000";
 
 export class OutputBuilder {
   private readonly _address: ErgoAddress;
@@ -70,7 +83,9 @@ export class OutputBuilder {
   }
 
   public get value(): bigint {
-    return isDefined(this._valueEstimator) ? this._valueEstimator(this) : this._value;
+    return isDefined(this._valueEstimator)
+      ? this._valueEstimator(this)
+      : this._value;
   }
 
   public get address(): ErgoAddress {
@@ -105,7 +120,9 @@ export class OutputBuilder {
       this._valueEstimator = undefined;
 
       if (this._value <= _0n) {
-        throw new Error("An UTxO cannot be created without a minimum required amount.");
+        throw new Error(
+          "An UTxO cannot be created without a minimum required amount."
+        );
       }
     }
 
@@ -136,7 +153,10 @@ export class OutputBuilder {
     return this;
   }
 
-  public setCreationHeight(height: number, options?: { replace: boolean }): OutputBuilder {
+  public setCreationHeight(
+    height: number,
+    options?: { replace: boolean }
+  ): OutputBuilder {
     if (
       isUndefined(options) ||
       options.replace === true ||
@@ -156,32 +176,43 @@ export class OutputBuilder {
       const r = registers[key] as ConstantInput;
       if (!r) continue;
 
-      hexRegisters[key as keyof NonMandatoryRegisters] = typeof r === "string" ? r : r.toHex();
+      hexRegisters[key as keyof NonMandatoryRegisters] =
+        typeof r === "string" ? r : r.toHex();
     }
 
-    if (!areRegistersDenselyPacked(hexRegisters)) throw new InvalidRegistersPacking();
+    if (!areRegistersDenselyPacked(hexRegisters))
+      throw new InvalidRegistersPacking();
     this._registers = hexRegisters;
 
     return this;
   }
 
-  public eject(ejector: (context: { tokens: TokensCollection }) => void): OutputBuilder {
+  public eject(
+    ejector: (context: { tokens: TokensCollection }) => void
+  ): OutputBuilder {
     ejector({ tokens: this._tokens });
     return this;
   }
 
-  public build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<bigint> {
+  public build(
+    transactionInputs?: UnsignedInput[] | Box<Amount>[]
+  ): BoxCandidate<bigint> {
     let tokens: TokenAmount<bigint>[];
 
     if (this.minting) {
-      const mintingTokenId = transactionInputs ? transactionInputs[0]?.boxId : undefined;
+      const mintingTokenId = transactionInputs
+        ? transactionInputs[0]?.boxId
+        : undefined;
       tokens = this.assets.toArray(mintingTokenId);
 
       if (isEmpty(this.additionalRegisters)) {
         this.setAdditionalRegisters({
           R4: SColl(SByte, utf8.decode(this.minting.name || "")),
           R5: SColl(SByte, utf8.decode(this.minting.description || "")),
-          R6: SColl(SByte, utf8.decode(this.minting.decimals?.toString() || "0"))
+          R6: SColl(
+            SByte,
+            utf8.decode(this.minting.decimals?.toString() || "0")
+          )
         });
       }
     } else {
@@ -257,7 +288,9 @@ export type R4ToR9Registers<T = HexString> = {
   R9: T;
 } & NonMandatoryRegisters<T>;
 
-export type SequentialNonMandatoryRegisters<T extends AdditionalRegistersInput> = T extends {
+export type SequentialNonMandatoryRegisters<
+  T extends AdditionalRegistersInput
+> = T extends {
   R9: ConstantInput;
 }
   ? R4ToR9Registers<ConstantInput>

@@ -3,7 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NotAllowedTokenBurning } from "../errors";
 import { OutputBuilder } from "./outputBuilder";
 import { createPluginContext, FleetPluginContext } from "./pluginContext";
-import { RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from "./transactionBuilder";
+import {
+  RECOMMENDED_MIN_FEE_VALUE,
+  TransactionBuilder
+} from "./transactionBuilder";
 
 describe("Plugin context", () => {
   const creationHeight = 894169;
@@ -58,14 +61,20 @@ describe("Plugin context", () => {
     const toMethod = vi.spyOn(builder, "to");
 
     let newLen = context.addOutputs(
-      new OutputBuilder(10000n, "9gn5Jo6T7m4pAzCdD9JFdRMPxnfKLPgcX68rD8RQvPLyJsTpKcq")
+      new OutputBuilder(
+        10000n,
+        "9gn5Jo6T7m4pAzCdD9JFdRMPxnfKLPgcX68rD8RQvPLyJsTpKcq"
+      )
     );
 
     expect(toMethod).toBeCalledTimes(1);
     expect(newLen).toBe(builder.outputs.length);
 
     newLen = context.addOutputs(
-      new OutputBuilder(20000n, "9gn5Jo6T7m4pAzCdD9JFdRMPxnfKLPgcX68rD8RQvPLyJsTpKcq")
+      new OutputBuilder(
+        20000n,
+        "9gn5Jo6T7m4pAzCdD9JFdRMPxnfKLPgcX68rD8RQvPLyJsTpKcq"
+      )
     );
 
     expect(toMethod).toBeCalledTimes(2);
@@ -76,11 +85,21 @@ describe("Plugin context", () => {
   it("Should burn tokens, plugin context allowed", () => {
     const burnTokensMethod = vi.spyOn(builder, "burnTokens");
 
-    builder.from(regularBoxes).configure((settings) => settings.allowTokenBurningFromPlugins(true));
+    builder
+      .from(regularBoxes)
+      .configure((settings) => settings.allowTokenBurningFromPlugins(true));
 
     context.burnTokens([
-      { tokenId: "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2", amount: 1n },
-      { tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283", amount: 126n }
+      {
+        tokenId:
+          "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2",
+        amount: 1n
+      },
+      {
+        tokenId:
+          "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+        amount: 126n
+      }
     ]);
 
     expect(burnTokensMethod).toBeCalledTimes(1);
@@ -90,11 +109,21 @@ describe("Plugin context", () => {
   it("Should burn tokens, globally allowed", () => {
     const burnTokensMethod = vi.spyOn(builder, "burnTokens");
 
-    builder.from(regularBoxes).configure((settings) => settings.allowTokenBurning(true));
+    builder
+      .from(regularBoxes)
+      .configure((settings) => settings.allowTokenBurning(true));
 
     context.burnTokens([
-      { tokenId: "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2", amount: 1n },
-      { tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283", amount: 126n }
+      {
+        tokenId:
+          "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2",
+        amount: 1n
+      },
+      {
+        tokenId:
+          "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+        amount: 126n
+      }
     ]);
 
     expect(burnTokensMethod).toBeCalledTimes(1);
@@ -108,9 +137,14 @@ describe("Plugin context", () => {
 
     expect(() => {
       context.burnTokens([
-        { tokenId: "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2", amount: 1n },
         {
-          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId:
+            "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2",
+          amount: 1n
+        },
+        {
+          tokenId:
+            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 126n
         }
       ]);

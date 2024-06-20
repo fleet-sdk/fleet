@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { zigZagDecode, zigZagDecodeBigInt, zigZagEncode, zigZagEncodeBigInt } from "./zigZag";
+import {
+  zigZagDecode,
+  zigZagDecodeBigInt,
+  zigZagEncode,
+  zigZagEncodeBigInt
+} from "./zigZag";
 
 describe("ZigZag encoding", () => {
   it("Should encode", () => {
@@ -61,7 +66,11 @@ describe("BigInt ZigZag encoding", () => {
 
   it("Should encode/decode radom numbers", () => {
     Array.from(Array(100))
-      .map(() => BigInt(Math.ceil(Math.random() * 1000)) * BigInt(Number.MAX_SAFE_INTEGER))
+      .map(
+        () =>
+          BigInt(Math.ceil(Math.random() * 1000)) *
+          BigInt(Number.MAX_SAFE_INTEGER)
+      )
       .forEach((n) => {
         expect(zigZagDecodeBigInt(zigZagEncodeBigInt(n))).toBe(n);
       });

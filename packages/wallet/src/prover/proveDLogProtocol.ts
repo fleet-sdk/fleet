@@ -1,5 +1,11 @@
 import { _0n, concatBytes, FleetError } from "@fleet-sdk/common";
-import { bigintBE, blake2b256, hex, randomBytes, validateEcPoint } from "@fleet-sdk/crypto";
+import {
+  bigintBE,
+  blake2b256,
+  hex,
+  randomBytes,
+  validateEcPoint
+} from "@fleet-sdk/crypto";
 import { secp256k1 } from "@noble/curves/secp256k1";
 
 const { ProjectivePoint: ECPoint, CURVE } = secp256k1;
@@ -38,7 +44,10 @@ export function sign(message: Uint8Array, secretKey: Uint8Array) {
  * @returns The generated signature as a Uint8Array, or undefined if the verification fails.
  * @throws Error if failed to generate commitment.
  */
-export function genSignature(message: Uint8Array, secretKey: Uint8Array): undefined | Uint8Array {
+export function genSignature(
+  message: Uint8Array,
+  secretKey: Uint8Array
+): undefined | Uint8Array {
   const sk = bigintBE.encode(secretKey);
   const pk = G.multiply(sk).toRawBytes();
   const r = genRandomSecret();
@@ -99,12 +108,18 @@ export function umod(a: bigint, b: bigint): bigint {
  * @returns A boolean indicating whether the signature is valid or not.
  * @throws FleetError if the public key is invalid.
  */
-export function verify(message: Uint8Array, proof: Uint8Array, publicKey: Uint8Array) {
+export function verify(
+  message: Uint8Array,
+  proof: Uint8Array,
+  publicKey: Uint8Array
+) {
   if (!proof || proof.length !== ERGO_SCHNORR_SIG_LEN) return false;
   if (!validateEcPoint(publicKey)) throw new FleetError("Invalid Public Key.");
 
   const pc = bigintBE.encode(proof.slice(0, ERGO_SOUNDNESS_BYTES));
-  const pz = bigintBE.encode(proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN));
+  const pz = bigintBE.encode(
+    proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN)
+  );
 
   const vt = ECPoint.fromHex(publicKey).multiply(CURVE.n - pc);
   const vw = G.multiply(pz).add(vt).toRawBytes();

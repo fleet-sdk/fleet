@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { SigmaByteReader } from "./sigmaByteReader";
 import { SigmaByteWriter } from "./sigmaByteWriter";
-import { estimateVLQSize, readBigVLQ, readVLQ, writeBigVLQ, writeVLQ } from "./vlq";
+import {
+  estimateVLQSize,
+  readBigVLQ,
+  readVLQ,
+  writeBigVLQ,
+  writeVLQ
+} from "./vlq";
 
 describe("VLQ encoding/decoding", () => {
   const testVectors = [
@@ -77,7 +83,10 @@ describe("Big VLQ encoding/decoding", () => {
     { uint: 2097151n, bytes: Uint8Array.from([0xff, 0xff, 0x7f]) },
     { uint: 2097152n, bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x01]) },
     { uint: 268435455n, bytes: Uint8Array.from([0xff, 0xff, 0xff, 0x7f]) },
-    { uint: 268435456n, bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x01]) }
+    {
+      uint: 268435456n,
+      bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x01])
+    }
   ];
 
   it("Should encode", () => {
@@ -104,7 +113,11 @@ describe("Big VLQ encoding/decoding", () => {
 
   it("Should encode/decode radom numbers", () => {
     Array.from(Array(100))
-      .map(() => BigInt(Math.ceil(Math.random() * 100000000000)) * BigInt(Number.MAX_SAFE_INTEGER))
+      .map(
+        () =>
+          BigInt(Math.ceil(Math.random() * 100000000000)) *
+          BigInt(Number.MAX_SAFE_INTEGER)
+      )
       .forEach((n) => {
         expect(readBigVLQ(new SigmaByteReader(toBigVLQBytes(n)))).toBe(n);
       });

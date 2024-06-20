@@ -18,18 +18,27 @@ import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 export const MAX_TOKENS_PER_BOX = 120;
 
 export type TokenAddOptions = CollectionAddOptions & { sum?: boolean };
-export type OutputToken<T extends Amount = Amount> = { tokenId?: TokenId; amount: T };
+export type OutputToken<T extends Amount = Amount> = {
+  tokenId?: TokenId;
+  amount: T;
+};
 
 type MintingData = { index: number; metadata: NewToken<Amount> };
 
-export class TokensCollection extends Collection<OutputToken<bigint>, OutputToken> {
+export class TokensCollection extends Collection<
+  OutputToken<bigint>,
+  OutputToken
+> {
   #minting: MintingData | undefined;
 
   constructor();
   constructor(token: TokenAmount<Amount>);
   constructor(tokens: TokenAmount<Amount>[]);
   constructor(tokens: TokenAmount<Amount>[], options: TokenAddOptions);
-  constructor(tokens?: OneOrMore<TokenAmount<Amount>>, options?: TokenAddOptions) {
+  constructor(
+    tokens?: OneOrMore<TokenAmount<Amount>>,
+    options?: TokenAddOptions
+  ) {
     super();
 
     if (isDefined(tokens)) {
@@ -39,14 +48,20 @@ export class TokensCollection extends Collection<OutputToken<bigint>, OutputToke
 
   public get minting(): NewToken<bigint> | undefined {
     if (!this.#minting) return;
-    return { ...this.#minting.metadata, amount: this._items[this.#minting.index].amount };
+    return {
+      ...this.#minting.metadata,
+      amount: this._items[this.#minting.index].amount
+    };
   }
 
   protected override _map(token: OutputToken): OutputToken<bigint> {
     return { tokenId: token.tokenId, amount: ensureBigInt(token.amount) };
   }
 
-  protected override _addOne(token: OutputToken, options?: TokenAddOptions): number {
+  protected override _addOne(
+    token: OutputToken,
+    options?: TokenAddOptions
+  ): number {
     if (isUndefined(options) || (options.sum && isUndefined(options.index))) {
       if (this._sum(this._map(token))) return this.length;
     }
@@ -57,9 +72,13 @@ export class TokensCollection extends Collection<OutputToken<bigint>, OutputToke
     return this.length;
   }
 
-  public override add(items: OneOrMore<TokenAmount<Amount>>, options?: TokenAddOptions): number {
+  public override add(
+    items: OneOrMore<TokenAmount<Amount>>,
+    options?: TokenAddOptions
+  ): number {
     if (Array.isArray(items)) {
-      if (items.some((x) => !x.tokenId)) throw new FleetError("TokenID is required.");
+      if (items.some((x) => !x.tokenId))
+        throw new FleetError("TokenID is required.");
     } else if (!items.tokenId) {
       throw new FleetError("TokenID is required.");
     }
@@ -69,7 +88,9 @@ export class TokensCollection extends Collection<OutputToken<bigint>, OutputToke
 
   public mint(token: NewToken<Amount>): number {
     if (isDefined(this.#minting)) {
-      throw new FleetError("Only one minting token is allowed per transaction.");
+      throw new FleetError(
+        "Only one minting token is allowed per transaction."
+      );
     } else {
       const len = super.add({ tokenId: token.tokenId, amount: token.amount });
       this.#minting = { index: len - 1, metadata: token };
@@ -100,10 +121,14 @@ export class TokensCollection extends Collection<OutputToken<bigint>, OutputToke
 
       index = tokenIdOrIndex;
     } else {
-      index = this._items.findIndex((token) => token.tokenId === tokenIdOrIndex);
+      index = this._items.findIndex(
+        (token) => token.tokenId === tokenIdOrIndex
+      );
 
       if (this._isIndexOutOfBounds(index)) {
-        throw new NotFoundError(`TokenId '${tokenIdOrIndex}' not found in assets collection.`);
+        throw new NotFoundError(
+          `TokenId '${tokenIdOrIndex}' not found in assets collection.`
+        );
       }
     }
 

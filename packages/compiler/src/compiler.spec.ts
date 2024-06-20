@@ -2,7 +2,12 @@ import { hex } from "@fleet-sdk/crypto";
 import { SInt } from "@fleet-sdk/serializer";
 import { HexString, Value, Value$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
-import { compile, compilerDefaults, CompilerOptions, parseNamedConstantsMap } from "./compiler";
+import {
+  compile,
+  compilerDefaults,
+  CompilerOptions,
+  parseNamedConstantsMap
+} from "./compiler";
 
 const compilerTestVectors: {
   name: string;
@@ -70,7 +75,11 @@ const compilerTestVectors: {
     script: "sigmaProp(HEIGHT > deadline)",
     tree: "19090104c801d191a37300",
     template: "d191a37300",
-    options: { version: 1, segregateConstants: true, map: { deadline: SInt(100) } }
+    options: {
+      version: 1,
+      segregateConstants: true,
+      map: { deadline: SInt(100) }
+    }
   }
 ];
 
@@ -82,7 +91,9 @@ describe("ErgoScript Compiler", () => {
     expect(tree.template.toHex()).to.be.equal(tv.template);
     expect(hex.encode(tree.template.toBytes())).to.be.equal(tv.template);
 
-    expect(tree.hasSegregatedConstants).to.be.equal(tv.options.segregateConstants);
+    expect(tree.hasSegregatedConstants).to.be.equal(
+      tv.options.segregateConstants
+    );
     expect(tree.version).to.be.equal(tv.options.version);
 
     if (tv.options.version === 1) {
@@ -149,14 +160,14 @@ describe("Compiler constants map parsing", () => {
   });
 
   it("Should throw is an invalid hex string is passed", () => {
-    expect(() => parseNamedConstantsMap({ invalidHex: "non-hex string" })).to.throw(
-      "'non-hex string' is not a valid hex string."
-    );
+    expect(() =>
+      parseNamedConstantsMap({ invalidHex: "non-hex string" })
+    ).to.throw("'non-hex string' is not a valid hex string.");
   });
 
   it("Should throw is unsupported type is passed", () => {
-    expect(() => parseNamedConstantsMap({ invalidHex: 23 as unknown as HexString })).to.throw(
-      "Unsupported constant object mapping."
-    );
+    expect(() =>
+      parseNamedConstantsMap({ invalidHex: 23 as unknown as HexString })
+    ).to.throw("Unsupported constant object mapping.");
   });
 });

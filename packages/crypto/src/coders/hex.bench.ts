@@ -4,7 +4,9 @@ import { bench, describe } from "vitest";
 import { regularBoxes, validBoxes } from "../../../_test-vectors/mockedBoxes";
 import { hex as fleetHex } from "./hex";
 
-const hexString = [...regularBoxes, ...validBoxes].map((x) => x.ergoTree).join("");
+const hexString = [...regularBoxes, ...validBoxes]
+  .map((x) => x.ergoTree)
+  .join("");
 const bytes = hexToBytes(hexString);
 
 describe("Decode hex to bytes", () => {

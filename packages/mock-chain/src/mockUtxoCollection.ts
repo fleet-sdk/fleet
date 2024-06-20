@@ -31,7 +31,9 @@ export class MockUTxOCollection extends Collection<Box<bigint>, MockUTxOInput> {
     }
   }
 
-  protected override _map(utxo: BoxCandidate<Amount> | Box<Amount>): Box<bigint> {
+  protected override _map(
+    utxo: BoxCandidate<Amount> | Box<Amount>
+  ): Box<bigint> {
     if (isUTxOCandidate(utxo)) {
       return mockUTxO(ensureUTxOBigInt(utxo));
     }

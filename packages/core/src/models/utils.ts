@@ -60,7 +60,8 @@ export function encodeAddress(
 export function validateUnpackedAddress(unpacked: UnpackedAddress): boolean {
   const content = concatBytes(unpacked.head, unpacked.body);
   if (isEmpty(unpacked.body)) return false;
-  if (unpacked.type === AddressType.P2PK && !validateEcPoint(unpacked.body)) return false;
+  if (unpacked.type === AddressType.P2PK && !validateEcPoint(unpacked.body))
+    return false;
 
   const checksum = blake2b256(content).subarray(0, CHECKSUM_LENGTH);
   return areEqual(checksum, unpacked.checksum);

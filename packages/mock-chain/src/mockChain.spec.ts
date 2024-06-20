@@ -23,7 +23,10 @@ describe("Mock chain instantiation", () => {
   it("Should create with custom parameters", () => {
     const customHeightChain = new MockChain(10);
     expect(customHeightChain.height).to.be.equal(10);
-    expect(customHeightChain.timestamp).to.be.closeTo(new Date().getTime(), 100);
+    expect(customHeightChain.timestamp).to.be.closeTo(
+      new Date().getTime(),
+      100
+    );
 
     const params = { height: 1231, timestamp: new Date().getTime() };
     const customParamsChain = new MockChain(params);
@@ -129,8 +132,10 @@ describe("Contract execution and chain mocking", () => {
     return;
   });
 
-  const SIGUSD_TOKEN_ID = "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04";
-  const SIGRSV_TOKEN_ID = "003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0";
+  const SIGUSD_TOKEN_ID =
+    "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04";
+  const SIGRSV_TOKEN_ID =
+    "003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0";
 
   afterEach(() => {
     consoleMock.mockReset();
@@ -283,7 +288,10 @@ describe("Contract execution and chain mocking", () => {
       tokens: [{ tokenId, amount: 1000n }]
     });
 
-    expect(chain.assetsMetadata.get(tokenId)).to.be.deep.equal({ name: "Test Token", decimals: 2 });
+    expect(chain.assetsMetadata.get(tokenId)).to.be.deep.equal({
+      name: "Test Token",
+      decimals: 2
+    });
   });
 
   it("Should add minting token metadata to assetMetadataMap", () => {
@@ -403,10 +411,14 @@ describe("Contract execution and chain mocking", () => {
       .build();
 
     // should throw by default
-    expect(() => chain.execute(unsignedTransaction, { signers: [alice] })).to.throw();
+    expect(() =>
+      chain.execute(unsignedTransaction, { signers: [alice] })
+    ).to.throw();
 
     // should throw if { throw: true }
-    expect(() => chain.execute(unsignedTransaction, { signers: [alice], throw: true })).to.throw();
+    expect(() =>
+      chain.execute(unsignedTransaction, { signers: [alice], throw: true })
+    ).to.throw();
 
     // should not throw if { throw: false }
     expect(() =>
@@ -415,7 +427,11 @@ describe("Contract execution and chain mocking", () => {
 
     // log error message if { log: true }
     expect(() =>
-      chain.execute(unsignedTransaction, { signers: [alice], log: true, throw: false })
+      chain.execute(unsignedTransaction, {
+        signers: [alice],
+        log: true,
+        throw: false
+      })
     ).not.to.throw();
 
     expect(consoleMock.mock.calls[0][0]).to.include(

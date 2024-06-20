@@ -1,6 +1,16 @@
 import { hex, utf8 } from "@fleet-sdk/crypto";
 import { SConstant } from "../sigmaConstant";
-import { SBigInt, SBool, SByte, SColl, SGroupElement, SInt, SLong, SPair, SShort } from "../types";
+import {
+  SBigInt,
+  SBool,
+  SByte,
+  SColl,
+  SGroupElement,
+  SInt,
+  SLong,
+  SPair,
+  SShort
+} from "../types";
 import { SConstructor, STuple } from "../types/constructors";
 
 const u8a = (input: number[]) => Uint8Array.from(input);
@@ -76,40 +86,142 @@ export const bigintVectors: ConstantTestVector<string>[] = [
   { hex: "060400c1f4a5", value: "12711077" },
   { hex: "060519debd01c7", value: "111111111111" },
   { hex: "06060102b36211c7", value: "1111111111111" },
-  { hex: "060f9c2404f2634ef40afccc320eed30b3", value: "-518499127179672366370132270668500813" },
-  { hex: "060fa48aae0a58c333fcb45c22eb77423f", value: "-474878549557465338514633771922800065" },
-  { hex: "060fdd1c7569871f783f9e7c9489215a93", value: "-181153180225522922855494996901930349" },
-  { hex: "060ff0be3a08b885a5c09b96aee8797fef", value: "-79218493979484035630659040499367953" },
-  { hex: "060fb5c30093fd377e9986d2cb46a6aa80", value: "-385467148716983254797818803869275520" },
-  { hex: "060fcbc5a938f002f37a8784120c51000e", value: "-271182691629644891741764079254962162" },
-  { hex: "06100080c2a6bf0e86c4b39aaf5b72bf25cf", value: "668561996359741991358095026099791311" },
-  { hex: "061000844935789da1a1015e411873fd04a3", value: "686868037649042878185896845279823011" },
-  { hex: "06100085a44d9646705fedbf146bcd80d8ef", value: "693907944436551502091064778281769199" },
-  { hex: "061000c04e5372d5aec10adf40f09f9695ab", value: "998509636264877990895239100406076843" },
-  { hex: "061000c1152c6ecd3042dd7af6d46b4c5e9f", value: "1002542744629457825420725569826086559" },
-  { hex: "061000fb98488ddf56996aeb9434f5803b8f", value: "1306355186087083611855402901922921359" },
-  { hex: "061000fec346162748f0e3c268260919f73f", value: "1322804024768097068934748188867950399" },
-  { hex: "061000ff0aed27d915df669709f890468527", value: "1324257312429289019228814893866452263" },
-  { hex: "06104b3b4ca85a86c47a098a223fffffffff", value: "99999999999999999999999999999999999999" },
-  { hex: "0610fd399ad011430f3cf1173d88e0157d88", value: "-3688583090539181963106320020268548728" },
-  { hex: "0610efcb7de64abd55fa4a07b00ffcc80e04", value: "-21540286119252381366314201135174906364" },
-  { hex: "0610f7ee0f9e6b31e5b8bf79c0103cd98a94", value: "-10726968522364003605754510423632541036" },
-  { hex: "0610e568d66fc6ef02311087197a516bfd08", value: "-35344807721356910388894827443251315448" },
-  { hex: "0610ea4b448df22c343557e9d34980ecd344", value: "-28852203192905262646985616891927801020" },
-  { hex: "0610ed8d2982d73cf954ca90f09eebd46697", value: "-24522376117792124222555029947659557225" },
-  { hex: "0610f6a12915ff35fbfdc0de719c2b44239f", value: "-12455486842055948395012500175862881377" },
-  { hex: "0610e730b99d5580f36594530fd961844c3d", value: "-32977704934352917049306884343898813379" },
-  { hex: "0610f51c7da6efcc5267e609d013e6464820", value: "-14473575114305738236514890463904905184" },
-  { hex: "0610eb5839c44ec0be3d5b95d4c9522d72ca", value: "-27455694137492064653731458579914984758" },
-  { hex: "0610f7ce9e56ef64e15237a2ab2d91aa1f6b", value: "-10890227300777841195633415700652351637" },
-  { hex: "0610d3d187be808cd61d4215be07445d3179", value: "-58727316548455722622554018085215587975" },
-  { hex: "0610edad8f7090c4b7782c4d8e563c3e731c", value: "-24354155260455695334173947929779342564" },
-  { hex: "0610f34e21b2b957ed470b2baabc227286a0", value: "-16874281310747317873912526684847700320" },
-  { hex: "0610da31d4846523942d30bf81311ed324e8", value: "-50251930933504172440026254536365366040" },
-  { hex: "0610eee296791bc9b5bc269844845d3d5eec", value: "-22749592877451455117651003320075198740" },
-  { hex: "0610f43d7dea14e4619a1e2e43774e908e20", value: "-15631451993992084997026121768636477920" },
-  { hex: "0610ec6afd4980220003c03b50fee83e697f", value: "-26029039175752853511346953066928772737" },
-  { hex: "061913aaf504e4bc1e62173f87a4378c37b49c8ccff196ce3f0ad2", value: "123456789012345678901234567890123456789012345678901234567890" } /* biome-ignore format: */
+  {
+    hex: "060f9c2404f2634ef40afccc320eed30b3",
+    value: "-518499127179672366370132270668500813"
+  },
+  {
+    hex: "060fa48aae0a58c333fcb45c22eb77423f",
+    value: "-474878549557465338514633771922800065"
+  },
+  {
+    hex: "060fdd1c7569871f783f9e7c9489215a93",
+    value: "-181153180225522922855494996901930349"
+  },
+  {
+    hex: "060ff0be3a08b885a5c09b96aee8797fef",
+    value: "-79218493979484035630659040499367953"
+  },
+  {
+    hex: "060fb5c30093fd377e9986d2cb46a6aa80",
+    value: "-385467148716983254797818803869275520"
+  },
+  {
+    hex: "060fcbc5a938f002f37a8784120c51000e",
+    value: "-271182691629644891741764079254962162"
+  },
+  {
+    hex: "06100080c2a6bf0e86c4b39aaf5b72bf25cf",
+    value: "668561996359741991358095026099791311"
+  },
+  {
+    hex: "061000844935789da1a1015e411873fd04a3",
+    value: "686868037649042878185896845279823011"
+  },
+  {
+    hex: "06100085a44d9646705fedbf146bcd80d8ef",
+    value: "693907944436551502091064778281769199"
+  },
+  {
+    hex: "061000c04e5372d5aec10adf40f09f9695ab",
+    value: "998509636264877990895239100406076843"
+  },
+  {
+    hex: "061000c1152c6ecd3042dd7af6d46b4c5e9f",
+    value: "1002542744629457825420725569826086559"
+  },
+  {
+    hex: "061000fb98488ddf56996aeb9434f5803b8f",
+    value: "1306355186087083611855402901922921359"
+  },
+  {
+    hex: "061000fec346162748f0e3c268260919f73f",
+    value: "1322804024768097068934748188867950399"
+  },
+  {
+    hex: "061000ff0aed27d915df669709f890468527",
+    value: "1324257312429289019228814893866452263"
+  },
+  {
+    hex: "06104b3b4ca85a86c47a098a223fffffffff",
+    value: "99999999999999999999999999999999999999"
+  },
+  {
+    hex: "0610fd399ad011430f3cf1173d88e0157d88",
+    value: "-3688583090539181963106320020268548728"
+  },
+  {
+    hex: "0610efcb7de64abd55fa4a07b00ffcc80e04",
+    value: "-21540286119252381366314201135174906364"
+  },
+  {
+    hex: "0610f7ee0f9e6b31e5b8bf79c0103cd98a94",
+    value: "-10726968522364003605754510423632541036"
+  },
+  {
+    hex: "0610e568d66fc6ef02311087197a516bfd08",
+    value: "-35344807721356910388894827443251315448"
+  },
+  {
+    hex: "0610ea4b448df22c343557e9d34980ecd344",
+    value: "-28852203192905262646985616891927801020"
+  },
+  {
+    hex: "0610ed8d2982d73cf954ca90f09eebd46697",
+    value: "-24522376117792124222555029947659557225"
+  },
+  {
+    hex: "0610f6a12915ff35fbfdc0de719c2b44239f",
+    value: "-12455486842055948395012500175862881377"
+  },
+  {
+    hex: "0610e730b99d5580f36594530fd961844c3d",
+    value: "-32977704934352917049306884343898813379"
+  },
+  {
+    hex: "0610f51c7da6efcc5267e609d013e6464820",
+    value: "-14473575114305738236514890463904905184"
+  },
+  {
+    hex: "0610eb5839c44ec0be3d5b95d4c9522d72ca",
+    value: "-27455694137492064653731458579914984758"
+  },
+  {
+    hex: "0610f7ce9e56ef64e15237a2ab2d91aa1f6b",
+    value: "-10890227300777841195633415700652351637"
+  },
+  {
+    hex: "0610d3d187be808cd61d4215be07445d3179",
+    value: "-58727316548455722622554018085215587975"
+  },
+  {
+    hex: "0610edad8f7090c4b7782c4d8e563c3e731c",
+    value: "-24354155260455695334173947929779342564"
+  },
+  {
+    hex: "0610f34e21b2b957ed470b2baabc227286a0",
+    value: "-16874281310747317873912526684847700320"
+  },
+  {
+    hex: "0610da31d4846523942d30bf81311ed324e8",
+    value: "-50251930933504172440026254536365366040"
+  },
+  {
+    hex: "0610eee296791bc9b5bc269844845d3d5eec",
+    value: "-22749592877451455117651003320075198740"
+  },
+  {
+    hex: "0610f43d7dea14e4619a1e2e43774e908e20",
+    value: "-15631451993992084997026121768636477920"
+  },
+  {
+    hex: "0610ec6afd4980220003c03b50fee83e697f",
+    value: "-26029039175752853511346953066928772737"
+  },
+  {
+    hex: "061913aaf504e4bc1e62173f87a4378c37b49c8ccff196ce3f0ad2",
+    value: "123456789012345678901234567890123456789012345678901234567890"
+  }
 ];
 
 export const groupElementVectors: ConstantTestVector<string>[] = [
@@ -162,11 +274,11 @@ export const collVectors: GenericTypeTestVector[] = [
   ...buildCollVectors("SColl[SBool]", SBool, [
     {
       hex: "0d0c010e",
-      value: [true, false, false, false, false, false, false, false, false, true, true, true]
+      value: [true, false, false, false, false, false, false, false, false, true, true, true] /* biome-ignore format: */
     },
     {
       hex: "0d0c0101",
-      value: [true, false, false, false, false, false, false, false, true, false, false, false]
+      value: [true, false, false, false, false, false, false, false, true, false, false, false] /* biome-ignore format: */
     },
     {
       hex: "0d400e01020a0b010202",
@@ -269,7 +381,10 @@ export const collVectors: GenericTypeTestVector[] = [
     { hex: "12020500bebc2000050efb586040", value: [3200000000n, 64346415168n] },
     { hex: "1202050efb5860400500bebc2000", value: [64346415168n, 3200000000n] },
     { hex: "1201060182ee5e0040", value: [1661856514112n] },
-    { hex: "120206018271d5b48106018271d5b481", value: [1659767207041n, 1659767207041n] }
+    {
+      hex: "120206018271d5b48106018271d5b481",
+      value: [1659767207041n, 1659767207041n]
+    }
   ]),
   ...buildCollVectors("SColl[SColl[SByte]]", SColl(SByte), [
     {
@@ -277,14 +392,20 @@ export const collVectors: GenericTypeTestVector[] = [
       value: [
         hex.decode("4c657427732063656c656272617465204572676f526166666c652120"),
         hex.decode("4c657427732063656c656272617465204572676f526166666c652120"),
-        hex.decode("e730bbae0463346f8ce72be23ab8391d1e7a58f48ed857fcf4ee9aecf6915307")
+        hex.decode(
+          "e730bbae0463346f8ce72be23ab8391d1e7a58f48ed857fcf4ee9aecf6915307"
+        )
       ]
     }
   ]),
-  ...buildCollVectors("SColl[SColl[SColl[SColl[SByte]]]]", SColl(SColl(SColl(SByte))), [
-    { hex: "0c0c1a00", value: [] },
-    { hex: "0c0c1a0101010201ff", value: [[[u8a([0x01, 0xff])]]] }
-  ]),
+  ...buildCollVectors(
+    "SColl[SColl[SColl[SColl[SByte]]]]",
+    SColl(SColl(SColl(SByte))),
+    [
+      { hex: "0c0c1a00", value: [] },
+      { hex: "0c0c1a0101010201ff", value: [[[u8a([0x01, 0xff])]]] }
+    ]
+  ),
   ...buildCollVectors("SColl[(SInt, SLong)]", SPair(SInt, SLong), [
     {
       hex: "0c400504b40180febe81027880d4d4ab015a80bfdf80013c80aaea55",
@@ -296,43 +417,51 @@ export const collVectors: GenericTypeTestVector[] = [
       ]
     }
   ]),
-  ...buildCollVectors("SColl[(SColl[SByte], SInt)]", SPair(SColl(SByte), SInt), [
-    {
-      hex: "0c4c0e01240008cd0302122c332fd4e3c901f045ac18f559dcecf8dc61f6f94fbb34d0c7c3aac71fb714",
-      value: [
-        [hex.decode("0008cd0302122c332fd4e3c901f045ac18f559dcecf8dc61f6f94fbb34d0c7c3aac71fb7"), 10]
-      ]
-    },
-    {
-      hex: "0c4c0e03240008cd026d9d81d27185efa93c148f700839183a882aae3a4de1f984faff69eeed37202706240008cd026dd353119c75189796b3fb01c60289399f5fa2e7e115f4d8e3ffcc0a4ba5326906240008cd0287352ce40ff53154c5b3751a661908d3ca99edbb198e7ebb63d1d00e580f2efd06",
-      value: [
-        [hex.decode("0008cd026d9d81d27185efa93c148f700839183a882aae3a4de1f984faff69eeed372027"), 3],
-        [hex.decode("0008cd026dd353119c75189796b3fb01c60289399f5fa2e7e115f4d8e3ffcc0a4ba53269"), 3],
-        [hex.decode("0008cd0287352ce40ff53154c5b3751a661908d3ca99edbb198e7ebb63d1d00e580f2efd"), 3]
-      ]
-    },
-    {
-      hex: "0c4c0e01240008cd0315a5d99a010bf189b1abae2d9f21be6f3438803aca1e6aac739fbee31150d62700",
-      value: [
-        [hex.decode("0008cd0315a5d99a010bf189b1abae2d9f21be6f3438803aca1e6aac739fbee31150d627"), 0]
-      ]
-    }
-  ]),
-  ...buildCollVectors("SColl[(SColl[SByte], SColl[SByte])]", SPair(SColl(SByte), SColl(SByte)), [
-    {
-      hex: "0c3c0e0e02240008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf573339694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443240008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59333967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a",
-      value: [
-        [
-          hex.decode("0008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf57"),
-          hex.decode("39694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443") /* biome-ignore format: */
-        ],
-        [
-          hex.decode("0008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59"),
-          hex.decode("3967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a") /* biome-ignore format: */
+  ...buildCollVectors(
+    "SColl[(SColl[SByte], SInt)]",
+    SPair(SColl(SByte), SInt),
+    [
+      {
+        hex: "0c4c0e01240008cd0302122c332fd4e3c901f045ac18f559dcecf8dc61f6f94fbb34d0c7c3aac71fb714",
+        value: [
+          [hex.decode("0008cd0302122c332fd4e3c901f045ac18f559dcecf8dc61f6f94fbb34d0c7c3aac71fb7"), 10] /* biome-ignore format: */
         ]
-      ]
-    }
-  ]),
+      },
+      {
+        hex: "0c4c0e03240008cd026d9d81d27185efa93c148f700839183a882aae3a4de1f984faff69eeed37202706240008cd026dd353119c75189796b3fb01c60289399f5fa2e7e115f4d8e3ffcc0a4ba5326906240008cd0287352ce40ff53154c5b3751a661908d3ca99edbb198e7ebb63d1d00e580f2efd06",
+        value: [
+          [hex.decode("0008cd026d9d81d27185efa93c148f700839183a882aae3a4de1f984faff69eeed372027"), 3] /* biome-ignore format: */,
+          [hex.decode("0008cd026dd353119c75189796b3fb01c60289399f5fa2e7e115f4d8e3ffcc0a4ba53269"), 3] /* biome-ignore format: */,
+          [hex.decode("0008cd0287352ce40ff53154c5b3751a661908d3ca99edbb198e7ebb63d1d00e580f2efd"), 3] /* biome-ignore format: */
+        ]
+      },
+      {
+        hex: "0c4c0e01240008cd0315a5d99a010bf189b1abae2d9f21be6f3438803aca1e6aac739fbee31150d62700",
+        value: [
+          [hex.decode("0008cd0315a5d99a010bf189b1abae2d9f21be6f3438803aca1e6aac739fbee31150d627"), 0] /* biome-ignore format: */
+        ]
+      }
+    ]
+  ),
+  ...buildCollVectors(
+    "SColl[(SColl[SByte], SColl[SByte])]",
+    SPair(SColl(SByte), SColl(SByte)),
+    [
+      {
+        hex: "0c3c0e0e02240008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf573339694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443240008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59333967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a",
+        value: [
+          [
+            hex.decode("0008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf57") /* biome-ignore format: */,
+            hex.decode("39694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443") /* biome-ignore format: */
+          ],
+          [
+            hex.decode("0008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59") /* biome-ignore format: */,
+            hex.decode("3967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a") /* biome-ignore format: */
+          ]
+        ]
+      }
+    ]
+  ),
   ...buildCollVectors("SColl[SColl[(SInt, SInt)]]", SColl(SPair(SInt, SInt)), [
     {
       hex: "0c0c580202020406080208060402",
@@ -387,7 +516,10 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
       SColl(SByte, hex.decode("505250")),
       SColl(SByte, hex.decode("596f7572206c6f616e204a616e75617279"))
     ),
-    value: [hex.decode("505250"), hex.decode("596f7572206c6f616e204a616e75617279")],
+    value: [
+      hex.decode("505250"),
+      hex.decode("596f7572206c6f616e204a616e75617279")
+    ],
     hex: "3c0e0e0350525011596f7572206c6f616e204a616e75617279"
   },
   {
@@ -399,24 +531,41 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
   {
     name: "(SColl[SByte], SGroupElement)",
     sconst: SPair(
-      SColl(SByte, hex.decode("8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006")),
+      SColl(
+        SByte,
+        hex.decode(
+          "8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"
+        )
+      ),
       SGroupElement(
-        hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
+        hex.decode(
+          "036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607"
+        )
       )
     ),
     value: [
-      hex.decode("8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"),
-      hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
+      hex.decode(
+        "8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006"
+      ),
+      hex.decode(
+        "036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607"
+      )
     ],
     hex: "4f0e208743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607"
   },
   {
     name: "(SColl[(SColl[SByte], SColl[SByte])], (SColl[(SColl[SByte], (SInt, SInt))], SColl[(SColl[SByte], (SInt, SInt))]))",
     sconst: SPair(
-      SColl(SPair(SColl(SByte), SColl(SByte)), [[u8a([1, 2, 3]), u8a([4, 5, 6])]]),
+      SColl(SPair(SColl(SByte), SColl(SByte)), [
+        [u8a([1, 2, 3]), u8a([4, 5, 6])]
+      ]),
       SPair(
-        SColl(SPair(SColl(SByte), SPair(SInt, SInt)), [[u8a([1, 2, 3]), [10, 11]]]),
-        SColl(SPair(SColl(SByte), SPair(SInt, SInt)), [[u8a([4, 5, 6]), [12, 13]]])
+        SColl(SPair(SColl(SByte), SPair(SInt, SInt)), [
+          [u8a([1, 2, 3]), [10, 11]]
+        ]),
+        SColl(SPair(SColl(SByte), SPair(SInt, SInt)), [
+          [u8a([4, 5, 6]), [12, 13]]
+        ])
       )
     ),
     value: [
@@ -429,12 +578,21 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
     name: "(SColl[(SColl[SByte], SColl[SByte])], (SColl[(SColl[SByte], (SInt, SInt))], SColl[(SColl[SByte], (SInt, SInt))]))",
     sconst: SPair(
       SColl(SPair(SColl(SByte), SColl(SByte)), [
-        [u8a([98, 97, 99, 107, 103, 114, 111, 117, 110, 100]), u8a([98, 108, 117, 101])],
+        [
+          u8a([98, 97, 99, 107, 103, 114, 111, 117, 110, 100]),
+          u8a([98, 108, 117, 101])
+        ],
         [u8a([112, 117, 110, 107, 115]), u8a([97, 112, 101])],
-        [u8a([98, 101, 97, 114, 100]), u8a([98, 105, 103, 32, 98, 101, 97, 114, 100])],
+        [
+          u8a([98, 101, 97, 114, 100]),
+          u8a([98, 105, 103, 32, 98, 101, 97, 114, 100])
+        ],
         [u8a([109, 111, 117, 116, 104]), u8a([109, 111, 100, 101, 115, 116])],
         [u8a([103, 108, 97, 115, 115, 101, 115]), u8a([118, 114])],
-        [u8a([116, 111, 112]), u8a([112, 101, 97, 107, 32, 115, 112, 105, 107, 101])]
+        [
+          u8a([116, 111, 112]),
+          u8a([112, 101, 97, 107, 32, 115, 112, 105, 107, 101])
+        ]
       ]),
       SPair(
         SColl(SPair(SColl(SByte), SPair(SInt, SInt)), []),
@@ -443,12 +601,21 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
     ),
     value: [
       [
-        [u8a([98, 97, 99, 107, 103, 114, 111, 117, 110, 100]), u8a([98, 108, 117, 101])],
+        [
+          u8a([98, 97, 99, 107, 103, 114, 111, 117, 110, 100]),
+          u8a([98, 108, 117, 101])
+        ],
         [u8a([112, 117, 110, 107, 115]), u8a([97, 112, 101])],
-        [u8a([98, 101, 97, 114, 100]), u8a([98, 105, 103, 32, 98, 101, 97, 114, 100])],
+        [
+          u8a([98, 101, 97, 114, 100]),
+          u8a([98, 105, 103, 32, 98, 101, 97, 114, 100])
+        ],
         [u8a([109, 111, 117, 116, 104]), u8a([109, 111, 100, 101, 115, 116])],
         [u8a([103, 108, 97, 115, 115, 101, 115]), u8a([118, 114])],
-        [u8a([116, 111, 112]), u8a([112, 101, 97, 107, 32, 115, 112, 105, 107, 101])]
+        [
+          u8a([116, 111, 112]),
+          u8a([112, 101, 97, 107, 32, 115, 112, 105, 107, 101])
+        ]
       ],
       [[], []]
     ],

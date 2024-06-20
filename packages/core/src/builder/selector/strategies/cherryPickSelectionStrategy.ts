@@ -7,7 +7,10 @@ import { AccumulativeSelectionStrategy } from "./accumulativeSelectionStrategy";
  * to pick inputs with as less as possible unused tokens.
  */
 export class CherryPickSelectionStrategy extends AccumulativeSelectionStrategy {
-  public override select(inputs: Box<bigint>[], target: SelectionTarget): Box<bigint>[] {
+  public override select(
+    inputs: Box<bigint>[],
+    target: SelectionTarget
+  ): Box<bigint>[] {
     const orderedInputs = orderBy(
       inputs,
       (x) => new Set(x.assets.map((asset) => asset.tokenId)).size,

@@ -48,7 +48,10 @@ export class SConstant<D = unknown, T extends SType = SType> {
 }
 
 export function decode<T>(value: ByteInput | undefined): T | undefined;
-export function decode<T, K>(value: ByteInput | undefined, coder: (input: T) => K): K | undefined;
+export function decode<T, K>(
+  value: ByteInput | undefined,
+  coder: (input: T) => K
+): K | undefined;
 export function decode<T, K>(
   value: ByteInput | undefined,
   coder?: (input: T) => K
@@ -65,9 +68,15 @@ export function parse<T>(constant: ByteInput): T;
 /** @deprecated use `decode` instead */
 export function parse<T>(constant: ByteInput, mode: "strict"): T;
 /** @deprecated use `decode` instead */
-export function parse<T>(constant: ByteInput | undefined, mode: "safe"): T | undefined;
+export function parse<T>(
+  constant: ByteInput | undefined,
+  mode: "safe"
+): T | undefined;
 /** @deprecated use `decode` instead */
-export function parse<T>(constant: ByteInput | undefined, mode: "strict" | "safe" = "strict") {
+export function parse<T>(
+  constant: ByteInput | undefined,
+  mode: "strict" | "safe" = "strict"
+) {
   if (mode === "strict") return SConstant.from<T>(constant ?? "").data;
   if (!constant) return;
 

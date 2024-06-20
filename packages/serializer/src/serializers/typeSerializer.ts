@@ -16,11 +16,15 @@ export class TypeSerializer {
       writer.write(type.code);
     } else if (isColl(type)) {
       if (type.elementsType.embeddable) {
-        writer.write(descriptors.coll.simpleCollTypeCode + type.elementsType.code);
+        writer.write(
+          descriptors.coll.simpleCollTypeCode + type.elementsType.code
+        );
       } else if (isColl(type.elementsType)) {
         const nestedColl = type.elementsType;
         if (nestedColl.elementsType.embeddable) {
-          writer.write(descriptors.coll.nestedCollTypeCode + nestedColl.elementsType.code);
+          writer.write(
+            descriptors.coll.nestedCollTypeCode + nestedColl.elementsType.code
+          );
         } else {
           writer.write(descriptors.coll.simpleCollTypeCode);
           this.serialize(nestedColl, writer);
@@ -65,7 +69,10 @@ export class TypeSerializer {
           break;
         default: {
           const len = type.elementsType.length;
-          assert(len >= 2 && len <= 255, "Invalid type: tuples must have between 2 and 255 items.");
+          assert(
+            len >= 2 && len <= 255,
+            "Invalid type: tuples must have between 2 and 255 items."
+          );
 
           // Generic tuple
           writer.write(descriptors.tuple.genericTupleTypeCode);
@@ -83,7 +90,10 @@ export class TypeSerializer {
 
   static deserialize(r: SigmaByteReader): SType {
     const byte = r.readByte();
-    assert(byte > 0, `Parsing Error: Unexpected type code '0x${byte.toString(16)}'`);
+    assert(
+      byte > 0,
+      `Parsing Error: Unexpected type code '0x${byte.toString(16)}'`
+    );
 
     if (byte < descriptors.tuple.genericTupleTypeCode) {
       const ctorCode = Math.floor(byte / PRIMITIVE_TYPE_RANGE);
@@ -94,7 +104,8 @@ export class TypeSerializer {
           return getPrimitiveType(embdCode);
         }
         case constructorCode.simpleColl: {
-          const internal = embdCode === 0 ? this.deserialize(r) : getPrimitiveType(embdCode);
+          const internal =
+            embdCode === 0 ? this.deserialize(r) : getPrimitiveType(embdCode);
 
           return new SCollType(internal);
         }
@@ -120,7 +131,12 @@ export class TypeSerializer {
         case constructorCode.symmetricPair: {
           const internal =
             embdCode === 0
-              ? [this.deserialize(r), this.deserialize(r), this.deserialize(r), this.deserialize(r)] // Quadruple of types
+              ? [
+                  this.deserialize(r),
+                  this.deserialize(r),
+                  this.deserialize(r),
+                  this.deserialize(r)
+                ] // Quadruple of types
               : [getPrimitiveType(embdCode), getPrimitiveType(embdCode)]; // Symmetric pair of primitive types (`(Int, Int)`, `(Byte,Byte)`, etc.)
 
           return new STupleType(internal);

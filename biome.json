@@ -10,13 +10,11 @@
       "**/node_modules/*",
       "**/_test-vectors/mockedGraphQLBoxResponses.json"
     ],
-    "indentStyle": "space",
-    "lineWidth": 100
+    "indentStyle": "space"
   },
   "javascript": {
     "formatter": {
-      "trailingCommas": "none",
-      "lineWidth": 100
+      "trailingCommas": "none"
     }
   },
   "linter": {

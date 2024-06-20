@@ -16,13 +16,18 @@ import { SigmaByteWriter } from "./sigmaByteWriter";
  * @param writer: Sigma writer
  * @returns Sigma writer passed as function argument.
  */
-export function writeVLQ(writer: SigmaByteWriter, value: number): SigmaByteWriter {
+export function writeVLQ(
+  writer: SigmaByteWriter,
+  value: number
+): SigmaByteWriter {
   // source: https://stackoverflow.com/a/3564685
 
   if (value === 0) {
     return writer.write(0);
   } else if (value < 0) {
-    throw new RangeError("Variable Length Quantity not supported for negative numbers.");
+    throw new RangeError(
+      "Variable Length Quantity not supported for negative numbers."
+    );
   }
 
   do {
@@ -68,13 +73,18 @@ export function readVLQ(reader: SigmaByteReader): number {
  * @param writer: Sigma writer
  * @returns Sigma writer passed as function argument.
  */
-export function writeBigVLQ(writer: SigmaByteWriter, value: bigint): SigmaByteWriter {
+export function writeBigVLQ(
+  writer: SigmaByteWriter,
+  value: bigint
+): SigmaByteWriter {
   // source: https://stackoverflow.com/a/3564685
 
   if (value === _0n) {
     return writer.write(0);
   } else if (value < _0n) {
-    throw new RangeError("Variable Length Quantity not supported for negative numbers");
+    throw new RangeError(
+      "Variable Length Quantity not supported for negative numbers"
+    );
   }
 
   do {

@@ -7,7 +7,8 @@ describe("Insufficient inputs error", () => {
       nanoErgs: 10n,
       tokens: [
         {
-          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId:
+            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 100n
         }
       ]
@@ -18,7 +19,9 @@ describe("Insufficient inputs error", () => {
     expect(error.unreached).toEqual(unreached);
     expect(
       error.message.includes("nanoErgs") &&
-        error.message.includes("007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283")
+        error.message.includes(
+          "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
+        )
     ).toBeTruthy();
   });
 });

@@ -16,7 +16,9 @@ type Output = BoxCandidate<bigint>;
 type ReadOnlyInputs = readonly Input[];
 type ReadOnlyOutputs = readonly Output[];
 
-type TransactionType<T> = T extends "default" ? UnsignedTransaction : EIP12UnsignedTransaction;
+type TransactionType<T> = T extends "default"
+  ? UnsignedTransaction
+  : EIP12UnsignedTransaction;
 
 export class ErgoUnsignedTransaction {
   private readonly _inputs!: ReadOnlyInputs;
@@ -53,8 +55,12 @@ export class ErgoUnsignedTransaction {
   toPlainObject<T extends BuildOutputType>(outputType: T): TransactionType<T>;
   toPlainObject<T extends BuildOutputType>(outputType?: T): TransactionType<T> {
     return {
-      inputs: this.inputs.map((input) => input.toUnsignedInputObject(outputType || "default")),
-      dataInputs: this.dataInputs.map((input) => input.toPlainObject(outputType || "default")),
+      inputs: this.inputs.map((input) =>
+        input.toUnsignedInputObject(outputType || "default")
+      ),
+      dataInputs: this.dataInputs.map((input) =>
+        input.toPlainObject(outputType || "default")
+      ),
       outputs: this.outputs.map((output) => _stringifyBoxAmounts(output))
     } as TransactionType<T>;
   }
@@ -65,8 +71,12 @@ export class ErgoUnsignedTransaction {
 
   toBytes(): Uint8Array {
     return serializeTransaction({
-      inputs: this.inputs.map((input) => input.toUnsignedInputObject("default")),
-      dataInputs: this.dataInputs.map((input) => input.toPlainObject("default")),
+      inputs: this.inputs.map((input) =>
+        input.toUnsignedInputObject("default")
+      ),
+      dataInputs: this.dataInputs.map((input) =>
+        input.toPlainObject("default")
+      ),
       outputs: this.outputs
     }).toBytes();
   }

@@ -31,6 +31,10 @@ describe("Sequential registers types", () => {
     // @ts-expect-error skipped R4
     builder.setAdditionalRegisters({ R5: SBool(true) });
     // @ts-expect-error skipped R6 and R7
-    builder.setAdditionalRegisters({ R4: SBool(true), R5: SInt(2), R9: SBool(false) });
+    builder.setAdditionalRegisters({
+      R4: SBool(true),
+      R5: SInt(2),
+      R9: SBool(false)
+    });
   });
 });

@@ -6,7 +6,8 @@ import { mockHeaders, mockUTxO } from "./objectMocking";
 
 describe("mockUTxO()", () => {
   it("Should set default values when omitted", () => {
-    const ergoTree = "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d";
+    const ergoTree =
+      "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d";
 
     const utxo = mockUTxO({ ergoTree });
 
@@ -25,12 +26,14 @@ describe("mockUTxO()", () => {
 
   it("Should transform a candidate in a valid UTxO", () => {
     const candidate: BoxCandidate<bigint> = {
-      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      ergoTree:
+        "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
       creationHeight: 804138,
       value: 1000000n,
       assets: [
         {
-          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId:
+            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 10000n
         }
       ],
@@ -44,7 +47,9 @@ describe("mockUTxO()", () => {
     expect(utxo.ergoTree).to.be.equal(candidate.ergoTree);
     expect(utxo.assets).to.be.deep.equal(candidate.assets);
     expect(utxo.creationHeight).to.be.equal(candidate.creationHeight);
-    expect(utxo.additionalRegisters).to.be.deep.equal(candidate.additionalRegisters);
+    expect(utxo.additionalRegisters).to.be.deep.equal(
+      candidate.additionalRegisters
+    );
 
     expect(utxo.transactionId).to.have.length(64);
     expect(utxo.index).to.be.equal(0);
@@ -65,7 +70,9 @@ describe("mockHeaders()", () => {
       expect(headers[i].height).to.be.greaterThan(0);
       expect(headers[i].parentId).to.be.equal(headers[i + 1].id);
       expect(headers[i].height).to.be.equal(headers[i + 1].height - 1);
-      expect(headers[i + 1].timestamp - headers[i].timestamp).to.be.equal(120000); // 2 min
+      expect(headers[i + 1].timestamp - headers[i].timestamp).to.be.equal(
+        120000
+      ); // 2 min
       expect(headers[i].version).to.be.equal(3);
     }
   });
@@ -91,7 +98,9 @@ describe("mockHeaders()", () => {
       } else {
         expect(headers[i].parentId).to.be.equal(headers[i + 1].id);
         expect(headers[i].height).to.be.equal(headers[i + 1].height - 1);
-        expect(headers[i + 1].timestamp - headers[i].timestamp).to.be.equal(120000); // 2 min
+        expect(headers[i + 1].timestamp - headers[i].timestamp).to.be.equal(
+          120000
+        ); // 2 min
         expect(headers[i].version).to.be.equal(params.version);
       }
     }

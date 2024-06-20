@@ -21,8 +21,10 @@ function isHexChar(value: string) {
 }
 
 describe("Hex string checking", () => {
-  const validHex = "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7";
-  const invalidHex = "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7tt";
+  const validHex =
+    "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7";
+  const invalidHex =
+    "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7tt";
 
   bench("Using charset", () => {
     isHexChar(validHex);

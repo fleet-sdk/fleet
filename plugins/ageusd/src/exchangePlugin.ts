@@ -29,16 +29,30 @@ function minting(params: unknown): params is AgeUSDMintAction {
   return isDefined((params as AgeUSDMintAction).mint);
 }
 
-function buildErrorMsgFor(action: ActionType, coin: CoinType, bank: AgeUSDBank): string {
-  const amount = action === "minting" ? bank.getAvailable(coin) : bank.getRedeemable(coin);
+function buildErrorMsgFor(
+  action: ActionType,
+  coin: CoinType,
+  bank: AgeUSDBank
+): string {
+  const amount =
+    action === "minting" ? bank.getAvailable(coin) : bank.getRedeemable(coin);
   const verb = action === "minting" ? "mint" : "redeem";
 
   return `Unable to ${verb} more than ${amount} ${coin} coins.`;
 }
 
-export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDMintAction): FleetPlugin;
-export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDRedeemAction): FleetPlugin;
-export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAction): FleetPlugin {
+export function AgeUSDExchangePlugin(
+  bank: AgeUSDBank,
+  action: AgeUSDMintAction
+): FleetPlugin;
+export function AgeUSDExchangePlugin(
+  bank: AgeUSDBank,
+  action: AgeUSDRedeemAction
+): FleetPlugin;
+export function AgeUSDExchangePlugin(
+  bank: AgeUSDBank,
+  action: AgeUSDExchangeAction
+): FleetPlugin {
   const amount = big(action.amount);
   let stableDelta = _0n;
   let reserveDelta = _0n;
@@ -49,7 +63,9 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
   let uiFeeAmount = _0n;
 
   if (minting(action)) {
-    assert(bank.canMint(amount, action.mint), () => buildErrorMsgFor("minting", action.mint, bank));
+    assert(bank.canMint(amount, action.mint), () =>
+      buildErrorMsgFor("minting", action.mint, bank)
+    );
 
     circulationDelta = amount;
     nanoergsDelta += bank.getMintingCostFor(amount, action.mint, "base");
@@ -66,8 +82,14 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
       buildErrorMsgFor("redeeming", action.redeem, bank)
     );
 
-    const txFee = isDefined(action.transactionFee) ? big(action.transactionFee) : _0n;
-    const baseAmount = bank.getRedeemingAmountFor(amount, action.redeem, "base");
+    const txFee = isDefined(action.transactionFee)
+      ? big(action.transactionFee)
+      : _0n;
+    const baseAmount = bank.getRedeemingAmountFor(
+      amount,
+      action.redeem,
+      "base"
+    );
 
     circulationDelta -= amount;
     nanoergsDelta -= baseAmount;
@@ -92,12 +114,24 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
     addDataInputs(bank.oracleBox, { index: 0 });
     addOutputs(
       new OutputBuilder(big(box.value) + nanoergsDelta, box.ergoTree)
-        .addTokens({ tokenId: stable.tokenId, amount: big(stable.amount) + stableDelta })
-        .addTokens({ tokenId: reserve.tokenId, amount: big(reserve.amount) + reserveDelta })
+        .addTokens({
+          tokenId: stable.tokenId,
+          amount: big(stable.amount) + stableDelta
+        })
+        .addTokens({
+          tokenId: reserve.tokenId,
+          amount: big(reserve.amount) + reserveDelta
+        })
         .addTokens(nft)
         .setAdditionalRegisters({
-          R4: SLong(SConstant.from<bigint>(box.additionalRegisters.R4).data - stableDelta).toHex(),
-          R5: SLong(SConstant.from<bigint>(box.additionalRegisters.R5).data - reserveDelta).toHex()
+          R4: SLong(
+            SConstant.from<bigint>(box.additionalRegisters.R4).data -
+              stableDelta
+          ).toHex(),
+          R5: SLong(
+            SConstant.from<bigint>(box.additionalRegisters.R5).data -
+              reserveDelta
+          ).toHex()
         }),
       { index: 0 }
     );
@@ -107,26 +141,35 @@ export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAct
     }
 
     if (action.recipient) {
-      const recipient = new OutputBuilder(recipientAmount, action.recipient).setAdditionalRegisters(
-        {
-          R4: SLong(circulationDelta).toHex(),
-          R5: SLong(nanoergsDelta).toHex()
-        }
-      );
+      const recipient = new OutputBuilder(
+        recipientAmount,
+        action.recipient
+      ).setAdditionalRegisters({
+        R4: SLong(circulationDelta).toHex(),
+        R5: SLong(nanoergsDelta).toHex()
+      });
 
       if (stableDelta < _0n) {
-        recipient.addTokens({ tokenId: box.assets[0].tokenId, amount: -stableDelta });
+        recipient.addTokens({
+          tokenId: box.assets[0].tokenId,
+          amount: -stableDelta
+        });
       }
 
       if (reserveDelta < _0n) {
-        recipient.addTokens({ tokenId: box.assets[1].tokenId, amount: -reserveDelta });
+        recipient.addTokens({
+          tokenId: box.assets[1].tokenId,
+          amount: -reserveDelta
+        });
       }
 
       addOutputs(recipient, { index: 1 });
     }
 
     if (bank.implementorAddress && uiFeeAmount > _0n) {
-      addOutputs(new OutputBuilder(uiFeeAmount, bank.implementorAddress), { index: 2 });
+      addOutputs(new OutputBuilder(uiFeeAmount, bank.implementorAddress), {
+        index: 2
+      });
     }
   };
 }

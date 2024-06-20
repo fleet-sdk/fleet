@@ -35,5 +35,13 @@
   "engines": {
     "node": ">=18"
   },
-  "files": ["dist", "!**/*.spec.*", "!**/*.json", "!tests", "CHANGELOG.md", "LICENSE", "README.md"]
+  "files": [
+    "dist",
+    "!**/*.spec.*",
+    "!**/*.json",
+    "!tests",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ]
 }

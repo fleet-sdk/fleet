@@ -1,6 +1,9 @@
 import { ErgoTree } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
-import { ErgoTree as SigmaErgoTree, Value as SigmaValue } from "sigmastate-js/main";
+import {
+  ErgoTree as SigmaErgoTree,
+  Value as SigmaValue
+} from "sigmastate-js/main";
 import { ContractTemplate } from "./contractTemplate";
 
 export class CompilerOutput extends ErgoTree {

@@ -16,7 +16,10 @@ import { estimateVLQSize, SigmaByteWriter } from "../coders";
 const MAX_UINT16_VALUE = 65535;
 
 export function serializeBox(box: Box<Amount>): SigmaByteWriter;
-export function serializeBox(box: Box<Amount>, writer: SigmaByteWriter): SigmaByteWriter;
+export function serializeBox(
+  box: Box<Amount>,
+  writer: SigmaByteWriter
+): SigmaByteWriter;
 export function serializeBox(
   box: BoxCandidate<Amount>,
   writer: SigmaByteWriter,
@@ -48,7 +51,9 @@ export function serializeBox(
   }
 }
 
-function isBox<T extends Amount>(box: Box<Amount> | BoxCandidate<Amount>): box is Box<T> {
+function isBox<T extends Amount>(
+  box: Box<Amount> | BoxCandidate<Amount>
+): box is Box<T> {
   const castedBox = box as Box<T>;
 
   return isDefined(castedBox.transactionId) && isDefined(castedBox.index);
@@ -68,14 +73,21 @@ function writeTokens(
   writer.writeVLQ(tokens.length);
   if (some(tokenIds)) {
     tokens.map((token) =>
-      writer.writeVLQ(tokenIds.indexOf(token.tokenId)).writeBigVLQ(ensureBigInt(token.amount))
+      writer
+        .writeVLQ(tokenIds.indexOf(token.tokenId))
+        .writeBigVLQ(ensureBigInt(token.amount))
     );
   } else {
-    tokens.map((token) => writer.writeHex(token.tokenId).writeBigVLQ(ensureBigInt(token.amount)));
+    tokens.map((token) =>
+      writer.writeHex(token.tokenId).writeBigVLQ(ensureBigInt(token.amount))
+    );
   }
 }
 
-function writeRegisters(writer: SigmaByteWriter, registers: NonMandatoryRegisters): void {
+function writeRegisters(
+  writer: SigmaByteWriter,
+  registers: NonMandatoryRegisters
+): void {
   const keys = Object.keys(registers).sort();
   let length = 0;
 
@@ -118,13 +130,15 @@ export function estimateBoxSize(
 
   size += estimateVLQSize(box.assets.length);
   size += box.assets.reduce(
-    (acc: number, curr) => (acc += byteSizeOf(curr.tokenId) + estimateVLQSize(curr.amount)),
+    (acc: number, curr) =>
+      (acc += byteSizeOf(curr.tokenId) + estimateVLQSize(curr.amount)),
     0
   );
 
   let registersLength = 0;
   for (const key in box.additionalRegisters) {
-    const register = box.additionalRegisters[key as keyof NonMandatoryRegisters];
+    const register =
+      box.additionalRegisters[key as keyof NonMandatoryRegisters];
     if (register) {
       size += byteSizeOf(register);
       registersLength++;

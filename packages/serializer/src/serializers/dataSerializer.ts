@@ -8,7 +8,11 @@ const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
 
 export class DataSerializer {
-  public static serialize(data: unknown, type: SType, writer: SigmaByteWriter): SigmaByteWriter {
+  public static serialize(
+    data: unknown,
+    type: SType,
+    writer: SigmaByteWriter
+  ): SigmaByteWriter {
     if (type.embeddable) {
       switch (type.code) {
         case descriptors.bool.code:
@@ -34,16 +38,24 @@ export class DataSerializer {
 
             return DataSerializer.serialize(node.data, node.type, writer);
           } else {
-            throw Error("Serialization error: SigmaProp operation not implemented.");
+            throw Error(
+              "Serialization error: SigmaProp operation not implemented."
+            );
           }
         }
       }
     } else if (isColl(type)) {
       if (type.elementsType.code === descriptors.byte.code) {
         const isUint8Array = data instanceof Uint8Array;
-        assert(isUint8Array, `SColl[Byte] expected an UInt8Array, got ${typeof data}.`);
+        assert(
+          isUint8Array,
+          `SColl[Byte] expected an UInt8Array, got ${typeof data}.`
+        );
       } else {
-        assert(Array.isArray(data), `SColl expected an array, got ${typeof data}.`);
+        assert(
+          Array.isArray(data),
+          `SColl expected an array, got ${typeof data}.`
+        );
       }
 
       writer.writeVLQ(data.length);
@@ -78,7 +90,9 @@ export class DataSerializer {
       return writer;
     }
 
-    throw Error(`Serialization error: '0x${type.code.toString(16)}' type not implemented.`);
+    throw Error(
+      `Serialization error: '0x${type.code.toString(16)}' type not implemented.`
+    );
   }
 
   static deserialize(type: SType, reader: SigmaByteReader): unknown {
@@ -128,7 +142,9 @@ export class DataSerializer {
           }
         }
         case descriptors.tuple.code: {
-          return (type as STupleType).elementsType.map((t) => this.deserialize(t, reader));
+          return (type as STupleType).elementsType.map((t) =>
+            this.deserialize(t, reader)
+          );
         }
         case descriptors.unit.code: {
           return undefined;
@@ -136,6 +152,8 @@ export class DataSerializer {
       }
     }
 
-    throw new Error(`Parsing error: '0x${type.code.toString(16)}' type not implemented.`);
+    throw new Error(
+      `Parsing error: '0x${type.code.toString(16)}' type not implemented.`
+    );
   }
 }

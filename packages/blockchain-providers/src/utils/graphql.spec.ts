@@ -16,7 +16,9 @@ import {
 describe("GraphQL query builder", () => {
   const fetchSpy = vi
     .spyOn(global, "fetch")
-    .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+    .mockResolvedValueOnce(
+      mockResponse('{"data":{"state":{"height":1098787}}}')
+    );
 
   const parseSpy = vi.spyOn(JSON, "parse");
   const stringifySpy = vi.spyOn(JSON, "stringify");
@@ -54,11 +56,14 @@ describe("GraphQL query builder", () => {
   });
 
   it("Should fetch results with custom params", async () => {
-    const boxId = "d8d1bf79e2b85e4ab6e23cdcdd08e5f364daa317cd6313b39ef0d4f9fdcadc6f";
+    const boxId =
+      "d8d1bf79e2b85e4ab6e23cdcdd08e5f364daa317cd6313b39ef0d4f9fdcadc6f";
     const mockedFetch = vi
       .fn()
       .mockImplementation(fetch)
-      .mockResolvedValueOnce(mockResponse(`{"data":{"boxes":[{"boxId":"${boxId}"}]}}`));
+      .mockResolvedValueOnce(
+        mockResponse(`{"data":{"boxes":[{"boxId":"${boxId}"}]}}`)
+      );
 
     const mockedParser = {
       parse: vi.fn().mockImplementation(JSON.parse),
@@ -73,12 +78,15 @@ describe("GraphQL query builder", () => {
       }
     `;
 
-    const getBoxes = createGqlOperation<{ boxes: Box[] }, QueryBoxesArgs>(query, {
-      url: "https://gql.example.com/",
-      fetcher: mockedFetch,
-      parser: mockedParser,
-      headers: { foo: "bar" }
-    });
+    const getBoxes = createGqlOperation<{ boxes: Box[] }, QueryBoxesArgs>(
+      query,
+      {
+        url: "https://gql.example.com/",
+        fetcher: mockedFetch,
+        parser: mockedParser,
+        headers: { foo: "bar" }
+      }
+    );
 
     const response = await getBoxes({ boxId });
 
@@ -99,7 +107,9 @@ describe("GraphQL query builder", () => {
 
   it("Should throw if throwOnNonNetworkErrors is true and server returns errors", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
-      mockResponse('{"errors":[{"message":"test error 1"},{"message":"test error 2"}]}')
+      mockResponse(
+        '{"errors":[{"message":"test error 1"},{"message":"test error 2"}]}'
+      )
     );
 
     const operation = createGqlOperation("query test { state { height } }", {
@@ -125,9 +135,13 @@ describe("Operation name extraction", () => {
 
     expect(getOpName("query boxes { boxes { boxId } }")).to.be.equal("boxes");
     expect(getOpName("query _boxes { boxes { boxId } }")).to.be.equal("_boxes");
-    expect(getOpName("query boxes-test { boxes { boxId } }")).to.be.equal("boxes-test");
+    expect(getOpName("query boxes-test { boxes { boxId } }")).to.be.equal(
+      "boxes-test"
+    );
     expect(getOpName("query boxes1 { boxes { boxId } }")).to.be.equal("boxes1");
-    expect(getOpName(" query boxes ($take: Int) { boxes { boxId } }")).to.be.equal("boxes");
+    expect(
+      getOpName(" query boxes ($take: Int) { boxes { boxId } }")
+    ).to.be.equal("boxes");
     expect(
       getOpName(`
         query unspent($take: Int, $address: String) {
@@ -150,7 +164,8 @@ describe("Operation name extraction", () => {
 
     expect(getOpName("query { boxes { boxId } }")).to.be.undefined;
     expect(getOpName("mutation { boxes { boxId } }")).to.be.undefined;
-    expect(getOpName(" query ($take: Int) { boxes { boxId } }")).to.be.undefined;
+    expect(getOpName(" query ($take: Int) { boxes { boxId } }")).to.be
+      .undefined;
   });
 });
 

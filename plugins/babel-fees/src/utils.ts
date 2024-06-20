@@ -6,7 +6,9 @@ import { BABEL_ERGOTREE_PREFIX, BABEL_ERGOTREE_SUFFIX } from "./constants";
 const TOKEN_ID_HEX_LENGTH = 64;
 
 const BABEL_CONTRACT_LENGTH =
-  BABEL_ERGOTREE_PREFIX.length + TOKEN_ID_HEX_LENGTH + BABEL_ERGOTREE_SUFFIX.length;
+  BABEL_ERGOTREE_PREFIX.length +
+  TOKEN_ID_HEX_LENGTH +
+  BABEL_ERGOTREE_SUFFIX.length;
 
 /**
  * Get the the price for a token unit in NanoErgs
@@ -14,7 +16,10 @@ const BABEL_CONTRACT_LENGTH =
  * @returns
  */
 export function getTokenPrice(babelBox: Box<Amount>): bigint {
-  if (isUndefined(babelBox.additionalRegisters.R5) || !isValidBabelBox(babelBox)) {
+  if (
+    isUndefined(babelBox.additionalRegisters.R5) ||
+    !isValidBabelBox(babelBox)
+  ) {
     throw Error("Invalid babel box.");
   }
 

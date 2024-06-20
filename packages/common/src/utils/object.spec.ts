@@ -4,7 +4,12 @@ import { clearUndefined, ensureDefaults } from "./object";
 describe("Remove undefined fields", () => {
   it("Should remove", () => {
     expect(
-      clearUndefined({ propOne: 1, propTwo: undefined, propThree: "test", nullProp: null })
+      clearUndefined({
+        propOne: 1,
+        propTwo: undefined,
+        propThree: "test",
+        nullProp: null
+      })
     ).toEqual({ propOne: 1, propThree: "test" });
   });
 });
@@ -21,7 +26,9 @@ describe("Ensure defaults", () => {
 
     expect(ensureDefaults(undefined, defaults)).to.be.equal(defaults);
     expect(ensureDefaults({}, defaults)).to.be.equal(defaults);
-    expect(ensureDefaults([] as unknown as object, defaults)).to.be.equal(defaults);
+    expect(ensureDefaults([] as unknown as object, defaults)).to.be.equal(
+      defaults
+    );
 
     expect(ensureDefaults({ a: 5, t: 1 }, defaults)).to.be.deep.equal({
       a: 5, // opt
@@ -54,7 +61,9 @@ describe("Ensure defaults", () => {
     const defaults = { a: 1, b: 2 };
 
     expect(
-      ensureDefaults({ a: 5, b: undefined }, defaults, { keepUndefinedKeys: true })
+      ensureDefaults({ a: 5, b: undefined }, defaults, {
+        keepUndefinedKeys: true
+      })
     ).to.be.deep.equal({
       a: 5,
       b: undefined // it must keep undefined

@@ -1,9 +1,9 @@
-export type AssertErrorMessageInput = string | Error | (() => string);
+export type ErrorMessage = string | Error | (() => string);
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type Constructable = Function;
 
-type JSPrimitiveTypes =
+type JSPrimitive =
   | "string"
   | "number"
   | "bigint"
@@ -13,7 +13,10 @@ type JSPrimitiveTypes =
   | "object"
   | "function";
 
-export function assert(condition: boolean, error: AssertErrorMessageInput): asserts condition {
+export function assert(
+  condition: boolean,
+  error: ErrorMessage
+): asserts condition {
   if (condition) return;
 
   let err: Error | undefined = undefined;
@@ -31,7 +34,7 @@ export function assert(condition: boolean, error: AssertErrorMessageInput): asse
   throw err;
 }
 
-export function assertTypeOf<T>(obj: T, expected: JSPrimitiveTypes): asserts obj {
+export function assertTypeOf<T>(obj: T, expected: JSPrimitive): asserts obj {
   const type = typeof obj;
 
   if (type !== expected) {
@@ -44,21 +47,32 @@ function getTypeName(value: unknown): string {
   if (value === null) return "null";
   const type = typeof value;
 
-  return type === "object" || type === "function" ? toString(value).slice(8, -1) : type;
+  return type === "object" || type === "function"
+    ? toString(value).slice(8, -1)
+    : type;
 }
 
-export function assertInstanceOf<T>(obj: T, expected: Constructable): asserts obj {
+export function assertInstanceOf<T>(
+  obj: T,
+  expected: Constructable
+): asserts obj {
   const condition = obj instanceof expected;
 
   if (!condition) {
-    throw new Error(`Expected an instance of '${expected.name}', got '${getTypeName(obj)}'.`);
+    throw new Error(
+      `Expected an instance of '${expected.name}', got '${getTypeName(obj)}'.`
+    );
   }
 }
 
-export function isEmpty<T>(target: T | null | undefined): target is undefined | null {
+export function isEmpty<T>(
+  target: T | null | undefined
+): target is undefined | null {
   if (!target) return true;
 
-  return Array.isArray(target) ? target.length === 0 : Object.keys(target).length === 0;
+  return Array.isArray(target)
+    ? target.length === 0
+    : Object.keys(target).length === 0;
 }
 
 export function some<T>(target: T | null | undefined): target is T {

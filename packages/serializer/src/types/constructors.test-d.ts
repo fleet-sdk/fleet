@@ -45,17 +45,23 @@ describe("Constructor proxies types", () => {
     expectTypeOf(SInt()).toMatchTypeOf<SIntType>();
     expectTypeOf(SInt(1)).toMatchTypeOf<SConstant<number, SIntType>>();
 
-    expectTypeOf(SLong).parameter(0).toMatchTypeOf<string | bigint | undefined>();
+    expectTypeOf(SLong)
+      .parameter(0)
+      .toMatchTypeOf<string | bigint | undefined>();
     expectTypeOf(SLong()).toMatchTypeOf<SLongType>();
     expectTypeOf(SLong(1n)).toMatchTypeOf<SConstant<bigint, SLongType>>();
     expectTypeOf(SLong("1")).toMatchTypeOf<SConstant<bigint, SLongType>>();
 
-    expectTypeOf(SBigInt).parameter(0).toMatchTypeOf<string | bigint | undefined>();
+    expectTypeOf(SBigInt)
+      .parameter(0)
+      .toMatchTypeOf<string | bigint | undefined>();
     expectTypeOf(SBigInt()).toMatchTypeOf<SBigIntType>();
     expectTypeOf(SBigInt(1n)).toMatchTypeOf<SConstant<bigint, SBigIntType>>();
     expectTypeOf(SBigInt("1")).toMatchTypeOf<SConstant<bigint, SBigIntType>>();
 
-    expectTypeOf(SGroupElement).parameter(0).toMatchTypeOf<Uint8Array | string | undefined>();
+    expectTypeOf(SGroupElement)
+      .parameter(0)
+      .toMatchTypeOf<Uint8Array | string | undefined>();
     expectTypeOf(SGroupElement()).toMatchTypeOf<SGroupElementType>();
     expectTypeOf(SGroupElement(Uint8Array.from([1, 2, 3]))).toMatchTypeOf<
       SConstant<Uint8Array, SGroupElementType>
@@ -64,7 +70,9 @@ describe("Constructor proxies types", () => {
       SConstant<Uint8Array, SGroupElementType>
     >();
 
-    expectTypeOf(SSigmaProp).parameter(0).toMatchTypeOf<SConstant<Uint8Array> | undefined>();
+    expectTypeOf(SSigmaProp)
+      .parameter(0)
+      .toMatchTypeOf<SConstant<Uint8Array> | undefined>();
     expectTypeOf(SSigmaProp()).toMatchTypeOf<SSigmaPropType>();
     expectTypeOf(SSigmaProp(SGroupElement("deadbeef"))).toMatchTypeOf<
       SConstant<SConstant<Uint8Array>, SSigmaPropType>
@@ -75,12 +83,22 @@ describe("Constructor proxies types", () => {
   });
 
   it("Should ensure correct types for generics", () => {
-    expectTypeOf(SColl(SByte)).toMatchTypeOf<SConstructor<number[], SByteType>>();
-    expectTypeOf(SColl(SBool)).toMatchTypeOf<SConstructor<boolean[], SBoolType>>();
-    expectTypeOf(SColl(SShort)).toMatchTypeOf<SConstructor<number[], SShortType>>();
+    expectTypeOf(SColl(SByte)).toMatchTypeOf<
+      SConstructor<number[], SByteType>
+    >();
+    expectTypeOf(SColl(SBool)).toMatchTypeOf<
+      SConstructor<boolean[], SBoolType>
+    >();
+    expectTypeOf(SColl(SShort)).toMatchTypeOf<
+      SConstructor<number[], SShortType>
+    >();
     expectTypeOf(SColl(SInt)).toMatchTypeOf<SConstructor<number[], SIntType>>();
-    expectTypeOf(SColl(SLong)).toMatchTypeOf<SConstructor<bigint[], SLongType>>();
-    expectTypeOf(SColl(SBigInt)).toMatchTypeOf<SConstructor<bigint[], SBigIntType>>();
+    expectTypeOf(SColl(SLong)).toMatchTypeOf<
+      SConstructor<bigint[], SLongType>
+    >();
+    expectTypeOf(SColl(SBigInt)).toMatchTypeOf<
+      SConstructor<bigint[], SBigIntType>
+    >();
     expectTypeOf(SColl(SGroupElement)).toMatchTypeOf<
       SConstructor<Uint8Array[], SGroupElementType>
     >();
@@ -108,11 +126,15 @@ describe("Constructor proxies types", () => {
       ]).data
     ).toMatchTypeOf<[boolean[], ByteInput | number[]][]>();
 
-    expectTypeOf(SColl(SBool, [true, false, true, true]).data).toMatchTypeOf<boolean[]>();
+    expectTypeOf(SColl(SBool, [true, false, true, true]).data).toMatchTypeOf<
+      boolean[]
+    >();
 
     expectTypeOf(SColl(SByte, "deadbeef").data).toMatchTypeOf<Uint8Array>();
     expectTypeOf(SColl(SByte, [1, 2]).data).toMatchTypeOf<Uint8Array>();
-    expectTypeOf(SColl(SByte, Uint8Array.from([1])).data).toMatchTypeOf<Uint8Array>();
+    expectTypeOf(
+      SColl(SByte, Uint8Array.from([1])).data
+    ).toMatchTypeOf<Uint8Array>();
     expectTypeOf(SColl(SInt, [1, 2, 3]).data).toMatchTypeOf<number[]>();
     expectTypeOf(
       SColl(SColl(SBool), [
@@ -121,12 +143,18 @@ describe("Constructor proxies types", () => {
       ]).data
     ).toMatchTypeOf<boolean[][]>();
 
-    expectTypeOf(SPair(SInt(1), SBool(false)).data).toMatchTypeOf<[number, boolean]>();
-    expectTypeOf(SPair(SBool(true), SInt(1)).data).toMatchTypeOf<[boolean, number]>();
-    expectTypeOf(SPair(SInt(1), SLong("1")).data).toMatchTypeOf<[number, bigint]>();
-    expectTypeOf(SPair(SPair(SBool(true), SInt(1)), SLong("1")).data).toMatchTypeOf<
-      [[boolean, number], bigint]
+    expectTypeOf(SPair(SInt(1), SBool(false)).data).toMatchTypeOf<
+      [number, boolean]
     >();
+    expectTypeOf(SPair(SBool(true), SInt(1)).data).toMatchTypeOf<
+      [boolean, number]
+    >();
+    expectTypeOf(SPair(SInt(1), SLong("1")).data).toMatchTypeOf<
+      [number, bigint]
+    >();
+    expectTypeOf(
+      SPair(SPair(SBool(true), SInt(1)), SLong("1")).data
+    ).toMatchTypeOf<[[boolean, number], bigint]>();
 
     // @ts-expect-error elements should be boolean[]
     SColl(SPair(SColl(SByte), SColl(SInt)), [[[1, 2, 3], 1]]);
