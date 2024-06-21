@@ -34,7 +34,7 @@
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
     "@noble/hashes": "^1.4.0",
-    "@scure/base": "^1.1.6"
+    "@scure/base": "^1.1.7"
   },
   "files": [
     "dist",
