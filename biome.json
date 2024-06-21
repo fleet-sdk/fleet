@@ -5,7 +5,8 @@
       "**/coverage/*",
       "**/dist/*",
       "**/node_modules/*",
-      "**/_test-vectors/mockedGraphQLBoxResponses.json"
+      "**/_test-vectors/mockedGraphQLBoxResponses.json",
+      "**/package.json"
     ]
   },
   "organizeImports": {
