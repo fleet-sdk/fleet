@@ -34,8 +34,8 @@
     "@fleet-sdk/crypto": "workspace:^",
     "@fleet-sdk/serializer": "workspace:^",
     "@fleet-sdk/wallet": "workspace:^",
-    "diff": "^5.1.0",
-    "picocolors": "^1.0.0",
+    "diff": "^5.2.0",
+    "picocolors": "^1.0.1",
     "sigmastate-js": "0.4.6"
   },
   "engines": {

@@ -1,10 +1,16 @@
-import * as bip39 from "@scure/bip39";
-import { wordlist } from "@scure/bip39/wordlists/english";
+import {
+  generateMnemonic as generate,
+  validateMnemonic as validate
+} from "@scure/bip39";
+import { wordlist as english } from "@scure/bip39/wordlists/english";
 
-export function generateMnemonic(strength = 160): string {
-  return bip39.generateMnemonic(wordlist, strength);
+export function generateMnemonic(strength = 160, wordlist = english): string {
+  return generate(wordlist, strength);
 }
 
-export function validateMnemonic(mnemonic: string): boolean {
-  return bip39.validateMnemonic(mnemonic, wordlist);
+export function validateMnemonic(
+  mnemonic: string,
+  wordlist = english
+): boolean {
+  return validate(mnemonic, wordlist);
 }
