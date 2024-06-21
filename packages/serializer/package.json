@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/serializer",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Ergo constant serializer and parser.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -24,7 +24,12 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": ["ergo", "blockchain", "transactions", "serialization"],
+  "keywords": [
+    "ergo",
+    "blockchain",
+    "transactions",
+    "serialization"
+  ],
   "scripts": {
     "build": "tsup --config ../../tsup.config.ts"
   },

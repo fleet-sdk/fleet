@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/ageusd-plugin",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "AgeUSD protocol plugin for Fleet SDK.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -24,7 +24,12 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": ["ergo", "blockchain", "babel fees", "plugins"],
+  "keywords": [
+    "ergo",
+    "blockchain",
+    "babel fees",
+    "plugins"
+  ],
   "dependencies": {
     "@fleet-sdk/core": "workspace:^",
     "@fleet-sdk/common": "workspace:^",

@@ -1,5 +1,13 @@
 # @fleet-sdk/serializer
 
+## 0.5.0
+
+### Patch Changes
+
+- 9dd0b55: Export `SigmaByteWriter` and `SigmaByteReader` classes
+- Updated dependencies [6ecfd2e]
+  - @fleet-sdk/crypto@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes

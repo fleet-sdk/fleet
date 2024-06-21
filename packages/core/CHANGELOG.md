@@ -1,5 +1,18 @@
 # @fleet-sdk/core
 
+## 0.5.0
+
+### Minor Changes
+
+- 8f14d37: Add `ErgoMessage` class for arbitrary data signing
+
+### Patch Changes
+
+- Updated dependencies [9dd0b55]
+- Updated dependencies [6ecfd2e]
+  - @fleet-sdk/serializer@0.5.0
+  - @fleet-sdk/crypto@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes
