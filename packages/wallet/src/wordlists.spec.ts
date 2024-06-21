@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   english,
   portuguese,
-  chinese_simplified,
-  chinese_traditional,
+  simplifiedChinese,
+  traditionalChinese,
   czech,
   french,
   italian,
@@ -17,8 +17,8 @@ describe("wordlists", () => {
   it("Should export all wordlists correctly", () => {
     expect(english).to.have.length(wordlistLength);
     expect(portuguese).to.have.length(wordlistLength);
-    expect(chinese_simplified).to.have.length(wordlistLength);
-    expect(chinese_traditional).to.have.length(wordlistLength);
+    expect(simplifiedChinese).to.have.length(wordlistLength);
+    expect(traditionalChinese).to.have.length(wordlistLength);
     expect(czech).to.have.length(wordlistLength);
     expect(french).to.have.length(wordlistLength);
     expect(italian).to.have.length(wordlistLength);
