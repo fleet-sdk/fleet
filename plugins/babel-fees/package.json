@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/babel-fees-plugin",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Babel Fees plugin for Fleet SDK.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -24,7 +24,12 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": ["ergo", "blockchain", "babel fees", "plugins"],
+  "keywords": [
+    "ergo",
+    "blockchain",
+    "babel fees",
+    "plugins"
+  ],
   "dependencies": {
     "@fleet-sdk/core": "workspace:^",
     "@fleet-sdk/common": "workspace:^",

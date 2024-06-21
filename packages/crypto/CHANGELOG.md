@@ -1,5 +1,11 @@
 # @fleet-sdk/crypto
 
+## 0.5.0
+
+### Patch Changes
+
+- 6ecfd2e: Add `ensureBytes()` function
+
 ## 0.4.1
 
 ### Patch Changes

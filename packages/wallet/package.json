@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/wallet",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Key management and signature for Ergo Platform.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -29,7 +29,12 @@
     "access": "public",
     "provenance": true
   },
-  "keywords": ["ergo", "blockchain", "transactions", "serialization"],
+  "keywords": [
+    "ergo",
+    "blockchain",
+    "transactions",
+    "serialization"
+  ],
   "scripts": {
     "build": "tsup --config ../../tsup.config.ts  --entry ./src/index.ts --entry ./src/wordlists.ts"
   },
