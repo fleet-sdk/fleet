@@ -620,6 +620,7 @@ describe("ergo-graphql provider", () => {
   });
 
   it("Should throw not supported error when reduceTransaction is called", async () => {
+    // TODO: refactor this test
     const client = new ErgoGraphQLProvider({ url: "https://gql.example.com/" });
     expect(client.reduceTransaction).to.throw(NotSupportedError);
   });

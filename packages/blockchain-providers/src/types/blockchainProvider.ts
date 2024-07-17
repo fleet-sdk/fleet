@@ -66,6 +66,7 @@ export type TransactionReductionSuccess = {
 export type TransactionEvaluationResult =
   | TransactionEvaluationError
   | TransactionEvaluationSuccess;
+
 export type TransactionReductionResult =
   | TransactionEvaluationError
   | TransactionReductionSuccess;

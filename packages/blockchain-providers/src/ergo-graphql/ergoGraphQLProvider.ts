@@ -14,6 +14,7 @@ import {
   NotSupportedError,
   orderBy,
   type SignedTransaction,
+  type UnsignedTransaction,
   some,
   uniq,
   uniqBy
@@ -42,6 +43,7 @@ import {
   CHECK_TX_MUTATION,
   CONF_BOXES_QUERY,
   HEADERS_QUERY,
+  REDUCE_TX_MUTATION,
   SEND_TX_MUTATION,
   UNCONF_BOXES_QUERY
 } from "./queries";
@@ -70,6 +72,14 @@ type BlockHeadersResponse = { blockHeaders: Header[] };
 type CheckTransactionResponse = { checkTransaction: string };
 type TransactionSubmissionResponse = { submitTransaction: string };
 type SignedTxArgsResp = { signedTransaction: SignedTransaction };
+type ReduceTxArgs = {
+  transaction: {
+    inputs: string[];
+    dataInputs: string[];
+    outputs: string[];
+  };
+};
+type TransactionReductionResponse = { reduceTransaction: HexString };
 
 const PAGE_SIZE = 50;
 
@@ -82,6 +92,7 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   #getHeaders;
   #checkTx;
   #sendTx;
+  #reduceTx;
 
   constructor(url: string | URL);
   constructor(url: ErgoGraphQLRequestOptions);
@@ -120,6 +131,11 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
       TransactionSubmissionResponse,
       SignedTxArgsResp
     >(SEND_TX_MUTATION);
+
+    this.#reduceTx = this.createOperation<
+      TransactionReductionResponse,
+      ReduceTxArgs
+    >(REDUCE_TX_MUTATION);
   }
 
   #fetchBoxes(args: QueryBoxesArgs, inclConf: boolean, inclUnconf: boolean) {
@@ -250,10 +266,25 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
     }
   }
 
-  reduceTransaction(): Promise<TransactionReductionResult> {
-    throw new NotSupportedError(
-      "Transaction reducing is not supported by ergo-graphql."
-    );
+  async reduceTransaction(
+    transaction: UnsignedTransaction
+  ): Promise<TransactionReductionResult> {
+    try {
+      // TODO: Write stringify function
+      const response = await this.#reduceTx({
+        transaction: {
+          inputs: transaction.inputs.map((input) => input.boxId),
+          dataInputs: transaction.dataInputs.map((input) => input.boxId),
+          outputs: transaction.outputs.map((output) => output.ergoTree)
+        }
+      });
+      return {
+        success: true,
+        reducedTransaction: response.data.reduceTransaction
+      };
+    } catch (e) {
+      return { success: false, message: (e as Error).message };
+    }
   }
 }
 

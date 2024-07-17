@@ -13,3 +13,5 @@ export const CHECK_TX_MUTATION =
   "mutation checkTransaction($signedTransaction: SignedTransaction!) { checkTransaction(signedTransaction: $signedTransaction) }";
 export const SEND_TX_MUTATION =
   "mutation submitTransaction($signedTransaction: SignedTransaction!) { submitTransaction(signedTransaction: $signedTransaction) }";
+export const REDUCE_TX_MUTATION =
+  "mutation reduceTransaction($transaction: UnsignedTransaction!) { reduceTransaction(transaction: $transaction) } ";
