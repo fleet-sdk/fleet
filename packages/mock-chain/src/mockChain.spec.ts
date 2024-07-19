@@ -294,6 +294,63 @@ describe("Contract execution and chain mocking", () => {
     });
   });
 
+  it("Should update balance after execution", () => {
+    const chain = new MockChain();
+
+    const alice = chain.newParty();
+    const bob = chain
+      .newParty()
+      .withBalance({
+        nanoergs: 1000000000n,
+        tokens: [{ tokenId: SIGUSD_TOKEN_ID, amount: 1000n }]
+      })
+      .withBalance({
+        nanoergs: 2000000000n,
+        tokens: [{ tokenId: SIGUSD_TOKEN_ID, amount: 2000n }]
+      });
+
+    expect(bob.utxos).to.have.length(2);
+    expect(alice.utxos).to.have.length(0);
+
+    const unsignedTransaction = new TransactionBuilder(38479)
+      .from(bob.utxos.toArray())
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, alice.address).addTokens({
+          tokenId: SIGUSD_TOKEN_ID,
+          amount: 1500n
+        })
+      )
+      .sendChangeTo(bob.address)
+      .payMinFee()
+      .build();
+
+    expect(chain.execute(unsignedTransaction)).to.be.true;
+
+    expect(bob.utxos).to.have.length(1);
+    expect(bob.balance).to.be.deep.equal({
+      nanoergs: 2997900000n,
+      tokens: [
+        {
+          amount: 1500n,
+          tokenId:
+            "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04"
+        }
+      ]
+    });
+
+    expect(alice.utxos).to.have.length(1);
+    expect(alice.balance).to.be.deep.equal({
+      nanoergs: 1000000n,
+      tokens: [
+        {
+          amount: 1500n,
+          tokenId:
+            "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04"
+        }
+      ]
+    });
+  });
+
   it("Should add minting token metadata to assetMetadataMap", () => {
     const chain = new MockChain();
     const bob = chain.newParty().withBalance({ nanoergs: 1000000000n });

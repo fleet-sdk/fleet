@@ -183,9 +183,6 @@ export class MockChain {
       for (let i = inputs.length - 1; i >= 0; i--) {
         if (party.utxos.exists(inputs[i].boxId)) {
           party.utxos.remove(inputs[i].boxId);
-          inputs.splice(i, 1);
-
-          break;
         }
       }
 
