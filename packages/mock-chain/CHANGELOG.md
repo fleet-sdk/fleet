@@ -1,5 +1,11 @@
 # @fleet-sdk/mock-chain
 
+## 0.5.1
+
+### Patch Changes
+
+- 82a5fdf: Fix `UTxO` invalidation after transaction execution
+
 ## 0.5.0
 
 ### Patch Changes
