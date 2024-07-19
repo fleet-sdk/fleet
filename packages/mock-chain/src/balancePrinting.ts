@@ -12,22 +12,20 @@ export function stringifyBalance(
   width: number,
   metadata?: AssetMetadataMap
 ): string {
-  const rows = new Array<string>();
   const tokenWidth = (width * 70) / 100;
 
-  rows.push(line("-", width));
-  rows.push(center(compact(`- ${name} -`, width - 4), width));
-  rows.push(line("-", width));
-  rows.push(between("Asset", "Balance", width));
-  rows.push(line("=", width));
-
-  rows.push(
+  const rows = [
+    line("-", width),
+    center(compact(`- ${name} -`, width - 4), width),
+    line("-", width),
+    between("Asset", "Balance", width),
+    line("=", width),
     between(
       metaName("nanoerg", metadata),
       metaAmount("nanoerg", balance.nanoergs, metadata),
       width
     )
-  );
+  ];
 
   if (some(balance.tokens)) {
     for (const token of balance.tokens) {
