@@ -14,6 +14,8 @@ export default defineConfig({
         "**/*.bench.ts",
         "**/*.test-d.ts",
         "**/*.test.ts",
+        "**/*.config.*",
+        "**/dist/**",
         "**/common/src/types/index.ts", // probably a vitest bug
         "**/common/src/types/enums.ts", // no need to test enums directly
         "**/src/index.ts"

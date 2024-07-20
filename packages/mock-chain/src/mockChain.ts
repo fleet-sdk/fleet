@@ -216,19 +216,16 @@ export class MockChain {
     const box = transaction.outputs.find((output) =>
       output.assets.some((asset) => asset.tokenId === firstInputId)
     );
+    if (!box) return;
 
-    if (box) {
-      const name = decode(box.additionalRegisters.R4, safeUtf8Encode);
-      const decimals = decode(box.additionalRegisters.R6, safeUtf8Encode);
-      if (name) {
-        this.#metadataMap.set(firstInputId, {
-          name,
-          decimals: decimals ? Number.parseInt(decimals) : undefined
-        });
-      }
+    const name = decode(box.additionalRegisters.R4, safeUtf8Encode);
+    const decimals = decode(box.additionalRegisters.R6, safeUtf8Encode);
+    if (name) {
+      this.#metadataMap.set(firstInputId, {
+        name,
+        decimals: decimals ? Number.parseInt(decimals) : undefined
+      });
     }
-
-    return undefined;
   }
 }
 
