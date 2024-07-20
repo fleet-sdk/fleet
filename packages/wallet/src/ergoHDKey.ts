@@ -90,10 +90,7 @@ export class ErgoHDKey {
     );
   }
 
-  static fromMnemonicSync(
-    mnemonic: string,
-    options?: FromMnemonicOptions
-  ): ErgoHDKey {
+  static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): ErgoHDKey {
     return ErgoHDKey.fromMasterSeed(
       mnemonicToSeedSync(mnemonic, options?.passphrase),
       options?.path

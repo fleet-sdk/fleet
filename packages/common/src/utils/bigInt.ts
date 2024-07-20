@@ -43,10 +43,7 @@ type ParsingOptions = {
  * undecimalize("1", { decimals: 2 }) // 100n
  * undecimalize("1", 2) // 100n
  */
-export function undecimalize(
-  input: string,
-  options?: ParsingOptions | number
-): bigint {
+export function undecimalize(input: string, options?: ParsingOptions | number): bigint {
   if (!input) return _0n;
 
   options = typeof options === "number" ? { decimals: options } : options;
@@ -110,10 +107,7 @@ type FormattingOptions = {
  * decimalize(129837918300n, { decimals: 9 }) // "129.8379183"
  * decimalize(100n, { decimals: 2 }) // "1"
  */
-export function decimalize(
-  value: Amount,
-  options?: FormattingOptions | number
-): string {
+export function decimalize(value: Amount, options?: FormattingOptions | number): string {
   value = ensureBigInt(value);
   if (!options) {
     return value.toString();
@@ -127,11 +121,7 @@ export function decimalize(
   const integer = value / pow;
   const decimal = value - integer * pow;
 
-  return buildFormattedDecimal(
-    integer.toString(10),
-    decimal.toString(10),
-    options
-  );
+  return buildFormattedDecimal(integer.toString(10), decimal.toString(10), options);
 }
 
 /**

@@ -1,24 +1,14 @@
 import { assert } from "@fleet-sdk/common";
 import type { SigmaByteReader, SigmaByteWriter } from "../coders";
 import type { SConstant } from "../sigmaConstant";
-import {
-  isColl,
-  isTuple,
-  type SCollType,
-  type STupleType,
-  type SType
-} from "../types";
+import { isColl, isTuple, type SCollType, type STupleType, type SType } from "../types";
 import { descriptors } from "../types/descriptors";
 
 const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
 
 export const dataSerializer = {
-  serialize(
-    data: unknown,
-    type: SType,
-    writer: SigmaByteWriter
-  ): SigmaByteWriter {
+  serialize(data: unknown, type: SType, writer: SigmaByteWriter): SigmaByteWriter {
     if (type.embeddable) {
       switch (type.code) {
         case descriptors.bool.code:
@@ -42,9 +32,7 @@ export const dataSerializer = {
             return dataSerializer.serialize(node.data, node.type, writer);
           }
 
-          throw Error(
-            "Serialization error: SigmaProp operation not implemented."
-          );
+          throw Error("Serialization error: SigmaProp operation not implemented.");
         }
       }
     }
@@ -56,10 +44,7 @@ export const dataSerializer = {
           `SColl[Byte] expected an UInt8Array, got ${typeof data}.`
         );
       } else {
-        assert(
-          Array.isArray(data),
-          `SColl expected an array, got ${typeof data}.`
-        );
+        assert(Array.isArray(data), `SColl expected an array, got ${typeof data}.`);
       }
 
       writer.writeVLQ(data.length);
@@ -157,8 +142,6 @@ export const dataSerializer = {
       }
     }
 
-    throw new Error(
-      `Parsing error: '0x${type.code.toString(16)}' type not implemented.`
-    );
+    throw new Error(`Parsing error: '0x${type.code.toString(16)}' type not implemented.`);
   }
 };

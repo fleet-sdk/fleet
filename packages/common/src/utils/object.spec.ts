@@ -26,9 +26,7 @@ describe("Ensure defaults", () => {
 
     expect(ensureDefaults(undefined, defaults)).to.be.equal(defaults);
     expect(ensureDefaults({}, defaults)).to.be.equal(defaults);
-    expect(ensureDefaults([] as unknown as object, defaults)).to.be.equal(
-      defaults
-    );
+    expect(ensureDefaults([] as unknown as object, defaults)).to.be.equal(defaults);
 
     expect(ensureDefaults({ a: 5, t: 1 }, defaults)).to.be.deep.equal({
       a: 5, // opt

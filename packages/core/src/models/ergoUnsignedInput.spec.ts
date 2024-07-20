@@ -45,9 +45,7 @@ describe("Tweaking", () => {
 describe("Unsigned input object conversion", () => {
   it("Should convert to default unsigned input object and set empty extension", () => {
     for (const box of regularBoxes) {
-      expect(
-        new ErgoUnsignedInput(box).toUnsignedInputObject("default")
-      ).toEqual({
+      expect(new ErgoUnsignedInput(box).toUnsignedInputObject("default")).toEqual({
         boxId: box.boxId,
         extension: {}
       });

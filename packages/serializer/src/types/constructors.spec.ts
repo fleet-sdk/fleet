@@ -27,33 +27,19 @@ import {
 
 describe("Constructor proxies", () => {
   it("Should correspond to proxied type", () => {
-    expect(new SByteType())
-      .to.be.instanceof(SByte)
-      .and.to.be.instanceOf(SByteType);
-    expect(new SBoolType())
-      .to.be.instanceof(SBool)
-      .and.to.be.instanceOf(SBoolType);
-    expect(new SShortType())
-      .to.be.instanceof(SShort)
-      .and.to.be.instanceOf(SShortType);
-    expect(new SIntType())
-      .to.be.instanceof(SInt)
-      .and.to.be.instanceOf(SIntType);
-    expect(new SLongType())
-      .to.be.instanceof(SLong)
-      .and.to.be.instanceOf(SLongType);
-    expect(new SBigIntType())
-      .to.be.instanceof(SBigInt)
-      .and.to.be.instanceOf(SBigIntType);
+    expect(new SByteType()).to.be.instanceof(SByte).and.to.be.instanceOf(SByteType);
+    expect(new SBoolType()).to.be.instanceof(SBool).and.to.be.instanceOf(SBoolType);
+    expect(new SShortType()).to.be.instanceof(SShort).and.to.be.instanceOf(SShortType);
+    expect(new SIntType()).to.be.instanceof(SInt).and.to.be.instanceOf(SIntType);
+    expect(new SLongType()).to.be.instanceof(SLong).and.to.be.instanceOf(SLongType);
+    expect(new SBigIntType()).to.be.instanceof(SBigInt).and.to.be.instanceOf(SBigIntType);
     expect(new SGroupElementType())
       .to.be.instanceof(SGroupElement)
       .and.to.be.instanceOf(SGroupElementType);
     expect(new SSigmaPropType())
       .to.be.instanceof(SSigmaProp)
       .and.to.be.instanceOf(SSigmaPropType);
-    expect(new SUnitType())
-      .to.be.instanceof(SUnit)
-      .and.to.be.instanceOf(SUnitType);
+    expect(new SUnitType()).to.be.instanceof(SUnit).and.to.be.instanceOf(SUnitType);
     expect(new SCollType(new SByteType()))
       .to.be.instanceof(SColl)
       .and.to.be.instanceOf(SCollType);

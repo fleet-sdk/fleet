@@ -24,31 +24,33 @@
     "snapshot:publish": "pnpm clear && pnpm -r build && changeset publish --no-git-tag --tag snapshot"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.2",
-    "@changesets/cli": "^2.27.5",
-    "@edge-runtime/vm": "^3.2.0",
+    "@biomejs/biome": "^1.8.3",
+    "@changesets/cli": "^2.27.7",
+    "@edge-runtime/vm": "^4.0.1",
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/crypto": "workspace:^",
     "@types/diff": "^5.2.1",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "^2.0.3",
     "ergo-lib-wasm-nodejs": "^0.26.0",
-    "fast-check": "^3.19.0",
-    "happy-dom": "^14.12.0",
+    "fast-check": "^3.20.0",
+    "happy-dom": "^14.12.3",
     "npm-run-all": "^4.1.5",
     "open-cli": "^8.0.0",
     "sigmastate-js": "0.4.6",
-    "tsup": "^8.1.0",
-    "type-fest": "^4.20.1",
-    "typescript": "^5.4.5",
-    "vite": "^5.3.1",
+    "tsup": "^8.2.1",
+    "type-fest": "^4.22.1",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^1.6.0"
+    "vitest": "^2.0.3"
   },
   "engines": {
     "node": ">=18",
     "pnpm": ">=8"
   },
   "pnpm": {
-    "requiredScripts": ["build"]
+    "requiredScripts": [
+      "build"
+    ]
   }
 }

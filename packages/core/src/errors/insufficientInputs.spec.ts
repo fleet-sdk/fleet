@@ -7,8 +7,7 @@ describe("Insufficient inputs error", () => {
       nanoErgs: 10n,
       tokens: [
         {
-          tokenId:
-            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 100n
         }
       ]

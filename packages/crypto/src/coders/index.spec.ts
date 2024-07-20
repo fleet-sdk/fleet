@@ -19,17 +19,10 @@ describe("Coders smoke tests", () => {
   });
 
   test("base58check coder roundtrip", () => {
-    const decodedBase58check = utf8.decode(
-      "this is a base58check encoded string"
-    );
-    const encodedBase58check =
-      "6nURSRrD1s933Ruwq4Gi9XzULMhuRQbX1mYrnY2jknX9pW67uKbADDk";
+    const decodedBase58check = utf8.decode("this is a base58check encoded string");
+    const encodedBase58check = "6nURSRrD1s933Ruwq4Gi9XzULMhuRQbX1mYrnY2jknX9pW67uKbADDk";
 
-    expect(base58check.encode(decodedBase58check)).to.be.equal(
-      encodedBase58check
-    );
-    expect(base58check.decode(encodedBase58check)).to.be.deep.equal(
-      decodedBase58check
-    );
+    expect(base58check.encode(decodedBase58check)).to.be.equal(encodedBase58check);
+    expect(base58check.decode(encodedBase58check)).to.be.deep.equal(decodedBase58check);
   });
 });

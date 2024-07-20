@@ -10,12 +10,7 @@ import {
   some
 } from "@fleet-sdk/common";
 import { ErgoMessage, ErgoUnsignedTransaction } from "@fleet-sdk/core";
-import {
-  blake2b256,
-  type ByteInput,
-  ensureBytes,
-  hex
-} from "@fleet-sdk/crypto";
+import { blake2b256, type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import {
   type MinimalUnsignedTransaction,
   serializeBox,
@@ -25,9 +20,7 @@ import type { ErgoHDKey } from "../ergoHDKey";
 import { sign, verify } from "./proveDLogProtocol";
 
 type RKey = keyof NonMandatoryRegisters;
-export type UnsignedTransaction =
-  | EIP12UnsignedTransaction
-  | ErgoUnsignedTransaction;
+export type UnsignedTransaction = EIP12UnsignedTransaction | ErgoUnsignedTransaction;
 export type KeyMap = Record<number, ErgoHDKey> & { _?: ErgoHDKey[] };
 
 export type Message =
@@ -39,16 +32,9 @@ export type Message =
   | Base58String;
 
 export interface ISigmaProver {
-  signTransaction(
-    unsignedTx: UnsignedTransaction,
-    keys: ErgoHDKey[]
-  ): SignedTransaction;
+  signTransaction(unsignedTx: UnsignedTransaction, keys: ErgoHDKey[]): SignedTransaction;
   signMessage(message: ErgoMessage, key: ErgoHDKey): Uint8Array;
-  verify(
-    message: Message,
-    proof: Uint8Array,
-    publicKey: ErgoHDKey | Uint8Array
-  ): boolean;
+  verify(message: Message, proof: Uint8Array, publicKey: ErgoHDKey | Uint8Array): boolean;
 }
 
 export class Prover implements ISigmaProver {
@@ -67,9 +53,7 @@ export class Prover implements ISigmaProver {
         boxId: input.boxId,
         spendingProof: {
           extension: input.extension,
-          proofBytes: hex.encode(
-            generateProof(txBytes, getKeyFor(input, index))
-          )
+          proofBytes: hex.encode(generateProof(txBytes, getKeyFor(input, index)))
         }
       })),
       dataInputs: txData.dataInputs.map((x) => ({ boxId: x.boxId })),
@@ -81,11 +65,7 @@ export class Prover implements ISigmaProver {
     return generateProof(message.serialize().toBytes(), key);
   }
 
-  verify(
-    message: Message,
-    proof: ByteInput,
-    publicKey: ErgoHDKey | Uint8Array
-  ): boolean {
+  verify(message: Message, proof: ByteInput, publicKey: ErgoHDKey | Uint8Array): boolean {
     let bytes: Uint8Array;
 
     if (typeof message === "string") {
@@ -104,15 +84,12 @@ export class Prover implements ISigmaProver {
         inputs: message.inputs.map((input) => ({
           ...input,
           extension:
-            "extension" in input
-              ? input.extension
-              : input.spendingProof.extension
+            "extension" in input ? input.extension : input.spendingProof.extension
         }))
       }).toBytes();
     }
 
-    const pubKey =
-      publicKey instanceof Uint8Array ? publicKey : publicKey.publicKey;
+    const pubKey = publicKey instanceof Uint8Array ? publicKey : publicKey.publicKey;
     return verify(bytes, ensureBytes(proof), pubKey);
   }
 }
@@ -156,9 +133,7 @@ function includesPubKey(
   return (
     ergoTree.includes(pubKey) ||
     (registers &&
-      Object.keys(registers).some((k) =>
-        registers[k as RKey]?.includes(pubKey)
-      ))
+      Object.keys(registers).some((k) => registers[k as RKey]?.includes(pubKey)))
   );
 }
 
@@ -181,8 +156,6 @@ function mapOutput(txId: string) {
   };
 }
 
-function flattenTransactionObject(
-  tx: UnsignedTransaction
-): EIP12UnsignedTransaction {
+function flattenTransactionObject(tx: UnsignedTransaction): EIP12UnsignedTransaction {
   return tx instanceof ErgoUnsignedTransaction ? tx.toEIP12Object() : tx;
 }

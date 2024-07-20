@@ -29,11 +29,7 @@ function minting(params: unknown): params is AgeUSDMintAction {
   return isDefined((params as AgeUSDMintAction).mint);
 }
 
-function buildErrorMsgFor(
-  action: ActionType,
-  coin: CoinType,
-  bank: AgeUSDBank
-): string {
+function buildErrorMsgFor(action: ActionType, coin: CoinType, bank: AgeUSDBank): string {
   const amount =
     action === "minting" ? bank.getAvailable(coin) : bank.getRedeemable(coin);
   const verb = action === "minting" ? "mint" : "redeem";
@@ -82,14 +78,8 @@ export function AgeUSDExchangePlugin(
       buildErrorMsgFor("redeeming", action.redeem, bank)
     );
 
-    const txFee = isDefined(action.transactionFee)
-      ? big(action.transactionFee)
-      : _0n;
-    const baseAmount = bank.getRedeemingAmountFor(
-      amount,
-      action.redeem,
-      "base"
-    );
+    const txFee = isDefined(action.transactionFee) ? big(action.transactionFee) : _0n;
+    const baseAmount = bank.getRedeemingAmountFor(amount, action.redeem, "base");
 
     circulationDelta -= amount;
     nanoergsDelta -= baseAmount;
@@ -125,12 +115,10 @@ export function AgeUSDExchangePlugin(
         .addTokens(nft)
         .setAdditionalRegisters({
           R4: SLong(
-            SConstant.from<bigint>(box.additionalRegisters.R4).data -
-              stableDelta
+            SConstant.from<bigint>(box.additionalRegisters.R4).data - stableDelta
           ).toHex(),
           R5: SLong(
-            SConstant.from<bigint>(box.additionalRegisters.R5).data -
-              reserveDelta
+            SConstant.from<bigint>(box.additionalRegisters.R5).data - reserveDelta
           ).toHex()
         }),
       { index: 0 }

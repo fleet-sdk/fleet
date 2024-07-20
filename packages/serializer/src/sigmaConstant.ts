@@ -68,10 +68,7 @@ export function parse<T>(constant: ByteInput): T;
 /** @deprecated use `decode` instead */
 export function parse<T>(constant: ByteInput, mode: "strict"): T;
 /** @deprecated use `decode` instead */
-export function parse<T>(
-  constant: ByteInput | undefined,
-  mode: "safe"
-): T | undefined;
+export function parse<T>(constant: ByteInput | undefined, mode: "safe"): T | undefined;
 /** @deprecated use `decode` instead */
 export function parse<T>(
   constant: ByteInput | undefined,

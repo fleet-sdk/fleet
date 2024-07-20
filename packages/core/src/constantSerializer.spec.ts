@@ -30,9 +30,7 @@ describe("Serialize -> Parse roundtrip", () => {
   function randomBigInt(min: bigint, max: bigint) {
     // increase the chances of negative numbers generation;
     const rand =
-      getRandomBigInt(1) % 2n === 0n
-        ? getRandomBigInt(1)
-        : getRandomBigInt(1) * -1n;
+      getRandomBigInt(1) % 2n === 0n ? getRandomBigInt(1) : getRandomBigInt(1) * -1n;
 
     return (rand * (max - min + 1n) + min) / 10_000n;
   }
@@ -42,9 +40,7 @@ describe("Serialize -> Parse roundtrip", () => {
     expect(SParse(SConstant(SColl(SInt, intVal)))).toEqual(intVal);
 
     const hexVal = "deadbeef";
-    expect(SParse(SConstant(SColl(SByte, hexVal)))).to.be.deep.equal(
-      hex.decode(hexVal)
-    );
+    expect(SParse(SConstant(SColl(SByte, hexVal)))).to.be.deep.equal(hex.decode(hexVal));
 
     const bytes = hex.decode(hexVal);
     expect(SParse(SConstant(SColl(SByte, bytes)))).to.be.deep.equal(bytes);
@@ -77,10 +73,7 @@ describe("Serialize -> Parse roundtrip", () => {
   });
 
   it("Should roundtrip SLong", () => {
-    const value = randomBigInt(
-      -9_223_372_036_854_775_808n,
-      9_223_372_036_854_775_807n
-    );
+    const value = randomBigInt(-9_223_372_036_854_775_808n, 9_223_372_036_854_775_807n);
     expect(SParse(SConstant(SLong(value)))).toBe(value);
   });
 

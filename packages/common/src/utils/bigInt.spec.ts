@@ -76,9 +76,7 @@ describe("decimalize()", () => {
 
   it("Should do a roundtrip", () => {
     const options = { decimals: 9 };
-    expect(decimalize(undecimalize("129.8379183", options), options)).toBe(
-      "129.8379183"
-    );
+    expect(decimalize(undecimalize("129.8379183", options), options)).toBe("129.8379183");
   });
 });
 
@@ -104,9 +102,7 @@ describe("undecimalize()", () => {
     expect(undecimalize("1")).toBe(1n);
     expect(undecimalize("1", { decimals: 0 })).toBe(1n);
     expect(undecimalize("1", 0)).toBe(1n);
-    expect(undecimalize("0,0011", { decimals: 9, decimalMark: "," })).toBe(
-      1100000n
-    );
+    expect(undecimalize("0,0011", { decimals: 9, decimalMark: "," })).toBe(1100000n);
     expect(undecimalize("129-8379183", { decimals: 9, decimalMark: "-" })).toBe(
       129837918300n
     );

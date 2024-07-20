@@ -1,11 +1,7 @@
 import { Network } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
-import {
-  ErgoMessage,
-  type ErgoMessageOptions,
-  MessageType
-} from "./ergoMessage";
+import { ErgoMessage, type ErgoMessageOptions, MessageType } from "./ergoMessage";
 
 const testVectors = [
   {
@@ -51,10 +47,7 @@ describe("ErgoMessage construction", () => {
     const message = ErgoMessage.fromData(tv.data);
 
     expect(message.type).to.be.equal(tv.type);
-    expect(message.network).to.be.equal(
-      Network.Mainnet,
-      "Should default to Mainnet"
-    );
+    expect(message.network).to.be.equal(Network.Mainnet, "Should default to Mainnet");
     if (tv.type === MessageType.Binary && typeof tv.data === "string") {
       expect(hex.encode(message.getData() as Uint8Array)).to.be.equal(tv.data);
     } else {
@@ -113,16 +106,13 @@ describe("ErgoMessage construction", () => {
   });
 
   it("Should throw when invalid encoded message hash", () => {
-    const invalidChecksum =
-      "AdQ5WCyibKZvCFkCAShhic5Z6cP3sG3KFp5ZSdb7gDfBL6b4Sy";
+    const invalidChecksum = "AdQ5WCyibKZvCFkCAShhic5Z6cP3sG3KFp5ZSdb7gDfBL6b4Sy";
     expect(() => ErgoMessage.decode(invalidChecksum)).to.throw(
       "Invalid encoded message hash"
     );
 
     const invalidType = "9et2sWchC9o4894aaVDzcgfCyDoBV8nNvtnk5hSW3fzBbSwoX31"; // p2pk
-    expect(() => ErgoMessage.decode(invalidType)).to.throw(
-      "Invalid message type"
-    );
+    expect(() => ErgoMessage.decode(invalidType)).to.throw("Invalid message type");
   });
 });
 

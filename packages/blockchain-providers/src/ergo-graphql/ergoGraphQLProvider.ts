@@ -91,35 +91,29 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
       throwOnNonNetworkErrors: true
     };
 
-    this.#getConfBoxes = this.createOperation<
-      ConfirmedBoxesResponse,
-      QueryBoxesArgs
-    >(CONF_BOXES_QUERY);
+    this.#getConfBoxes = this.createOperation<ConfirmedBoxesResponse, QueryBoxesArgs>(
+      CONF_BOXES_QUERY
+    );
 
-    this.#getUnconfBoxes = this.createOperation<
-      UnconfirmedBoxesResponse,
-      QueryBoxesArgs
-    >(UNCONF_BOXES_QUERY);
+    this.#getUnconfBoxes = this.createOperation<UnconfirmedBoxesResponse, QueryBoxesArgs>(
+      UNCONF_BOXES_QUERY
+    );
 
-    this.#getAllBoxes = this.createOperation<
-      CombinedBoxesResponse,
-      QueryBoxesArgs
-    >(ALL_BOXES_QUERY);
+    this.#getAllBoxes = this.createOperation<CombinedBoxesResponse, QueryBoxesArgs>(
+      ALL_BOXES_QUERY
+    );
 
-    this.#getHeaders = this.createOperation<
-      BlockHeadersResponse,
-      QueryBlockHeadersArgs
-    >(HEADERS_QUERY);
+    this.#getHeaders = this.createOperation<BlockHeadersResponse, QueryBlockHeadersArgs>(
+      HEADERS_QUERY
+    );
 
-    this.#checkTx = this.createOperation<
-      CheckTransactionResponse,
-      SignedTxArgsResp
-    >(CHECK_TX_MUTATION);
+    this.#checkTx = this.createOperation<CheckTransactionResponse, SignedTxArgsResp>(
+      CHECK_TX_MUTATION
+    );
 
-    this.#sendTx = this.createOperation<
-      TransactionSubmissionResponse,
-      SignedTxArgsResp
-    >(SEND_TX_MUTATION);
+    this.#sendTx = this.createOperation<TransactionSubmissionResponse, SignedTxArgsResp>(
+      SEND_TX_MUTATION
+    );
   }
 
   #fetchBoxes(args: QueryBoxesArgs, inclConf: boolean, inclUnconf: boolean) {
@@ -130,9 +124,7 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
         : this.#getConfBoxes(args);
   }
 
-  async *streamBoxes(
-    query: GraphQLBoxQuery
-  ): AsyncGenerator<ChainProviderBox[]> {
+  async *streamBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainProviderBox[]> {
     if (isEmpty(query.where)) {
       throw new Error("Cannot fetch unspent boxes without a where clause.");
     }
@@ -251,9 +243,7 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   }
 
   reduceTransaction(): Promise<TransactionReductionResult> {
-    throw new NotSupportedError(
-      "Transaction reducing is not supported by ergo-graphql."
-    );
+    throw new NotSupportedError("Transaction reducing is not supported by ergo-graphql.");
   }
 }
 
@@ -276,9 +266,7 @@ function buildGqlBoxQueryArgs(where: GraphQLBoxWhere) {
         : address.ergoTree
     );
 
-    args.ergoTrees = uniq(
-      some(args.ergoTrees) ? args.ergoTrees.concat(trees) : trees
-    );
+    args.ergoTrees = uniq(some(args.ergoTrees) ? args.ergoTrees.concat(trees) : trees);
   }
 
   return args;

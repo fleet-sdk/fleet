@@ -2,11 +2,7 @@ import { serializeTransaction } from "@fleet-sdk/serializer";
 import { regularBoxes } from "_test-vectors";
 import { mockedUnsignedTransactions } from "_test-vectors";
 import { describe, expect, it } from "vitest";
-import {
-  OutputBuilder,
-  SAFE_MIN_BOX_VALUE,
-  TransactionBuilder
-} from "../builder";
+import { OutputBuilder, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "../builder";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
 
@@ -79,13 +75,11 @@ describe("ErgoUnsignedTransaction model", () => {
   it("Should calculate burning amount", () => {
     const tokensToBurn = [
       {
-        tokenId:
-          "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489",
+        tokenId: "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489",
         amount: 10n
       },
       {
-        tokenId:
-          "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5",
+        tokenId: "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5",
         amount: 20n
       }
     ];

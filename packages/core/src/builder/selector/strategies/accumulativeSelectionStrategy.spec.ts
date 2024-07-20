@@ -31,8 +31,7 @@ describe("Accumulative selection strategy", () => {
     const boxes = selector.select(regularBoxes, {
       tokens: [
         {
-          tokenId:
-            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
         }
       ]
     });
@@ -47,12 +46,10 @@ describe("Accumulative selection strategy", () => {
     const boxes = selector.select(regularBoxes, {
       tokens: [
         {
-          tokenId:
-            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
         },
         {
-          tokenId:
-            "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b"
+          tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b"
         }
       ]
     });
@@ -67,13 +64,11 @@ describe("Accumulative selection strategy", () => {
       nanoErgs: 100000n,
       tokens: [
         {
-          tokenId:
-            "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
+          tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
           amount: 100n
         },
         {
-          tokenId:
-            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 10n
         }
       ]
@@ -81,9 +76,7 @@ describe("Accumulative selection strategy", () => {
     const inputs = selector.select(regularBoxes, target);
 
     expect(inputs).toHaveLength(1); // should try to reuse already selected inputs
-    expect(sumBy(inputs, (x) => x.value)).toBeGreaterThanOrEqual(
-      target.nanoErgs
-    );
+    expect(sumBy(inputs, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
     for (const t of target.tokens) {
       expect(utxoSum(inputs, t.tokenId)).toBeGreaterThanOrEqual(t.amount);
     }

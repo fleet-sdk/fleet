@@ -20,11 +20,7 @@ import {
   utxoSum
 } from "@fleet-sdk/common";
 import { estimateVLQSize } from "@fleet-sdk/serializer";
-import {
-  InvalidInput,
-  MalformedTransaction,
-  NotAllowedTokenBurning
-} from "../errors";
+import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import {
   ErgoAddress,
@@ -181,9 +177,7 @@ export class TransactionBuilder {
     return this;
   }
 
-  public burnTokens(
-    tokens: OneOrMore<TokenAmount<Amount>>
-  ): TransactionBuilder {
+  public burnTokens(tokens: OneOrMore<TokenAmount<Amount>>): TransactionBuilder {
     if (!this._burning) {
       this._burning = new TokensCollection();
     }
@@ -198,9 +192,7 @@ export class TransactionBuilder {
     return this;
   }
 
-  public configureSelector(
-    selectorCallback: SelectorCallback
-  ): TransactionBuilder {
+  public configureSelector(selectorCallback: SelectorCallback): TransactionBuilder {
     if (isUndefined(this._selectorCallbacks)) {
       this._selectorCallbacks = [];
     }
@@ -247,9 +239,7 @@ export class TransactionBuilder {
 
     if (this._isMinting()) {
       if (this._isMoreThanOneTokenBeingMinted()) {
-        throw new MalformedTransaction(
-          "only one token can be minted per transaction."
-        );
+        throw new MalformedTransaction("only one token can be minted per transaction.");
       }
 
       if (this._isTheSameTokenBeingMintedFromOutsideTheMintingBox()) {
@@ -311,10 +301,7 @@ export class TransactionBuilder {
           });
         }
 
-        const chunkedTokens = chunk(
-          change.tokens,
-          this._settings.maxTokensPerChangeBox
-        );
+        const chunkedTokens = chunk(change.tokens, this._settings.maxTokensPerChangeBox);
         for (const tokens of chunkedTokens) {
           const output = new OutputBuilder(
             estimateMinBoxValue(),
@@ -330,9 +317,7 @@ export class TransactionBuilder {
       if (change.nanoErgs > _0n) {
         if (some(changeBoxes)) {
           if (this.settings.shouldIsolateErgOnChange) {
-            outputs.add(
-              new OutputBuilder(change.nanoErgs, this._changeAddress)
-            );
+            outputs.add(new OutputBuilder(change.nanoErgs, this._changeAddress));
           } else {
             const firstChangeBox = first(changeBoxes);
             firstChangeBox.setValue(firstChangeBox.value + change.nanoErgs);
@@ -357,9 +342,7 @@ export class TransactionBuilder {
       outputs
         .toArray()
         .map((output) =>
-          output
-            .setCreationHeight(this._creationHeight, { replace: false })
-            .build(inputs)
+          output.setCreationHeight(this._creationHeight, { replace: false }).build(inputs)
         )
     );
 
@@ -476,8 +459,7 @@ function estimateChangeSize({
   if (tokens.length > maxTokensPerBox) {
     if (tokens.length % maxTokensPerBox > 0) {
       size +=
-        estimateVLQSize(maxTokensPerBox) *
-        Math.floor(tokens.length / maxTokensPerBox);
+        estimateVLQSize(maxTokensPerBox) * Math.floor(tokens.length / maxTokensPerBox);
       size += estimateVLQSize(tokens.length % maxTokensPerBox);
     } else {
       size += estimateVLQSize(maxTokensPerBox) * neededBoxes;

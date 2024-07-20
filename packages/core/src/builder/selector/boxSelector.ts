@@ -45,9 +45,7 @@ export class BoxSelector<T extends Box<bigint>> {
     this._inputs = inputs;
   }
 
-  public defineStrategy(
-    strategy: ISelectionStrategy | SelectorFunction
-  ): BoxSelector<T> {
+  public defineStrategy(strategy: ISelectionStrategy | SelectorFunction): BoxSelector<T> {
     if (this._isISelectionStrategyImplementation(strategy)) {
       this._strategy = strategy;
     } else {
@@ -71,9 +69,7 @@ export class BoxSelector<T extends Box<bigint>> {
 
     if (predicate) {
       if (inclusion) {
-        selected = unselected.filter(
-          (box) => predicate(box) || inclusion.has(box.boxId)
-        );
+        selected = unselected.filter((box) => predicate(box) || inclusion.has(box.boxId));
       } else {
         selected = unselected.filter(predicate);
       }
@@ -90,10 +86,7 @@ export class BoxSelector<T extends Box<bigint>> {
         remaining.nanoErgs -= sumBy(selected, (input) => input.value);
       }
 
-      if (
-        some(remaining.tokens) &&
-        selected.some((input) => !isEmpty(input.assets))
-      ) {
+      if (some(remaining.tokens) && selected.some((input) => !isEmpty(input.assets))) {
         for (const t of remaining.tokens) {
           if (t.amount && t.amount > _0n) {
             t.amount -= utxoSum(selected, t.tokenId);
@@ -103,11 +96,7 @@ export class BoxSelector<T extends Box<bigint>> {
     }
 
     if (this._selector) {
-      unselected = orderBy(
-        unselected,
-        this._selector,
-        this._sortDirection || "asc"
-      );
+      unselected = orderBy(unselected, this._selector, this._sortDirection || "asc");
     }
 
     selected = selected.concat(this._strategy.select(unselected, remaining));
@@ -172,9 +161,7 @@ export class BoxSelector<T extends Box<bigint>> {
     return unreached;
   }
 
-  public ensureInclusion(
-    predicate: FilterPredicate<Box<bigint>>
-  ): BoxSelector<T>;
+  public ensureInclusion(predicate: FilterPredicate<Box<bigint>>): BoxSelector<T>;
   public ensureInclusion(boxIds: OneOrMore<BoxId>): BoxSelector<T>;
   public ensureInclusion(filter: "all"): BoxSelector<T>;
   public ensureInclusion(
@@ -211,9 +198,7 @@ export class BoxSelector<T extends Box<bigint>> {
     return this;
   }
 
-  private _isISelectionStrategyImplementation(
-    obj: unknown
-  ): obj is ISelectionStrategy {
+  private _isISelectionStrategyImplementation(obj: unknown): obj is ISelectionStrategy {
     if ((obj as ISelectionStrategy).select) {
       return true;
     }

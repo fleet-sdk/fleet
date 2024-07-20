@@ -35,9 +35,7 @@ export function serializeTransaction(
 
   // write outputs
   writer.writeVLQ(transaction.outputs.length);
-  transaction.outputs.map((output) =>
-    serializeBox(output, writer, distinctTokenIds)
-  );
+  transaction.outputs.map((output) => serializeBox(output, writer, distinctTokenIds));
 
   return writer;
 }
@@ -48,10 +46,7 @@ function writeInput(writer: SigmaByteWriter, input: UnsignedInput): void {
   writeExtension(writer, input.extension);
 }
 
-function writeExtension(
-  writer: SigmaByteWriter,
-  extension: ContextExtension
-): void {
+function writeExtension(writer: SigmaByteWriter, extension: ContextExtension): void {
   const keys = Object.keys(extension);
   let length = 0;
 
@@ -75,9 +70,7 @@ function writeExtension(
 
 function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {
   const tokenIds = new Set<string>();
-  outputs.flatMap((output) =>
-    output.assets.map((asset) => tokenIds.add(asset.tokenId))
-  );
+  outputs.flatMap((output) => output.assets.map((asset) => tokenIds.add(asset.tokenId)));
 
   return Array.from(tokenIds);
 }

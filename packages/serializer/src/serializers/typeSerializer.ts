@@ -16,9 +16,7 @@ export const typeSerializer = {
       writer.write(type.code);
     } else if (isColl(type)) {
       if (type.elementsType.embeddable) {
-        writer.write(
-          descriptors.coll.simpleCollTypeCode + type.elementsType.code
-        );
+        writer.write(descriptors.coll.simpleCollTypeCode + type.elementsType.code);
       } else if (isColl(type.elementsType)) {
         const nestedColl = type.elementsType;
         if (nestedColl.elementsType.embeddable) {
@@ -90,10 +88,7 @@ export const typeSerializer = {
 
   deserialize(r: SigmaByteReader): SType {
     const byte = r.readByte();
-    assert(
-      byte > 0,
-      `Parsing Error: Unexpected type code '0x${byte.toString(16)}'`
-    );
+    assert(byte > 0, `Parsing Error: Unexpected type code '0x${byte.toString(16)}'`);
 
     if (byte < descriptors.tuple.genericTupleTypeCode) {
       const ctorCode = Math.floor(byte / PRIMITIVE_TYPE_RANGE);
