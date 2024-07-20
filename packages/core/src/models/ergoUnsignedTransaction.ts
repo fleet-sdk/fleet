@@ -71,12 +71,8 @@ export class ErgoUnsignedTransaction {
 
   toBytes(): Uint8Array {
     return serializeTransaction({
-      inputs: this.inputs.map((input) =>
-        input.toUnsignedInputObject("default")
-      ),
-      dataInputs: this.dataInputs.map((input) =>
-        input.toPlainObject("default")
-      ),
+      inputs: this.inputs.map((input) => input.toUnsignedInputObject("default")),
+      dataInputs: this.dataInputs.map((input) => input.toPlainObject("default")),
       outputs: this.outputs
     }).toBytes();
   }

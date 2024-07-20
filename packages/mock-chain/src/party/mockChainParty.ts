@@ -6,18 +6,12 @@ import {
   type TokenAmount,
   utxoSum
 } from "@fleet-sdk/common";
-import {
-  type Box,
-  type ErgoAddress,
-  SAFE_MIN_BOX_VALUE
-} from "@fleet-sdk/core";
+import { type Box, type ErgoAddress, SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { stringifyBalance } from "../balancePrinting";
 import type { MockChain } from "../mockChain";
 import { MockUTxOCollection } from "../mockUtxoCollection";
 
-export type MockUTxOInput =
-  | OneOrMore<BoxCandidate<Amount>>
-  | OneOrMore<Box<Amount>>;
+export type MockUTxOInput = OneOrMore<BoxCandidate<Amount>> | OneOrMore<Box<Amount>>;
 
 export type AddBalance = {
   nanoergs?: Amount;
@@ -114,11 +108,6 @@ export abstract class MockChainParty {
   }
 
   toString(width = 50): string {
-    return stringifyBalance(
-      this.balance,
-      this.name,
-      width,
-      this._chain.assetsMetadata
-    );
+    return stringifyBalance(this.balance, this.name, width, this._chain.assetsMetadata);
   }
 }

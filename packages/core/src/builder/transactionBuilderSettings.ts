@@ -50,9 +50,7 @@ export class TransactionBuilderSettings {
   /**
    * Allows or denies token burning **only** from plugins context.
    */
-  public allowTokenBurningFromPlugins(
-    allow = true
-  ): TransactionBuilderSettings {
+  public allowTokenBurningFromPlugins(allow = true): TransactionBuilderSettings {
     this._allowTokenBurningFromPlugins = allow;
 
     return this;

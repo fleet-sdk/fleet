@@ -8,11 +8,7 @@ import {
   UndefinedMintingContext
 } from "../errors";
 import { ErgoAddress, ErgoTree, TokensCollection } from "../models";
-import {
-  estimateMinBoxValue,
-  OutputBuilder,
-  SAFE_MIN_BOX_VALUE
-} from "./outputBuilder";
+import { estimateMinBoxValue, OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
 
 const address = "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c";
 const ergoTreeHex =
@@ -49,11 +45,7 @@ describe("Constructor", () => {
 
   it("Should construct using 'recipient' param as ErgoTree instance", () => {
     const ergoTreeInstance = new ErgoTree(ergoTreeHex);
-    const builder = new OutputBuilder(
-      SAFE_MIN_BOX_VALUE,
-      ergoTreeInstance,
-      height
-    );
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeInstance, height);
 
     expect(builder.value).toBe(SAFE_MIN_BOX_VALUE);
     expect(builder.address.toString()).toBe(address);
@@ -126,10 +118,8 @@ describe("Creation height", () => {
 });
 
 describe("Token handling", () => {
-  const tokenA =
-    "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
-  const tokenB =
-    "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
+  const tokenA = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
+  const tokenB = "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
   let builder!: OutputBuilder;
 
   beforeEach(() => {
@@ -189,9 +179,9 @@ describe("Token handling", () => {
       .addTokens({ tokenId: tokenA, amount: "50" })
       .addTokens({ tokenId: tokenB, amount: 10n });
     expect(builder.assets).toHaveLength(2);
-    expect(
-      builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount
-    ).toEqual(50n);
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(
+      50n
+    );
 
     builder.addTokens({ tokenId: tokenA, amount: 100n });
     expect(builder.assets).toHaveLength(2);
@@ -202,9 +192,9 @@ describe("Token handling", () => {
 
   it("Should add multiple tokens and sum if the same tokenId is added more than one time", () => {
     builder.addTokens({ tokenId: tokenA, amount: "50" });
-    expect(
-      builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount
-    ).toEqual(50n);
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(
+      50n
+    );
     expect(builder.assets).toHaveLength(1);
 
     builder.addTokens([
@@ -219,9 +209,9 @@ describe("Token handling", () => {
 
   it("Should not sum if the same tokenId is added more than one time", () => {
     builder.addTokens({ tokenId: tokenA, amount: "50" });
-    expect(
-      builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount
-    ).toEqual(50n);
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(
+      50n
+    );
     expect(builder.assets).toHaveLength(1);
 
     builder.addTokens(
@@ -233,15 +223,9 @@ describe("Token handling", () => {
     );
     expect(builder.assets).toHaveLength(3);
     const tokens = builder.assets.toArray();
-    expect(
-      tokens.find((x) => x.tokenId === tokenA && x.amount === 50n)
-    ).not.toBeFalsy();
-    expect(
-      tokens.find((x) => x.tokenId === tokenB && x.amount === 10n)
-    ).not.toBeFalsy();
-    expect(
-      tokens.find((x) => x.tokenId === tokenA && x.amount === 110n)
-    ).not.toBeFalsy();
+    expect(tokens.find((x) => x.tokenId === tokenA && x.amount === 50n)).not.toBeFalsy();
+    expect(tokens.find((x) => x.tokenId === tokenB && x.amount === 10n)).not.toBeFalsy();
+    expect(tokens.find((x) => x.tokenId === tokenA && x.amount === 110n)).not.toBeFalsy();
   });
 
   it("Should remove tokens from the list using context ejector", () => {
@@ -253,9 +237,7 @@ describe("Token handling", () => {
     builder.eject(({ tokens }) => tokens.remove(tokenA));
 
     expect(builder.assets).toHaveLength(1);
-    expect(
-      builder.assets.toArray().find((x) => x.tokenId === tokenA)
-    ).toBeFalsy();
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)).toBeFalsy();
   });
 });
 
@@ -359,23 +341,15 @@ describe("Additional registers", () => {
 });
 
 describe("Building", () => {
-  const tokenA =
-    "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
-  const tokenB =
-    "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
+  const tokenA = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
+  const tokenB = "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
 
   it("Should build box without tokens", () => {
-    const boxCandidate = new OutputBuilder(
-      SAFE_MIN_BOX_VALUE,
-      address,
-      height
-    ).build();
+    const boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).build();
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(boxCandidate.ergoTree).toEqual(
-      ErgoAddress.fromBase58(address).ergoTree
-    );
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([]);
     expect(boxCandidate.additionalRegisters).toEqual({});
@@ -389,9 +363,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(boxCandidate.ergoTree).toEqual(
-      ErgoAddress.fromBase58(address).ergoTree
-    );
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       { tokenId: tokenA, amount: 15n },
@@ -412,9 +384,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(boxCandidate.ergoTree).toEqual(
-      ErgoAddress.fromBase58(address).ergoTree
-    );
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
@@ -443,9 +413,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(boxCandidate.ergoTree).toEqual(
-      ErgoAddress.fromBase58(address).ergoTree
-    );
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       { tokenId: tokenA, amount: 15n },
@@ -486,9 +454,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(boxCandidate.ergoTree).toEqual(
-      ErgoAddress.fromBase58(address).ergoTree
-    );
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
@@ -514,9 +480,7 @@ describe("Building", () => {
 
     expect(boxCandidate.boxId).toBeUndefined();
     expect(boxCandidate.value).toEqual(SAFE_MIN_BOX_VALUE);
-    expect(boxCandidate.ergoTree).toEqual(
-      ErgoAddress.fromBase58(address).ergoTree
-    );
+    expect(boxCandidate.ergoTree).toEqual(ErgoAddress.fromBase58(address).ergoTree);
     expect(boxCandidate.creationHeight).toEqual(height);
     expect(boxCandidate.assets).toEqual([
       {
@@ -528,11 +492,7 @@ describe("Building", () => {
   });
 
   it("Should fail if inputs aren't included", () => {
-    const builder = new OutputBuilder(
-      SAFE_MIN_BOX_VALUE,
-      address,
-      height
-    ).mintToken({
+    const builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height).mintToken({
       amount: 100n,
       name: "TestToken",
       decimals: 4,
@@ -575,11 +535,7 @@ describe("Building", () => {
   });
 
   it("Should estimate min box value with custom value per byte", () => {
-    const output = new OutputBuilder(
-      estimateMinBoxValue(200n),
-      address,
-      height
-    );
+    const output = new OutputBuilder(estimateMinBoxValue(200n), address, height);
     expect(output.value).toBe(15800n);
 
     output.addTokens({ tokenId: tokenA, amount: 10n });

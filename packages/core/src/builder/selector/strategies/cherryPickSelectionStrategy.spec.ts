@@ -45,8 +45,7 @@ describe("Cherry Pick selection strategy", () => {
     const boxes = selector.select(regularBoxes, {
       tokens: [
         {
-          tokenId:
-            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283"
         }
       ]
     });
@@ -59,13 +58,11 @@ describe("Cherry Pick selection strategy", () => {
     const target = {
       tokens: [
         {
-          tokenId:
-            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 100n
         },
         {
-          tokenId:
-            "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
+          tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
           amount: 10n
         }
       ]
@@ -89,13 +86,11 @@ describe("Cherry Pick selection strategy", () => {
       nanoErgs: 10000000000n,
       tokens: [
         {
-          tokenId:
-            "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+          tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
           amount: 100n
         },
         {
-          tokenId:
-            "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
+          tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
           amount: 10n
         }
       ]
@@ -111,9 +106,7 @@ describe("Cherry Pick selection strategy", () => {
     expect(inputTwo.assets).toHaveLength(1);
     expect(inputTree.assets).toHaveLength(0);
 
-    expect(sumBy(inputs, (x) => x.value)).toBeGreaterThanOrEqual(
-      target.nanoErgs
-    );
+    expect(sumBy(inputs, (x) => x.value)).toBeGreaterThanOrEqual(target.nanoErgs);
     for (const t of target.tokens) {
       expect(utxoSum(inputs, t.tokenId)).toBeGreaterThanOrEqual(t.amount);
     }

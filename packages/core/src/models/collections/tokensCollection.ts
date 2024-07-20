@@ -25,20 +25,14 @@ export type OutputToken<T extends Amount = Amount> = {
 
 type MintingData = { index: number; metadata: NewToken<Amount> };
 
-export class TokensCollection extends Collection<
-  OutputToken<bigint>,
-  OutputToken
-> {
+export class TokensCollection extends Collection<OutputToken<bigint>, OutputToken> {
   #minting: MintingData | undefined;
 
   constructor();
   constructor(token: TokenAmount<Amount>);
   constructor(tokens: TokenAmount<Amount>[]);
   constructor(tokens: TokenAmount<Amount>[], options: TokenAddOptions);
-  constructor(
-    tokens?: OneOrMore<TokenAmount<Amount>>,
-    options?: TokenAddOptions
-  ) {
+  constructor(tokens?: OneOrMore<TokenAmount<Amount>>, options?: TokenAddOptions) {
     super();
 
     if (isDefined(tokens)) {
@@ -58,10 +52,7 @@ export class TokensCollection extends Collection<
     return { tokenId: token.tokenId, amount: ensureBigInt(token.amount) };
   }
 
-  protected override _addOne(
-    token: OutputToken,
-    options?: TokenAddOptions
-  ): number {
+  protected override _addOne(token: OutputToken, options?: TokenAddOptions): number {
     if (isUndefined(options) || (options.sum && isUndefined(options.index))) {
       if (this._sum(this._map(token))) return this.length;
     }
@@ -77,8 +68,7 @@ export class TokensCollection extends Collection<
     options?: TokenAddOptions
   ): number {
     if (Array.isArray(items)) {
-      if (items.some((x) => !x.tokenId))
-        throw new FleetError("TokenID is required.");
+      if (items.some((x) => !x.tokenId)) throw new FleetError("TokenID is required.");
     } else if (!items.tokenId) {
       throw new FleetError("TokenID is required.");
     }
@@ -88,9 +78,7 @@ export class TokensCollection extends Collection<
 
   public mint(token: NewToken<Amount>): number {
     if (isDefined(this.#minting)) {
-      throw new FleetError(
-        "Only one minting token is allowed per transaction."
-      );
+      throw new FleetError("Only one minting token is allowed per transaction.");
     }
 
     const len = super.add({ tokenId: token.tokenId, amount: token.amount });
@@ -120,9 +108,7 @@ export class TokensCollection extends Collection<
 
       index = tokenIdOrIndex;
     } else {
-      index = this._items.findIndex(
-        (token) => token.tokenId === tokenIdOrIndex
-      );
+      index = this._items.findIndex((token) => token.tokenId === tokenIdOrIndex);
 
       if (this._isIndexOutOfBounds(index)) {
         throw new NotFoundError(

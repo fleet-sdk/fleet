@@ -1,9 +1,7 @@
 import { assert, assertInstanceOf, assertTypeOf } from "@fleet-sdk/common";
 import type { BytesCoder } from "../types";
 
-const HEXES = Array.from({ length: 256 }, (_, i) =>
-  i.toString(16).padStart(2, "0")
-);
+const HEXES = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0"));
 
 const HexChar = {
   ZERO: 48, // 0
@@ -42,10 +40,8 @@ function hexToBytes(hex: string): Uint8Array {
 
 function charCodeToBase16(char: number) {
   if (char >= HexChar.ZERO && char <= HexChar.NINE) return char - HexChar.ZERO;
-  if (char >= HexChar.A_UP && char <= HexChar.F_UP)
-    return char - (HexChar.A_UP - 10);
-  if (char >= HexChar.A_LO && char <= HexChar.F_LO)
-    return char - (HexChar.A_LO - 10);
+  if (char >= HexChar.A_UP && char <= HexChar.F_UP) return char - (HexChar.A_UP - 10);
+  if (char >= HexChar.A_LO && char <= HexChar.F_LO) return char - (HexChar.A_LO - 10);
 
   throw new Error("Invalid byte sequence.");
 }

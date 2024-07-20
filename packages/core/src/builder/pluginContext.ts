@@ -5,11 +5,7 @@ import type {
   OneOrMore,
   TokenAmount
 } from "@fleet-sdk/common";
-import {
-  NotAllowedTokenBurning,
-  type OutputBuilder,
-  type TransactionBuilder
-} from "..";
+import { NotAllowedTokenBurning, type OutputBuilder, type TransactionBuilder } from "..";
 
 export type FleetPluginContext = {
   /**
@@ -65,9 +61,7 @@ export function createPluginContext(
         .from(inputs)
         .configureSelector((selector) =>
           selector.ensureInclusion(
-            Array.isArray(inputs)
-              ? inputs.map((input) => input.boxId)
-              : inputs.boxId
+            Array.isArray(inputs) ? inputs.map((input) => input.boxId) : inputs.boxId
           )
         ).inputs.length,
     addOutputs: (outputs, options) =>

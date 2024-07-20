@@ -13,10 +13,7 @@ type JSPrimitive =
   | "object"
   | "function";
 
-export function assert(
-  condition: boolean,
-  error: ErrorMessage
-): asserts condition {
+export function assert(condition: boolean, error: ErrorMessage): asserts condition {
   if (condition) return;
 
   let err: Error | undefined = undefined;
@@ -51,10 +48,7 @@ function getTypeName(value: unknown): string {
     : type;
 }
 
-export function assertInstanceOf<T>(
-  obj: T,
-  expected: Constructable
-): asserts obj {
+export function assertInstanceOf<T>(obj: T, expected: Constructable): asserts obj {
   const condition = obj instanceof expected;
 
   if (!condition) {
@@ -64,14 +58,10 @@ export function assertInstanceOf<T>(
   }
 }
 
-export function isEmpty<T>(
-  target: T | null | undefined
-): target is undefined | null {
+export function isEmpty<T>(target: T | null | undefined): target is undefined | null {
   if (!target) return true;
 
-  return Array.isArray(target)
-    ? target.length === 0
-    : Object.keys(target).length === 0;
+  return Array.isArray(target) ? target.length === 0 : Object.keys(target).length === 0;
 }
 
 export function some<T>(target: T | null | undefined): target is T {

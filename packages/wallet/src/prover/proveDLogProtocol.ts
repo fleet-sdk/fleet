@@ -108,18 +108,12 @@ export function umod(a: bigint, b: bigint): bigint {
  * @returns A boolean indicating whether the signature is valid or not.
  * @throws FleetError if the public key is invalid.
  */
-export function verify(
-  message: Uint8Array,
-  proof: Uint8Array,
-  publicKey: Uint8Array
-) {
+export function verify(message: Uint8Array, proof: Uint8Array, publicKey: Uint8Array) {
   if (!proof || proof.length !== ERGO_SCHNORR_SIG_LEN) return false;
   if (!validateEcPoint(publicKey)) throw new FleetError("Invalid Public Key.");
 
   const pc = bigintBE.encode(proof.slice(0, ERGO_SOUNDNESS_BYTES));
-  const pz = bigintBE.encode(
-    proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN)
-  );
+  const pz = bigintBE.encode(proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN));
 
   const vt = ECPoint.fromHex(publicKey).multiply(CURVE.n - pc);
   const vw = G.multiply(pz).add(vt).toRawBytes();

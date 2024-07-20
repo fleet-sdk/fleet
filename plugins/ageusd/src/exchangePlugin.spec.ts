@@ -64,18 +64,18 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     expect(bank.stableCoinErgRate).to.be.equal(1_24n);
     expect(bank.reserveCoinErgRate).to.be.equal(2386n);
 
-    expect(
-      bank.getFeeAmountFor(mintingAmount, "reserve", "protocol")
-    ).to.be.equal(701930577n);
-    expect(
-      bank.getFeeAmountFor(mintingAmount, "reserve", "implementor")
-    ).to.be.equal(uiFee);
-    expect(
-      bank.getMintingCostFor(mintingAmount, "reserve", "base")
-    ).to.be.equal(baseCost);
-    expect(
-      bank.getMintingCostFor(mintingAmount, "reserve", "total")
-    ).to.be.equal(totalCost);
+    expect(bank.getFeeAmountFor(mintingAmount, "reserve", "protocol")).to.be.equal(
+      701930577n
+    );
+    expect(bank.getFeeAmountFor(mintingAmount, "reserve", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getMintingCostFor(mintingAmount, "reserve", "base")).to.be.equal(
+      baseCost
+    );
+    expect(bank.getMintingCostFor(mintingAmount, "reserve", "total")).to.be.equal(
+      totalCost
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -141,15 +141,15 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const totalCost = baseCost + uiFee;
 
     expect(bank.reserveRatio).to.be.equal(reserveRatio);
-    expect(
-      bank.getFeeAmountFor(mintingAmount, "reserve", "implementor")
-    ).to.be.equal(uiFee);
-    expect(
-      bank.getMintingCostFor(mintingAmount, "reserve", "base")
-    ).to.be.equal(baseCost);
-    expect(
-      bank.getMintingCostFor(mintingAmount, "reserve", "total")
-    ).to.be.equal(totalCost);
+    expect(bank.getFeeAmountFor(mintingAmount, "reserve", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getMintingCostFor(mintingAmount, "reserve", "base")).to.be.equal(
+      baseCost
+    );
+    expect(bank.getMintingCostFor(mintingAmount, "reserve", "total")).to.be.equal(
+      totalCost
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -222,18 +222,18 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const totalAmount = baseAmount - uiFee;
 
     expect(bank.reserveRatio).to.be.equal(reserveRatio);
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "stable", "protocol")
-    ).to.be.equal(protocolFee);
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "stable", "implementor")
-    ).to.be.equal(uiFee);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "stable", "base")
-    ).to.be.equal(baseAmount);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "stable", "total")
-    ).to.be.equal(totalAmount);
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "protocol")).to.be.equal(
+      protocolFee
+    );
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "base")).to.be.equal(
+      baseAmount
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "total")).to.be.equal(
+      totalAmount
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -267,8 +267,7 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     });
 
     expect(bob.balance).to.be.deep.equal({
-      nanoergs:
-        prevBobBalance.nanoergs + totalAmount - RECOMMENDED_MIN_FEE_VALUE,
+      nanoergs: prevBobBalance.nanoergs + totalAmount - RECOMMENDED_MIN_FEE_VALUE,
       tokens: [
         {
           tokenId: tokens.stableCoinId,
@@ -300,9 +299,7 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     bankParty.addUTxOs(bank.bankBox);
     bob.addBalance({
       nanoergs: SAFE_MIN_BOX_VALUE,
-      tokens: [
-        { tokenId: tokens.stableCoinId, amount: bank.redeemableStableCoins }
-      ]
+      tokens: [{ tokenId: tokens.stableCoinId, amount: bank.redeemableStableCoins }]
     });
 
     const prevBobBalance = bob.balance;
@@ -316,18 +313,18 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     const totalAmount = baseAmount - uiFee;
 
     expect(bank.reserveRatio).to.be.equal(reserveRatio);
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "stable", "protocol")
-    ).to.be.equal(protocolFee);
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "stable", "implementor")
-    ).to.be.equal(uiFee);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "stable", "base")
-    ).to.be.equal(baseAmount);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "stable", "total")
-    ).to.be.equal(totalAmount);
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "protocol")).to.be.equal(
+      protocolFee
+    );
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "base")).to.be.equal(
+      baseAmount
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "total")).to.be.equal(
+      totalAmount
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -361,8 +358,7 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     });
 
     expect(bob.balance).to.be.deep.equal({
-      nanoergs:
-        prevBobBalance.nanoergs + totalAmount - RECOMMENDED_MIN_FEE_VALUE,
+      nanoergs: prevBobBalance.nanoergs + totalAmount - RECOMMENDED_MIN_FEE_VALUE,
       tokens: []
     });
 
@@ -385,9 +381,7 @@ describe("AgeUSD exchange plugin, reserve rate under 400%", () => {
     bankParty.addUTxOs(bank.bankBox);
     bob.addBalance({
       nanoergs: SAFE_MIN_BOX_VALUE,
-      tokens: [
-        { tokenId: tokens.stableCoinId, amount: bank.redeemableStableCoins }
-      ]
+      tokens: [{ tokenId: tokens.stableCoinId, amount: bank.redeemableStableCoins }]
     });
 
     expect(bank.reserveRatio).to.be.equal(351n);
@@ -519,18 +513,18 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
     expect(bank.reserveCoinErgRate).to.be.equal(1207n);
     expect(bank.reserveRatio).to.be.equal(437n);
 
-    expect(
-      bank.getFeeAmountFor(mintingAmount, "reserve", "protocol")
-    ).to.be.equal(1387854619n);
-    expect(
-      bank.getFeeAmountFor(mintingAmount, "reserve", "implementor")
-    ).to.be.equal(uiFee);
-    expect(
-      bank.getMintingCostFor(mintingAmount, "reserve", "base")
-    ).to.be.equal(baseCost);
-    expect(
-      bank.getMintingCostFor(mintingAmount, "reserve", "total")
-    ).to.be.equal(totalCost);
+    expect(bank.getFeeAmountFor(mintingAmount, "reserve", "protocol")).to.be.equal(
+      1387854619n
+    );
+    expect(bank.getFeeAmountFor(mintingAmount, "reserve", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getMintingCostFor(mintingAmount, "reserve", "base")).to.be.equal(
+      baseCost
+    );
+    expect(bank.getMintingCostFor(mintingAmount, "reserve", "total")).to.be.equal(
+      totalCost
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -597,18 +591,16 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
     expect(bank.reserveCoinErgRate).to.be.equal(1207n);
     expect(bank.reserveRatio).to.be.equal(437n);
 
-    expect(
-      bank.getFeeAmountFor(mintingAmount, "stable", "protocol")
-    ).to.be.equal(3_526736577n);
-    expect(
-      bank.getFeeAmountFor(mintingAmount, "stable", "implementor")
-    ).to.be.equal(uiFee);
-    expect(bank.getMintingCostFor(mintingAmount, "stable", "base")).to.be.equal(
-      baseCost
+    expect(bank.getFeeAmountFor(mintingAmount, "stable", "protocol")).to.be.equal(
+      3_526736577n
     );
-    expect(
-      bank.getMintingCostFor(mintingAmount, "stable", "total")
-    ).to.be.equal(totalCost);
+    expect(bank.getFeeAmountFor(mintingAmount, "stable", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getMintingCostFor(mintingAmount, "stable", "base")).to.be.equal(baseCost);
+    expect(bank.getMintingCostFor(mintingAmount, "stable", "total")).to.be.equal(
+      totalCost
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -680,18 +672,16 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
     expect(bank.reserveCoinErgRate).to.be.equal(1207n);
     expect(bank.reserveRatio).to.be.equal(437n);
 
-    expect(
-      bank.getFeeAmountFor(mintingAmount, "stable", "protocol")
-    ).to.be.equal(848_629915300n);
-    expect(
-      bank.getFeeAmountFor(mintingAmount, "stable", "implementor")
-    ).to.be.equal(uiFee);
-    expect(bank.getMintingCostFor(mintingAmount, "stable", "base")).to.be.equal(
-      baseCost
+    expect(bank.getFeeAmountFor(mintingAmount, "stable", "protocol")).to.be.equal(
+      848_629915300n
     );
-    expect(
-      bank.getMintingCostFor(mintingAmount, "stable", "total")
-    ).to.be.equal(totalCost);
+    expect(bank.getFeeAmountFor(mintingAmount, "stable", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getMintingCostFor(mintingAmount, "stable", "base")).to.be.equal(baseCost);
+    expect(bank.getMintingCostFor(mintingAmount, "stable", "total")).to.be.equal(
+      totalCost
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -770,18 +760,18 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
     expect(bank.reserveCoinErgRate).to.be.equal(1207n);
     expect(bank.reserveRatio).to.be.equal(437n);
 
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "stable", "protocol")
-    ).to.be.equal(protocolFee);
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "stable", "implementor")
-    ).to.be.equal(uiFee);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "stable", "base")
-    ).to.be.equal(baseAmount);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "stable", "total")
-    ).to.be.equal(totalAmount);
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "protocol")).to.be.equal(
+      protocolFee
+    );
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "base")).to.be.equal(
+      baseAmount
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "total")).to.be.equal(
+      totalAmount
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -848,9 +838,7 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
     bankParty.addUTxOs(bank.bankBox);
     bob.addBalance({
       nanoergs: SAFE_MIN_BOX_VALUE,
-      tokens: [
-        { tokenId: tokens.stableCoinId, amount: bank.circulatingStableCoins }
-      ]
+      tokens: [{ tokenId: tokens.stableCoinId, amount: bank.circulatingStableCoins }]
     });
 
     const prevBobBalance = bob.balance;
@@ -867,18 +855,18 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
     expect(bank.reserveCoinErgRate).to.be.equal(1207n);
     expect(bank.reserveRatio).to.be.equal(437n);
 
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "stable", "protocol")
-    ).to.be.equal(protocolFee);
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "stable", "implementor")
-    ).to.be.equal(uiFee);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "stable", "base")
-    ).to.be.equal(baseAmount);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "stable", "total")
-    ).to.be.equal(totalAmount);
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "protocol")).to.be.equal(
+      protocolFee
+    );
+    expect(bank.getFeeAmountFor(redeemAmount, "stable", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "base")).to.be.equal(
+      baseAmount
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "stable", "total")).to.be.equal(
+      totalAmount
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -952,15 +940,15 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
     expect(bank.reserveCoinErgRate).to.be.equal(1207n);
     expect(bank.reserveRatio).to.be.equal(437n);
 
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "reserve", "protocol")
-    ).to.be.equal(protocolFee);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "reserve", "base")
-    ).to.be.equal(baseAmount);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "reserve", "total")
-    ).to.be.equal(totalAmount);
+    expect(bank.getFeeAmountFor(redeemAmount, "reserve", "protocol")).to.be.equal(
+      protocolFee
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "reserve", "base")).to.be.equal(
+      baseAmount
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "reserve", "total")).to.be.equal(
+      totalAmount
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)
@@ -1026,9 +1014,7 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
     bankParty.addUTxOs(bank.bankBox);
     bob.addBalance({
       nanoergs: SAFE_MIN_BOX_VALUE + networkFee,
-      tokens: [
-        { tokenId: tokens.reserveCoinId, amount: bank.redeemableReserveCoins }
-      ]
+      tokens: [{ tokenId: tokens.reserveCoinId, amount: bank.redeemableReserveCoins }]
     });
 
     const prevBankBalance = bankParty.balance;
@@ -1043,18 +1029,18 @@ describe("AgeUSD exchange plugin, reserve rate between 400% and 800%", () => {
     expect(bank.reserveCoinErgRate).to.be.equal(1207n);
     expect(bank.reserveRatio).to.be.equal(437n);
 
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "reserve", "protocol")
-    ).to.be.equal(protocolFee);
-    expect(
-      bank.getFeeAmountFor(redeemAmount, "reserve", "implementor")
-    ).to.be.equal(uiFee);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "reserve", "base")
-    ).to.be.equal(baseAmount);
-    expect(
-      bank.getRedeemingAmountFor(redeemAmount, "reserve", "total")
-    ).to.be.equal(totalAmount);
+    expect(bank.getFeeAmountFor(redeemAmount, "reserve", "protocol")).to.be.equal(
+      protocolFee
+    );
+    expect(bank.getFeeAmountFor(redeemAmount, "reserve", "implementor")).to.be.equal(
+      uiFee
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "reserve", "base")).to.be.equal(
+      baseAmount
+    );
+    expect(bank.getRedeemingAmountFor(redeemAmount, "reserve", "total")).to.be.equal(
+      totalAmount
+    );
 
     const transaction = new TransactionBuilder(height)
       .from(bob.utxos)

@@ -17,14 +17,11 @@ describe("assert() function", () => {
   const b = 2;
 
   it("Should not throw if condition is met", () => {
-    expect(() => assert(a + b === 3, "error message in case of failure")).not.to
-      .throw;
+    expect(() => assert(a + b === 3, "error message in case of failure")).not.to.throw;
   });
 
   it("Should throw if condition is not met", () => {
-    expect(() => assert(a + b > 3, "string error msg")).to.throw(
-      "string error msg"
-    );
+    expect(() => assert(a + b > 3, "string error msg")).to.throw("string error msg");
     expect(() => assert(a + b > 3, new Error("Error instance msg"))).to.throw(
       "Error instance msg"
     );
@@ -40,9 +37,7 @@ describe("assert() function", () => {
     expect(() => assert(a + b === 3, errorMsgMock.getErrorMsg)).not.to.throw;
     expect(mock).not.toBeCalled();
 
-    expect(() => assert(a + b > 3, errorMsgMock.getErrorMsg)).to.throw(
-      "error msg test"
-    );
+    expect(() => assert(a + b > 3, errorMsgMock.getErrorMsg)).to.throw("error msg test");
     expect(mock).toBeCalledTimes(1);
   });
 });

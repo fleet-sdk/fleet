@@ -67,12 +67,9 @@ describe("BigInt ZigZag encoding", () => {
 
   it("Should encode/decode radom numbers", () => {
     fc.assert(
-      fc.property(
-        fc.bigInt({ min: 0n, max: BigInt(Number.MAX_SAFE_INTEGER) }),
-        (n) => {
-          expect(zigZagDecodeBigInt(zigZagEncodeBigInt(n))).to.be.equal(n);
-        }
-      )
+      fc.property(fc.bigInt({ min: 0n, max: BigInt(Number.MAX_SAFE_INTEGER) }), (n) => {
+        expect(zigZagDecodeBigInt(zigZagEncodeBigInt(n))).to.be.equal(n);
+      })
     );
   });
 });

@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  ALL_BOXES_QUERY,
-  CONF_BOXES_QUERY,
-  UNCONF_BOXES_QUERY
-} from "./queries";
+import { ALL_BOXES_QUERY, CONF_BOXES_QUERY, UNCONF_BOXES_QUERY } from "./queries";
 
 describe("Box queries", () => {
   it("Should build confirmed box query", () => {

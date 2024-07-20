@@ -93,16 +93,12 @@ export interface IBlockchainProvider<B extends BoxWhere> {
   /**
    * Check for transaction validity without broadcasting it to the network.
    */
-  checkTransaction(
-    transaction: SignedTransaction
-  ): Promise<TransactionEvaluationResult>;
+  checkTransaction(transaction: SignedTransaction): Promise<TransactionEvaluationResult>;
 
   /**
    * Broadcast a transaction to the network.
    */
-  submitTransaction(
-    transaction: SignedTransaction
-  ): Promise<TransactionEvaluationResult>;
+  submitTransaction(transaction: SignedTransaction): Promise<TransactionEvaluationResult>;
 
   /**
    * Evaluate a transaction and return Base16-encoded evaluation result.

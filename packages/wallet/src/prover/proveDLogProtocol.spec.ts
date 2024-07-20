@@ -85,8 +85,8 @@ describe("ProveDLog protocol", () => {
           const signature = sign(msg, sk);
 
           expect(verify(msg, signature, pk)).to.be.true;
-          expect(verify_signature(Address.from_public_key(pk), msg, signature))
-            .to.be.true;
+          expect(verify_signature(Address.from_public_key(pk), msg, signature)).to.be
+            .true;
         }
       )
     );

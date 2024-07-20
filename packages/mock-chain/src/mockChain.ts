@@ -121,9 +121,7 @@ export class MockChain {
   }
 
   newParty(name?: string): KeyedMockChainParty;
-  newParty(
-    nonKeyedOptions?: NonKeyedMockChainPartyOptions
-  ): NonKeyedMockChainParty;
+  newParty(nonKeyedOptions?: NonKeyedMockChainPartyOptions): NonKeyedMockChainParty;
   newParty(optOrName?: string | NonKeyedMockChainPartyOptions): MockChainParty {
     return this.#pushParty(
       typeof optOrName === "string" || isUndefined(optOrName)

@@ -91,9 +91,7 @@ describe("ErgoScript Compiler", () => {
     expect(tree.template.toHex()).to.be.equal(tv.template);
     expect(hex.encode(tree.template.toBytes())).to.be.equal(tv.template);
 
-    expect(tree.hasSegregatedConstants).to.be.equal(
-      tv.options.segregateConstants
-    );
+    expect(tree.hasSegregatedConstants).to.be.equal(tv.options.segregateConstants);
     expect(tree.version).to.be.equal(tv.options.version);
 
     if (tv.options.version === 1) {
@@ -160,9 +158,9 @@ describe("Compiler constants map parsing", () => {
   });
 
   it("Should throw is an invalid hex string is passed", () => {
-    expect(() =>
-      parseNamedConstantsMap({ invalidHex: "non-hex string" })
-    ).to.throw("'non-hex string' is not a valid hex string.");
+    expect(() => parseNamedConstantsMap({ invalidHex: "non-hex string" })).to.throw(
+      "'non-hex string' is not a valid hex string."
+    );
   });
 
   it("Should throw is unsupported type is passed", () => {

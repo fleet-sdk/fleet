@@ -29,9 +29,7 @@ export type CompilerOptionsForErgoTreeV1 = CompilerOptionsBase & {
   version?: 1;
 };
 
-export type CompilerOptions =
-  | CompilerOptionsForErgoTreeV0
-  | CompilerOptionsForErgoTreeV1;
+export type CompilerOptions = CompilerOptionsForErgoTreeV0 | CompilerOptionsForErgoTreeV1;
 
 export type NamedConstantsMap = {
   [key: string]: string | Value | SConstant;
@@ -43,10 +41,7 @@ export const compilerDefaults: Required<CompilerOptions> = {
   segregateConstants: true
 };
 
-export function compile(
-  script: string,
-  options?: CompilerOptions
-): CompilerOutput {
+export function compile(script: string, options?: CompilerOptions): CompilerOutput {
   const opt = ensureDefaults(options, compilerDefaults);
   assert(opt.version < 8, `Version should be lower than 8, got ${opt.version}`);
 

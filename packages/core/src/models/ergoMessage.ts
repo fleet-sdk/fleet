@@ -33,9 +33,7 @@ export type ErgoMessageFromDataOptions = NetworkOptions & {
   data: MessageData;
 };
 
-export type ErgoMessageOptions =
-  | ErgoMessageFromHashOptions
-  | ErgoMessageFromDataOptions;
+export type ErgoMessageOptions = ErgoMessageFromHashOptions | ErgoMessageFromDataOptions;
 
 export const MessageType = {
   Hash: 0,
@@ -90,8 +88,7 @@ export class ErgoMessage {
 
   static decode(encodedHash: Base58String): ErgoMessage {
     const unpacked = unpackAddress(base58.decode(encodedHash));
-    if (unpacked.type !== AddressType.ADH)
-      throw new Error("Invalid message type");
+    if (unpacked.type !== AddressType.ADH) throw new Error("Invalid message type");
     if (!validateUnpackedAddress(unpacked))
       throw new Error("Invalid encoded message hash");
 

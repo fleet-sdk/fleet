@@ -95,8 +95,7 @@ export function utxoDiff(
   for (const token of minuend.tokens) {
     const balance =
       token.amount -
-      (subtrahend.tokens.find((t) => t.tokenId === token.tokenId)?.amount ||
-        _0n);
+      (subtrahend.tokens.find((t) => t.tokenId === token.tokenId)?.amount || _0n);
 
     if (balance !== _0n) {
       tokens.push({ tokenId: token.tokenId, amount: balance });
@@ -123,9 +122,7 @@ const MAX_NON_MANDATORY_REGISTER_INDEX = 9;
  * console.log(result);
  * // false
  */
-export function areRegistersDenselyPacked(
-  registers: NonMandatoryRegisters
-): boolean {
+export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boolean {
   let lastIndex = 0;
   for (
     let i = MIN_NON_MANDATORY_REGISTER_INDEX;
@@ -178,14 +175,10 @@ export function utxoFilter<T extends Amount>(
   }
 
   if (isDefined(max.aggregatedDistinctTokens)) {
-    const tokenIds = _getDistinctTokenIds(
-      filtered,
-      max.aggregatedDistinctTokens
-    );
+    const tokenIds = _getDistinctTokenIds(filtered, max.aggregatedDistinctTokens);
     filtered = filtered.filter(
       (utxo) =>
-        isEmpty(utxo.assets) ||
-        utxo.assets.every((token) => tokenIds.has(token.tokenId))
+        isEmpty(utxo.assets) || utxo.assets.every((token) => tokenIds.has(token.tokenId))
     );
   }
 
@@ -250,9 +243,7 @@ export type BoxAmounts = {
  * @returns A new box object with BigInt representation for the value and asset amounts.
  */
 export function ensureUTxOBigInt(box: Box<Amount>): Box<bigint>;
-export function ensureUTxOBigInt(
-  candidate: BoxCandidate<Amount>
-): BoxCandidate<bigint>;
+export function ensureUTxOBigInt(candidate: BoxCandidate<Amount>): BoxCandidate<bigint>;
 export function ensureUTxOBigInt(
   box: Box<Amount> | BoxCandidate<Amount>
 ): BoxCandidate<bigint> | Box<bigint> {

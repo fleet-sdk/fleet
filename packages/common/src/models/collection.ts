@@ -77,10 +77,7 @@ export abstract class Collection<InternalType, ExternalType>
    * @param options
    * @returns The new length of the collection
    */
-  public add(
-    items: OneOrMore<ExternalType>,
-    options?: CollectionAddOptions
-  ): number {
+  public add(items: OneOrMore<ExternalType>, options?: CollectionAddOptions): number {
     return this._addOneOrMore(items, options);
   }
 

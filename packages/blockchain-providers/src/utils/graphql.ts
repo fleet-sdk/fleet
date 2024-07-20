@@ -36,10 +36,9 @@ export type GraphQLResponse<T = unknown> =
   | GraphQLSuccessResponse<T>
   | GraphQLErrorResponse;
 
-export type GraphQLOperation<
-  R extends GraphQLResponse,
-  V extends GraphQLVariables
-> = (variables?: V) => Promise<R>;
+export type GraphQLOperation<R extends GraphQLResponse, V extends GraphQLVariables> = (
+  variables?: V
+) => Promise<R>;
 
 export interface ResponseParser {
   parse<T>(text: string): T;
@@ -65,24 +64,15 @@ export interface GraphQLThrowableOptions extends GraphQLRequestOptions {
   throwOnNonNetworkErrors: true;
 }
 
-export function createGqlOperation<
-  R,
-  V extends GraphQLVariables = GraphQLVariables
->(
+export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
   query: string,
   options: GraphQLThrowableOptions
 ): GraphQLOperation<GraphQLSuccessResponse<R>, V>;
-export function createGqlOperation<
-  R,
-  V extends GraphQLVariables = GraphQLVariables
->(
+export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
   query: string,
   options: GraphQLRequestOptions
 ): GraphQLOperation<GraphQLResponse<R>, V>;
-export function createGqlOperation<
-  R,
-  V extends GraphQLVariables = GraphQLVariables
->(
+export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
   query: string,
   options: GraphQLRequestOptions
 ): GraphQLOperation<GraphQLResponse<R>, V> {
@@ -99,9 +89,7 @@ export function createGqlOperation<
     });
 
     const rawData = await response.text();
-    const parsedData = (options.parser ?? JSON).parse(
-      rawData
-    ) as GraphQLResponse<R>;
+    const parsedData = (options.parser ?? JSON).parse(rawData) as GraphQLResponse<R>;
 
     if (
       options.throwOnNonNetworkErrors &&
@@ -126,7 +114,5 @@ export function getOpName(query: string): string | undefined {
 }
 
 export function isRequestParam(obj: unknown): obj is GraphQLRequestOptions {
-  return (
-    typeof obj === "object" && (obj as GraphQLRequestOptions).url !== undefined
-  );
+  return typeof obj === "object" && (obj as GraphQLRequestOptions).url !== undefined;
 }

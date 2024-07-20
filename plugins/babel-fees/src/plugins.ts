@@ -9,11 +9,7 @@ import {
   type TokenAmount
 } from "@fleet-sdk/core";
 import { SByte, SColl, SInt } from "@fleet-sdk/serializer";
-import {
-  getTokenPrice,
-  isBabelContractForTokenId,
-  isValidBabelBox
-} from "./utils";
+import { getTokenPrice, isBabelContractForTokenId, isValidBabelBox } from "./utils";
 
 export function BabelSwapPlugin(
   babelBox: Box<Amount>,
@@ -30,8 +26,7 @@ export function BabelSwapPlugin(
   }
 
   const input = new ErgoUnsignedInput(babelBox);
-  const changeAmount =
-    input.value - ensureBigInt(token.amount) * getTokenPrice(babelBox);
+  const changeAmount = input.value - ensureBigInt(token.amount) * getTokenPrice(babelBox);
 
   if (changeAmount < SAFE_MIN_BOX_VALUE) {
     throw new Error(

@@ -25,10 +25,7 @@ describe("Transaction executor", () => {
   });
 
   it("Should throw if private key is missing", () => {
-    const key = new KeyedMockChainParty(
-      chain,
-      "bob"
-    ).key.wipePrivateData() as ErgoHDKey;
+    const key = new KeyedMockChainParty(chain, "bob").key.wipePrivateData() as ErgoHDKey;
     const unsigned = new TransactionBuilder(1032850)
       .from(regularBoxes)
       .sendChangeTo("9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga")

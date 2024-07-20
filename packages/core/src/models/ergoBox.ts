@@ -1,9 +1,4 @@
-import type {
-  Amount,
-  Box,
-  NonMandatoryRegisters,
-  TokenAmount
-} from "@fleet-sdk/common";
+import type { Amount, Box, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeBox } from "@fleet-sdk/serializer";

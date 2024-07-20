@@ -72,9 +72,9 @@ describe("Sigma Writer", () => {
     const all = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     for (const tv of testVectors) {
       all.writeShort(tv.int);
-      expect(
-        new SigmaByteWriter(tv.hex.length).writeShort(tv.int).encode(hex)
-      ).toBe(tv.hex);
+      expect(new SigmaByteWriter(tv.hex.length).writeShort(tv.int).encode(hex)).toBe(
+        tv.hex
+      );
     }
 
     expect(all.encode(hex)).toEqual(testVectors.map((x) => x.hex).join(""));
@@ -105,9 +105,7 @@ describe("Sigma Writer", () => {
       .writeBytes(bytes)
       .writeChecksum(0);
 
-    expect(fullHashSize.toBytes()).to.be.deep.equal(
-      concatBytes(bytes, blakeHash)
-    );
+    expect(fullHashSize.toBytes()).to.be.deep.equal(concatBytes(bytes, blakeHash));
 
     const customHashFn = new SigmaByteWriter(MAX_CONSTANT_LENGTH)
       .writeBytes(bytes)

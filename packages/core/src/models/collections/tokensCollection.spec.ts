@@ -7,10 +7,8 @@ import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 import { TokensCollection } from "./tokensCollection";
 
 describe("Tokens collection", () => {
-  const tokenA =
-    "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
-  const tokenB =
-    "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
+  const tokenA = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
+  const tokenB = "bf59773def7e08375a553be4cbd862de85f66e6dd3dccb8f87f53158f9255bf5";
 
   it("Should create an empty collection", () => {
     const collection = new TokensCollection();
@@ -127,9 +125,7 @@ describe("Tokens collection", () => {
     collection.add({ tokenId: tokenB, amount: 10n });
 
     expect(collection).toHaveLength(2);
-    expect(
-      collection.toArray().find((x) => x.tokenId === tokenA)?.amount
-    ).toEqual(50n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     collection.add({ tokenId: tokenA, amount: 100n }, { sum: true });
 
@@ -172,9 +168,7 @@ describe("Tokens collection", () => {
     collection.add({ tokenId: tokenB, amount: 10n });
 
     expect(collection).toHaveLength(2);
-    expect(
-      collection.toArray().find((x) => x.tokenId === tokenA)?.amount
-    ).toEqual(50n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     collection.add({ tokenId: tokenA, amount: 100n }, { sum: false });
     expect(collection).toHaveLength(3);
@@ -194,9 +188,7 @@ describe("Tokens collection", () => {
     const collection = new TokensCollection();
     collection.add({ tokenId: tokenA, amount: "50" });
     expect(collection).toHaveLength(1);
-    expect(
-      collection.toArray().find((x) => x.tokenId === tokenA)?.amount
-    ).toEqual(50n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     collection.add([
       { tokenId: tokenA, amount: 100n },
@@ -238,9 +230,7 @@ describe("Tokens collection", () => {
     collection.remove(tokenA, 10n);
 
     expect(collection).toHaveLength(2);
-    expect(
-      collection.toArray().find((x) => x.tokenId === tokenA)?.amount
-    ).toEqual(40n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(40n);
   });
 
   it("Should subtract if amount is specified by index", () => {
@@ -251,9 +241,7 @@ describe("Tokens collection", () => {
     collection.remove(0, 10n);
 
     expect(collection).toHaveLength(2);
-    expect(
-      collection.toArray().find((x) => x.tokenId === tokenA)?.amount
-    ).toEqual(40n);
+    expect(collection.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(40n);
   });
 
   it("Should remove token if amount is equal to already inserted amount by tokenId", () => {

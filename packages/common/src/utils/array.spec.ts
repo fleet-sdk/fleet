@@ -100,9 +100,7 @@ describe("hasDuplicates() checker", () => {
 
   const duplicateNumbers = uniqueNumbers.concat([1, 2]);
   const duplicateStrings = uniqueStrings.concat(["f"]);
-  const duplicateComplexObjects = uniqueComplexObjects.concat(
-    uniqueComplexObjects[1]
-  );
+  const duplicateComplexObjects = uniqueComplexObjects.concat(uniqueComplexObjects[1]);
 
   it("Should return false with a duplicate free array", () => {
     expect(hasDuplicates(uniqueNumbers)).toBeFalsy();
@@ -137,9 +135,7 @@ describe("hasDuplicatesBy() checker", () => {
   });
 
   it("Should return true with a duplicate item key", () => {
-    expect(
-      hasDuplicatesBy(duplicateComplexObjects, (x) => x.duplicated)
-    ).toBeTruthy();
+    expect(hasDuplicatesBy(duplicateComplexObjects, (x) => x.duplicated)).toBeTruthy();
   });
 });
 

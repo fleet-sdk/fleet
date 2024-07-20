@@ -1,13 +1,7 @@
 import { describe, expect, it, test } from "vitest";
 import { SigmaByteReader } from "./sigmaByteReader";
 import { SigmaByteWriter } from "./sigmaByteWriter";
-import {
-  estimateVLQSize,
-  readBigVLQ,
-  readVLQ,
-  writeBigVLQ,
-  writeVLQ
-} from "./vlq";
+import { estimateVLQSize, readBigVLQ, readVLQ, writeBigVLQ, writeVLQ } from "./vlq";
 import fc from "fast-check";
 
 describe("VLQ encoding/decoding", () => {
@@ -110,14 +104,9 @@ describe("Big VLQ encoding/decoding", () => {
 
   it("Should encode/decode radom numbers", () => {
     fc.assert(
-      fc.property(
-        fc.bigInt({ min: 0n, max: BigInt(Number.MAX_SAFE_INTEGER) }),
-        (n) => {
-          expect(readBigVLQ(new SigmaByteReader(toBigVLQBytes(n)))).to.be.equal(
-            n
-          );
-        }
-      )
+      fc.property(fc.bigInt({ min: 0n, max: BigInt(Number.MAX_SAFE_INTEGER) }), (n) => {
+        expect(readBigVLQ(new SigmaByteReader(toBigVLQBytes(n)))).to.be.equal(n);
+      })
     );
   });
 });

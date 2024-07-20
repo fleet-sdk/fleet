@@ -51,8 +51,7 @@ describe("UTxO Collection", () => {
       value: "1000000000",
       assets: [
         {
-          tokenId:
-            "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
+          tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b",
           amount: "10"
         }
       ],

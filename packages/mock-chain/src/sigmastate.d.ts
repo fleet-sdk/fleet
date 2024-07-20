@@ -363,10 +363,7 @@ declare module "sigmastate-js/main" {
      *         - private, containing secret randomness
      *         - public, containing only commitments
      */
-    generateCommitmentsFor(
-      sigmaTree: SigmaProp,
-      generateFor: SigmaProp[]
-    ): ProverHints;
+    generateCommitmentsFor(sigmaTree: SigmaProp, generateFor: SigmaProp[]): ProverHints;
 
     /**
      * A method which is extracting partial proofs of secret knowledge for particular secrets with their
@@ -498,10 +495,7 @@ declare module "sigmastate-js/main" {
      * @param mnemonicPhrase          secret seed phrase to be used in prover for generating proofs.
      * @param mnemonicPass            password to protect secret seed phrase.
      */
-    withMnemonic(
-      mnemonicPhrase: HexString,
-      mnemonicPass: HexString
-    ): ProverBuilder;
+    withMnemonic(mnemonicPhrase: HexString, mnemonicPass: HexString): ProverBuilder;
 
     /** Configure this builder to derive the new EIP-3 secret key with the given index.
      * The derivation uses master key derived from the mnemonic configured using
@@ -554,10 +548,7 @@ declare module "sigmastate-js/main" {
   }
 
   export declare class ProverBuilder$ {
-    static create(
-      parameters: BlockchainParameters,
-      network: number
-    ): ProverBuilder;
+    static create(parameters: BlockchainParameters, network: number): ProverBuilder;
   }
 
   /**

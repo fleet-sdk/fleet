@@ -10,9 +10,7 @@ type ObjectSelector<T> = (item: T) => T[keyof T];
  */
 export function first(array: undefined): undefined;
 export function first<T>(array: ArrayLike<T>): T;
-export function first<T>(
-  array: ArrayLike<T> | undefined
-): T | number | undefined {
+export function first<T>(array: ArrayLike<T> | undefined): T | number | undefined {
   if (!array) return undefined;
   assert(array.length > 0, "Empty array.");
 
@@ -40,10 +38,7 @@ export function last<T>(array: ArrayLike<T> | undefined): T | undefined {
  */
 export function at(array: undefined, index: number): undefined;
 export function at<T>(array: ArrayLike<T>, index: number): T;
-export function at<T>(
-  array: ArrayLike<T> | undefined,
-  index: number
-): T | undefined {
+export function at<T>(array: ArrayLike<T> | undefined, index: number): T | undefined {
   const len = array?.length;
   if (!len) return undefined;
 
@@ -66,10 +61,7 @@ export function hasDuplicates<T>(array: T[]): boolean {
 /**
  * Check for duplicate keys in complex elements
  */
-export function hasDuplicatesBy<T>(
-  array: T[],
-  selector: ObjectSelector<T>
-): boolean {
+export function hasDuplicatesBy<T>(array: T[], selector: ObjectSelector<T>): boolean {
   return array.some((item, index) => {
     return array.findIndex((x) => selector(x) === selector(item)) !== index;
   });
@@ -143,10 +135,7 @@ export function orderBy<T>(
  * areEqual(array1, array4); // false
  * ```
  */
-export function areEqual<T>(
-  array1: ArrayLike<T>,
-  array2: ArrayLike<T>
-): boolean {
+export function areEqual<T>(array1: ArrayLike<T>, array2: ArrayLike<T>): boolean {
   if (array1 === array2) {
     return true;
   }
@@ -217,10 +206,7 @@ export function areEqualBy<T>(
  * startsWith(array, target2); // false
  * ```
  */
-export function startsWith<T>(
-  array: ArrayLike<T>,
-  target: ArrayLike<T>
-): boolean {
+export function startsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolean {
   if (array === target) {
     return true;
   }
@@ -253,10 +239,7 @@ export function startsWith<T>(
  * endsWith(array, target2); // false
  * ```
  */
-export function endsWith<T>(
-  array: ArrayLike<T>,
-  target: ArrayLike<T>
-): boolean {
+export function endsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolean {
   if (array === target) {
     return true;
   }
