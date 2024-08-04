@@ -14,10 +14,6 @@ import {
 } from "./graphql";
 
 describe("GraphQL query builder", () => {
-  const fetchSpy = vi
-    .spyOn(global, "fetch")
-    .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
-
   const parseSpy = vi.spyOn(JSON, "parse");
   const stringifySpy = vi.spyOn(JSON, "stringify");
 
@@ -26,6 +22,10 @@ describe("GraphQL query builder", () => {
   });
 
   it("Should fetch results with default params", async () => {
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+
     const query = gql`
       query test {
         state {
@@ -51,6 +51,78 @@ describe("GraphQL query builder", () => {
         query
       })
     });
+  });
+
+  it("Should fetch results with default params and override url", async () => {
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+
+    const query = gql`
+      query test {
+        state {
+          height
+        }
+      }
+    `;
+    const getBoxes = createGqlOperation<{ state: State }>(query, {
+      url: "https://gql.example.com/"
+    });
+    const response = await getBoxes(undefined, "https://gql.example2.com/");
+
+    expect(response.data).to.be.deep.equal({ state: { height: 1098787 } });
+    expect(fetchSpy).toHaveBeenCalledOnce();
+    expect(fetchSpy).toHaveBeenCalledWith("https://gql.example2.com/", {
+      method: "POST",
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify({
+        operationName: getOpName(query),
+        query
+      })
+    });
+  });
+
+  it("Should fetch results with default params and set url on operation call", async () => {
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+
+    const query = gql`
+      query test {
+        state {
+          height
+        }
+      }
+    `;
+    const getBoxes = createGqlOperation<{ state: State }>(query);
+    const response = await getBoxes(undefined, "https://gql.example3.com/");
+
+    expect(response.data).to.be.deep.equal({ state: { height: 1098787 } });
+    expect(fetchSpy).toHaveBeenCalledOnce();
+    expect(fetchSpy).toHaveBeenCalledWith("https://gql.example3.com/", {
+      method: "POST",
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify({
+        operationName: getOpName(query),
+        query
+      })
+    });
+  });
+
+  it("Should throw if not url is set", async () => {
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+
+    const query = gql`
+      query test {
+        state {
+          height
+        }
+      }
+    `;
+    const getBoxes = createGqlOperation<{ state: State }>(query, {});
+    await expect(getBoxes()).rejects.toThrowError("URL is required");
   });
 
   it("Should fetch results and retry on failure", async () => {

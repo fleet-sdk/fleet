@@ -35,8 +35,14 @@ export type GraphQLResponse<T = unknown> =
   | GraphQLErrorResponse;
 
 export type GraphQLOperation<R extends GraphQLResponse, V extends GraphQLVariables> = (
-  variables?: V
+  variables?: V,
+  url?: string
 ) => Promise<R>;
+
+export type GraphQLRequiredUrlOperation<
+  R extends GraphQLResponse,
+  V extends GraphQLVariables
+> = (variables: V | undefined, url: string) => Promise<R>;
 
 interface RequestParams {
   operationName?: string | null;
@@ -45,37 +51,46 @@ interface RequestParams {
 }
 
 export interface GraphQLRequestOptions {
-  url: string;
+  url?: string;
   parser?: ParserLike;
   retry?: FallbackRetryOptions;
   throwOnNonNetworkErrors?: boolean;
   httpOptions?: Omit<RequestInit, "body" | "method">;
 }
 
-export interface GraphQLThrowableOptions extends GraphQLRequestOptions {
-  throwOnNonNetworkErrors: true;
-}
-
 export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
   query: string,
-  options: GraphQLThrowableOptions
+  options: GraphQLRequestOptions & { throwOnNonNetworkErrors: true }
 ): GraphQLOperation<GraphQLSuccessResponse<R>, V>;
+export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
+  query: string,
+  options?: GraphQLRequestOptions & { url: undefined }
+): GraphQLRequiredUrlOperation<GraphQLResponse<R>, V>;
+export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
+  query: string,
+  options: GraphQLRequestOptions & { url: undefined; throwOnNonNetworkErrors: true }
+): GraphQLRequiredUrlOperation<GraphQLSuccessResponse<R>, V>;
 export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
   query: string,
   options: GraphQLRequestOptions
 ): GraphQLOperation<GraphQLResponse<R>, V>;
 export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
   query: string,
-  options: GraphQLRequestOptions
-): GraphQLOperation<GraphQLResponse<R>, V> {
-  return async (variables?: V): Promise<GraphQLResponse<R>> => {
-    const response = await request<GraphQLResponse<R>>(options.url, {
+  options?: GraphQLRequestOptions
+):
+  | GraphQLOperation<GraphQLResponse<R>, V>
+  | GraphQLRequiredUrlOperation<GraphQLResponse<R>, V> {
+  return async (variables?: V, url?: string): Promise<GraphQLResponse<R>> => {
+    url = url ?? options?.url;
+    if (!url) throw new Error("URL is required");
+
+    const response = await request<GraphQLResponse<R>>(url, {
       ...options,
       httpOptions: {
-        ...options.httpOptions,
+        ...options?.httpOptions,
         method: "POST",
-        headers: ensureDefaults(options.httpOptions?.headers, DEFAULT_HEADERS),
-        body: (options.parser ?? JSON).stringify({
+        headers: ensureDefaults(options?.httpOptions?.headers, DEFAULT_HEADERS),
+        body: (options?.parser ?? JSON).stringify({
           operationName: getOpName(query),
           query,
           variables: variables ? clearUndefined(variables) : undefined
@@ -84,7 +99,7 @@ export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariab
     });
 
     if (
-      options.throwOnNonNetworkErrors &&
+      options?.throwOnNonNetworkErrors &&
       some(response.errors) &&
       isEmpty(response.data)
     ) {
