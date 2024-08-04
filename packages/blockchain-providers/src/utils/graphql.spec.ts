@@ -53,10 +53,43 @@ describe("GraphQL query builder", () => {
     });
   });
 
+  it("Should fetch results and retry on failure", async () => {
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockRejectedValueOnce(new Error("Failed"))
+      .mockRejectedValueOnce(new Error("Failed"))
+      .mockResolvedValue(mockResponse('{"data":{"state":{"height":1098787}}}'));
+
+    const query = gql`
+      query test {
+        state {
+          height
+        }
+      }
+    `;
+    const getBoxes = createGqlOperation<{ state: State }>(query, {
+      url: "https://gql.example.com/",
+      retry: { attempts: 3, delay: 5 }
+    });
+
+    const response = await getBoxes();
+
+    expect(response.data).to.be.deep.equal({ state: { height: 1098787 } });
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    expect(fetchSpy).toHaveBeenCalledWith("https://gql.example.com/", {
+      method: "POST",
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify({
+        operationName: getOpName(query),
+        query
+      })
+    });
+  });
+
   it("Should fetch results with custom params", async () => {
     const boxId = "d8d1bf79e2b85e4ab6e23cdcdd08e5f364daa317cd6313b39ef0d4f9fdcadc6f";
     const mockedFetch = vi
-      .fn()
+      .spyOn(global, "fetch")
       .mockImplementation(fetch)
       .mockResolvedValueOnce(mockResponse(`{"data":{"boxes":[{"boxId":"${boxId}"}]}}`));
 
@@ -75,9 +108,8 @@ describe("GraphQL query builder", () => {
 
     const getBoxes = createGqlOperation<{ boxes: Box[] }, QueryBoxesArgs>(query, {
       url: "https://gql.example.com/",
-      fetcher: mockedFetch,
       parser: mockedParser,
-      headers: { foo: "bar" }
+      httpOptions: { headers: { foo: "bar" } }
     });
 
     const response = await getBoxes({ boxId });

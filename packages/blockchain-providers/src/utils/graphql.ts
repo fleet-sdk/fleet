@@ -5,16 +5,14 @@ import {
   isEmpty,
   some
 } from "@fleet-sdk/common";
+import type { FallbackRetryOptions, ParserLike } from "./networking";
+import { request } from "./networking";
 
 const OP_NAME_REGEX = /(query|mutation)\s?([\w\-_]+)?/;
-export const DEFAULT_HEADERS: Headers = {
+export const DEFAULT_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   accept: "application/graphql-response+json, application/json"
 };
-
-type Credentials = RequestCredentials;
-type Headers = HeadersInit;
-type Fetcher = typeof fetch;
 
 export type GraphQLVariables = Record<string, unknown> | null;
 
@@ -40,24 +38,18 @@ export type GraphQLOperation<R extends GraphQLResponse, V extends GraphQLVariabl
   variables?: V
 ) => Promise<R>;
 
-export interface ResponseParser {
-  parse<T>(text: string): T;
-  stringify<T>(value: T): string;
-}
-
-export interface RequestParams {
+interface RequestParams {
   operationName?: string | null;
   query: string;
   variables?: Record<string, unknown> | null;
 }
 
 export interface GraphQLRequestOptions {
-  url: URL | string;
-  headers?: Headers;
-  parser?: ResponseParser;
-  fetcher?: Fetcher;
-  credentials?: Credentials;
+  url: string;
+  parser?: ParserLike;
+  retry?: FallbackRetryOptions;
   throwOnNonNetworkErrors?: boolean;
+  httpOptions?: Omit<RequestInit, "body" | "method">;
 }
 
 export interface GraphQLThrowableOptions extends GraphQLRequestOptions {
@@ -77,31 +69,30 @@ export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariab
   options: GraphQLRequestOptions
 ): GraphQLOperation<GraphQLResponse<R>, V> {
   return async (variables?: V): Promise<GraphQLResponse<R>> => {
-    const response = await (options.fetcher ?? fetch)(options.url, {
-      method: "POST",
-      headers: ensureDefaults(options.headers, DEFAULT_HEADERS),
-      credentials: options.credentials,
-      body: (options.parser ?? JSON).stringify({
-        operationName: getOpName(query),
-        query,
-        variables: variables ? clearUndefined(variables) : undefined
-      } as RequestParams)
+    const response = await request<GraphQLResponse<R>>(options.url, {
+      ...options,
+      httpOptions: {
+        ...options.httpOptions,
+        method: "POST",
+        headers: ensureDefaults(options.httpOptions?.headers, DEFAULT_HEADERS),
+        body: (options.parser ?? JSON).stringify({
+          operationName: getOpName(query),
+          query,
+          variables: variables ? clearUndefined(variables) : undefined
+        } as RequestParams)
+      }
     });
-
-    const rawData = await response.text();
-    const parsedData = (options.parser ?? JSON).parse(rawData) as GraphQLResponse<R>;
 
     if (
       options.throwOnNonNetworkErrors &&
-      some(parsedData.errors) &&
-      isEmpty(parsedData.data)
+      some(response.errors) &&
+      isEmpty(response.data)
     ) {
-      throw new BlockchainProviderError(parsedData.errors[0].message, {
-        cause: parsedData.errors
-      });
+      const msg = response.errors[0].message;
+      throw new BlockchainProviderError(msg, { cause: response.errors });
     }
 
-    return parsedData;
+    return response;
   };
 }
 
