@@ -33,7 +33,6 @@ import {
   type GraphQLOperation,
   type GraphQLRequestOptions,
   type GraphQLSuccessResponse,
-  type GraphQLThrowableOptions,
   type GraphQLVariables,
   isRequestParam
 } from "../utils";
@@ -73,6 +72,8 @@ type SignedTxArgsResp = { signedTransaction: SignedTransaction };
 
 const PAGE_SIZE = 50;
 
+type GraphQLThrowableOptions = GraphQLRequestOptions & { throwOnNonNetworkErrors: true };
+
 export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   #options: GraphQLThrowableOptions;
 
@@ -83,9 +84,9 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
   #checkTx;
   #sendTx;
 
-  constructor(url: string | URL);
+  constructor(url: string);
   constructor(url: ErgoGraphQLRequestOptions);
-  constructor(optOrUrl: ErgoGraphQLRequestOptions | string | URL) {
+  constructor(optOrUrl: ErgoGraphQLRequestOptions | string) {
     this.#options = {
       ...(isRequestParam(optOrUrl) ? optOrUrl : { url: optOrUrl }),
       throwOnNonNetworkErrors: true

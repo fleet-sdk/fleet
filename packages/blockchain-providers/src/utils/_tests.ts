@@ -1,8 +1,7 @@
-export const mockResponse = (data: string) => {
-  return {
-    text: () => new Promise((resolve) => resolve(data))
-  } as unknown as Response;
-};
+export const mockResponse = (data: string) =>
+  ({ text: () => new Promise((resolve) => resolve(data)) }) as unknown as Response;
+
+export const mockResponseData = (data: unknown) => mockResponse(JSON.stringify(data));
 
 export const mockChunkedResponse = (chunks: string[]) => {
   let i = 0;
