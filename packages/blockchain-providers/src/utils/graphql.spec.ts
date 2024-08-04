@@ -110,10 +110,6 @@ describe("GraphQL query builder", () => {
   });
 
   it("Should throw if not url is set", async () => {
-    const fetchSpy = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
-
     const query = gql`
       query test {
         state {
