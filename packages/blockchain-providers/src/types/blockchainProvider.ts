@@ -3,7 +3,9 @@ import type {
   BlockHeader,
   Box,
   BoxId,
+  DataInput,
   HexString,
+  ProverResult,
   SignedTransaction,
   TokenId,
   TransactionId,
@@ -13,19 +15,6 @@ import type { ErgoAddress } from "@fleet-sdk/core";
 import type { RequireAtLeastOne } from "type-fest";
 
 export type BoxSource = "blockchain" | "mempool" | "blockchain+mempool";
-
-export type BoxQuery<W extends BoxWhere> = {
-  /** The query to filter boxes. */
-  where: RequireAtLeastOne<W>;
-
-  /**
-   * The source of boxes to query.
-   * @default "blockchain+mempool"
-   */
-  from?: BoxSource;
-};
-
-export type HeaderQuery = { take: number };
 
 export type BoxWhere = {
   /** Base16-encoded BoxId */
@@ -44,8 +33,59 @@ export type BoxWhere = {
   tokenId?: TokenId;
 };
 
-export type ChainProviderBox = Box<bigint> & {
+export type BoxQuery<W extends BoxWhere> = {
+  /** The query to filter boxes. */
+  where: RequireAtLeastOne<W>;
+
+  /**
+   * The source of boxes to query.
+   * @default "blockchain+mempool"
+   */
+  from?: BoxSource;
+};
+
+export type TransactionWhere = {
+  /** Base16-encoded TransactionId */
+  transactionId?: TransactionId;
+
+  /** Base16-encoded HeaderID */
+  headerId?: HexString;
+
+  /** Base58-encoded address */
+  address?: ErgoAddress | Base58String;
+
+  /** Base16-encoded ErgoTree */
+  ergoTree?: HexString;
+
+  /** Min blockchain height */
+  minHeight?: number;
+
+  /** Only returns relevant outputs for the selected filter params */
+  onlyRelevantOutputs?: boolean;
+};
+
+export type TransactionQuery<W extends TransactionWhere> = {
+  /** The query to filter boxes. */
+  where: RequireAtLeastOne<W, keyof Omit<W, "minHeight" | "onlyRelevantOutputs">>;
+
+  /**
+   * The source of boxes to query.
+   * @default "blockchain+mempool"
+   */
+  from?: BoxSource;
+};
+
+export type HeaderQuery = { take: number };
+
+export type ChainProviderBox = Box<string> & {
   confirmed: boolean;
+};
+
+export type ChainProviderTransaction = {
+  id: TransactionId;
+  inputs: ChainProviderBox & { spendingProof: ProverResult }[];
+  dataInputs: DataInput[];
+  outputs: ChainProviderBox[];
 };
 
 export type TransactionEvaluationError = {
@@ -74,7 +114,9 @@ export type TransactionReductionResult =
  * Represents a blockchain provider that can interact with the blockchain.
  * @template B The type of the box query used by the provider.
  */
-export interface IBlockchainProvider<B extends BoxWhere> {
+export interface IBlockchainProvider<B extends BoxWhere, T extends TransactionWhere> {
+  updateUrl(url: string): void;
+
   /**
    * Get boxes.
    */
@@ -84,6 +126,18 @@ export interface IBlockchainProvider<B extends BoxWhere> {
    * Stream boxes.
    */
   streamBoxes(query: BoxQuery<B>): AsyncIterable<ChainProviderBox[]>;
+
+  /**
+   * Stream transactions
+   */
+  streamTransactions(
+    query: TransactionQuery<T>
+  ): AsyncIterable<ChainProviderTransaction[]>;
+
+  /**
+   * Get transactions
+   */
+  getTransactions(query: TransactionQuery<T>): Promise<ChainProviderTransaction[]>;
 
   /**
    * Get headers.

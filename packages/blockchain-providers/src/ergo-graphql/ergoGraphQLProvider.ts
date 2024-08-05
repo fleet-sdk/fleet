@@ -23,10 +23,13 @@ import type {
   BoxQuery,
   BoxWhere,
   ChainProviderBox,
+  ChainProviderTransaction,
   HeaderQuery,
   IBlockchainProvider,
   TransactionEvaluationResult,
-  TransactionReductionResult
+  TransactionQuery,
+  TransactionReductionResult,
+  TransactionWhere
 } from "../types/blockchainProvider";
 import {
   createGqlOperation,
@@ -56,6 +59,12 @@ export type GraphQLBoxWhere = BoxWhere & {
   addresses?: (Base58String | ErgoAddress)[];
 };
 
+export type GraphQLTransactionWhere = TransactionWhere & {
+  transactionIds?: HexString[];
+  addresses?: (Base58String | ErgoAddress)[];
+  ergoTrees?: HexString[];
+};
+
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
 export type ErgoGraphQLRequestOptions = Omit<
   GraphQLRequestOptions,
@@ -74,7 +83,9 @@ const PAGE_SIZE = 50;
 
 type GraphQLThrowableOptions = GraphQLRequestOptions & { throwOnNonNetworkErrors: true };
 
-export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
+export class ErgoGraphQLProvider
+  implements IBlockchainProvider<GraphQLBoxWhere, TransactionWhere>
+{
   #options: GraphQLThrowableOptions;
 
   #getConfBoxes;
@@ -119,10 +130,14 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
 
   #fetchBoxes(args: QueryBoxesArgs, inclConf: boolean, inclUnconf: boolean) {
     return inclConf && inclUnconf
-      ? this.#getAllBoxes(args)
+      ? this.#getAllBoxes(args, this.#options.url)
       : inclUnconf
-        ? this.#getUnconfBoxes(args)
-        : this.#getConfBoxes(args);
+        ? this.#getUnconfBoxes(args, this.#options.url)
+        : this.#getConfBoxes(args, this.#options.url);
+  }
+
+  async updateUrl(url: string) {
+    this.#options.url = url;
   }
 
   async *streamBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainProviderBox[]> {
@@ -186,17 +201,27 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
     } while (inclChain || inclPool);
   }
 
-  async getBoxes(query: GraphQLBoxQuery): Promise<ChainProviderBox[]> {
-    let boxes: ChainProviderBox[] = [];
-    for await (const chunk of this.streamBoxes(query)) {
-      boxes = boxes.concat(chunk);
-    }
+  async getTransactions(
+    query: TransactionQuery<TransactionWhere>
+  ): Promise<ChainProviderTransaction[]> {
+    throw new Error("Method not implemented.");
+  }
 
-    return orderBy(boxes, (box) => box.creationHeight);
+  // async *
+  streamTransactions(
+    query: TransactionQuery<TransactionWhere>
+  ): AsyncIterable<ChainProviderTransaction[]> {
+    throw new Error("Method not implemented.");
+  }
+
+  async getBoxes(query: GraphQLBoxQuery): Promise<ChainProviderBox[]> {
+    const boxes: ChainProviderBox[][] = [];
+    for await (const chunk of this.streamBoxes(query)) boxes.push(chunk);
+    return orderBy(boxes.flat(), (box) => box.creationHeight);
   }
 
   async getHeaders(query: HeaderQuery): Promise<BlockHeader[]> {
-    const response = await this.#getHeaders(query);
+    const response = await this.#getHeaders(query, this.#options.url);
 
     return (
       response.data?.blockHeaders.map((header) => ({
@@ -223,8 +248,7 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
     signedTransaction: SignedTransaction
   ): Promise<TransactionEvaluationResult> {
     try {
-      const response = await this.#checkTx({ signedTransaction });
-
+      const response = await this.#checkTx({ signedTransaction }, this.#options.url);
       return { success: true, transactionId: response.data.checkTransaction };
     } catch (e) {
       return { success: false, message: (e as Error).message };
@@ -235,8 +259,7 @@ export class ErgoGraphQLProvider implements IBlockchainProvider<BoxWhere> {
     signedTransaction: SignedTransaction
   ): Promise<TransactionEvaluationResult> {
     try {
-      const response = await this.#sendTx({ signedTransaction });
-
+      const response = await this.#sendTx({ signedTransaction }, this.#options.url);
       return { success: true, transactionId: response.data.submitTransaction };
     } catch (e) {
       return { success: false, message: (e as Error).message };
@@ -290,13 +313,5 @@ function hasConfirmed(data: unknown): data is ConfirmedBoxesResponse {
 }
 
 function asConfirmed(confirmed: boolean) {
-  return (box: Box): ChainProviderBox => ({
-    ...box,
-    value: BigInt(box.value),
-    assets: box.assets.map((asset) => ({
-      tokenId: asset.tokenId,
-      amount: BigInt(asset.amount)
-    })),
-    confirmed
-  });
+  return (box: Box): ChainProviderBox => ({ ...box, confirmed });
 }

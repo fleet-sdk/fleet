@@ -16,7 +16,7 @@ describe("Box queries", () => {
 
   it("Should build unconfirmed box query", () => {
     expect(UNCONF_BOXES_QUERY).to.be.equal(
-      "query boxes($spent: Boolean! $boxIds: [String!] $ergoTrees: [String!] $ergoTreeTemplateHash: String $tokenId: String $skip: Int $take: Int) { mempool { boxes(boxIds: $boxIds ergoTrees: $ergoTrees ergoTreeTemplateHash: $ergoTreeTemplateHash tokenId: $tokenId skip: $skip take: $take) { boxId transactionId index value creationHeight ergoTree assets { tokenId amount } additionalRegisters beingSpent } } }"
+      "query boxes($boxIds: [String!] $ergoTrees: [String!] $ergoTreeTemplateHash: String $tokenId: String $skip: Int $take: Int) { mempool { boxes(boxIds: $boxIds ergoTrees: $ergoTrees ergoTreeTemplateHash: $ergoTreeTemplateHash tokenId: $tokenId skip: $skip take: $take) { boxId transactionId index value creationHeight ergoTree assets { tokenId amount } additionalRegisters beingSpent } } }"
     );
   });
 });
