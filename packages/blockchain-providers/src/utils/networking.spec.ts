@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { exponentialRetry, request } from "./networking";
-import { mockResponseData } from "./_tests";
+import { resolveData } from "./_tests";
 
 describe("exponentialRetry", () => {
   afterEach(() => {
@@ -47,7 +47,7 @@ describe("request", () => {
     const mockResponse = { data: "response" };
     const fetchMock = vi
       .spyOn(global, "fetch")
-      .mockResolvedValue(mockResponseData(mockResponse));
+      .mockResolvedValue(resolveData(mockResponse));
 
     const parserMock = {
       parse: vi.fn().mockReturnValue(mockResponse),
@@ -72,7 +72,7 @@ describe("request", () => {
     const mockResponse = { data: "response" };
     const fetchMock = vi
       .spyOn(global, "fetch")
-      .mockResolvedValue(mockResponseData(mockResponse));
+      .mockResolvedValue(resolveData(mockResponse));
 
     const result = await request("https://example.com/api/data", {
       query: { param: "value" }
@@ -89,7 +89,7 @@ describe("request", () => {
     const mockResponse = { data: "response" };
     const fetchMock = vi
       .spyOn(global, "fetch")
-      .mockResolvedValue(mockResponseData(mockResponse));
+      .mockResolvedValue(resolveData(mockResponse));
 
     const result = await request("https://example.com/api/data");
 
@@ -102,7 +102,7 @@ describe("request", () => {
     const fetchMock = vi
       .spyOn(global, "fetch")
       .mockRejectedValueOnce(new Error("Failed"))
-      .mockResolvedValueOnce(mockResponseData(mockResponse));
+      .mockResolvedValueOnce(resolveData(mockResponse));
 
     const parserMock = {
       parse: vi.fn().mockReturnValue(mockResponse),
@@ -152,7 +152,7 @@ describe("request", () => {
       .spyOn(global, "fetch")
       .mockRejectedValueOnce(new Error("Failed"))
       .mockRejectedValueOnce(new Error("Failed"))
-      .mockResolvedValueOnce(mockResponseData(mockResponse));
+      .mockResolvedValueOnce(resolveData(mockResponse));
 
     const fallbacks = [
       { base: "https://fallback1.com", path: "/api/data", query: { param: "value1" } },

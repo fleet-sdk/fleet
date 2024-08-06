@@ -4,13 +4,11 @@ import { ErgoAddress } from "@fleet-sdk/core";
 import { mockedGraphQLBoxes } from "_test-vectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ChainProviderBox } from "../types/blockchainProvider";
-import { mockChunkedResponse, mockResponse } from "../utils";
+import { resolveData, resolveString } from "../utils";
 import { ErgoGraphQLProvider } from "./ergoGraphQLProvider";
 import { ALL_BOXES_QUERY, CONF_BOXES_QUERY, UNCONF_BOXES_QUERY } from "./queries";
 
-function encodeSuccessResponseData<T>(data: T): string {
-  return JSON.stringify({ data });
-}
+const resolve = (data: unknown) => resolveData({ data });
 
 describe("ergo-graphql provider", () => {
   afterEach(() => {
@@ -32,10 +30,7 @@ describe("ergo-graphql provider", () => {
         boxes: mockedGraphQLBoxes.slice(0, 2),
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
       };
-      const mockedResponse = encodeSuccessResponseData(mockedData);
-      const fetchSpy = vi
-        .spyOn(global, "fetch")
-        .mockResolvedValue(mockResponse(mockedResponse));
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(resolve(mockedData));
 
       await _client.getBoxes({
         where: {
@@ -79,10 +74,8 @@ describe("ergo-graphql provider", () => {
         boxes: mockedGraphQLBoxes.slice(0, 2),
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
       };
-      const mockedResponse = encodeSuccessResponseData(mockedData);
-      const fetchSpy = vi
-        .spyOn(global, "fetch")
-        .mockResolvedValue(mockResponse(mockedResponse));
+
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(resolve(mockedData));
 
       await _client.getBoxes({
         where: {
@@ -108,10 +101,7 @@ describe("ergo-graphql provider", () => {
         boxes: mockedGraphQLBoxes.slice(0, 2),
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
       };
-      const mockedResponse = encodeSuccessResponseData(mockedData);
-      const fetchSpy = vi
-        .spyOn(global, "fetch")
-        .mockResolvedValue(mockResponse(mockedResponse));
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(resolve(mockedData));
       const tree0 =
         "0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d";
       const tree1 =
@@ -158,8 +148,7 @@ describe("ergo-graphql provider", () => {
         boxes: mockedGraphQLBoxes.slice(0, 2),
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
       };
-      const mockedResponse = encodeSuccessResponseData(mockedData);
-      vi.spyOn(global, "fetch").mockResolvedValueOnce(mockResponse(mockedResponse));
+      vi.spyOn(global, "fetch").mockResolvedValueOnce(resolve(mockedData));
 
       await expect(
         // biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -172,10 +161,10 @@ describe("ergo-graphql provider", () => {
         boxes: mockedGraphQLBoxes.slice(0, 2),
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
       };
-      const mockedResponse = encodeSuccessResponseData(mockedData);
+
       const fetchSpy = vi
         .spyOn(global, "fetch")
-        .mockResolvedValueOnce(mockResponse(mockedResponse));
+        .mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
@@ -205,10 +194,10 @@ describe("ergo-graphql provider", () => {
         boxes: mockedGraphQLBoxes.slice(0, 2),
         mempool: { boxes: mockedGraphQLBoxes.slice(0, 4) }
       };
-      const mockedResponse = encodeSuccessResponseData(mockedData);
+
       const fetchSpy = vi
         .spyOn(global, "fetch")
-        .mockResolvedValueOnce(mockResponse(mockedResponse));
+        .mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(4);
@@ -221,10 +210,9 @@ describe("ergo-graphql provider", () => {
 
     it("Should return empty array when response is empty", async () => {
       const mockedData = { boxes: [], mempool: { boxes: [] } };
-      const mockedResponse = encodeSuccessResponseData(mockedData);
       const fetchSpy = vi
         .spyOn(global, "fetch")
-        .mockResolvedValueOnce(mockResponse(mockedResponse));
+        .mockResolvedValueOnce(resolve(mockedData));
 
       const response = await _client.getBoxes(_dumbQuery);
       expect(response).to.be.empty;
@@ -240,10 +228,9 @@ describe("ergo-graphql provider", () => {
       mockedData.boxes[0].beingSpent = true;
       mockedData.mempool.boxes[0].beingSpent = true;
 
-      const mockedResponse = encodeSuccessResponseData(mockedData);
       const fetchSpy = vi
         .spyOn(global, "fetch")
-        .mockResolvedValueOnce(mockResponse(mockedResponse));
+        .mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
@@ -265,10 +252,9 @@ describe("ergo-graphql provider", () => {
       // this should be ignored for this case, as it's not a mempool aware operation
       mockedData.boxes[0].beingSpent = true;
 
-      const mockedResponse = encodeSuccessResponseData(mockedData);
       const fetchSpy = vi
         .spyOn(global, "fetch")
-        .mockResolvedValueOnce(mockResponse(mockedResponse));
+        .mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
@@ -296,10 +282,9 @@ describe("ergo-graphql provider", () => {
         mempool: { boxes: mockedGraphQLBoxes.slice(10, 12) }
       };
 
-      const mockedResponse = encodeSuccessResponseData(mockedData);
       const fetchSpy = vi
         .spyOn(global, "fetch")
-        .mockResolvedValueOnce(mockResponse(mockedResponse));
+        .mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
@@ -325,26 +310,32 @@ describe("ergo-graphql provider", () => {
       const chunks = chunk(mockedGraphQLBoxes, pageSize);
       const [conf0, conf1, conf2, mempool] = chunks;
 
-      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
-        mockChunkedResponse([
-          encodeSuccessResponseData({
-            boxes: conf0,
-            mempool: { boxes: mempool }
-          }),
-          encodeSuccessResponseData({
-            boxes: conf1,
-            mempool: { boxes: [] }
-          }),
-          encodeSuccessResponseData({
-            boxes: conf2,
-            mempool: { boxes: [] }
-          }),
-          encodeSuccessResponseData({
-            boxes: [],
-            mempool: { boxes: [] }
-          })
-        ])
-      );
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(resolve({ boxes: conf0, mempool: { boxes: mempool } }))
+        .mockResolvedValueOnce(resolve({ boxes: conf1, mempool: { boxes: [] } }))
+        .mockResolvedValueOnce(resolve({ boxes: conf2, mempool: { boxes: [] } }))
+        .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: [] } }))
+        .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: [] } }));
+      //   mockChunkedResponse([
+      //     encodeSuccessResponseData({
+      //       boxes: conf0,
+      //       mempool: { boxes: mempool }
+      //     }),
+      //     encodeSuccessResponseData({
+      //       boxes: conf1,
+      //       mempool: { boxes: [] }
+      //     }),
+      //     encodeSuccessResponseData({
+      //       boxes: conf2,
+      //       mempool: { boxes: [] }
+      //     }),
+      //     encodeSuccessResponseData({
+      //       boxes: [],
+      //       mempool: { boxes: [] }
+      //     })
+      //   ])
+      // );
 
       let boxesCount = 0;
       for await (const boxes of _client.streamBoxes(_dumbQuery)) {
@@ -377,26 +368,12 @@ describe("ergo-graphql provider", () => {
       const chunks = chunk(mockedGraphQLBoxes, pageSize);
       const [mem1, mem2, mem3, conf] = chunks;
 
-      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
-        mockChunkedResponse([
-          encodeSuccessResponseData({
-            boxes: conf,
-            mempool: { boxes: mem1 }
-          }),
-          encodeSuccessResponseData({
-            boxes: [],
-            mempool: { boxes: mem2 }
-          }),
-          encodeSuccessResponseData({
-            boxes: [],
-            mempool: { boxes: mem3 }
-          }),
-          encodeSuccessResponseData({
-            boxes: [],
-            mempool: { boxes: [] }
-          })
-        ])
-      );
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(resolve({ boxes: conf, mempool: { boxes: mem1 } }))
+        .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: mem2 } }))
+        .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: mem3 } }))
+        .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: [] } }));
 
       let boxesCount = 0;
       for await (const boxes of _client.streamBoxes(_dumbQuery)) {
@@ -433,32 +410,20 @@ describe("ergo-graphql provider", () => {
       const chunks = chunk(mockedGraphQLBoxes, pageSize);
       const [conf0, conf1, conf2, mempool] = chunks;
 
-      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
-        mockChunkedResponse([
-          encodeSuccessResponseData({
-            boxes: conf0,
-            mempool: { boxes: mempool }
-          }),
-          encodeSuccessResponseData({
-            boxes: conf1,
-            mempool: { boxes: [] }
-          }),
-          encodeSuccessResponseData({
-            boxes: conf2,
-            mempool: { boxes: [] }
-          }),
-          encodeSuccessResponseData({
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(resolve({ boxes: conf0, mempool: { boxes: mempool } }))
+        .mockResolvedValueOnce(resolve({ boxes: conf1, mempool: { boxes: [] } }))
+        .mockResolvedValueOnce(resolve({ boxes: conf2, mempool: { boxes: [] } }))
+        .mockResolvedValueOnce(
+          resolve({
             // move 2 boxes from mempool to blockchain, thus they should be filtered out,
             // as they were already returned in the first chunk
             boxes: mempool,
             mempool: { boxes: [] }
-          }),
-          encodeSuccessResponseData({
-            boxes: [],
-            mempool: { boxes: [] }
           })
-        ])
-      );
+        )
+        .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: [] } }));
 
       let allBoxes: ChainProviderBox[] = [];
       for await (const boxes of _client.streamBoxes(_dumbQuery)) {
@@ -479,7 +444,7 @@ describe("ergo-graphql provider", () => {
     const mockDataJSON = JSON.parse(mockData);
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse(mockData));
+      .mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.getHeaders({ take: 2 });
@@ -500,7 +465,7 @@ describe("ergo-graphql provider", () => {
     const url = "https://gql.example.com/";
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+      .mockResolvedValueOnce(resolveString('{"data":{"state":{"height":1098787}}}'));
     const client = new ErgoGraphQLProvider(url);
 
     const operation = client.createOperation("query test { state { height } }");
@@ -516,7 +481,7 @@ describe("ergo-graphql provider", () => {
     const mockData = "{}";
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse(mockData));
+      .mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.getHeaders({ take: 2 });
@@ -528,7 +493,7 @@ describe("ergo-graphql provider", () => {
     const mockData = '{"data":{"checkTransaction": "txId"}}';
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse(mockData));
+      .mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.checkTransaction({
@@ -546,7 +511,7 @@ describe("ergo-graphql provider", () => {
     const mockData = '{"errors":[{"message":"Transaction is invalid"}]}';
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse(mockData));
+      .mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.checkTransaction({
@@ -567,7 +532,7 @@ describe("ergo-graphql provider", () => {
     const mockData = '{"data":{"submitTransaction": "txId"}}';
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse(mockData));
+      .mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.submitTransaction({
@@ -585,7 +550,7 @@ describe("ergo-graphql provider", () => {
     const mockData = '{"errors":[{"message":"Transaction not accepted by the node"}]}';
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse(mockData));
+      .mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.submitTransaction({

@@ -81,12 +81,25 @@ export type ChainProviderBox = Box<string> & {
   confirmed: boolean;
 };
 
-export type ChainProviderTransaction = {
-  id: TransactionId;
+export type ChainProviderUnconfirmedTransaction = {
+  transactionId: TransactionId;
   inputs: ChainProviderBox & { spendingProof: ProverResult }[];
-  dataInputs: DataInput[];
+  dataInputs: DataInput[] & { index: number };
   outputs: ChainProviderBox[];
+  confirmed: false;
+  timestamp: number;
 };
+
+export type ChainProviderConfirmedTransaction = ChainProviderUnconfirmedTransaction & {
+  confirmed: true;
+  height: number;
+  index: number;
+  headerId: HexString;
+};
+
+export type ChainProviderTransaction =
+  | ChainProviderUnconfirmedTransaction
+  | ChainProviderConfirmedTransaction;
 
 export type TransactionEvaluationError = {
   success: false;
@@ -128,16 +141,32 @@ export interface IBlockchainProvider<B extends BoxWhere, T extends TransactionWh
   streamBoxes(query: BoxQuery<B>): AsyncIterable<ChainProviderBox[]>;
 
   /**
-   * Stream transactions
+   * Stream unconfirmed transactions
    */
-  streamTransactions(
+  streamUnconfirmedTransactions(
     query: TransactionQuery<T>
-  ): AsyncIterable<ChainProviderTransaction[]>;
+  ): AsyncIterable<ChainProviderUnconfirmedTransaction[]>;
 
   /**
-   * Get transactions
+   * Get unconfirmed transactions
    */
-  getTransactions(query: TransactionQuery<T>): Promise<ChainProviderTransaction[]>;
+  getUnconfirmedTransactions(
+    query: TransactionQuery<T>
+  ): Promise<ChainProviderUnconfirmedTransaction[]>;
+
+  /**
+   * Stream confirmed transactions
+   */
+  streamConfirmedTransactions(
+    query: TransactionQuery<T>
+  ): AsyncIterable<ChainProviderConfirmedTransaction[]>;
+
+  /**
+   * Get confirmed transactions
+   */
+  getConfirmedTransactions(
+    query: TransactionQuery<T>
+  ): Promise<ChainProviderConfirmedTransaction[]>;
 
   /**
    * Get headers.

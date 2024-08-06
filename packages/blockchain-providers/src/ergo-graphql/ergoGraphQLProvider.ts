@@ -2,7 +2,9 @@ import type {
   Box,
   QueryBoxesArgs,
   Header,
-  QueryBlockHeadersArgs
+  QueryBlockHeadersArgs,
+  Transaction,
+  UnconfirmedTransaction
 } from "@ergo-graphql/types";
 import {
   type Base58String,
@@ -23,7 +25,8 @@ import type {
   BoxQuery,
   BoxWhere,
   ChainProviderBox,
-  ChainProviderTransaction,
+  ChainProviderConfirmedTransaction,
+  ChainProviderUnconfirmedTransaction,
   HeaderQuery,
   IBlockchainProvider,
   TransactionEvaluationResult,
@@ -47,6 +50,8 @@ import {
   SEND_TX_MUTATION,
   UNCONF_BOXES_QUERY
 } from "./queries";
+
+type GraphQLThrowableOptions = GraphQLRequestOptions & { throwOnNonNetworkErrors: true };
 
 export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded BoxIds */
@@ -74,14 +79,14 @@ export type ErgoGraphQLRequestOptions = Omit<
 type ConfirmedBoxesResponse = { boxes: Box[] };
 type UnconfirmedBoxesResponse = { mempool: { boxes: Box[] } };
 type CombinedBoxesResponse = ConfirmedBoxesResponse & UnconfirmedBoxesResponse;
+type UnconfirmedTxResponse = { mempool: { transactions: UnconfirmedTransaction[] } };
+type ConfirmedTxResponse = { transactions: Transaction[] };
 type BlockHeadersResponse = { blockHeaders: Header[] };
 type CheckTransactionResponse = { checkTransaction: string };
 type TransactionSubmissionResponse = { submitTransaction: string };
 type SignedTxArgsResp = { signedTransaction: SignedTransaction };
 
 const PAGE_SIZE = 50;
-
-type GraphQLThrowableOptions = GraphQLRequestOptions & { throwOnNonNetworkErrors: true };
 
 export class ErgoGraphQLProvider
   implements IBlockchainProvider<GraphQLBoxWhere, TransactionWhere>
@@ -201,23 +206,34 @@ export class ErgoGraphQLProvider
     } while (inclChain || inclPool);
   }
 
-  async getTransactions(
-    query: TransactionQuery<TransactionWhere>
-  ): Promise<ChainProviderTransaction[]> {
-    throw new Error("Method not implemented.");
-  }
-
-  // async *
-  streamTransactions(
-    query: TransactionQuery<TransactionWhere>
-  ): AsyncIterable<ChainProviderTransaction[]> {
-    throw new Error("Method not implemented.");
-  }
-
   async getBoxes(query: GraphQLBoxQuery): Promise<ChainProviderBox[]> {
     const boxes: ChainProviderBox[][] = [];
     for await (const chunk of this.streamBoxes(query)) boxes.push(chunk);
     return orderBy(boxes.flat(), (box) => box.creationHeight);
+  }
+
+  streamUnconfirmedTransactions(
+    query: TransactionQuery<TransactionWhere>
+  ): AsyncIterable<ChainProviderUnconfirmedTransaction[]> {
+    throw new Error("Method not implemented.");
+  }
+
+  getUnconfirmedTransactions(
+    query: TransactionQuery<TransactionWhere>
+  ): Promise<ChainProviderUnconfirmedTransaction[]> {
+    throw new Error("Method not implemented.");
+  }
+
+  streamConfirmedTransactions(
+    query: TransactionQuery<TransactionWhere>
+  ): AsyncIterable<ChainProviderConfirmedTransaction[]> {
+    throw new Error("Method not implemented.");
+  }
+
+  getConfirmedTransactions(
+    query: TransactionQuery<TransactionWhere>
+  ): Promise<ChainProviderConfirmedTransaction[]> {
+    throw new Error("Method not implemented.");
   }
 
   async getHeaders(query: HeaderQuery): Promise<BlockHeader[]> {
@@ -286,12 +302,34 @@ function buildGqlBoxQueryArgs(where: GraphQLBoxWhere) {
   if (some(addresses)) {
     const trees = addresses.map((address) =>
       typeof address === "string"
-        ? ErgoAddress.fromBase58(address).ergoTree
+        ? ErgoAddress.decode(address).ergoTree
         : address.ergoTree
     );
 
     args.ergoTrees = uniq(some(args.ergoTrees) ? args.ergoTrees.concat(trees) : trees);
   }
+
+  return args;
+}
+
+function buildGqlTxQueryArgs(where: GraphQLTransactionWhere) {
+  const addresses = uniq(
+    [
+      merge(where.addresses, where.address)?.map((address): string =>
+        typeof address === "string" ? address : address.encode()
+      ) ?? [],
+      merge(where.ergoTrees, where.ergoTree)?.map((tree) =>
+        ErgoAddress.fromErgoTree(tree).encode()
+      ) ?? []
+    ].flat()
+  );
+
+  const args = {
+    addresses: addresses.length ? addresses : undefined,
+    transactionIds: merge(where.transactionIds, where.transactionId),
+    skip: 0,
+    take: PAGE_SIZE
+  };
 
   return args;
 }
