@@ -317,25 +317,6 @@ describe("ergo-graphql provider", () => {
         .mockResolvedValueOnce(resolve({ boxes: conf2, mempool: { boxes: [] } }))
         .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: [] } }))
         .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: [] } }));
-      //   mockChunkedResponse([
-      //     encodeSuccessResponseData({
-      //       boxes: conf0,
-      //       mempool: { boxes: mempool }
-      //     }),
-      //     encodeSuccessResponseData({
-      //       boxes: conf1,
-      //       mempool: { boxes: [] }
-      //     }),
-      //     encodeSuccessResponseData({
-      //       boxes: conf2,
-      //       mempool: { boxes: [] }
-      //     }),
-      //     encodeSuccessResponseData({
-      //       boxes: [],
-      //       mempool: { boxes: [] }
-      //     })
-      //   ])
-      // );
 
       let boxesCount = 0;
       for await (const boxes of _client.streamBoxes(_dumbQuery)) {
@@ -416,12 +397,9 @@ describe("ergo-graphql provider", () => {
         .mockResolvedValueOnce(resolve({ boxes: conf1, mempool: { boxes: [] } }))
         .mockResolvedValueOnce(resolve({ boxes: conf2, mempool: { boxes: [] } }))
         .mockResolvedValueOnce(
-          resolve({
-            // move 2 boxes from mempool to blockchain, thus they should be filtered out,
-            // as they were already returned in the first chunk
-            boxes: mempool,
-            mempool: { boxes: [] }
-          })
+          // move 2 boxes from mempool to blockchain, thus they should be filtered out,
+          // as they were already returned in the first chunk
+          resolve({ boxes: mempool, mempool: { boxes: [] } })
         )
         .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: [] } }));
 
