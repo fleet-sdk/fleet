@@ -11,12 +11,10 @@ import type {
 import {
   type Base58String,
   type BlockHeader,
-  type Box,
   ensureDefaults,
   type HexString,
   isEmpty,
   isUndefined,
-  NonMandatoryRegisters,
   NotSupportedError,
   orderBy,
   type SignedTransaction,
@@ -42,7 +40,6 @@ import {
   createGqlOperation,
   type GraphQLOperation,
   type GraphQLRequestOptions,
-  type GraphQLResponse,
   type GraphQLSuccessResponse,
   type GraphQLVariables,
   isRequestParam
@@ -146,7 +143,7 @@ export class ErgoGraphQLProvider<I = bigint>
   }
 
   setBigIntMapper<M>(mapper: BiMapper<M>): ErgoGraphQLProvider<M> {
-    this.#biMapper = mapper as unknown as (value: unknown) => I;
+    this.#biMapper = mapper as unknown as BiMapper<I>;
     return this as unknown as ErgoGraphQLProvider<M>;
   }
 
@@ -216,19 +213,19 @@ export class ErgoGraphQLProvider<I = bigint>
   }
 
   streamUnconfirmedTransactions(
-    query: TransactionQuery<TransactionWhere>
+    query: TransactionQuery<GraphQLTransactionWhere>
   ): AsyncIterable<ChainProviderUnconfirmedTransaction<I>[]> {
     throw new Error("Method not implemented.");
   }
 
-  getUnconfirmedTransactions(
-    query: TransactionQuery<TransactionWhere>
+  async getUnconfirmedTransactions(
+    query: TransactionQuery<GraphQLTransactionWhere>
   ): Promise<ChainProviderUnconfirmedTransaction<I>[]> {
     throw new Error("Method not implemented.");
   }
 
   async *streamConfirmedTransactions(
-    query: TransactionQuery<TransactionWhere>
+    query: TransactionQuery<GraphQLTransactionWhere>
   ): AsyncIterable<ChainProviderConfirmedTransaction<I>[]> {
     const args = buildGqlTxQueryArgs(query.where);
 
@@ -246,10 +243,15 @@ export class ErgoGraphQLProvider<I = bigint>
     }
   }
 
-  getConfirmedTransactions(
-    query: TransactionQuery<TransactionWhere>
+  async getConfirmedTransactions(
+    query: TransactionQuery<GraphQLTransactionWhere>
   ): Promise<ChainProviderConfirmedTransaction<I>[]> {
-    throw new Error("Method not implemented.");
+    const transactions: ChainProviderConfirmedTransaction<I>[][] = [];
+    for await (const chunk of this.streamConfirmedTransactions(query)) {
+      transactions.push(chunk);
+    }
+
+    return transactions.flat();
   }
 
   async getHeaders(query: HeaderQuery): Promise<BlockHeader[]> {
@@ -349,6 +351,9 @@ function buildGqlTxQueryArgs(where: GraphQLTransactionWhere) {
   const args = {
     addresses: addresses.length ? addresses : undefined,
     transactionIds: merge(where.transactionIds, where.transactionId),
+    headerId: where.headerId,
+    minHeight: where.minHeight,
+    onlyRelevantOutputs: where.onlyRelevantOutputs,
     skip: 0,
     take: PAGE_SIZE
   };

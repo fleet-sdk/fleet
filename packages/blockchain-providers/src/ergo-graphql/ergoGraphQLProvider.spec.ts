@@ -1,12 +1,18 @@
 import type { Header } from "@ergo-graphql/types";
 import { chunk, hasDuplicatesBy, NotSupportedError } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
-import { mockedGraphQLBoxes } from "_test-vectors";
+import { mockedGraphQLBoxes, mockedGraphQLTransactions } from "_test-vectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ChainProviderBox } from "../types/blockchainProvider";
 import { resolveData, resolveString } from "../utils";
 import { ErgoGraphQLProvider } from "./ergoGraphQLProvider";
-import { ALL_BOXES_QUERY, CONF_BOXES_QUERY, UNCONF_BOXES_QUERY } from "./queries";
+import {
+  ALL_BOXES_QUERY,
+  CONF_BOXES_QUERY,
+  CONF_TX_QUERY,
+  UNCONF_BOXES_QUERY,
+  UNCONF_TX_QUERY
+} from "./queries";
 
 const resolve = (data: unknown) => resolveData({ data });
 
@@ -421,6 +427,107 @@ describe("ergo-graphql provider", () => {
         mockedGraphQLBoxes.filter((x) => !x.beingSpent).length
       );
       expect(fetchSpy).toBeCalledTimes(5);
+    });
+  });
+
+  describe("fetch transactions", () => {
+    const _client = new ErgoGraphQLProvider("https://gql.example.com/");
+    const _addresses = [
+      "9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga",
+      "9hUHXWmimBFT8aPihapba3BDL1uKzDxcdDpV8jATJxwKDqco3ez",
+      "9ggSesEc8b7URDr3aZEZmwGxqJk7Yap8dzP6FV6qutQ94jKhNR7",
+      "9fJCKJahBVQUKq8eR714YJu4Euds8nPTijBok3EDNzj49L8cACn",
+      "9fB7xguS4tToEPCZsaeV8hBAhL6GjvxDfczGCnyEHcfyoFpHPvg"
+    ].map(ErgoAddress.decode);
+
+    afterEach(() => {
+      vi.resetAllMocks();
+    });
+
+    it("Should map and deduplicate query arguments to GraphQL variables", async () => {
+      const mockedData = { transactions: mockedGraphQLTransactions.slice(0, 10) };
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(resolve(mockedData));
+
+      const response = await _client.getConfirmedTransactions({
+        where: {
+          transactionId: "txId",
+          transactionIds: ["txId_1", "txId_2", "txId_1"],
+          address: _addresses[0].encode(),
+          addresses: [_addresses[0], _addresses[1]],
+          ergoTree: _addresses[1].ergoTree,
+          ergoTrees: [_addresses[2].ergoTree, _addresses[3].ergoTree],
+          headerId: "headerId",
+          minHeight: 100,
+          onlyRelevantOutputs: true
+        }
+      });
+
+      // should default to bigint
+      expect(response[0].outputs[0].value).toBeTypeOf("bigint");
+
+      let callBody = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
+      expect(callBody.query).to.be.equal(CONF_TX_QUERY);
+      expect(callBody.variables).to.be.deep.equal({
+        transactionIds: ["txId_1", "txId_2", "txId"],
+        addresses: [
+          _addresses[0].encode(),
+          _addresses[1].encode(),
+          _addresses[2].encode(),
+          _addresses[3].encode()
+        ],
+        headerId: "headerId",
+        minHeight: 100,
+        onlyRelevantOutputs: true,
+        skip: 0,
+        take: 50
+      });
+
+      await _client.getConfirmedTransactions({
+        where: {
+          transactionId: "txId",
+          ergoTrees: [],
+          addresses: undefined
+        }
+      });
+
+      // should cleanup undefined values
+      callBody = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
+      expect(callBody.variables).to.be.deep.equal({
+        transactionIds: ["txId"],
+        skip: 0,
+        take: 50
+      });
+    });
+
+    it("Should handle multi-paged queries", async () => {
+      const firstChunk = { transactions: mockedGraphQLTransactions.splice(0, 50) };
+      const secondChunk = { transactions: mockedGraphQLTransactions.splice(50) };
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(resolve(firstChunk))
+        .mockResolvedValueOnce(resolve(secondChunk));
+
+      const response = await _client.getConfirmedTransactions({
+        where: { transactionId: "txId" }
+      });
+
+      expect(response).to.have.length(mockedGraphQLTransactions.length);
+
+      expect(
+        JSON.parse(fetchSpy.mock.calls[0]?.[1]?.body as string).variables
+      ).to.be.deep.equal({
+        transactionIds: ["txId"],
+        skip: 0,
+        take: 50
+      });
+
+      expect(
+        JSON.parse(fetchSpy.mock.calls[1]?.[1]?.body as string).variables
+      ).to.be.deep.equal({
+        transactionIds: ["txId"],
+        skip: 50,
+        take: 50
+      });
     });
   });
 
