@@ -430,7 +430,7 @@ describe("ergo-graphql provider", () => {
     });
   });
 
-  describe("fetch transactions", () => {
+  describe("fetch confirmed transactions", () => {
     const _client = new ErgoGraphQLProvider("https://gql.example.com/");
     const _addresses = [
       "9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga",
@@ -464,6 +464,7 @@ describe("ergo-graphql provider", () => {
 
       // should default to bigint
       expect(response[0].outputs[0].value).toBeTypeOf("bigint");
+      expect(response.every((x) => x.confirmed)).to.be.true;
 
       let callBody = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(callBody.query).to.be.equal(CONF_TX_QUERY);
@@ -500,19 +501,22 @@ describe("ergo-graphql provider", () => {
     });
 
     it("Should handle multi-paged queries", async () => {
-      const firstChunk = { transactions: mockedGraphQLTransactions.splice(0, 50) };
-      const secondChunk = { transactions: mockedGraphQLTransactions.splice(50) };
+      const firstChunk = { transactions: mockedGraphQLTransactions.slice(0, 50) };
+      const secondChunk = { transactions: mockedGraphQLTransactions.slice(50) };
+      const thirdChunk = { transactions: [] };
+
       const fetchSpy = vi
         .spyOn(global, "fetch")
         .mockResolvedValueOnce(resolve(firstChunk))
-        .mockResolvedValueOnce(resolve(secondChunk));
+        .mockResolvedValueOnce(resolve(secondChunk))
+        .mockResolvedValueOnce(resolve(thirdChunk));
 
       const response = await _client.getConfirmedTransactions({
         where: { transactionId: "txId" }
       });
 
       expect(response).to.have.length(mockedGraphQLTransactions.length);
-
+      expect(fetchSpy).toHaveBeenCalledTimes(3);
       expect(
         JSON.parse(fetchSpy.mock.calls[0]?.[1]?.body as string).variables
       ).to.be.deep.equal({
@@ -526,6 +530,133 @@ describe("ergo-graphql provider", () => {
       ).to.be.deep.equal({
         transactionIds: ["txId"],
         skip: 50,
+        take: 50
+      });
+
+      expect(
+        JSON.parse(fetchSpy.mock.calls[2]?.[1]?.body as string).variables
+      ).to.be.deep.equal({
+        transactionIds: ["txId"],
+        skip: 100,
+        take: 50
+      });
+    });
+  });
+
+  describe("fetch unconfirmed transactions", () => {
+    const _client = new ErgoGraphQLProvider("https://gql.example.com/");
+    const _addresses = [
+      "9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga",
+      "9hUHXWmimBFT8aPihapba3BDL1uKzDxcdDpV8jATJxwKDqco3ez",
+      "9ggSesEc8b7URDr3aZEZmwGxqJk7Yap8dzP6FV6qutQ94jKhNR7",
+      "9fJCKJahBVQUKq8eR714YJu4Euds8nPTijBok3EDNzj49L8cACn",
+      "9fB7xguS4tToEPCZsaeV8hBAhL6GjvxDfczGCnyEHcfyoFpHPvg"
+    ].map(ErgoAddress.decode);
+
+    afterEach(() => {
+      vi.resetAllMocks();
+    });
+
+    it("Should map and deduplicate query arguments to GraphQL variables", async () => {
+      const mockedData = {
+        mempool: { transactions: mockedGraphQLTransactions.slice(0, 10) }
+      };
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(resolve(mockedData));
+
+      const response = await _client.getUnconfirmedTransactions({
+        where: {
+          transactionId: "txId",
+          transactionIds: ["txId_1", "txId_2", "txId_1"],
+          address: _addresses[0].encode(),
+          addresses: [_addresses[0], _addresses[1]],
+          ergoTree: _addresses[1].ergoTree,
+          ergoTrees: [_addresses[2].ergoTree, _addresses[3].ergoTree]
+        }
+      });
+
+      // should default to bigint
+      expect(response[0].outputs[0].value).toBeTypeOf("bigint");
+      expect(response.every((x) => x.confirmed)).to.be.false;
+
+      expect(fetchSpy.mock.calls[0]?.[0]).to.be.equal("https://gql.example.com/");
+      let callBody = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
+      expect(callBody.query).to.be.equal(UNCONF_TX_QUERY);
+      expect(callBody.variables).to.be.deep.equal({
+        transactionIds: ["txId_1", "txId_2", "txId"],
+        addresses: [
+          _addresses[0].encode(),
+          _addresses[1].encode(),
+          _addresses[2].encode(),
+          _addresses[3].encode()
+        ],
+        skip: 0,
+        take: 50
+      });
+
+      await _client.getConfirmedTransactions({
+        where: {
+          transactionId: "txId",
+          ergoTrees: [],
+          addresses: undefined
+        }
+      });
+
+      // should cleanup undefined values
+      callBody = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
+      expect(callBody.variables).to.be.deep.equal({
+        transactionIds: ["txId"],
+        skip: 0,
+        take: 50
+      });
+    });
+
+    it("Should handle multi-paged queries", async () => {
+      const firstChunk = {
+        mempool: { transactions: mockedGraphQLTransactions.slice(0, 50) }
+      };
+      const secondChunk = {
+        mempool: { transactions: mockedGraphQLTransactions.slice(50) }
+      };
+      const thirdChunk = { mempool: { transactions: [] } };
+
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(resolve(firstChunk))
+        .mockResolvedValueOnce(resolve(secondChunk))
+        .mockResolvedValueOnce(resolve(thirdChunk));
+
+      const response = await _client
+        .setBigIntMapper((x) => x)
+        .setUrl("https://gql.example2.com/")
+        .getUnconfirmedTransactions({
+          where: { transactionId: "txId" }
+        });
+
+      expect(response[0].outputs[0].value).toBeTypeOf("string");
+      expect(response).to.have.length(mockedGraphQLTransactions.length);
+      expect(fetchSpy).toHaveBeenCalledTimes(3);
+      expect(fetchSpy.mock.calls[0]?.[0]).to.be.equal("https://gql.example2.com/");
+      expect(
+        JSON.parse(fetchSpy.mock.calls[0]?.[1]?.body as string).variables
+      ).to.be.deep.equal({
+        transactionIds: ["txId"],
+        skip: 0,
+        take: 50
+      });
+
+      expect(
+        JSON.parse(fetchSpy.mock.calls[1]?.[1]?.body as string).variables
+      ).to.be.deep.equal({
+        transactionIds: ["txId"],
+        skip: 50,
+        take: 50
+      });
+
+      expect(
+        JSON.parse(fetchSpy.mock.calls[2]?.[1]?.body as string).variables
+      ).to.be.deep.equal({
+        transactionIds: ["txId"],
+        skip: 100,
         take: 50
       });
     });
