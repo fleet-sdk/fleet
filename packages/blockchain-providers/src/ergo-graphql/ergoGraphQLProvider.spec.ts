@@ -32,7 +32,7 @@ describe("ergo-graphql provider", () => {
       };
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(resolve(mockedData));
 
-      await _client.getBoxes({
+      const response = await _client.getBoxes({
         where: {
           boxId: "boxId",
           ergoTree: "ergoTree",
@@ -40,6 +40,9 @@ describe("ergo-graphql provider", () => {
           tokenId: "tokenId"
         }
       });
+
+      // should default to bigint
+      expect(response[0].value).toBeTypeOf("bigint");
 
       let call = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(call.variables).to.be.deep.equal({
@@ -77,14 +80,19 @@ describe("ergo-graphql provider", () => {
 
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(resolve(mockedData));
 
-      await _client.getBoxes({
-        where: {
-          boxIds: ["boxId_0", "boxId_1"],
-          boxId: "boxId_0",
-          ergoTrees: ["ergoTree_0", "ergoTree_1", "ergoTree_1"],
-          ergoTree: "ergoTree_2"
-        }
-      });
+      const response = await _client
+        .setBigIntMapper((v) => Number(v))
+        .getBoxes({
+          where: {
+            boxIds: ["boxId_0", "boxId_1"],
+            boxId: "boxId_0",
+            ergoTrees: ["ergoTree_0", "ergoTree_1", "ergoTree_1"],
+            ergoTree: "ergoTree_2"
+          }
+        });
+
+      // should use setBigIntMapper mapping
+      expect(response[0].value).toBeTypeOf("number");
 
       const call = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(call.variables).to.be.deep.equal({
@@ -403,7 +411,7 @@ describe("ergo-graphql provider", () => {
         )
         .mockResolvedValueOnce(resolve({ boxes: [], mempool: { boxes: [] } }));
 
-      let allBoxes: ChainProviderBox[] = [];
+      let allBoxes: ChainProviderBox<bigint>[] = [];
       for await (const boxes of _client.streamBoxes(_dumbQuery)) {
         allBoxes = allBoxes.concat(boxes);
       }

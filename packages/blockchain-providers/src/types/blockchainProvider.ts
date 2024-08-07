@@ -67,39 +67,34 @@ export type TransactionWhere = {
 export type TransactionQuery<W extends TransactionWhere> = {
   /** The query to filter boxes. */
   where: RequireAtLeastOne<W, keyof Omit<W, "minHeight" | "onlyRelevantOutputs">>;
-
-  /**
-   * The source of boxes to query.
-   * @default "blockchain+mempool"
-   */
-  from?: BoxSource;
 };
 
 export type HeaderQuery = { take: number };
 
-export type ChainProviderBox = Box<string> & {
+export type ChainProviderBox<T> = Omit<Box, "value" | "assets"> & {
+  value: T;
+  assets: { tokenId: TokenId; amount: T }[];
   confirmed: boolean;
 };
 
-export type ChainProviderUnconfirmedTransaction = {
+type TransactionOutput<T> = Omit<ChainProviderBox<T>, "confirmed">;
+type TransactionInput<T> = TransactionOutput<T> & { spendingProof: ProverResult };
+
+export type ChainProviderUnconfirmedTransaction<T> = {
   transactionId: TransactionId;
-  inputs: ChainProviderBox & { spendingProof: ProverResult }[];
-  dataInputs: DataInput[] & { index: number };
-  outputs: ChainProviderBox[];
-  confirmed: false;
+  inputs: TransactionInput<T>[];
+  dataInputs: DataInput[];
+  outputs: TransactionOutput<T>[];
+  confirmed: boolean;
   timestamp: number;
 };
 
-export type ChainProviderConfirmedTransaction = ChainProviderUnconfirmedTransaction & {
-  confirmed: true;
-  height: number;
-  index: number;
-  headerId: HexString;
-};
-
-export type ChainProviderTransaction =
-  | ChainProviderUnconfirmedTransaction
-  | ChainProviderConfirmedTransaction;
+export type ChainProviderConfirmedTransaction<T> =
+  ChainProviderUnconfirmedTransaction<T> & {
+    height: number;
+    index: number;
+    headerId: HexString;
+  };
 
 export type TransactionEvaluationError = {
   success: false;
@@ -127,46 +122,44 @@ export type TransactionReductionResult =
  * Represents a blockchain provider that can interact with the blockchain.
  * @template B The type of the box query used by the provider.
  */
-export interface IBlockchainProvider<B extends BoxWhere, T extends TransactionWhere> {
-  updateUrl(url: string): void;
-
+export interface IBlockchainProvider<B extends BoxWhere, T extends TransactionWhere, I> {
   /**
    * Get boxes.
    */
-  getBoxes(query: BoxQuery<B>): Promise<ChainProviderBox[]>;
+  getBoxes(query: BoxQuery<B>): Promise<ChainProviderBox<I>[]>;
 
   /**
    * Stream boxes.
    */
-  streamBoxes(query: BoxQuery<B>): AsyncIterable<ChainProviderBox[]>;
+  streamBoxes(query: BoxQuery<B>): AsyncIterable<ChainProviderBox<I>[]>;
 
   /**
    * Stream unconfirmed transactions
    */
   streamUnconfirmedTransactions(
     query: TransactionQuery<T>
-  ): AsyncIterable<ChainProviderUnconfirmedTransaction[]>;
+  ): AsyncIterable<ChainProviderUnconfirmedTransaction<I>[]>;
 
   /**
    * Get unconfirmed transactions
    */
   getUnconfirmedTransactions(
     query: TransactionQuery<T>
-  ): Promise<ChainProviderUnconfirmedTransaction[]>;
+  ): Promise<ChainProviderUnconfirmedTransaction<I>[]>;
 
   /**
    * Stream confirmed transactions
    */
   streamConfirmedTransactions(
     query: TransactionQuery<T>
-  ): AsyncIterable<ChainProviderConfirmedTransaction[]>;
+  ): AsyncIterable<ChainProviderConfirmedTransaction<I>[]>;
 
   /**
    * Get confirmed transactions
    */
   getConfirmedTransactions(
     query: TransactionQuery<T>
-  ): Promise<ChainProviderConfirmedTransaction[]>;
+  ): Promise<ChainProviderConfirmedTransaction<I>[]>;
 
   /**
    * Get headers.

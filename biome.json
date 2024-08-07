@@ -5,7 +5,8 @@
       "**/coverage/*",
       "**/dist/*",
       "**/node_modules/*",
-      "**/_test-vectors/mockedGraphQLBoxResponses.json",
+      "./packages/_test-vectors/mockedGraphQLBoxResponses.json",
+      "./packages/_test-vectors/mockedGraphQLTxResponse.json",
       "**/package.json"
     ]
   },

@@ -1,18 +1,22 @@
 import type {
-  Box,
+  Box as GQLBox,
   QueryBoxesArgs,
   Header,
   QueryBlockHeadersArgs,
   Transaction,
+  QueryTransactionsArgs,
+  MempoolTransactionsArgs,
   UnconfirmedTransaction
 } from "@ergo-graphql/types";
 import {
   type Base58String,
   type BlockHeader,
+  type Box,
   ensureDefaults,
   type HexString,
   isEmpty,
   isUndefined,
+  NonMandatoryRegisters,
   NotSupportedError,
   orderBy,
   type SignedTransaction,
@@ -38,6 +42,7 @@ import {
   createGqlOperation,
   type GraphQLOperation,
   type GraphQLRequestOptions,
+  type GraphQLResponse,
   type GraphQLSuccessResponse,
   type GraphQLVariables,
   isRequestParam
@@ -46,12 +51,16 @@ import {
   ALL_BOXES_QUERY,
   CHECK_TX_MUTATION,
   CONF_BOXES_QUERY,
+  CONF_TX_QUERY,
   HEADERS_QUERY,
   SEND_TX_MUTATION,
-  UNCONF_BOXES_QUERY
+  UNCONF_BOXES_QUERY,
+  UNCONF_TX_QUERY
 } from "./queries";
 
 type GraphQLThrowableOptions = GraphQLRequestOptions & { throwOnNonNetworkErrors: true };
+type OP<R, V extends GraphQLVariables> = GraphQLOperation<GraphQLSuccessResponse<R>, V>;
+type BiMapper<T> = (value: string) => T;
 
 export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded BoxIds */
@@ -76,8 +85,8 @@ export type ErgoGraphQLRequestOptions = Omit<
   "throwOnNonNetworkError"
 >;
 
-type ConfirmedBoxesResponse = { boxes: Box[] };
-type UnconfirmedBoxesResponse = { mempool: { boxes: Box[] } };
+type ConfirmedBoxesResponse = { boxes: GQLBox[] };
+type UnconfirmedBoxesResponse = { mempool: { boxes: GQLBox[] } };
 type CombinedBoxesResponse = ConfirmedBoxesResponse & UnconfirmedBoxesResponse;
 type UnconfirmedTxResponse = { mempool: { transactions: UnconfirmedTransaction[] } };
 type ConfirmedTxResponse = { transactions: Transaction[] };
@@ -88,17 +97,20 @@ type SignedTxArgsResp = { signedTransaction: SignedTransaction };
 
 const PAGE_SIZE = 50;
 
-export class ErgoGraphQLProvider
-  implements IBlockchainProvider<GraphQLBoxWhere, TransactionWhere>
+export class ErgoGraphQLProvider<I = bigint>
+  implements IBlockchainProvider<GraphQLBoxWhere, TransactionWhere, I>
 {
   #options: GraphQLThrowableOptions;
+  #biMapper: BiMapper<I>;
 
-  #getConfBoxes;
-  #getUnconfBoxes;
-  #getAllBoxes;
-  #getHeaders;
-  #checkTx;
-  #sendTx;
+  #getConfirmedBoxes: OP<ConfirmedBoxesResponse, QueryBoxesArgs>;
+  #getUnconfirmedBoxes: OP<UnconfirmedBoxesResponse, QueryBoxesArgs>;
+  #getAllBoxes: OP<CombinedBoxesResponse, QueryBoxesArgs>;
+  #getConfirmedTransactions: OP<ConfirmedTxResponse, QueryTransactionsArgs>;
+  #getUnconfirmedTransactions: OP<UnconfirmedTxResponse, MempoolTransactionsArgs>;
+  #checkTransaction: OP<CheckTransactionResponse, SignedTxArgsResp>;
+  #sendTransaction: OP<TransactionSubmissionResponse, SignedTxArgsResp>;
+  #getHeaders!: OP<BlockHeadersResponse, QueryBlockHeadersArgs>;
 
   constructor(url: string);
   constructor(url: ErgoGraphQLRequestOptions);
@@ -108,49 +120,42 @@ export class ErgoGraphQLProvider
       throwOnNonNetworkErrors: true
     };
 
-    this.#getConfBoxes = this.createOperation<ConfirmedBoxesResponse, QueryBoxesArgs>(
-      CONF_BOXES_QUERY
-    );
+    this.#biMapper = (value) => BigInt(value) as I;
 
-    this.#getUnconfBoxes = this.createOperation<UnconfirmedBoxesResponse, QueryBoxesArgs>(
-      UNCONF_BOXES_QUERY
-    );
-
-    this.#getAllBoxes = this.createOperation<CombinedBoxesResponse, QueryBoxesArgs>(
-      ALL_BOXES_QUERY
-    );
-
-    this.#getHeaders = this.createOperation<BlockHeadersResponse, QueryBlockHeadersArgs>(
-      HEADERS_QUERY
-    );
-
-    this.#checkTx = this.createOperation<CheckTransactionResponse, SignedTxArgsResp>(
-      CHECK_TX_MUTATION
-    );
-
-    this.#sendTx = this.createOperation<TransactionSubmissionResponse, SignedTxArgsResp>(
-      SEND_TX_MUTATION
-    );
+    this.#getConfirmedBoxes = this.createOperation(CONF_BOXES_QUERY);
+    this.#getUnconfirmedBoxes = this.createOperation(UNCONF_BOXES_QUERY);
+    this.#getAllBoxes = this.createOperation(ALL_BOXES_QUERY);
+    this.#getConfirmedTransactions = this.createOperation(CONF_TX_QUERY);
+    this.#getUnconfirmedTransactions = this.createOperation(UNCONF_TX_QUERY);
+    this.#checkTransaction = this.createOperation(CHECK_TX_MUTATION);
+    this.#sendTransaction = this.createOperation(SEND_TX_MUTATION);
+    this.#getHeaders = this.createOperation(HEADERS_QUERY);
   }
 
   #fetchBoxes(args: QueryBoxesArgs, inclConf: boolean, inclUnconf: boolean) {
     return inclConf && inclUnconf
       ? this.#getAllBoxes(args, this.#options.url)
       : inclUnconf
-        ? this.#getUnconfBoxes(args, this.#options.url)
-        : this.#getConfBoxes(args, this.#options.url);
+        ? this.#getUnconfirmedBoxes(args, this.#options.url)
+        : this.#getConfirmedBoxes(args, this.#options.url);
   }
 
-  async updateUrl(url: string) {
+  updateUrl(url: string): ErgoGraphQLProvider<I> {
     this.#options.url = url;
+    return this;
   }
 
-  async *streamBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainProviderBox[]> {
+  setBigIntMapper<M>(mapper: BiMapper<M>): ErgoGraphQLProvider<M> {
+    this.#biMapper = mapper as unknown as (value: unknown) => I;
+    return this as unknown as ErgoGraphQLProvider<M>;
+  }
+
+  async *streamBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainProviderBox<I>[]> {
     if (isEmpty(query.where)) {
       throw new Error("Cannot fetch unspent boxes without a where clause.");
     }
 
-    const notBeingSpent = (box: Box) => !box.beingSpent;
+    const notBeingSpent = (box: GQLBox) => !box.beingSpent;
     const returnedBoxIds = new Set<string>();
     const { where, from } = query;
     const args = buildGqlBoxQueryArgs(where);
@@ -160,16 +165,14 @@ export class ErgoGraphQLProvider
     const isMempoolAware = inclPool;
 
     do {
-      const response = await this.#fetchBoxes(args, inclChain, inclPool);
-
-      const { data } = response;
-      let boxes: ChainProviderBox[] = [];
+      const { data } = await this.#fetchBoxes(args, inclChain, inclPool);
+      let boxes: ChainProviderBox<I>[] = [];
 
       if (inclChain && hasConfirmed(data)) {
         if (some(data.boxes)) {
           const confirmedBoxes = (
             isMempoolAware ? data.boxes.filter(notBeingSpent) : data.boxes
-          ).map(asConfirmed(true));
+          ).map((b) => mapConfirmedBox(b, this.#biMapper));
 
           boxes = boxes.concat(confirmedBoxes);
         }
@@ -181,7 +184,7 @@ export class ErgoGraphQLProvider
         if (some(data.mempool.boxes)) {
           const mempoolBoxes = data.mempool.boxes
             .filter(notBeingSpent)
-            .map(asConfirmed(false));
+            .map((b) => mapUnconfirmedBox(b, this.#biMapper));
           boxes = boxes.concat(mempoolBoxes);
         }
 
@@ -206,33 +209,46 @@ export class ErgoGraphQLProvider
     } while (inclChain || inclPool);
   }
 
-  async getBoxes(query: GraphQLBoxQuery): Promise<ChainProviderBox[]> {
-    const boxes: ChainProviderBox[][] = [];
+  async getBoxes(query: GraphQLBoxQuery): Promise<ChainProviderBox<I>[]> {
+    const boxes: ChainProviderBox<I>[][] = [];
     for await (const chunk of this.streamBoxes(query)) boxes.push(chunk);
     return orderBy(boxes.flat(), (box) => box.creationHeight);
   }
 
   streamUnconfirmedTransactions(
     query: TransactionQuery<TransactionWhere>
-  ): AsyncIterable<ChainProviderUnconfirmedTransaction[]> {
+  ): AsyncIterable<ChainProviderUnconfirmedTransaction<I>[]> {
     throw new Error("Method not implemented.");
   }
 
   getUnconfirmedTransactions(
     query: TransactionQuery<TransactionWhere>
-  ): Promise<ChainProviderUnconfirmedTransaction[]> {
+  ): Promise<ChainProviderUnconfirmedTransaction<I>[]> {
     throw new Error("Method not implemented.");
   }
 
-  streamConfirmedTransactions(
+  async *streamConfirmedTransactions(
     query: TransactionQuery<TransactionWhere>
-  ): AsyncIterable<ChainProviderConfirmedTransaction[]> {
-    throw new Error("Method not implemented.");
+  ): AsyncIterable<ChainProviderConfirmedTransaction<I>[]> {
+    const args = buildGqlTxQueryArgs(query.where);
+
+    let keepFetching = true;
+    while (keepFetching) {
+      const response = await this.#getConfirmedTransactions(args);
+      if (some(response.data.transactions)) {
+        yield response.data.transactions.map((t) =>
+          mapConfirmedTransaction(t, this.#biMapper)
+        );
+      }
+
+      keepFetching = response.data.transactions?.length === PAGE_SIZE;
+      if (keepFetching) args.skip += PAGE_SIZE;
+    }
   }
 
   getConfirmedTransactions(
     query: TransactionQuery<TransactionWhere>
-  ): Promise<ChainProviderConfirmedTransaction[]> {
+  ): Promise<ChainProviderConfirmedTransaction<I>[]> {
     throw new Error("Method not implemented.");
   }
 
@@ -264,7 +280,10 @@ export class ErgoGraphQLProvider
     signedTransaction: SignedTransaction
   ): Promise<TransactionEvaluationResult> {
     try {
-      const response = await this.#checkTx({ signedTransaction }, this.#options.url);
+      const response = await this.#checkTransaction(
+        { signedTransaction },
+        this.#options.url
+      );
       return { success: true, transactionId: response.data.checkTransaction };
     } catch (e) {
       return { success: false, message: (e as Error).message };
@@ -275,7 +294,10 @@ export class ErgoGraphQLProvider
     signedTransaction: SignedTransaction
   ): Promise<TransactionEvaluationResult> {
     try {
-      const response = await this.#sendTx({ signedTransaction }, this.#options.url);
+      const response = await this.#sendTransaction(
+        { signedTransaction },
+        this.#options.url
+      );
       return { success: true, transactionId: response.data.submitTransaction };
     } catch (e) {
       return { success: false, message: (e as Error).message };
@@ -350,6 +372,56 @@ function hasConfirmed(data: unknown): data is ConfirmedBoxesResponse {
   return !!(data as ConfirmedBoxesResponse)?.boxes;
 }
 
-function asConfirmed(confirmed: boolean) {
-  return (box: Box): ChainProviderBox => ({ ...box, confirmed });
+function mapConfirmedBox<T>(box: GQLBox, mapper: BiMapper<T>): ChainProviderBox<T> {
+  const mapped = mapBox(box, mapper) as ChainProviderBox<T>;
+  mapped.confirmed = true;
+  return mapped;
+}
+
+function mapUnconfirmedBox<T>(box: GQLBox, mapper: BiMapper<T>): ChainProviderBox<T> {
+  const mapped = mapBox(box, mapper) as ChainProviderBox<T>;
+  mapped.confirmed = false;
+  return mapped;
+}
+
+function mapBox<T>(
+  box: GQLBox,
+  mapper: BiMapper<T>
+): Omit<ChainProviderBox<T>, "confirmed"> {
+  return {
+    boxId: box.boxId,
+    transactionId: box.transactionId,
+    value: mapper(box.value),
+    ergoTree: box.ergoTree,
+    assets: box.assets.map((t) => ({ tokenId: t.tokenId, amount: mapper(t.amount) })),
+    creationHeight: box.creationHeight,
+    additionalRegisters: box.additionalRegisters,
+    index: box.index
+  };
+}
+
+function mapConfirmedTransaction<T>(
+  tx: Transaction,
+  mapper: BiMapper<T>
+): ChainProviderConfirmedTransaction<T> {
+  return {
+    transactionId: tx.transactionId,
+    timestamp: Number(tx.timestamp),
+    inputs: tx.inputs.map((i) => ({
+      spendingProof: {
+        // biome-ignore lint/style/noNonNullAssertion: bad type declarations at '@ergo-graphql/type'
+        extension: i.extension!,
+        // biome-ignore lint/style/noNonNullAssertion: bad type declarations at '@ergo-graphql/type'
+        proofBytes: i.proofBytes!
+      },
+      // biome-ignore lint/style/noNonNullAssertion: bad type declarations at '@ergo-graphql/type'
+      ...mapBox(i.box!, mapper)
+    })),
+    dataInputs: tx.dataInputs.map((di) => ({ boxId: di.boxId })),
+    outputs: tx.outputs.map((b) => mapBox(b, mapper)),
+    height: tx.inclusionHeight,
+    headerId: tx.headerId,
+    index: tx.index,
+    confirmed: true
+  };
 }
