@@ -1,5 +1,17 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.6.0
+
+### Minor Changes
+
+- 6ef2c1b: Add custom `BigInt` mapping support
+- 9cdf4dd: Add transaction fetching
+
+### Patch Changes
+
+- 62b881b: Add exponential delay retrying strategy
+- 9ed3499: Add GraphQL operation URL override
+
 ## 0.5.0
 
 ### Patch Changes
