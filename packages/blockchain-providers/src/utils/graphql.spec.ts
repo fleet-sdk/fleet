@@ -1,7 +1,7 @@
 import type { Box, QueryBoxesArgs, State } from "@ergo-graphql/types";
 import { BlockchainProviderError } from "@fleet-sdk/common";
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import { mockResponse } from "./_tests";
+import { resolveString } from "./_tests";
 import {
   createGqlOperation,
   DEFAULT_HEADERS,
@@ -24,7 +24,7 @@ describe("GraphQL query builder", () => {
   it("Should fetch results with default params", async () => {
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+      .mockResolvedValueOnce(resolveString('{"data":{"state":{"height":1098787}}}'));
 
     const query = gql`
       query test {
@@ -56,7 +56,7 @@ describe("GraphQL query builder", () => {
   it("Should fetch results with default params and override url", async () => {
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+      .mockResolvedValueOnce(resolveString('{"data":{"state":{"height":1098787}}}'));
 
     const query = gql`
       query test {
@@ -85,7 +85,7 @@ describe("GraphQL query builder", () => {
   it("Should fetch results with default params and set url on operation call", async () => {
     const fetchSpy = vi
       .spyOn(global, "fetch")
-      .mockResolvedValueOnce(mockResponse('{"data":{"state":{"height":1098787}}}'));
+      .mockResolvedValueOnce(resolveString('{"data":{"state":{"height":1098787}}}'));
 
     const query = gql`
       query test {
@@ -126,7 +126,7 @@ describe("GraphQL query builder", () => {
       .spyOn(global, "fetch")
       .mockRejectedValueOnce(new Error("Failed"))
       .mockRejectedValueOnce(new Error("Failed"))
-      .mockResolvedValue(mockResponse('{"data":{"state":{"height":1098787}}}'));
+      .mockResolvedValue(resolveString('{"data":{"state":{"height":1098787}}}'));
 
     const query = gql`
       query test {
@@ -159,7 +159,7 @@ describe("GraphQL query builder", () => {
     const mockedFetch = vi
       .spyOn(global, "fetch")
       .mockImplementation(fetch)
-      .mockResolvedValueOnce(mockResponse(`{"data":{"boxes":[{"boxId":"${boxId}"}]}}`));
+      .mockResolvedValueOnce(resolveString(`{"data":{"boxes":[{"boxId":"${boxId}"}]}}`));
 
     const mockedParser = {
       parse: vi.fn().mockImplementation(JSON.parse),
@@ -199,7 +199,7 @@ describe("GraphQL query builder", () => {
 
   it("Should throw if throwOnNonNetworkErrors is true and server returns errors", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
-      mockResponse('{"errors":[{"message":"test error 1"},{"message":"test error 2"}]}')
+      resolveString('{"errors":[{"message":"test error 1"},{"message":"test error 2"}]}')
     );
 
     const operation = createGqlOperation("query test { state { height } }", {

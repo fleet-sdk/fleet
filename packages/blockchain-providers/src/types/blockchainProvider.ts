@@ -3,7 +3,9 @@ import type {
   BlockHeader,
   Box,
   BoxId,
+  DataInput,
   HexString,
+  ProverResult,
   SignedTransaction,
   TokenId,
   TransactionId,
@@ -13,19 +15,6 @@ import type { ErgoAddress } from "@fleet-sdk/core";
 import type { RequireAtLeastOne } from "type-fest";
 
 export type BoxSource = "blockchain" | "mempool" | "blockchain+mempool";
-
-export type BoxQuery<W extends BoxWhere> = {
-  /** The query to filter boxes. */
-  where: RequireAtLeastOne<W>;
-
-  /**
-   * The source of boxes to query.
-   * @default "blockchain+mempool"
-   */
-  from?: BoxSource;
-};
-
-export type HeaderQuery = { take: number };
 
 export type BoxWhere = {
   /** Base16-encoded BoxId */
@@ -44,9 +33,79 @@ export type BoxWhere = {
   tokenId?: TokenId;
 };
 
-export type ChainProviderBox = Box<bigint> & {
+export type BoxQuery<W extends BoxWhere> = {
+  /** The query to filter boxes. */
+  where: RequireAtLeastOne<W>;
+
+  /**
+   * The source of boxes to query.
+   * @default "blockchain+mempool"
+   */
+  from?: BoxSource;
+};
+
+export type UnconfirmedTransactionWhere = {
+  /** Base16-encoded TransactionId */
+  transactionId?: TransactionId;
+
+  /** Base58-encoded address */
+  address?: ErgoAddress | Base58String;
+
+  /** Base16-encoded ErgoTree */
+  ergoTree?: HexString;
+};
+
+export type ConfirmedTransactionWhere = {
+  /** Base16-encoded TransactionId */
+  transactionId?: TransactionId;
+
+  /** Base16-encoded HeaderID */
+  headerId?: HexString;
+
+  /** Base58-encoded address */
+  address?: ErgoAddress | Base58String;
+
+  /** Base16-encoded ErgoTree */
+  ergoTree?: HexString;
+
+  /** Min blockchain height */
+  minHeight?: number;
+
+  /** Only returns relevant outputs for the selected filter params */
+  onlyRelevantOutputs?: boolean;
+};
+
+export type TransactionQuery<W extends ConfirmedTransactionWhere> = {
+  /** The query to filter boxes. */
+  where: RequireAtLeastOne<W, keyof Omit<W, "minHeight" | "onlyRelevantOutputs">>;
+};
+
+export type HeaderQuery = { take: number };
+
+export type ChainProviderBox<T> = Omit<Box, "value" | "assets"> & {
+  value: T;
+  assets: { tokenId: TokenId; amount: T }[];
   confirmed: boolean;
 };
+
+type TransactionOutput<T> = Omit<ChainProviderBox<T>, "confirmed">;
+type TransactionInput<T> = TransactionOutput<T> & { spendingProof: ProverResult };
+
+export type ChainProviderUnconfirmedTransaction<T> = {
+  transactionId: TransactionId;
+  inputs: TransactionInput<T>[];
+  dataInputs: DataInput[];
+  outputs: TransactionOutput<T>[];
+  confirmed: boolean;
+  timestamp: number;
+};
+
+export type ChainProviderConfirmedTransaction<T> =
+  ChainProviderUnconfirmedTransaction<T> & {
+    height: number;
+    index: number;
+    headerId: HexString;
+  };
 
 export type TransactionEvaluationError = {
   success: false;
@@ -74,16 +133,44 @@ export type TransactionReductionResult =
  * Represents a blockchain provider that can interact with the blockchain.
  * @template B The type of the box query used by the provider.
  */
-export interface IBlockchainProvider<B extends BoxWhere> {
+export interface IBlockchainProvider<I> {
   /**
    * Get boxes.
    */
-  getBoxes(query: BoxQuery<B>): Promise<ChainProviderBox[]>;
+  getBoxes(query: BoxQuery<BoxWhere>): Promise<ChainProviderBox<I>[]>;
 
   /**
    * Stream boxes.
    */
-  streamBoxes(query: BoxQuery<B>): AsyncIterable<ChainProviderBox[]>;
+  streamBoxes(query: BoxQuery<BoxWhere>): AsyncIterable<ChainProviderBox<I>[]>;
+
+  /**
+   * Stream unconfirmed transactions
+   */
+  streamUnconfirmedTransactions(
+    query: TransactionQuery<UnconfirmedTransactionWhere>
+  ): AsyncIterable<ChainProviderUnconfirmedTransaction<I>[]>;
+
+  /**
+   * Get unconfirmed transactions
+   */
+  getUnconfirmedTransactions(
+    query: TransactionQuery<UnconfirmedTransactionWhere>
+  ): Promise<ChainProviderUnconfirmedTransaction<I>[]>;
+
+  /**
+   * Stream confirmed transactions
+   */
+  streamConfirmedTransactions(
+    query: TransactionQuery<ConfirmedTransactionWhere>
+  ): AsyncIterable<ChainProviderConfirmedTransaction<I>[]>;
+
+  /**
+   * Get confirmed transactions
+   */
+  getConfirmedTransactions(
+    query: TransactionQuery<ConfirmedTransactionWhere>
+  ): Promise<ChainProviderConfirmedTransaction<I>[]>;
 
   /**
    * Get headers.
