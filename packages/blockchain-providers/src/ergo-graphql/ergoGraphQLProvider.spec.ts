@@ -63,7 +63,7 @@ describe("ergo-graphql provider", () => {
 
       await _client.getBoxes({
         where: {
-          boxIds: ["boxId_1", "boxId_2"],
+          boxId: "boxId_1",
           ergoTrees: ["contract", "another_contract"]
         }
       });
@@ -71,7 +71,7 @@ describe("ergo-graphql provider", () => {
       call = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(call.variables).to.be.deep.equal({
         spent: false,
-        boxIds: ["boxId_1", "boxId_2"],
+        boxIds: ["boxId_1"],
         ergoTrees: ["contract", "another_contract"],
         skip: 0,
         take: 50
@@ -90,7 +90,6 @@ describe("ergo-graphql provider", () => {
         .setBigIntMapper((v) => Number(v))
         .getBoxes({
           where: {
-            boxIds: ["boxId_0", "boxId_1"],
             boxId: "boxId_0",
             ergoTrees: ["ergoTree_0", "ergoTree_1", "ergoTree_1"],
             ergoTree: "ergoTree_2"
@@ -103,7 +102,7 @@ describe("ergo-graphql provider", () => {
       const call = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(call.variables).to.be.deep.equal({
         spent: false,
-        boxIds: ["boxId_0", "boxId_1"],
+        boxIds: ["boxId_0"],
         ergoTrees: ["ergoTree_0", "ergoTree_1", "ergoTree_2"],
         skip: 0,
         take: 50
@@ -451,7 +450,6 @@ describe("ergo-graphql provider", () => {
       const response = await _client.getConfirmedTransactions({
         where: {
           transactionId: "txId",
-          transactionIds: ["txId_1", "txId_2", "txId_1"],
           address: _addresses[0].encode(),
           addresses: [_addresses[0], _addresses[1]],
           ergoTree: _addresses[1].ergoTree,
@@ -469,7 +467,7 @@ describe("ergo-graphql provider", () => {
       let callBody = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(callBody.query).to.be.equal(CONF_TX_QUERY);
       expect(callBody.variables).to.be.deep.equal({
-        transactionIds: ["txId_1", "txId_2", "txId"],
+        transactionIds: ["txId"],
         addresses: [
           _addresses[0].encode(),
           _addresses[1].encode(),
@@ -565,8 +563,6 @@ describe("ergo-graphql provider", () => {
 
       const response = await _client.getUnconfirmedTransactions({
         where: {
-          transactionId: "txId",
-          transactionIds: ["txId_1", "txId_2", "txId_1"],
           address: _addresses[0].encode(),
           addresses: [_addresses[0], _addresses[1]],
           ergoTree: _addresses[1].ergoTree,
@@ -582,7 +578,6 @@ describe("ergo-graphql provider", () => {
       let callBody = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
       expect(callBody.query).to.be.equal(UNCONF_TX_QUERY);
       expect(callBody.variables).to.be.deep.equal({
-        transactionIds: ["txId_1", "txId_2", "txId"],
         addresses: [
           _addresses[0].encode(),
           _addresses[1].encode(),

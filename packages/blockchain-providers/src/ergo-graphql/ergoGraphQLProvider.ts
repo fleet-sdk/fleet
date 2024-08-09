@@ -56,15 +56,9 @@ import {
   UNCONF_BOXES_QUERY,
   UNCONF_TX_QUERY
 } from "./queries";
-
-type GraphQLThrowableOptions = GraphQLRequestOptions & { throwOnNonNetworkErrors: true };
-type OP<R, V extends GraphQLVariables> = GraphQLOperation<GraphQLSuccessResponse<R>, V>;
-type BiMapper<T> = (value: string) => T;
+import { chunk } from "packages/common/src";
 
 export type GraphQLBoxWhere = BoxWhere & {
-  /** Base16-encoded BoxIds */
-  boxIds?: HexString[];
-
   /** Base16-encoded ErgoTrees */
   ergoTrees?: HexString[];
 
@@ -73,13 +67,11 @@ export type GraphQLBoxWhere = BoxWhere & {
 };
 
 export type GraphQLConfirmedTransactionWhere = ConfirmedTransactionWhere & {
-  transactionIds?: HexString[];
   addresses?: (Base58String | ErgoAddress)[];
   ergoTrees?: HexString[];
 };
 
 export type GraphQLUnconfirmedTransactionWhere = UnconfirmedTransactionWhere & {
-  transactionIds?: HexString[];
   addresses?: (Base58String | ErgoAddress)[];
   ergoTrees?: HexString[];
 };
@@ -100,7 +92,12 @@ type CheckTransactionResponse = { checkTransaction: string };
 type TransactionSubmissionResponse = { submitTransaction: string };
 type SignedTxArgsResp = { signedTransaction: SignedTransaction };
 
+type GraphQLThrowableOptions = GraphQLRequestOptions & { throwOnNonNetworkErrors: true };
+type OP<R, V extends GraphQLVariables> = GraphQLOperation<GraphQLSuccessResponse<R>, V>;
+type BiMapper<T> = (value: string) => T;
+
 const PAGE_SIZE = 50;
+const MAX_ARGS = 20;
 
 export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   #options: GraphQLThrowableOptions;
@@ -116,14 +113,13 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   #getHeaders!: OP<BlockHeadersResponse, QueryBlockHeadersArgs>;
 
   constructor(url: string);
-  constructor(url: ErgoGraphQLRequestOptions);
+  constructor(options: ErgoGraphQLRequestOptions);
   constructor(optOrUrl: ErgoGraphQLRequestOptions | string) {
+    this.#biMapper = (value) => BigInt(value) as I;
     this.#options = {
       ...(isRequestParam(optOrUrl) ? optOrUrl : { url: optOrUrl }),
       throwOnNonNetworkErrors: true
     };
-
-    this.#biMapper = (value) => BigInt(value) as I;
 
     this.#getConfirmedBoxes = this.createOperation(CONF_BOXES_QUERY);
     this.#getUnconfirmedBoxes = this.createOperation(UNCONF_BOXES_QUERY);
@@ -137,10 +133,10 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
 
   #fetchBoxes(args: QueryBoxesArgs, inclConf: boolean, inclUnconf: boolean) {
     return inclConf && inclUnconf
-      ? this.#getAllBoxes(args, this.#options.url)
+      ? this.#getAllBoxes(args)
       : inclUnconf
-        ? this.#getUnconfirmedBoxes(args, this.#options.url)
-        : this.#getConfirmedBoxes(args, this.#options.url);
+        ? this.#getUnconfirmedBoxes(args)
+        : this.#getConfirmedBoxes(args);
   }
 
   setUrl(url: string): ErgoGraphQLProvider<I> {
@@ -161,55 +157,57 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
     const notBeingSpent = (box: GQLBox) => !box.beingSpent;
     const returnedBoxIds = new Set<string>();
     const { where, from } = query;
-    const args = buildGqlBoxQueryArgs(where);
+    const queries = buildGqlBoxQueries(where);
+    const isMempoolAware = from !== "blockchain";
 
-    let inclChain = from !== "mempool";
-    let inclPool = from !== "blockchain";
-    const isMempoolAware = inclPool;
+    for (const query of queries) {
+      let inclChain = from !== "mempool";
+      let inclPool = from !== "blockchain";
 
-    do {
-      const { data } = await this.#fetchBoxes(args, inclChain, inclPool);
-      let boxes: ChainProviderBox<I>[] = [];
+      while (inclChain || inclPool) {
+        const { data } = await this.#fetchBoxes(query, inclChain, inclPool);
+        let boxes: ChainProviderBox<I>[] = [];
 
-      if (inclChain && hasConfirmed(data)) {
-        if (some(data.boxes)) {
-          const confirmedBoxes = (
-            isMempoolAware ? data.boxes.filter(notBeingSpent) : data.boxes
-          ).map((b) => mapConfirmedBox(b, this.#biMapper));
+        if (inclChain && hasConfirmed(data)) {
+          if (some(data.boxes)) {
+            const confirmedBoxes = (
+              isMempoolAware ? data.boxes.filter(notBeingSpent) : data.boxes
+            ).map((b) => mapConfirmedBox(b, this.#biMapper));
 
-          boxes = boxes.concat(confirmedBoxes);
+            boxes = boxes.concat(confirmedBoxes);
+          }
+
+          inclChain = data.boxes.length === PAGE_SIZE;
         }
 
-        inclChain = data.boxes.length === PAGE_SIZE;
-      }
+        if (isMempoolAware && hasMempool(data)) {
+          if (some(data.mempool.boxes)) {
+            const mempoolBoxes = data.mempool.boxes
+              .filter(notBeingSpent)
+              .map((b) => mapUnconfirmedBox(b, this.#biMapper));
+            boxes = boxes.concat(mempoolBoxes);
+          }
 
-      if (isMempoolAware && hasMempool(data)) {
-        if (some(data.mempool.boxes)) {
-          const mempoolBoxes = data.mempool.boxes
-            .filter(notBeingSpent)
-            .map((b) => mapUnconfirmedBox(b, this.#biMapper));
-          boxes = boxes.concat(mempoolBoxes);
-        }
-
-        inclPool = data.mempool.boxes.length === PAGE_SIZE;
-      }
-
-      if (some(boxes)) {
-        // boxes can be moved from the mempool to the blockchain while streaming,
-        // so we need to filter out boxes that have already been returned.
-        if (boxes.some((box) => returnedBoxIds.has(box.boxId))) {
-          boxes = boxes.filter((b) => !returnedBoxIds.has(b.boxId));
+          inclPool = data.mempool.boxes.length === PAGE_SIZE;
         }
 
         if (some(boxes)) {
-          boxes = uniqBy(boxes, (box) => box.boxId);
-          for (const box of boxes) returnedBoxIds.add(box.boxId);
-          yield boxes;
-        }
-      }
+          // boxes can be moved from the mempool to the blockchain while streaming,
+          // so we need to filter out boxes that have already been returned.
+          if (boxes.some((box) => returnedBoxIds.has(box.boxId))) {
+            boxes = boxes.filter((b) => !returnedBoxIds.has(b.boxId));
+          }
 
-      if (inclChain || inclPool) args.skip += PAGE_SIZE;
-    } while (inclChain || inclPool);
+          if (some(boxes)) {
+            boxes = uniqBy(boxes, (box) => box.boxId);
+            for (const box of boxes) returnedBoxIds.add(box.boxId);
+            yield boxes;
+          }
+        }
+
+        if (inclChain || inclPool) query.skip += PAGE_SIZE;
+      }
+    }
   }
 
   async getBoxes(query: GraphQLBoxQuery): Promise<ChainProviderBox<I>[]> {
@@ -221,19 +219,21 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   async *streamUnconfirmedTransactions(
     query: TransactionQuery<GraphQLUnconfirmedTransactionWhere>
   ): AsyncIterable<ChainProviderUnconfirmedTransaction<I>[]> {
-    const args = buildGqlUnconfirmedTxQueryArgs(query.where);
+    const queries = buildGqlUnconfirmedTxQueries(query.where);
 
-    let keepFetching = true;
-    while (keepFetching) {
-      const response = await this.#getUnconfirmedTransactions(args);
-      if (some(response.data?.mempool?.transactions)) {
-        yield response.data.mempool.transactions.map((t) =>
-          mapUnconfirmedTransaction(t, this.#biMapper)
-        );
+    for (const query of queries) {
+      let keepFetching = true;
+      while (keepFetching) {
+        const response = await this.#getUnconfirmedTransactions(query);
+        if (some(response.data?.mempool?.transactions)) {
+          yield response.data.mempool.transactions.map((t) =>
+            mapUnconfirmedTransaction(t, this.#biMapper)
+          );
+        }
+
+        keepFetching = response.data?.mempool?.transactions?.length === PAGE_SIZE;
+        if (keepFetching) query.skip += PAGE_SIZE;
       }
-
-      keepFetching = response.data?.mempool?.transactions?.length === PAGE_SIZE;
-      if (keepFetching) args.skip += PAGE_SIZE;
     }
   }
 
@@ -251,19 +251,21 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   async *streamConfirmedTransactions(
     query: TransactionQuery<GraphQLConfirmedTransactionWhere>
   ): AsyncIterable<ChainProviderConfirmedTransaction<I>[]> {
-    const args = buildGqlConfirmedTxQueryArgs(query.where);
+    const queries = buildGqlConfirmedTxQueries(query.where);
 
-    let keepFetching = true;
-    while (keepFetching) {
-      const response = await this.#getConfirmedTransactions(args);
-      if (some(response.data?.transactions)) {
-        yield response.data.transactions.map((t) =>
-          mapConfirmedTransaction(t, this.#biMapper)
-        );
+    for (const query of queries) {
+      let keepFetching = true;
+      while (keepFetching) {
+        const response = await this.#getConfirmedTransactions(query);
+        if (some(response.data?.transactions)) {
+          yield response.data.transactions.map((t) =>
+            mapConfirmedTransaction(t, this.#biMapper)
+          );
+        }
+
+        keepFetching = response.data?.transactions?.length === PAGE_SIZE;
+        if (keepFetching) query.skip += PAGE_SIZE;
       }
-
-      keepFetching = response.data?.transactions?.length === PAGE_SIZE;
-      if (keepFetching) args.skip += PAGE_SIZE;
     }
   }
 
@@ -279,7 +281,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   }
 
   async getHeaders(query: HeaderQuery): Promise<BlockHeader[]> {
-    const response = await this.#getHeaders(query, this.#options.url);
+    const response = await this.#getHeaders(query);
 
     return (
       response.data?.blockHeaders.map((header) => ({
@@ -335,32 +337,28 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   }
 }
 
-function buildGqlBoxQueryArgs(where: GraphQLBoxWhere) {
-  const args = {
+function buildGqlBoxQueries(where: GraphQLBoxWhere) {
+  const ergoTrees = uniq(
+    [
+      merge(where.ergoTrees, where.ergoTree) ?? [],
+      merge(where.addresses, where.address)?.map((a) =>
+        typeof a === "string" ? ErgoAddress.decode(a).ergoTree : a.ergoTree
+      ) ?? []
+    ].flat()
+  );
+
+  return chunk(ergoTrees, MAX_ARGS).map((chunk) => ({
     spent: false,
-    boxIds: merge(where.boxIds, where.boxId),
-    ergoTrees: merge(where.ergoTrees, where.ergoTree),
+    boxIds: where.boxId ? [where.boxId] : undefined,
+    ergoTrees: chunk,
     ergoTreeTemplateHash: where.templateHash,
     tokenId: where.tokenId,
     skip: 0,
     take: PAGE_SIZE
-  } satisfies QueryBoxesArgs;
-
-  const addresses = merge(where.addresses, where.address);
-  if (some(addresses)) {
-    const trees = addresses.map((address) =>
-      typeof address === "string"
-        ? ErgoAddress.decode(address).ergoTree
-        : address.ergoTree
-    );
-
-    args.ergoTrees = uniq(some(args.ergoTrees) ? args.ergoTrees.concat(trees) : trees);
-  }
-
-  return args;
+  }));
 }
 
-function buildGqlUnconfirmedTxQueryArgs(where: GraphQLConfirmedTransactionWhere) {
+function buildGqlUnconfirmedTxQueries(where: GraphQLConfirmedTransactionWhere) {
   const addresses = uniq(
     [
       merge(where.addresses, where.address)?.map((address): string =>
@@ -372,21 +370,21 @@ function buildGqlUnconfirmedTxQueryArgs(where: GraphQLConfirmedTransactionWhere)
     ].flat()
   );
 
-  return {
-    addresses: addresses.length ? addresses : undefined,
-    transactionIds: merge(where.transactionIds, where.transactionId),
+  return chunk(addresses, MAX_ARGS).map((chunk) => ({
+    addresses: chunk.length ? chunk : undefined,
+    transactionIds: where.transactionId ? [where.transactionId] : undefined,
     skip: 0,
     take: PAGE_SIZE
-  };
+  }));
 }
 
-function buildGqlConfirmedTxQueryArgs(where: GraphQLConfirmedTransactionWhere) {
-  return {
-    ...buildGqlUnconfirmedTxQueryArgs(where),
+function buildGqlConfirmedTxQueries(where: GraphQLConfirmedTransactionWhere) {
+  return buildGqlUnconfirmedTxQueries(where).map((query) => ({
+    ...query,
     headerId: where.headerId,
     minHeight: where.minHeight,
     onlyRelevantOutputs: where.onlyRelevantOutputs
-  };
+  }));
 }
 
 function merge<T>(array?: T[], el?: T) {
