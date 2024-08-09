@@ -118,7 +118,3 @@ export function gql(query: TemplateStringsArray): string {
 export function getOpName(query: string): string | undefined {
   return OP_NAME_REGEX.exec(query)?.at(2);
 }
-
-export function isRequestParam(obj: unknown): obj is GraphQLRequestOptions {
-  return typeof obj === "object" && (obj as GraphQLRequestOptions).url !== undefined;
-}

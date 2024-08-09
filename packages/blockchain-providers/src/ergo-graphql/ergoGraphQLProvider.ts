@@ -12,18 +12,20 @@ import type {
 import {
   type Base58String,
   type BlockHeader,
-  ensureDefaults,
   type HexString,
+  type SignedTransaction,
+  ensureDefaults,
   isEmpty,
   isUndefined,
   NotSupportedError,
   orderBy,
-  type SignedTransaction,
   some,
   uniq,
-  uniqBy
+  uniqBy,
+  chunk
 } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
+import { hex } from "@fleet-sdk/crypto";
 import type {
   BoxQuery,
   BoxWhere,
@@ -39,12 +41,11 @@ import type {
   UnconfirmedTransactionWhere
 } from "../types/blockchainProvider";
 import {
-  createGqlOperation,
   type GraphQLOperation,
   type GraphQLRequestOptions,
   type GraphQLSuccessResponse,
   type GraphQLVariables,
-  isRequestParam
+  createGqlOperation
 } from "../utils";
 import {
   ALL_BOXES_QUERY,
@@ -56,7 +57,6 @@ import {
   UNCONF_BOXES_QUERY,
   UNCONF_TX_QUERY
 } from "./queries";
-import { chunk } from "packages/common/src";
 
 export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded ErgoTrees */
@@ -79,7 +79,7 @@ export type GraphQLUnconfirmedTransactionWhere = UnconfirmedTransactionWhere & {
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
 export type ErgoGraphQLRequestOptions = Omit<
   GraphQLRequestOptions,
-  "throwOnNonNetworkError"
+  "throwOnNonNetworkErrors"
 >;
 
 type ConfirmedBoxesResponse = { boxes: GQLBox[] };
@@ -92,7 +92,10 @@ type CheckTransactionResponse = { checkTransaction: string };
 type TransactionSubmissionResponse = { submitTransaction: string };
 type SignedTxArgsResp = { signedTransaction: SignedTransaction };
 
-type GraphQLThrowableOptions = GraphQLRequestOptions & { throwOnNonNetworkErrors: true };
+type GraphQLThrowableOptions = ErgoGraphQLRequestOptions & {
+  throwOnNonNetworkErrors: true;
+};
+
 type OP<R, V extends GraphQLVariables> = GraphQLOperation<GraphQLSuccessResponse<R>, V>;
 type BiMapper<T> = (value: string) => T;
 
@@ -284,12 +287,12 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
     const response = await this.#getHeaders(query);
 
     return (
-      response.data?.blockHeaders.map((header) => ({
-        ...header,
-        id: header.headerId,
-        timestamp: Number(header.timestamp),
-        nBits: Number(header.nBits),
-        votes: header.votes.join("")
+      response.data?.blockHeaders.map((h) => ({
+        ...h,
+        id: h.headerId,
+        timestamp: Number(h.timestamp),
+        nBits: Number(h.nBits),
+        votes: hex.encode(Uint8Array.from(h.votes))
       })) ?? []
     );
   }
@@ -478,4 +481,8 @@ function mapConfirmedTransaction<T>(
     index: tx.index,
     confirmed: true
   };
+}
+
+export function isRequestParam(obj: unknown): obj is ErgoGraphQLRequestOptions {
+  return typeof obj === "object" && (obj as ErgoGraphQLRequestOptions).url !== undefined;
 }

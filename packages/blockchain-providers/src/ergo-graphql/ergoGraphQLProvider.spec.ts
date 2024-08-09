@@ -674,7 +674,7 @@ describe("ergo-graphql provider", () => {
         id: header.headerId,
         nBits: Number(header.nBits),
         timestamp: Number(header.timestamp),
-        votes: header.votes.join("")
+        votes: "000000"
       }))
     );
     expect(fetchSpy).toHaveBeenCalledOnce();
