@@ -9,7 +9,7 @@ import type { FallbackRetryOptions, ParserLike } from "./networking";
 import { request } from "./networking";
 
 const OP_NAME_REGEX = /(query|mutation)\s?([\w\-_]+)?/;
-export const DEFAULT_HEADERS = {
+const DEFAULT_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   accept: "application/graphql-response+json, application/json"
 };

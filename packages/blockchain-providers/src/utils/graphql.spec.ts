@@ -4,13 +4,17 @@ import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { resolveString } from "./_tests";
 import {
   createGqlOperation,
-  DEFAULT_HEADERS,
   getOpName,
   gql,
   type GraphQLOperation,
   type GraphQLSuccessResponse,
   type GraphQLVariables
 } from "./graphql";
+
+const DEFAULT_HEADERS = {
+  "content-type": "application/json; charset=utf-8",
+  accept: "application/graphql-response+json, application/json"
+};
 
 describe("GraphQL query builder", () => {
   const parseSpy = vi.spyOn(JSON, "parse");
