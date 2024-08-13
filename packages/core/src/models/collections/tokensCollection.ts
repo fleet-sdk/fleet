@@ -15,7 +15,7 @@ import { NotFoundError, UndefinedMintingContext } from "../../errors";
 import { InsufficientTokenAmount } from "../../errors/insufficientTokenAmount";
 import { MaxTokensOverflow } from "../../errors/maxTokensOverflow";
 
-export const MAX_TOKENS_PER_BOX = 120;
+export const MAX_TOKENS_PER_BOX = 100;
 
 export type TokenAddOptions = CollectionAddOptions & { sum?: boolean };
 export type OutputToken<T extends Amount = Amount> = {

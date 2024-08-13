@@ -311,10 +311,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
     signedTransaction: SignedTransaction
   ): Promise<TransactionEvaluationResult> {
     try {
-      const response = await this.#checkTransaction(
-        { signedTransaction },
-        this.#options.url
-      );
+      const response = await this.#checkTransaction({ signedTransaction });
       return { success: true, transactionId: response.data.checkTransaction };
     } catch (e) {
       return { success: false, message: (e as Error).message };
@@ -325,10 +322,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
     signedTransaction: SignedTransaction
   ): Promise<TransactionEvaluationResult> {
     try {
-      const response = await this.#sendTransaction(
-        { signedTransaction },
-        this.#options.url
-      );
+      const response = await this.#sendTransaction({ signedTransaction });
       return { success: true, transactionId: response.data.submitTransaction };
     } catch (e) {
       return { success: false, message: (e as Error).message };
