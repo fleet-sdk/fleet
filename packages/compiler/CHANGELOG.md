@@ -1,5 +1,12 @@
 # @fleet-sdk/compiler
 
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [ece573c]
+  - @fleet-sdk/core@0.6.1
+
 ## 0.5.0
 
 ### Patch Changes

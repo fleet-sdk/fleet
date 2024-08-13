@@ -1,5 +1,16 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.6.1
+
+### Patch Changes
+
+- 208ac8e: Fix `Header#votes` encoding
+- a3d2a62: Export `BlockChainProviders` types
+- 506dfc4: [`ErgoGraphQLProvider`] Query Addresses/ErgoTrees by chunks of 20
+- 6245bc9: Export `request` and `createGqlOperation` utility functions
+- Updated dependencies [ece573c]
+  - @fleet-sdk/core@0.6.1
+
 ## 0.6.0
 
 ### Minor Changes
