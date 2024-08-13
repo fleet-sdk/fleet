@@ -1,5 +1,4 @@
 import { some } from "@fleet-sdk/common";
-import { isEmpty } from "packages/common/src";
 
 export interface ParserLike {
   parse<T>(text: string): T;

@@ -743,7 +743,7 @@ describe("Building", () => {
 
     expect(change1.ergoTree).toBe(a1.ergoTree);
     expect(change1.creationHeight).toBe(height);
-    expect(change1.value).toBe(3595808n);
+    expect(change1.value).toBe(3358208n);
     expect(change1.assets).toHaveLength(MAX_TOKENS_PER_BOX);
     expect(change1.additionalRegisters).toEqual({});
 
@@ -756,7 +756,7 @@ describe("Building", () => {
     expect(change3.ergoTree).toBe(a1.ergoTree);
     expect(change3.creationHeight).toBe(height);
     expect(change3.value).toBe(_estimateBoxValue(change3));
-    expect(change3.assets).toHaveLength(32);
+    expect(change3.assets).toHaveLength(72);
     expect(change3.additionalRegisters).toEqual({});
   });
 

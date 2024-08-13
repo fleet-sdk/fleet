@@ -4,14 +4,17 @@ import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { resolveString } from "./_tests";
 import {
   createGqlOperation,
-  DEFAULT_HEADERS,
   getOpName,
   gql,
   type GraphQLOperation,
   type GraphQLSuccessResponse,
-  type GraphQLVariables,
-  isRequestParam
+  type GraphQLVariables
 } from "./graphql";
+
+const DEFAULT_HEADERS = {
+  "content-type": "application/json; charset=utf-8",
+  accept: "application/graphql-response+json, application/json"
+};
 
 describe("GraphQL query builder", () => {
   const parseSpy = vi.spyOn(JSON, "parse");
@@ -253,16 +256,5 @@ describe("Operation name extraction", () => {
     expect(getOpName("query { boxes { boxId } }")).to.be.undefined;
     expect(getOpName("mutation { boxes { boxId } }")).to.be.undefined;
     expect(getOpName(" query ($take: Int) { boxes { boxId } }")).to.be.undefined;
-  });
-});
-
-describe("Request param handler", () => {
-  it("should return true for valid request params", () => {
-    expect(isRequestParam({ url: "https://gql.example.com/" })).to.be.true;
-  });
-
-  it("should return false for invalid request params", () => {
-    expect(isRequestParam({})).to.be.false;
-    expect(isRequestParam(3)).to.be.false;
   });
 });

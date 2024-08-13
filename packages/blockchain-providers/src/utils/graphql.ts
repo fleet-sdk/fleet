@@ -9,7 +9,7 @@ import type { FallbackRetryOptions, ParserLike } from "./networking";
 import { request } from "./networking";
 
 const OP_NAME_REGEX = /(query|mutation)\s?([\w\-_]+)?/;
-export const DEFAULT_HEADERS = {
+const DEFAULT_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   accept: "application/graphql-response+json, application/json"
 };
@@ -117,8 +117,4 @@ export function gql(query: TemplateStringsArray): string {
 
 export function getOpName(query: string): string | undefined {
   return OP_NAME_REGEX.exec(query)?.at(2);
-}
-
-export function isRequestParam(obj: unknown): obj is GraphQLRequestOptions {
-  return typeof obj === "object" && (obj as GraphQLRequestOptions).url !== undefined;
 }
