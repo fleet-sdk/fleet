@@ -1,5 +1,12 @@
 # @fleet-sdk/ageusd-plugin
 
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies [ece573c]
+  - @fleet-sdk/core@0.6.1
+
 ## 0.1.10
 
 ### Patch Changes

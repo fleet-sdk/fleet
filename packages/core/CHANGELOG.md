@@ -1,5 +1,11 @@
 # @fleet-sdk/core
 
+## 0.6.1
+
+### Patch Changes
+
+- ece573c: Set default token limit for a single box to `100`
+
 ## 0.5.0
 
 ### Minor Changes
