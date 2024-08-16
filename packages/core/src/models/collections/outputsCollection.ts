@@ -18,10 +18,7 @@ function setSum<K>(map: Map<K, bigint>, key: K, value: bigint) {
 export class OutputsCollection extends Collection<OutputBuilder, OutputBuilder> {
   constructor(outputs?: OneOrMore<OutputBuilder>) {
     super();
-
-    if (isDefined(outputs)) {
-      this.add(outputs);
-    }
+    if (isDefined(outputs)) this.add(outputs);
   }
 
   protected _map(output: OutputBuilder) {

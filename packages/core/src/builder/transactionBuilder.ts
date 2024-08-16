@@ -1,21 +1,21 @@
 import {
-  _0n,
   type Amount,
   type Base58String,
   type Box,
+  type CollectionAddOptions,
+  type HexString,
+  type OneOrMore,
+  type TokenAmount,
+  _0n,
   byteSizeOf,
   chunk,
-  type CollectionAddOptions,
   ensureBigInt,
   first,
-  type HexString,
   isDefined,
   isHex,
   isUndefined,
   Network,
-  type OneOrMore,
   some,
-  type TokenAmount,
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
@@ -59,8 +59,20 @@ type EjectorContext = {
   selection: (selectorCallBack: SelectorCallback) => void;
 };
 
+/**
+ * Options for including inputs in the transaction builder
+ */
+type InputsInclusionOptions = {
+  /**
+   * If true, all the inputs will be included in the
+   * transaction while preserving the original order.
+   */
+  ensureInclusion?: boolean;
+};
+
 export class TransactionBuilder {
   private readonly _inputs!: InputsCollection;
+  private readonly _preservedInputs!: InputsCollection;
   private readonly _dataInputs!: InputsCollection;
   private readonly _outputs!: OutputsCollection;
   private readonly _settings!: TransactionBuilderSettings;
@@ -127,9 +139,16 @@ export class TransactionBuilder {
   }
 
   public from(
-    inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>
+    inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>,
+    options: InputsInclusionOptions = { ensureInclusion: false }
   ): TransactionBuilder {
-    this._inputs.add(isCollectionLike(inputs) ? inputs.toArray() : inputs);
+    const items = isCollectionLike(inputs) ? inputs.toArray() : inputs;
+    if (options.ensureInclusion) {
+      this._preservedInputs.add(items);
+    } else {
+      this._inputs.add(items);
+    }
+
     return this;
   }
 
@@ -193,19 +212,13 @@ export class TransactionBuilder {
   }
 
   public configureSelector(selectorCallback: SelectorCallback): TransactionBuilder {
-    if (isUndefined(this._selectorCallbacks)) {
-      this._selectorCallbacks = [];
-    }
-
+    if (isUndefined(this._selectorCallbacks)) this._selectorCallbacks = [];
     this._selectorCallbacks.push(selectorCallback);
-
     return this;
   }
 
   public extend(plugins: FleetPlugin): TransactionBuilder {
-    if (!this._plugins) {
-      this._plugins = [];
-    }
+    if (!this._plugins) this._plugins = [];
     this._plugins.push({ execute: plugins, pending: true });
 
     return this;
@@ -331,9 +344,7 @@ export class TransactionBuilder {
     }
 
     for (const input of inputs) {
-      if (!input.isValid()) {
-        throw new InvalidInput(input.boxId);
-      }
+      if (!input.isValid()) throw new InvalidInput(input.boxId);
     }
 
     const unsignedTransaction = new ErgoUnsignedTransaction(
@@ -366,10 +377,7 @@ export class TransactionBuilder {
   }
 
   private _isMinting(): boolean {
-    for (const output of this._outputs) {
-      if (output.minting) return true;
-    }
-
+    for (const output of this._outputs) if (output.minting) return true;
     return false;
   }
 
@@ -428,7 +436,6 @@ type ChangeEstimationParams = {
 
 function estimateMinChangeValue(params: ChangeEstimationParams): bigint {
   const size = BigInt(estimateChangeSize(params));
-
   return size * BOX_VALUE_PER_BYTE;
 }
 
@@ -448,9 +455,7 @@ function estimateChangeSize({
   size += 32; // BLAKE 256 hash length
 
   size = size * neededBoxes;
-  for (let i = 0; i < neededBoxes; i++) {
-    size += estimateVLQSize(baseIndex + i);
-  }
+  for (let i = 0; i < neededBoxes; i++) size += estimateVLQSize(baseIndex + i);
 
   for (const token of tokens) {
     size += byteSizeOf(token.tokenId) + estimateVLQSize(token.amount);
