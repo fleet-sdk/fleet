@@ -73,11 +73,9 @@ export class BoxSelector<T extends Box<bigint>> {
     }
 
     if (predicate) {
-      if (inclusion) {
-        selected = unselected.filter((box) => predicate(box) || inclusion.has(box.boxId));
-      } else {
-        selected = unselected.filter(predicate);
-      }
+      selected = inclusion
+        ? unselected.filter((box) => predicate(box) || inclusion.has(box.boxId))
+        : unselected.filter(predicate);
     } else if (inclusion) {
       selected = unselected.filter((box) => inclusion.has(box.boxId));
     }
@@ -93,9 +91,7 @@ export class BoxSelector<T extends Box<bigint>> {
 
       if (some(remaining.tokens) && selected.some((input) => !isEmpty(input.assets))) {
         for (const t of remaining.tokens) {
-          if (t.amount && t.amount > _0n) {
-            t.amount -= utxoSum(selected, t.tokenId);
-          }
+          if (t.amount && t.amount > _0n) t.amount -= utxoSum(selected, t.tokenId);
         }
       }
     }
@@ -183,9 +179,7 @@ export class BoxSelector<T extends Box<bigint>> {
       }
 
       if (Array.isArray(predicateOrBoxIds)) {
-        for (const boxId of predicateOrBoxIds) {
-          this._ensureInclusionBoxIds.add(boxId);
-        }
+        for (const boxId of predicateOrBoxIds) this._ensureInclusionBoxIds.add(boxId);
       } else {
         this._ensureInclusionBoxIds.add(predicateOrBoxIds);
       }
