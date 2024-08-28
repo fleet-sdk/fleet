@@ -1,5 +1,11 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.6.2
+
+### Patch Changes
+
+- 401268b: Support `take` and `skip` params in `ErgoGraphQLProvider#stream*()` methods
+
 ## 0.6.1
 
 ### Patch Changes
