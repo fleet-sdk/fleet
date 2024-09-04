@@ -1,5 +1,3 @@
-// export const mockSuccessResponse = (data: unknown) => resolveString(JSON.stringify(data));
-
 export const resolveString = (data: string) =>
   ({
     text: () => new Promise((resolve) => resolve(data))
