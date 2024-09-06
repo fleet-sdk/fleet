@@ -142,14 +142,14 @@ export interface IBlockchainProvider<I> {
   /**
    * Stream boxes.
    */
-  streamBoxes(query: BoxQuery<BoxWhere>): AsyncIterable<ChainProviderBox<I>[]>;
+  streamBoxes(query: BoxQuery<BoxWhere>): AsyncGenerator<ChainProviderBox<I>[]>;
 
   /**
    * Stream unconfirmed transactions
    */
   streamUnconfirmedTransactions(
     query: TransactionQuery<UnconfirmedTransactionWhere>
-  ): AsyncIterable<ChainProviderUnconfirmedTransaction<I>[]>;
+  ): AsyncGenerator<ChainProviderUnconfirmedTransaction<I>[]>;
 
   /**
    * Get unconfirmed transactions
@@ -163,7 +163,7 @@ export interface IBlockchainProvider<I> {
    */
   streamConfirmedTransactions(
     query: TransactionQuery<ConfirmedTransactionWhere>
-  ): AsyncIterable<ChainProviderConfirmedTransaction<I>[]>;
+  ): AsyncGenerator<ChainProviderConfirmedTransaction<I>[]>;
 
   /**
    * Get confirmed transactions
