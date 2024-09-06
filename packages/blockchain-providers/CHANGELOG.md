@@ -1,5 +1,12 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.6.3
+
+### Patch Changes
+
+- 90ad0b8: Fix stream methods return types
+- 4d8f501: Retry on server errors
+
 ## 0.6.2
 
 ### Patch Changes
