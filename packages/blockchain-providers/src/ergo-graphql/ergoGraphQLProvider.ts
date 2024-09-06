@@ -226,7 +226,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
 
   async *streamUnconfirmedTransactions(
     query: TransactionQuery<GraphQLUnconfirmedTransactionWhere> & SkipAndTake
-  ): AsyncIterable<ChainProviderUnconfirmedTransaction<I>[]> {
+  ): AsyncGenerator<ChainProviderUnconfirmedTransaction<I>[]> {
     const pageSize = query.take ?? PAGE_SIZE;
     const queries = buildGqlUnconfirmedTxQueries(query);
 
@@ -259,7 +259,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
 
   async *streamConfirmedTransactions(
     query: TransactionQuery<GraphQLConfirmedTransactionWhere> & SkipAndTake
-  ): AsyncIterable<ChainProviderConfirmedTransaction<I>[]> {
+  ): AsyncGenerator<ChainProviderConfirmedTransaction<I>[]> {
     const pageSize = query.take ?? PAGE_SIZE;
     const queries = buildGqlConfirmedTxQueries(query);
 
