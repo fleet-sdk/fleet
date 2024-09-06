@@ -97,6 +97,39 @@ describe("request", () => {
     expect(result).toEqual(mockResponse);
   });
 
+  it("should retry if the response status is in the retry status codes", async () => {
+    const mockResponse = { data: "response" };
+
+    const fetchMock = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce({
+        ...resolveData({}),
+        status: 500,
+        statusText: "Internal Server Error"
+      } as unknown as Response)
+      .mockResolvedValueOnce(resolveData(mockResponse));
+
+    const parserMock = {
+      parse: vi.fn().mockReturnValue(mockResponse),
+      stringify: vi.fn().mockReturnValue(JSON.stringify(mockResponse))
+    };
+
+    const result = await request("/api/data", {
+      parser: parserMock,
+      base: "https://example.com",
+      query: { param: "value" },
+      retry: { attempts: 3, delay: 10 },
+      httpOptions: { method: "GET" }
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledWith("https://example.com/api/data?param=value", {
+      method: "GET"
+    });
+    expect(parserMock.parse).toHaveBeenCalledWith(JSON.stringify(mockResponse));
+    expect(result).toEqual(mockResponse);
+  });
+
   it("should retry the request and return the parsed response on success", async () => {
     const mockResponse = { data: "response" };
     const fetchMock = vi
