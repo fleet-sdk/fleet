@@ -368,23 +368,27 @@ export class TransactionBuilder {
     return unsignedTransaction;
   }
 
-  private _isMinting(): boolean {
-    return this._getMintingTokenId() !== undefined;
-  }
-
-  private _getMintingTokenId(): string | undefined {
+  private _getMintingOutput(): OutputBuilder | undefined {
     for (const output of this._outputs) {
-      if (output.minting) return output.minting.tokenId;
+      if (output.minting) return output;
     }
 
     return;
+  }
+
+  private _isMinting(): boolean {
+    return this._getMintingOutput() !== undefined;
+  }
+
+  private _getMintingTokenId(): string | undefined {
+    return this._getMintingOutput()?.minting?.tokenId;
   }
 
   private _isMoreThanOneTokenBeingMinted(): boolean {
     let mintingCount = 0;
 
     for (const output of this._outputs) {
-      if (isDefined(output.minting)) {
+      if (output.minting) {
         mintingCount++;
         if (mintingCount > 1) return true;
       }
