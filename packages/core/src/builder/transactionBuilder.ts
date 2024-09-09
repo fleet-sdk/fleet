@@ -369,11 +369,15 @@ export class TransactionBuilder {
   }
 
   private _isMinting(): boolean {
+    return this._getMintingTokenId() !== undefined;
+  }
+
+  private _getMintingTokenId(): string | undefined {
     for (const output of this._outputs) {
-      if (output.minting) return true;
+      if (output.minting) return output.minting.tokenId;
     }
 
-    return false;
+    return;
   }
 
   private _isMoreThanOneTokenBeingMinted(): boolean {
@@ -402,14 +406,6 @@ export class TransactionBuilder {
     }
 
     return false;
-  }
-
-  private _getMintingTokenId(): string | undefined {
-    for (const output of this._outputs) {
-      if (output.minting) return output.minting.tokenId;
-    }
-
-    return;
   }
 }
 

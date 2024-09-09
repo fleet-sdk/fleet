@@ -65,11 +65,11 @@ export class BoxSelector<T extends Box<bigint>> {
     let selected: Box<bigint>[] = [];
 
     const predicate = this._ensureFilterPredicate;
-    const inclusion = new Set(this._ensureInclusionBoxIds);
+    let inclusion = this._ensureInclusionBoxIds;
 
     // if the target has a token that is being minted, then the first input should be included
     if (target.tokens?.some((x) => x.tokenId === unselected[0].boxId)) {
-      inclusion.add(unselected[0].boxId);
+      inclusion = new Set(this._ensureInclusionBoxIds).add(unselected[0].boxId);
     }
 
     if (predicate) {
