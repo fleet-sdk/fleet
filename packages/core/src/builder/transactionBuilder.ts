@@ -273,6 +273,14 @@ export class TransactionBuilder {
     let inputs = selector.select(target);
 
     if (isDefined(this._changeAddress)) {
+      const manualMinting = target.tokens.some((x) => x.tokenId === inputs[0].boxId)
+        ? inputs[0].boxId
+        : undefined;
+
+      if (manualMinting) {
+        target.tokens = target.tokens.filter((x) => x.tokenId !== manualMinting);
+      }
+
       let change = utxoDiff(utxoSum(inputs), target);
       const changeBoxes: OutputBuilder[] = [];
 
@@ -331,9 +339,7 @@ export class TransactionBuilder {
     }
 
     for (const input of inputs) {
-      if (!input.isValid()) {
-        throw new InvalidInput(input.boxId);
-      }
+      if (!input.isValid()) throw new InvalidInput(input.boxId);
     }
 
     const unsignedTransaction = new ErgoUnsignedTransaction(
@@ -352,10 +358,7 @@ export class TransactionBuilder {
     }
 
     if (some(burning.tokens) && some(this._burning)) {
-      burning = utxoDiff(burning, {
-        nanoErgs: _0n,
-        tokens: this._burning.toArray()
-      });
+      burning = utxoDiff(burning, { nanoErgs: _0n, tokens: this._burning.toArray() });
     }
 
     if (!this._settings.canBurnTokens && some(burning.tokens)) {
@@ -402,15 +405,11 @@ export class TransactionBuilder {
   }
 
   private _getMintingTokenId(): string | undefined {
-    let tokenId = undefined;
     for (const output of this._outputs) {
-      if (output.minting) {
-        tokenId = output.minting.tokenId;
-        break;
-      }
+      if (output.minting) return output.minting.tokenId;
     }
 
-    return tokenId;
+    return;
   }
 }
 

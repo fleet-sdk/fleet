@@ -79,7 +79,8 @@ export function utxoSum(boxes: readonly BoxAmounts[], tokenId?: TokenId) {
  */
 export function utxoDiff(
   minuend: BoxSummary | Box<Amount>[],
-  subtrahend: BoxSummary | Box<Amount>[]
+  subtrahend: BoxSummary | Box<Amount>[],
+  ignoreSubtrahendLeftoverTokens = false
 ): BoxSummary {
   if (Array.isArray(minuend)) minuend = utxoSum(minuend);
   if (Array.isArray(subtrahend)) subtrahend = utxoSum(subtrahend);
@@ -101,7 +102,7 @@ export function utxoDiff(
     }
   }
 
-  if (subtrahendTokens.size > 0) {
+  if (!ignoreSubtrahendLeftoverTokens && subtrahendTokens.size > 0) {
     for (const [tokenId, amount] of subtrahendTokens) {
       tokens.push({ tokenId, amount: -amount });
     }
