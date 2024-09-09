@@ -5,7 +5,9 @@ export default defineConfig({
   plugins: [viteTsConfigPaths()],
   test: {
     coverage: {
-      all: true,
+      thresholds: {
+        "100": true
+      },
       provider: "v8",
       reporter: ["text", "json", "html"],
       exclude: [
