@@ -273,12 +273,13 @@ export class TransactionBuilder {
     let inputs = selector.select(target);
 
     if (isDefined(this._changeAddress)) {
-      const manualMinting = target.tokens.some((x) => x.tokenId === inputs[0].boxId)
-        ? inputs[0].boxId
+      const firstInputId = inputs[0].boxId;
+      const manualMintingTokenId = target.tokens.some((x) => x.tokenId === firstInputId)
+        ? firstInputId
         : undefined;
 
-      if (manualMinting) {
-        target.tokens = target.tokens.filter((x) => x.tokenId !== manualMinting);
+      if (manualMintingTokenId) {
+        target.tokens = target.tokens.filter((x) => x.tokenId !== manualMintingTokenId);
       }
 
       let change = utxoDiff(utxoSum(inputs), target);
