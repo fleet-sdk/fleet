@@ -125,6 +125,38 @@ describe("utxoDiff()", () => {
     });
   });
 
+  it("Should calculate the difference between two summaries and take subtrahend tokens, that are not present in minuend, into consideration", () => {
+    const sumA: BoxSummary = {
+      nanoErgs: 100n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 5n },
+        { tokenId: "token_id_2", amount: 875n },
+        { tokenId: "token_id_3", amount: 100n },
+        { tokenId: "token_id_4", amount: 200n }
+      ]
+    };
+
+    const sumB: BoxSummary = {
+      nanoErgs: 10n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 2n },
+        { tokenId: "token_id_2", amount: 880n },
+        { tokenId: "token_id_3", amount: 100n },
+        { tokenId: "token_id_5", amount: 200n } // not present in sumA
+      ]
+    };
+
+    expect(utxoDiff(sumA, sumB)).toEqual({
+      nanoErgs: 90n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 3n },
+        { tokenId: "token_id_2", amount: -5n },
+        { tokenId: "token_id_4", amount: 200n },
+        { tokenId: "token_id_5", amount: -200n }
+      ]
+    });
+  });
+
   it("Should calculate the difference between two box arrays", () => {
     const boxes1 = regularBoxes;
     const boxes2 = regularBoxes.slice(1);

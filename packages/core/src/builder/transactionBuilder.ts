@@ -273,6 +273,15 @@ export class TransactionBuilder {
     let inputs = selector.select(target);
 
     if (isDefined(this._changeAddress)) {
+      const firstInputId = inputs[0].boxId;
+      const manualMintingTokenId = target.tokens.some((x) => x.tokenId === firstInputId)
+        ? firstInputId
+        : undefined;
+
+      if (manualMintingTokenId) {
+        target.tokens = target.tokens.filter((x) => x.tokenId !== manualMintingTokenId);
+      }
+
       let change = utxoDiff(utxoSum(inputs), target);
       const changeBoxes: OutputBuilder[] = [];
 
@@ -331,9 +340,7 @@ export class TransactionBuilder {
     }
 
     for (const input of inputs) {
-      if (!input.isValid()) {
-        throw new InvalidInput(input.boxId);
-      }
+      if (!input.isValid()) throw new InvalidInput(input.boxId);
     }
 
     const unsignedTransaction = new ErgoUnsignedTransaction(
@@ -352,10 +359,7 @@ export class TransactionBuilder {
     }
 
     if (some(burning.tokens) && some(this._burning)) {
-      burning = utxoDiff(burning, {
-        nanoErgs: _0n,
-        tokens: this._burning.toArray()
-      });
+      burning = utxoDiff(burning, { nanoErgs: _0n, tokens: this._burning.toArray() });
     }
 
     if (!this._settings.canBurnTokens && some(burning.tokens)) {
@@ -365,19 +369,27 @@ export class TransactionBuilder {
     return unsignedTransaction;
   }
 
-  private _isMinting(): boolean {
+  private _getMintingOutput(): OutputBuilder | undefined {
     for (const output of this._outputs) {
-      if (output.minting) return true;
+      if (output.minting) return output;
     }
 
-    return false;
+    return;
+  }
+
+  private _isMinting(): boolean {
+    return this._getMintingOutput() !== undefined;
+  }
+
+  private _getMintingTokenId(): string | undefined {
+    return this._getMintingOutput()?.minting?.tokenId;
   }
 
   private _isMoreThanOneTokenBeingMinted(): boolean {
     let mintingCount = 0;
 
     for (const output of this._outputs) {
-      if (isDefined(output.minting)) {
+      if (output.minting) {
         mintingCount++;
         if (mintingCount > 1) return true;
       }
@@ -399,18 +411,6 @@ export class TransactionBuilder {
     }
 
     return false;
-  }
-
-  private _getMintingTokenId(): string | undefined {
-    let tokenId = undefined;
-    for (const output of this._outputs) {
-      if (output.minting) {
-        tokenId = output.minting.tokenId;
-        break;
-      }
-    }
-
-    return tokenId;
   }
 }
 

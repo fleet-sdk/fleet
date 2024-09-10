@@ -1005,20 +1005,23 @@ describe("Token minting", () => {
   });
 
   it("Should fail if trying to mint more than one token", () => {
-    const builder = new TransactionBuilder(height).from(regularBoxes).to([
-      new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({
-        name: "token1",
-        amount: 1n
-      }),
-      new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).mintToken({
-        name: "token2",
-        amount: 1n
-      })
-    ]);
+    const builder = new TransactionBuilder(height)
+      .from(regularBoxes)
+      .to([
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({
+          name: "token1",
+          amount: 1n
+        }),
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).mintToken({
+          name: "token2",
+          amount: 1n
+        })
+      ])
+      .sendChangeTo(a1.address);
 
-    expect(() => {
-      builder.build();
-    }).toThrow(MalformedTransaction);
+    expect(() => builder.build()).to.throw(
+      "Malformed transaction: only one token can be minted per transaction."
+    );
   });
 });
 

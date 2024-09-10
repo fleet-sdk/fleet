@@ -48,7 +48,12 @@ export class ErgoUnsignedTransaction {
   }
 
   get burning(): BoxSummary {
-    return utxoDiff(utxoSum(this.inputs), utxoSum(this.outputs));
+    const diff = utxoDiff(utxoSum(this.inputs), utxoSum(this.outputs));
+    if (diff.tokens.length > 0) {
+      diff.tokens = diff.tokens.filter((x) => x.tokenId !== this.inputs[0].boxId);
+    }
+
+    return diff;
   }
 
   toPlainObject(): UnsignedTransaction;
