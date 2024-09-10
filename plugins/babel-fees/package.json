@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/babel-fees-plugin",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Babel Fees plugin for Fleet SDK.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
