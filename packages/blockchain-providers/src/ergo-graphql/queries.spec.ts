@@ -34,7 +34,7 @@ describe("Box queries", () => {
 
   it("Should build query for confirmed transactions", () => {
     expect(CONF_TX_QUERY).to.be.equal(
-      "query confirmedTransactions($addresses: [String!], $transactionIds: [String!], $skip: Int, $take: Int  $relevantOnly: Boolean) { transactions(addresses: $addresses, transactionIds: $transactionIds, skip: $skip, take: $take) { transactionId timestamp inputs { proofBytes extension index box { boxId transactionId index value creationHeight ergoTree assets { tokenId amount } additionalRegisters } } dataInputs { boxId } outputs(relevantOnly: $relevantOnly) { boxId transactionId index value creationHeight ergoTree assets { tokenId amount } additionalRegisters } inclusionHeight headerId index } }"
+      "query confirmedTransactions($addresses: [String!], $transactionIds: [String!], $skip: Int, $take: Int  $onlyRelevantOutputs: Boolean) { transactions(addresses: $addresses, transactionIds: $transactionIds, skip: $skip, take: $take) { transactionId timestamp inputs { proofBytes extension index box { boxId transactionId index value creationHeight ergoTree assets { tokenId amount } additionalRegisters } } dataInputs { boxId } outputs(relevantOnly: $onlyRelevantOutputs) { boxId transactionId index value creationHeight ergoTree assets { tokenId amount } additionalRegisters } inclusionHeight headerId index } }"
     );
   });
 });
