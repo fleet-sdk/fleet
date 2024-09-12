@@ -1,5 +1,11 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.6.5
+
+### Patch Changes
+
+- 76998dd: Fix `relevantOnly` query var
+
 ## 0.6.4
 
 ### Patch Changes
