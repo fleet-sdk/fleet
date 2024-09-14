@@ -79,26 +79,32 @@ export function utxoSum(boxes: readonly BoxAmounts[], tokenId?: TokenId) {
  */
 export function utxoDiff(
   minuend: BoxSummary | Box<Amount>[],
-  subtrahend: BoxSummary | Box<Amount>[]
+  subtrahend: BoxSummary | Box<Amount>[],
+  ignoreSubtrahendLeftoverTokens = false
 ): BoxSummary {
-  if (Array.isArray(minuend)) {
-    minuend = utxoSum(minuend);
-  }
-
-  if (Array.isArray(subtrahend)) {
-    subtrahend = utxoSum(subtrahend);
-  }
+  if (Array.isArray(minuend)) minuend = utxoSum(minuend);
+  if (Array.isArray(subtrahend)) subtrahend = utxoSum(subtrahend);
 
   const tokens: TokenAmount<bigint>[] = [];
   const nanoErgs = minuend.nanoErgs - subtrahend.nanoErgs;
+  const subtrahendTokens = new Map(subtrahend.tokens.map((t) => [t.tokenId, t.amount]));
 
   for (const token of minuend.tokens) {
-    const balance =
-      token.amount -
-      (subtrahend.tokens.find((t) => t.tokenId === token.tokenId)?.amount || _0n);
+    const subtrahendAmount = subtrahendTokens.get(token.tokenId) || _0n;
+    const balance = token.amount - (subtrahendAmount || _0n);
 
     if (balance !== _0n) {
       tokens.push({ tokenId: token.tokenId, amount: balance });
+    }
+
+    if (subtrahendAmount > _0n) {
+      subtrahendTokens.delete(token.tokenId);
+    }
+  }
+
+  if (!ignoreSubtrahendLeftoverTokens && subtrahendTokens.size > 0) {
+    for (const [tokenId, amount] of subtrahendTokens) {
+      tokens.push({ tokenId, amount: -amount });
     }
   }
 

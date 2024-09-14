@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.6.4
+
+### Patch Changes
+
+- 504974e: Fix `utxoDiff` miscalculation when tokens are present in subtrahend but not in minuend
+
 ## 0.4.1
 
 ### Patch Changes

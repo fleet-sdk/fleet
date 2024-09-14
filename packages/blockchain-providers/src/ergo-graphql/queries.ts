@@ -20,5 +20,5 @@ const T = [
   "addresses: $addresses, transactionIds: $transactionIds, skip: $skip, take: $take",
   `transactionId timestamp inputs { proofBytes extension index box { ${B[2]} } } dataInputs { boxId }`
 ];
-export const CONF_TX_QUERY = `query confirmedTransactions(${T[0]}  $relevantOnly: Boolean) { transactions(${T[1]}) { ${T[2]} outputs(relevantOnly: $relevantOnly) { ${B[2]} } inclusionHeight headerId index } }`;
+export const CONF_TX_QUERY = `query confirmedTransactions(${T[0]}  $onlyRelevantOutputs: Boolean) { transactions(${T[1]}) { ${T[2]} outputs(relevantOnly: $onlyRelevantOutputs) { ${B[2]} } inclusionHeight headerId index } }`;
 export const UNCONF_TX_QUERY = `query unconfirmedTransactions(${T[0]}) { mempool { transactions(${T[1]}) { ${T[2]} outputs { ${B[2]} } } } }`;

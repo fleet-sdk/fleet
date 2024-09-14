@@ -1,5 +1,32 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.6.5
+
+### Patch Changes
+
+- 76998dd: Fix `relevantOnly` query var
+
+## 0.6.4
+
+### Patch Changes
+
+- Updated dependencies [504974e]
+  - @fleet-sdk/common@0.6.4
+  - @fleet-sdk/core@0.6.4
+
+## 0.6.3
+
+### Patch Changes
+
+- 90ad0b8: Fix stream methods return types
+- 4d8f501: Retry on server errors
+
+## 0.6.2
+
+### Patch Changes
+
+- 401268b: Support `take` and `skip` params in `ErgoGraphQLProvider#stream*()` methods
+
 ## 0.6.1
 
 ### Patch Changes

@@ -58,6 +58,8 @@ import {
   UNCONF_TX_QUERY
 } from "./queries";
 
+type SkipAndTake = { skip?: number; take?: number };
+
 export type GraphQLBoxWhere = BoxWhere & {
   /** Base16-encoded ErgoTrees */
   ergoTrees?: HexString[];
@@ -152,15 +154,18 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
     return this as unknown as ErgoGraphQLProvider<M>;
   }
 
-  async *streamBoxes(query: GraphQLBoxQuery): AsyncGenerator<ChainProviderBox<I>[]> {
+  async *streamBoxes(
+    query: GraphQLBoxQuery & SkipAndTake
+  ): AsyncGenerator<ChainProviderBox<I>[]> {
     if (isEmpty(query.where)) {
       throw new Error("Cannot fetch unspent boxes without a where clause.");
     }
 
     const notBeingSpent = (box: GQLBox) => !box.beingSpent;
     const returnedBoxIds = new Set<string>();
-    const { where, from } = query;
-    const queries = buildGqlBoxQueries(where);
+    const { from, take } = query;
+    const pageSize = take ?? PAGE_SIZE;
+    const queries = buildGqlBoxQueries(query);
     const isMempoolAware = from !== "blockchain";
 
     for (const query of queries) {
@@ -180,7 +185,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
             boxes = boxes.concat(confirmedBoxes);
           }
 
-          inclChain = data.boxes.length === PAGE_SIZE;
+          inclChain = data.boxes.length === pageSize;
         }
 
         if (isMempoolAware && hasMempool(data)) {
@@ -191,7 +196,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
             boxes = boxes.concat(mempoolBoxes);
           }
 
-          inclPool = data.mempool.boxes.length === PAGE_SIZE;
+          inclPool = data.mempool.boxes.length === pageSize;
         }
 
         if (some(boxes)) {
@@ -208,7 +213,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
           }
         }
 
-        if (inclChain || inclPool) query.skip += PAGE_SIZE;
+        if (inclChain || inclPool) query.skip += pageSize;
       }
     }
   }
@@ -220,9 +225,10 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   }
 
   async *streamUnconfirmedTransactions(
-    query: TransactionQuery<GraphQLUnconfirmedTransactionWhere>
-  ): AsyncIterable<ChainProviderUnconfirmedTransaction<I>[]> {
-    const queries = buildGqlUnconfirmedTxQueries(query.where);
+    query: TransactionQuery<GraphQLUnconfirmedTransactionWhere> & SkipAndTake
+  ): AsyncGenerator<ChainProviderUnconfirmedTransaction<I>[]> {
+    const pageSize = query.take ?? PAGE_SIZE;
+    const queries = buildGqlUnconfirmedTxQueries(query);
 
     for (const query of queries) {
       let keepFetching = true;
@@ -234,8 +240,8 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
           );
         }
 
-        keepFetching = response.data?.mempool?.transactions?.length === PAGE_SIZE;
-        if (keepFetching) query.skip += PAGE_SIZE;
+        keepFetching = response.data?.mempool?.transactions?.length === pageSize;
+        if (keepFetching) query.skip += pageSize;
       }
     }
   }
@@ -252,9 +258,10 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   }
 
   async *streamConfirmedTransactions(
-    query: TransactionQuery<GraphQLConfirmedTransactionWhere>
-  ): AsyncIterable<ChainProviderConfirmedTransaction<I>[]> {
-    const queries = buildGqlConfirmedTxQueries(query.where);
+    query: TransactionQuery<GraphQLConfirmedTransactionWhere> & SkipAndTake
+  ): AsyncGenerator<ChainProviderConfirmedTransaction<I>[]> {
+    const pageSize = query.take ?? PAGE_SIZE;
+    const queries = buildGqlConfirmedTxQueries(query);
 
     for (const query of queries) {
       let keepFetching = true;
@@ -266,8 +273,8 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
           );
         }
 
-        keepFetching = response.data?.transactions?.length === PAGE_SIZE;
-        if (keepFetching) query.skip += PAGE_SIZE;
+        keepFetching = response.data?.transactions?.length === pageSize;
+        if (keepFetching) query.skip += pageSize;
       }
     }
   }
@@ -334,11 +341,11 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   }
 }
 
-function buildGqlBoxQueries(where: GraphQLBoxWhere) {
+function buildGqlBoxQueries(query: GraphQLBoxQuery & SkipAndTake) {
   const ergoTrees = uniq(
     [
-      merge(where.ergoTrees, where.ergoTree) ?? [],
-      merge(where.addresses, where.address)?.map((a) =>
+      merge(query.where.ergoTrees, query.where.ergoTree) ?? [],
+      merge(query.where.addresses, query.where.address)?.map((a) =>
         typeof a === "string" ? ErgoAddress.decode(a).ergoTree : a.ergoTree
       ) ?? []
     ].flat()
@@ -346,22 +353,24 @@ function buildGqlBoxQueries(where: GraphQLBoxWhere) {
 
   return chunk(ergoTrees, MAX_ARGS).map((chunk) => ({
     spent: false,
-    boxIds: where.boxId ? [where.boxId] : undefined,
+    boxIds: query.where.boxId ? [query.where.boxId] : undefined,
     ergoTrees: chunk,
-    ergoTreeTemplateHash: where.templateHash,
-    tokenId: where.tokenId,
-    skip: 0,
-    take: PAGE_SIZE
+    ergoTreeTemplateHash: query.where.templateHash,
+    tokenId: query.where.tokenId,
+    skip: query.skip ?? 0,
+    take: query.take ?? PAGE_SIZE
   }));
 }
 
-function buildGqlUnconfirmedTxQueries(where: GraphQLConfirmedTransactionWhere) {
+function buildGqlUnconfirmedTxQueries(
+  query: TransactionQuery<GraphQLUnconfirmedTransactionWhere> & SkipAndTake
+) {
   const addresses = uniq(
     [
-      merge(where.addresses, where.address)?.map((address): string =>
+      merge(query.where.addresses, query.where.address)?.map((address): string =>
         typeof address === "string" ? address : address.encode()
       ) ?? [],
-      merge(where.ergoTrees, where.ergoTree)?.map((tree) =>
+      merge(query.where.ergoTrees, query.where.ergoTree)?.map((tree) =>
         ErgoAddress.fromErgoTree(tree).encode()
       ) ?? []
     ].flat()
@@ -369,18 +378,22 @@ function buildGqlUnconfirmedTxQueries(where: GraphQLConfirmedTransactionWhere) {
 
   return chunk(addresses, MAX_ARGS).map((chunk) => ({
     addresses: chunk.length ? chunk : undefined,
-    transactionIds: where.transactionId ? [where.transactionId] : undefined,
-    skip: 0,
-    take: PAGE_SIZE
+    transactionIds: query.where.transactionId ? [query.where.transactionId] : undefined,
+    skip: query.skip ?? 0,
+    take: query.take ?? PAGE_SIZE
   }));
 }
 
-function buildGqlConfirmedTxQueries(where: GraphQLConfirmedTransactionWhere) {
-  return buildGqlUnconfirmedTxQueries(where).map((query) => ({
-    ...query,
-    headerId: where.headerId,
-    minHeight: where.minHeight,
-    onlyRelevantOutputs: where.onlyRelevantOutputs
+function buildGqlConfirmedTxQueries(
+  query: TransactionQuery<GraphQLConfirmedTransactionWhere> & SkipAndTake
+) {
+  return buildGqlUnconfirmedTxQueries(
+    query as TransactionQuery<GraphQLUnconfirmedTransactionWhere>
+  ).map((q) => ({
+    ...q,
+    headerId: query.where.headerId,
+    minHeight: query.where.minHeight,
+    onlyRelevantOutputs: query.where.onlyRelevantOutputs
   }));
 }
 

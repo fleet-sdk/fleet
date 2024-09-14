@@ -17,6 +17,18 @@ export type FetchOptions = {
   httpOptions?: RequestInit;
 };
 
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+const RETRY_STATUS_CODES = new Set([
+  408, // Request Timeout
+  409, // Conflict
+  425, // Too Early (Experimental)
+  429, // Too Many Requests
+  500, // Internal Server Error
+  502, // Bad Gateway
+  503, // Service Unavailable
+  504 // Gateway Timeout
+]);
+
 export async function request<T>(path: string, opt?: Partial<FetchOptions>): Promise<T> {
   const url = buildURL(path, opt?.query, opt?.base);
 
@@ -24,10 +36,12 @@ export async function request<T>(path: string, opt?: Partial<FetchOptions>): Pro
   if (opt?.retry) {
     const routes = some(opt.retry.fallbacks) ? [url, ...opt.retry.fallbacks] : [url];
     const attempts = opt.retry.attempts;
-    response = await exponentialRetry(
-      (r) => fetch(resolveUrl(routes, attempts - r), opt.httpOptions),
-      opt.retry
-    );
+    response = await exponentialRetry(async (r) => {
+      const response = await fetch(resolveUrl(routes, attempts - r), opt.httpOptions);
+      if (RETRY_STATUS_CODES.has(response.status)) throw new Error(response.statusText);
+
+      return response;
+    }, opt.retry);
   } else {
     response = await fetch(url, opt?.httpOptions);
   }
