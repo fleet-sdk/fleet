@@ -58,12 +58,8 @@ export function createPluginContext(
   return {
     addInputs: (inputs) =>
       transactionBuilder
-        .from(inputs)
-        .configureSelector((selector) =>
-          selector.ensureInclusion(
-            Array.isArray(inputs) ? inputs.map((input) => input.boxId) : inputs.boxId
-          )
-        ).inputs.length,
+        .from(inputs, { ensureInclusion: true })
+        .inputs.length,
     addOutputs: (outputs, options) =>
       transactionBuilder.to(outputs, options).outputs.length,
     addDataInputs: (dataInputs, options) =>
