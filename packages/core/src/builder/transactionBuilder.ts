@@ -281,10 +281,10 @@ export class TransactionBuilder {
     }
 
     const selector = new BoxSelector(this.inputs.toArray());
-    if (this._ensureInclusion?.size) { 
+    if (this._ensureInclusion?.size) {
       selector.ensureInclusion(Array.from(this._ensureInclusion));
     }
-    
+
     if (some(this._selectorCallbacks)) {
       for (const selectorCallBack of this._selectorCallbacks) {
         selectorCallBack(selector);

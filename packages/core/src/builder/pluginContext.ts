@@ -52,24 +52,16 @@ export type FleetPluginContext = {
   setFee: (amount: Amount) => void;
 };
 
-export function createPluginContext(
-  transactionBuilder: TransactionBuilder
-): FleetPluginContext {
+export function createPluginContext(builder: TransactionBuilder): FleetPluginContext {
   return {
-    addInputs: (inputs) =>
-      transactionBuilder
-        .from(inputs, { ensureInclusion: true })
-        .inputs.length,
-    addOutputs: (outputs, options) =>
-      transactionBuilder.to(outputs, options).outputs.length,
+    addInputs: (inputs) => builder.from(inputs, { ensureInclusion: true }).inputs.length,
+    addOutputs: (outputs, options) => builder.to(outputs, options).outputs.length,
     addDataInputs: (dataInputs, options) =>
-      transactionBuilder.withDataFrom(dataInputs, options).dataInputs.length,
+      builder.withDataFrom(dataInputs, options).dataInputs.length,
     burnTokens: (tokens) => {
-      if (!transactionBuilder.settings.canBurnTokensFromPlugins) {
-        throw new NotAllowedTokenBurning();
-      }
-      transactionBuilder.burnTokens(tokens);
+      if (!builder.settings.canBurnTokensFromPlugins) throw new NotAllowedTokenBurning();
+      builder.burnTokens(tokens);
     },
-    setFee: (amount) => transactionBuilder.payFee(amount)
+    setFee: (amount) => builder.payFee(amount)
   };
 }
