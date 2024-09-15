@@ -72,12 +72,12 @@ type InputsInclusionOptions = {
 
 export class TransactionBuilder {
   private readonly _inputs!: InputsCollection;
-  private readonly _preservedInputs!: InputsCollection;
   private readonly _dataInputs!: InputsCollection;
   private readonly _outputs!: OutputsCollection;
   private readonly _settings!: TransactionBuilderSettings;
   private readonly _creationHeight!: number;
 
+  private _ensureInclusion?: Set<string>;
   private _selectorCallbacks?: SelectorCallback[];
   private _changeAddress?: ErgoAddress;
   private _feeAmount?: bigint;
@@ -143,13 +143,20 @@ export class TransactionBuilder {
     options: InputsInclusionOptions = { ensureInclusion: false }
   ): TransactionBuilder {
     const items = isCollectionLike(inputs) ? inputs.toArray() : inputs;
-    if (options.ensureInclusion) {
-      this._preservedInputs.add(items);
-    } else {
-      this._inputs.add(items);
-    }
+    if (options.ensureInclusion) this.#ensureInclusionOf(items);
 
+    this._inputs.add(items);
     return this;
+  }
+
+  #ensureInclusionOf(inputs: OneOrMore<Box<Amount>>): void {
+    if (!this._ensureInclusion) this._ensureInclusion = new Set();
+
+    if (Array.isArray(inputs)) {
+      for (const input of inputs) this._ensureInclusion.add(input.boxId);
+    } else {
+      this._ensureInclusion.add(inputs.boxId);
+    }
   }
 
   public to(
@@ -274,6 +281,10 @@ export class TransactionBuilder {
     }
 
     const selector = new BoxSelector(this.inputs.toArray());
+    if (this._ensureInclusion?.size) { 
+      selector.ensureInclusion(Array.from(this._ensureInclusion));
+    }
+    
     if (some(this._selectorCallbacks)) {
       for (const selectorCallBack of this._selectorCallbacks) {
         selectorCallBack(selector);
