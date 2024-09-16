@@ -25,6 +25,7 @@ import {
   RECOMMENDED_MIN_FEE_VALUE,
   TransactionBuilder
 } from "./transactionBuilder";
+import { mockUTxO } from "packages/mock-chain/src";
 
 const height = 844540;
 const a1 = {
@@ -818,16 +819,19 @@ describe("Building", () => {
     }
   });
 
-  it("Should ensure inclusion and order or inputs", () => {
+  it("Should ensure inclusion and preserver the order or inputs", () => {
+    const anotherInput = mockUTxO({ ergoTree: a1.ergoTree });
     const transaction = new TransactionBuilder(height)
-      .from(regularBoxes)
-      .and.from(manyTokensBoxes, { ensureInclusion: true })
+      .from(manyTokensBoxes, { ensureInclusion: true })
+      .and.from(regularBoxes)
+      .and.from(anotherInput, { ensureInclusion: true })
       .sendChangeTo(a1.address)
       .build();
 
-    expect(transaction.inputs).to.have.length(manyTokensBoxes.length);
+    const expectedInputs = [...manyTokensBoxes, anotherInput];
+    expect(transaction.inputs).to.have.length(expectedInputs.length);
     for (let i = 0; i < transaction.inputs.length; i++) {
-      expect(transaction.inputs[i].boxId).to.be.equal(manyTokensBoxes[i].boxId);
+      expect(transaction.inputs[i].boxId).to.be.equal(expectedInputs[i].boxId);
     }
   });
 
