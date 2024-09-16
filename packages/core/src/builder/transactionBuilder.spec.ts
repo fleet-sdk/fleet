@@ -818,6 +818,19 @@ describe("Building", () => {
     }
   });
 
+  it("Should ensure inclusion and order or inputs", () => {
+    const transaction = new TransactionBuilder(height)
+      .from(regularBoxes)
+      .and.from(manyTokensBoxes, { ensureInclusion: true })
+      .sendChangeTo(a1.address)
+      .build();
+
+    expect(transaction.inputs).to.have.length(manyTokensBoxes.length);
+    for (let i = 0; i < transaction.inputs.length; i++) {
+      expect(transaction.inputs[i].boxId).to.be.equal(manyTokensBoxes[i].boxId);
+    }
+  });
+
   it("Should produce multiple change boxes based on maxTokensPerChangeBox and isolate erg in a exclusive box ", () => {
     const tokensPerBox = 3;
 
@@ -908,7 +921,7 @@ describe("Building", () => {
 
   it("Should preserve inputs extension", () => {
     const input = new ErgoUnsignedInput(regularBoxes[0]);
-    input.setContextVars({ 0: "0580c0fc82aa02" });
+    input.setContextExtension({ 0: "0580c0fc82aa02" });
 
     const unsignedTransaction = new TransactionBuilder(height)
       .from(regularBoxes[1])
