@@ -47,7 +47,6 @@ export class SConstant<D = unknown, T extends SType = SType> {
   }
 }
 
-
 /**
  * Decodes a byte input into a Sigma constant of type `SConstant<D, T>`.
  *

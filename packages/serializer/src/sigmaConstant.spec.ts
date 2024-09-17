@@ -182,7 +182,7 @@ describe("Data only decoding", () => {
     expect(() => parse("", "strict")).to.throw();
     expect(() => parse(undefined as unknown as string, "strict")).to.throw();
   });
-  
+
   it("Should return undefined with invalid bytes in 'safe' parsing mode", () => {
     expect(() => parse("deadbeef", "safe")).not.to.throw();
     expect(parse("deadbeef", "safe")).to.be.undefined;
