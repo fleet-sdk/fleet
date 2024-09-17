@@ -1,5 +1,12 @@
 # @fleet-sdk/serializer
 
+## 0.7.0
+
+### Minor Changes
+
+- 9fceb6f: **🚨 BREAKING CHANGE**: `decode` function now returns `SConstant` instead of data directly
+- 62025c4: Introduce `stypeof` utility function
+
 ## 0.6.4
 
 ### Patch Changes

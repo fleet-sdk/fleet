@@ -1,5 +1,17 @@
 # @fleet-sdk/core
 
+## 0.7.0
+
+### Minor Changes
+
+- a08a573: Add `ensureInclusion` flag to the `TransactionBuilder#from` method to ensure both inclusion and order of inputs
+
+### Patch Changes
+
+- Updated dependencies [9fceb6f]
+- Updated dependencies [62025c4]
+  - @fleet-sdk/serializer@0.7.0
+
 ## 0.6.4
 
 ### Patch Changes

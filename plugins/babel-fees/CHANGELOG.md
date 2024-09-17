@@ -1,5 +1,16 @@
 # @fleet-sdk/babel-fees-plugin
 
+## 0.1.16
+
+### Patch Changes
+
+- 8904077: Improve Babel Box validation by validating `R4` and `R5` types
+- Updated dependencies [a08a573]
+- Updated dependencies [9fceb6f]
+- Updated dependencies [62025c4]
+  - @fleet-sdk/core@0.7.0
+  - @fleet-sdk/serializer@0.7.0
+
 ## 0.1.15
 
 ### Patch Changes
