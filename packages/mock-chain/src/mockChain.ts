@@ -6,7 +6,7 @@ import {
   some
 } from "@fleet-sdk/common";
 import type { ErgoUnsignedTransaction } from "@fleet-sdk/core";
-import { utf8 } from "@fleet-sdk/crypto";
+import { type ByteInput, utf8 } from "@fleet-sdk/crypto";
 import { decode } from "@fleet-sdk/serializer";
 import pc from "picocolors";
 import type { BlockchainParameters } from "sigmastate-js/main";
@@ -216,8 +216,8 @@ export class MockChain {
     );
     if (!box) return;
 
-    const name = decode(box.additionalRegisters.R4, safeUtf8Encode);
-    const decimals = decode(box.additionalRegisters.R6, safeUtf8Encode);
+    const name = decodeString(box.additionalRegisters.R4);
+    const decimals = decodeString(box.additionalRegisters.R6);
     if (name) {
       this.#metadataMap.set(firstInputId, {
         name,
@@ -232,5 +232,8 @@ function log(str: string) {
   console.log(str);
 }
 
-const safeUtf8Encode = (v: unknown) =>
-  v instanceof Uint8Array ? utf8.encode(v) : undefined;
+function decodeString(bytes?: ByteInput): string | undefined {
+  const c = decode<Uint8Array>(bytes);
+  if (!c || c.type.toString() !== "SColl[SByte]") return;
+  return utf8.encode(c.data);
+}

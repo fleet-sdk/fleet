@@ -144,15 +144,36 @@ describe("SColl serialization and parsing", () => {
   });
 });
 
-describe("Data only decoding", () => {
-  it("Should decode only data", () => {
-    expect(decode("40050002")).to.deep.equal([0, 1n]);
-    expect(decode("0101")).to.deep.equal(true);
+describe("Safe decoding", () => {
+  const validVectors = [
+    { hex: "40050002", data: [0, 1n], type: "(SInt, SLong)" },
+    { hex: "0101", data: true, type: "SBool" }
+  ];
+
+  test.each(validVectors)("Should decode valid bytes", (tv) => {
+    let c: SConstant | undefined;
+    expect(() => {
+      c = decode(tv.hex);
+    }).not.to.throw();
+
+    expect(c?.data).to.deep.equal(tv.data);
+    expect(c?.type.toString()).to.be.equal(tv.type);
+    expect(c?.toHex()).to.be.equal(tv.hex);
   });
 
-  it("Should decode and encode using custom coder", () => {
-    expect(decode("0e0a46656d616c6520233035", utf8.encode)).to.be.equal("Female #05");
-    expect(decode(SInt(1).toHex(), (v: number) => v.toString())).to.be.equal("1");
+  it("Should not throw but return undefined for invalid inputs", () => {
+    expect(() => decode("deadbeef")).not.to.throw();
+    expect(decode("deadbeef")).to.be.undefined;
+    expect(decode(undefined)).to.be.undefined;
+    expect(decode("")).to.be.undefined;
+  });
+});
+
+describe("Data only decoding", () => {
+  it("Should decode only data", () => {
+    expect(parse("40050002")).to.deep.equal([0, 1n]);
+    expect(parse("0101")).to.deep.equal(true);
+    expect(parse("0101"), "safe").to.deep.equal(true);
   });
 
   it("Should throw with invalid bytes in 'strict' parsing mode", () => {
@@ -161,13 +182,12 @@ describe("Data only decoding", () => {
     expect(() => parse("", "strict")).to.throw();
     expect(() => parse(undefined as unknown as string, "strict")).to.throw();
   });
-
-  it("Should not throw but return undefined with invalid bytes", () => {
-    expect(() => decode("deadbeef")).not.to.throw();
-    expect(decode("deadbeef")).to.be.undefined;
-    expect(decode(undefined)).to.be.undefined;
-    expect(decode("")).to.be.undefined;
-    expect(decode("0102")).to.be.equal(false);
+  
+  it("Should return undefined with invalid bytes in 'safe' parsing mode", () => {
+    expect(() => parse("deadbeef", "safe")).not.to.throw();
+    expect(parse("deadbeef", "safe")).to.be.undefined;
+    expect(parse("", "safe")).to.be.undefined;
+    expect(parse(undefined as unknown as string, "safe")).to.be.undefined;
   });
 });
 

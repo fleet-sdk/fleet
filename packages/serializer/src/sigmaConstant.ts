@@ -47,20 +47,25 @@ export class SConstant<D = unknown, T extends SType = SType> {
   }
 }
 
-export function decode<T>(value: ByteInput | undefined): T | undefined;
-export function decode<T, K>(
-  value: ByteInput | undefined,
-  coder: (input: T) => K
-): K | undefined;
-export function decode<T, K>(
-  value: ByteInput | undefined,
-  coder?: (input: T) => K
-): T | K | undefined {
-  if (isUndefined(value)) return;
-  const data = parse<T>(value, "safe");
-  if (isUndefined(data)) return;
 
-  return coder ? coder(data) : data;
+/**
+ * Decodes a byte input into a Sigma constant of type `SConstant<D, T>`.
+ *
+ * @template D - The data type of the constant.
+ * @template T - The type of the constant.
+ * @param value - The value to decode.
+ * @returns The decoded constant or `undefined` if the value is `undefined` or decoding fails.
+ */
+export function decode<D = unknown, T extends SType = SType>(
+  value?: ByteInput
+): SConstant<D, T> | undefined {
+  if (value === undefined) return;
+
+  try {
+    return SConstant.from<D, T>(value);
+  } catch {
+    return;
+  }
 }
 
 /** @deprecated use `decode` instead */
