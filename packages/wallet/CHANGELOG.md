@@ -1,5 +1,15 @@
 # @fleet-sdk/wallet
 
+## 0.7.0
+
+### Patch Changes
+
+- Updated dependencies [a08a573]
+- Updated dependencies [9fceb6f]
+- Updated dependencies [62025c4]
+  - @fleet-sdk/core@0.7.0
+  - @fleet-sdk/serializer@0.7.0
+
 ## 0.6.4
 
 ### Patch Changes
