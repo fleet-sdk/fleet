@@ -34,10 +34,7 @@ export class TokensCollection extends Collection<OutputToken<bigint>, OutputToke
   constructor(tokens: TokenAmount<Amount>[], options: TokenAddOptions);
   constructor(tokens?: OneOrMore<TokenAmount<Amount>>, options?: TokenAddOptions) {
     super();
-
-    if (isDefined(tokens)) {
-      this.add(tokens, options);
-    }
+    if (isDefined(tokens)) this.add(tokens, options);
   }
 
   public get minting(): NewToken<bigint> | undefined {

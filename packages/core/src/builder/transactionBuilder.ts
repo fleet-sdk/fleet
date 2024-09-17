@@ -1,21 +1,21 @@
 import {
-  _0n,
   type Amount,
   type Base58String,
   type Box,
+  type CollectionAddOptions,
+  type HexString,
+  type OneOrMore,
+  type TokenAmount,
+  _0n,
   byteSizeOf,
   chunk,
-  type CollectionAddOptions,
   ensureBigInt,
   first,
-  type HexString,
   isDefined,
   isHex,
   isUndefined,
   Network,
-  type OneOrMore,
   some,
-  type TokenAmount,
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
@@ -59,6 +59,17 @@ type EjectorContext = {
   selection: (selectorCallBack: SelectorCallback) => void;
 };
 
+/**
+ * Options for including inputs in the transaction builder
+ */
+type InputsInclusionOptions = {
+  /**
+   * If true, all the inputs will be included in the
+   * transaction while preserving the original order.
+   */
+  ensureInclusion?: boolean;
+};
+
 export class TransactionBuilder {
   private readonly _inputs!: InputsCollection;
   private readonly _dataInputs!: InputsCollection;
@@ -66,6 +77,7 @@ export class TransactionBuilder {
   private readonly _settings!: TransactionBuilderSettings;
   private readonly _creationHeight!: number;
 
+  private _ensureInclusion?: Set<string>;
   private _selectorCallbacks?: SelectorCallback[];
   private _changeAddress?: ErgoAddress;
   private _feeAmount?: bigint;
@@ -127,10 +139,24 @@ export class TransactionBuilder {
   }
 
   public from(
-    inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>
+    inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>,
+    options: InputsInclusionOptions = { ensureInclusion: false }
   ): TransactionBuilder {
-    this._inputs.add(isCollectionLike(inputs) ? inputs.toArray() : inputs);
+    const items = isCollectionLike(inputs) ? inputs.toArray() : inputs;
+    if (options.ensureInclusion) this.#ensureInclusionOf(items);
+
+    this._inputs.add(items);
     return this;
+  }
+
+  #ensureInclusionOf(inputs: OneOrMore<Box<Amount>>): void {
+    if (!this._ensureInclusion) this._ensureInclusion = new Set();
+
+    if (Array.isArray(inputs)) {
+      for (const input of inputs) this._ensureInclusion.add(input.boxId);
+    } else {
+      this._ensureInclusion.add(inputs.boxId);
+    }
   }
 
   public to(
@@ -193,19 +219,13 @@ export class TransactionBuilder {
   }
 
   public configureSelector(selectorCallback: SelectorCallback): TransactionBuilder {
-    if (isUndefined(this._selectorCallbacks)) {
-      this._selectorCallbacks = [];
-    }
-
+    if (isUndefined(this._selectorCallbacks)) this._selectorCallbacks = [];
     this._selectorCallbacks.push(selectorCallback);
-
     return this;
   }
 
   public extend(plugins: FleetPlugin): TransactionBuilder {
-    if (!this._plugins) {
-      this._plugins = [];
-    }
+    if (!this._plugins) this._plugins = [];
     this._plugins.push({ execute: plugins, pending: true });
 
     return this;
@@ -261,6 +281,10 @@ export class TransactionBuilder {
     }
 
     const selector = new BoxSelector(this.inputs.toArray());
+    if (this._ensureInclusion?.size) {
+      selector.ensureInclusion(Array.from(this._ensureInclusion));
+    }
+
     if (some(this._selectorCallbacks)) {
       for (const selectorCallBack of this._selectorCallbacks) {
         selectorCallBack(selector);
@@ -428,7 +452,6 @@ type ChangeEstimationParams = {
 
 function estimateMinChangeValue(params: ChangeEstimationParams): bigint {
   const size = BigInt(estimateChangeSize(params));
-
   return size * BOX_VALUE_PER_BYTE;
 }
 
@@ -448,9 +471,7 @@ function estimateChangeSize({
   size += 32; // BLAKE 256 hash length
 
   size = size * neededBoxes;
-  for (let i = 0; i < neededBoxes; i++) {
-    size += estimateVLQSize(baseIndex + i);
-  }
+  for (let i = 0; i < neededBoxes; i++) size += estimateVLQSize(baseIndex + i);
 
   for (const token of tokens) {
     size += byteSizeOf(token.tokenId) + estimateVLQSize(token.amount);

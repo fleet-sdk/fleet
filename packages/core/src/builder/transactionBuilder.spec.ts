@@ -25,6 +25,7 @@ import {
   RECOMMENDED_MIN_FEE_VALUE,
   TransactionBuilder
 } from "./transactionBuilder";
+import { mockUTxO } from "packages/mock-chain/src";
 
 const height = 844540;
 const a1 = {
@@ -818,6 +819,22 @@ describe("Building", () => {
     }
   });
 
+  it("Should ensure inclusion and preserver the order or inputs", () => {
+    const anotherInput = mockUTxO({ ergoTree: a1.ergoTree });
+    const transaction = new TransactionBuilder(height)
+      .from(manyTokensBoxes, { ensureInclusion: true })
+      .and.from(regularBoxes)
+      .and.from(anotherInput, { ensureInclusion: true })
+      .sendChangeTo(a1.address)
+      .build();
+
+    const expectedInputs = [...manyTokensBoxes, anotherInput];
+    expect(transaction.inputs).to.have.length(expectedInputs.length);
+    for (let i = 0; i < transaction.inputs.length; i++) {
+      expect(transaction.inputs[i].boxId).to.be.equal(expectedInputs[i].boxId);
+    }
+  });
+
   it("Should produce multiple change boxes based on maxTokensPerChangeBox and isolate erg in a exclusive box ", () => {
     const tokensPerBox = 3;
 
@@ -908,7 +925,7 @@ describe("Building", () => {
 
   it("Should preserve inputs extension", () => {
     const input = new ErgoUnsignedInput(regularBoxes[0]);
-    input.setContextVars({ 0: "0580c0fc82aa02" });
+    input.setContextExtension({ 0: "0580c0fc82aa02" });
 
     const unsignedTransaction = new TransactionBuilder(height)
       .from(regularBoxes[1])

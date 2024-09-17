@@ -17,29 +17,26 @@ describe("Plugin context", () => {
 
   it("Should add inputs", () => {
     const fromSpy = vi.spyOn(builder, "from");
-    const configureSelectorMethod = vi.spyOn(builder, "configureSelector");
-
     const newLen = context.addInputs(regularBoxes);
 
     expect(fromSpy).toBeCalledTimes(1);
-    expect(configureSelectorMethod).toBeCalledTimes(1);
+    expect(fromSpy).toBeCalledWith(regularBoxes, { ensureInclusion: true });
     expect(builder.inputs).toHaveLength(newLen);
     expect(builder.inputs).toHaveLength(regularBoxes.length);
   });
 
   it("Should add a single input", () => {
-    const fromMethod = vi.spyOn(builder, "from");
-    const configureSelectorMethod = vi.spyOn(builder, "configureSelector");
+    const fromSpy = vi.spyOn(builder, "from");
 
+    const inputs = regularBoxes[0];
     let newLen = context.addInputs(regularBoxes[0]);
-    expect(fromMethod).toBeCalledTimes(1);
-    expect(configureSelectorMethod).toBeCalledTimes(1);
+    expect(fromSpy).toBeCalledTimes(1);
+    expect(fromSpy).toBeCalledWith(inputs, { ensureInclusion: true });
     expect(builder.inputs).toHaveLength(newLen);
     expect(builder.inputs).toHaveLength(1);
 
     newLen = context.addInputs(regularBoxes[1]);
-    expect(fromMethod).toBeCalledTimes(2);
-    expect(configureSelectorMethod).toBeCalledTimes(2);
+    expect(fromSpy).toBeCalledTimes(2);
     expect(builder.inputs).toHaveLength(newLen);
     expect(builder.inputs).toHaveLength(2);
   });

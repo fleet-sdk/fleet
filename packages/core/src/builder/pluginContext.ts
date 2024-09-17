@@ -5,7 +5,7 @@ import type {
   OneOrMore,
   TokenAmount
 } from "@fleet-sdk/common";
-import { NotAllowedTokenBurning, type OutputBuilder, type TransactionBuilder } from "..";
+import { type OutputBuilder, type TransactionBuilder, NotAllowedTokenBurning } from "..";
 
 export type FleetPluginContext = {
   /**
@@ -52,28 +52,16 @@ export type FleetPluginContext = {
   setFee: (amount: Amount) => void;
 };
 
-export function createPluginContext(
-  transactionBuilder: TransactionBuilder
-): FleetPluginContext {
+export function createPluginContext(builder: TransactionBuilder): FleetPluginContext {
   return {
-    addInputs: (inputs) =>
-      transactionBuilder
-        .from(inputs)
-        .configureSelector((selector) =>
-          selector.ensureInclusion(
-            Array.isArray(inputs) ? inputs.map((input) => input.boxId) : inputs.boxId
-          )
-        ).inputs.length,
-    addOutputs: (outputs, options) =>
-      transactionBuilder.to(outputs, options).outputs.length,
+    addInputs: (inputs) => builder.from(inputs, { ensureInclusion: true }).inputs.length,
+    addOutputs: (outputs, options) => builder.to(outputs, options).outputs.length,
     addDataInputs: (dataInputs, options) =>
-      transactionBuilder.withDataFrom(dataInputs, options).dataInputs.length,
+      builder.withDataFrom(dataInputs, options).dataInputs.length,
     burnTokens: (tokens) => {
-      if (!transactionBuilder.settings.canBurnTokensFromPlugins) {
-        throw new NotAllowedTokenBurning();
-      }
-      transactionBuilder.burnTokens(tokens);
+      if (!builder.settings.canBurnTokensFromPlugins) throw new NotAllowedTokenBurning();
+      builder.burnTokens(tokens);
     },
-    setFee: (amount) => transactionBuilder.payFee(amount)
+    setFee: (amount) => builder.payFee(amount)
   };
 }

@@ -15,9 +15,7 @@ export function BabelSwapPlugin(
   babelBox: Box<Amount>,
   token: TokenAmount<Amount>
 ): FleetPlugin {
-  if (!isValidBabelBox(babelBox)) {
-    throw new Error("Invalid Babel Box.");
-  }
+  if (!isValidBabelBox(babelBox)) throw new Error("Invalid Babel Box.");
 
   if (!isBabelContractForTokenId(babelBox.ergoTree, token.tokenId)) {
     throw new Error(
@@ -42,14 +40,10 @@ export function BabelSwapPlugin(
         .setAdditionalRegisters({
           R4: input.additionalRegisters.R4,
           R5: input.additionalRegisters.R5,
-          R6: SColl(SByte, input.boxId).toHex()
+          R6: SColl(SByte, input.boxId)
         })
     );
 
-    addInputs(
-      input.setContextVars({
-        0: SInt(outputsLength - 1).toHex()
-      })
-    );
+    addInputs(input.setContextExtension({ 0: SInt(outputsLength - 1) }));
   };
 }

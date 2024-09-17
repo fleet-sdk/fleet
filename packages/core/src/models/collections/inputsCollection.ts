@@ -2,8 +2,8 @@ import {
   type Amount,
   type Box,
   type BoxId,
-  Collection,
-  type OneOrMore
+  type OneOrMore,
+  Collection
 } from "@fleet-sdk/common";
 import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "../../errors";
@@ -15,10 +15,7 @@ export class InputsCollection extends Collection<ErgoUnsignedInput, Box<Amount>>
   constructor(boxes: Box<Amount>[]);
   constructor(boxes?: OneOrMore<Box<Amount>>) {
     super();
-
-    if (isDefined(boxes)) {
-      this.add(boxes);
-    }
+    if (isDefined(boxes)) this.add(boxes);
   }
 
   protected override _map(input: Box<Amount> | ErgoUnsignedInput): ErgoUnsignedInput {
@@ -54,7 +51,6 @@ export class InputsCollection extends Collection<ErgoUnsignedInput, Box<Amount>>
     }
 
     this._items.splice(index, 1);
-
     return this.length;
   }
 }
