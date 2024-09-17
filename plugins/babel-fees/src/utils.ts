@@ -1,6 +1,6 @@
 import { isDefined, isHex, isUndefined } from "@fleet-sdk/common";
 import type { Amount, Box, R4ToR5Registers } from "@fleet-sdk/core";
-import { parse } from "@fleet-sdk/serializer";
+import { parse, SLong, SSigmaProp, stypeof } from "@fleet-sdk/serializer";
 import { BABEL_ERGOTREE_PREFIX, BABEL_ERGOTREE_SUFFIX } from "./constants";
 
 const TOKEN_ID_HEX_LENGTH = 64;
@@ -60,8 +60,8 @@ export type BabelBox = Box<Amount, R4ToR5Registers>;
  */
 export function isValidBabelBox(box: Box<Amount>): box is BabelBox {
   return (
-    isDefined(box.additionalRegisters.R4) &&
-    isDefined(box.additionalRegisters.R5) &&
+    stypeof(box.additionalRegisters.R4) instanceof SSigmaProp &&
+    stypeof(box.additionalRegisters.R5) instanceof SLong &&
     isValidBabelContract(box.ergoTree)
   );
 }

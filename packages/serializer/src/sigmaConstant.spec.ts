@@ -15,7 +15,7 @@ import {
 } from "./_test-vectors/constantVectors";
 import { SigmaByteWriter } from "./coders";
 import { dataSerializer } from "./serializers";
-import { decode, parse, SConstant } from "./sigmaConstant";
+import { decode, parse, SConstant, stypeof } from "./sigmaConstant";
 import type { SGroupElementType } from "./types";
 import {
   SBigInt,
@@ -27,6 +27,7 @@ import {
   SLong,
   SShort,
   SSigmaProp,
+  STupleType,
   SUnit
 } from "./types/";
 import { STuple } from "./types/constructors";
@@ -141,6 +142,32 @@ describe("SColl serialization and parsing", () => {
 
   it("Should return a Uint8Array instance when parsing SColl[SByte] type", () => {
     expect(SConstant.from("0e0a46656d616c6520233035").data).to.be.instanceof(Uint8Array);
+  });
+});
+
+describe("stypeof", () => {
+  it("Should return the type of a valid constant", () => {
+    expect(stypeof(SBool(true).toBytes())).to.be.instanceOf(SBool);
+    expect(stypeof(SByte(1).toBytes())).to.be.instanceOf(SByte);
+    expect(stypeof(SShort(1).toBytes())).to.be.instanceOf(SShort);
+    expect(stypeof(SInt(1).toBytes())).to.be.instanceOf(SInt);
+    expect(stypeof(SLong(1n).toBytes())).to.be.instanceOf(SLong);
+    expect(stypeof(SBigInt(1n).toBytes())).to.be.instanceOf(SBigInt);
+    expect(stypeof(SGroupElement(hex.decode("deadbeef")).toBytes())).to.be.instanceOf(
+      SGroupElement
+    );
+    expect(stypeof(SSigmaProp(SGroupElement("deadbeef")).toBytes())).to.be.instanceOf(
+      SSigmaProp
+    );
+    expect(stypeof(SColl(SByte, [1, 2, 3]).toBytes())).to.be.instanceOf(SColl);
+    expect(stypeof(STuple(SByte(1), SByte(2)).toBytes())).to.be.instanceOf(STupleType);
+    expect(stypeof(SUnit().toBytes())).to.be.instanceOf(SUnit);
+  });
+
+  it("Should return SUnit for empty bytes", () => {
+    expect(stypeof(Uint8Array.from([]))).to.be.equal(undefined);
+    expect(stypeof(undefined)).to.be.equal(undefined);
+    expect(stypeof("deadbeef")).to.be.equal(undefined);
   });
 });
 

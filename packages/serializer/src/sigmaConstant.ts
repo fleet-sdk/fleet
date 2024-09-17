@@ -67,6 +67,23 @@ export function decode<D = unknown, T extends SType = SType>(
   }
 }
 
+/**
+ * Returns the `SType` of the given value.
+ *
+ * @param value - The value to check the SType of.
+ * @returns The SType of the value, or `undefined` if the value is `undefined` or
+ * deserialization fails.
+ */
+export function stypeof(value?: ByteInput): SType | undefined {
+  if (!value) return;
+
+  try {
+    return typeSerializer.deserialize(new SigmaByteReader(value));
+  } catch {
+    return;
+  }
+}
+
 /** @deprecated use `decode` instead */
 export function parse<T>(constant: ByteInput): T;
 /** @deprecated use `decode` instead */
