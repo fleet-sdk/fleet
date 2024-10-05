@@ -1,6 +1,6 @@
 # Fleet SDK [![Checks](https://img.shields.io/github/actions/workflow/status/fleet-sdk/fleet/ci.yml?logo=githubactions)](https://github.com/fleet-sdk/fleet/actions) [![Coverage](https://img.shields.io/codecov/c/gh/fleet-sdk/fleet?logo=codecov)](https://app.codecov.io/gh/fleet-sdk/fleet)
 
-Fleet (Fluent Ergo Toolset) is a pure TypeScript SDK for Ergo Platform, offering an easy, fluent and flexible way to write off-chain code.
+Fleet (Fluent Ergo Toolset) is a comprehensive TypeScript SDK for the Ergo Platform, designed to provide a seamless, fluent, and flexible approach to writing off-chain and on-chain code.
 
 ## Packages
 
