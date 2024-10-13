@@ -21,14 +21,14 @@ type TransactionType<T> = T extends "default"
   : EIP12UnsignedTransaction;
 
 export class ErgoUnsignedTransaction {
-  private readonly _inputs!: ReadOnlyInputs;
-  private readonly _dataInputs!: ReadOnlyInputs;
-  private readonly _outputs!: ReadOnlyOutputs;
+  readonly #inputs!: ReadOnlyInputs;
+  readonly #dataInputs!: ReadOnlyInputs;
+  readonly #outputs!: ReadOnlyOutputs;
 
   constructor(inputs: Input[], dataInputs: Input[], outputs: Output[]) {
-    this._inputs = Object.freeze(inputs);
-    this._dataInputs = Object.freeze(dataInputs);
-    this._outputs = Object.freeze(outputs);
+    this.#inputs = Object.freeze(inputs);
+    this.#dataInputs = Object.freeze(dataInputs);
+    this.#outputs = Object.freeze(outputs);
   }
 
   get id(): string {
@@ -36,15 +36,15 @@ export class ErgoUnsignedTransaction {
   }
 
   get inputs(): ReadOnlyInputs {
-    return this._inputs;
+    return this.#inputs;
   }
 
   get dataInputs(): ReadOnlyInputs {
-    return this._dataInputs;
+    return this.#dataInputs;
   }
 
   get outputs(): ReadOnlyOutputs {
-    return this._outputs;
+    return this.#outputs;
   }
 
   get burning(): BoxSummary {
@@ -57,16 +57,12 @@ export class ErgoUnsignedTransaction {
   }
 
   toPlainObject(): UnsignedTransaction;
-  toPlainObject<T extends BuildOutputType>(outputType: T): TransactionType<T>;
-  toPlainObject<T extends BuildOutputType>(outputType?: T): TransactionType<T> {
+  toPlainObject<T extends BuildOutputType>(type: T): TransactionType<T>;
+  toPlainObject<T extends BuildOutputType>(type?: T): TransactionType<T> {
     return {
-      inputs: this.inputs.map((input) =>
-        input.toUnsignedInputObject(outputType || "default")
-      ),
-      dataInputs: this.dataInputs.map((input) =>
-        input.toPlainObject(outputType || "default")
-      ),
-      outputs: this.outputs.map((output) => _stringifyBoxAmounts(output))
+      inputs: this.inputs.map((input) => input.toUnsignedInputObject(type || "default")),
+      dataInputs: this.dataInputs.map((input) => input.toPlainObject(type || "default")),
+      outputs: this.outputs.map(stringifyBoxAmounts)
     } as TransactionType<T>;
   }
 
@@ -83,7 +79,7 @@ export class ErgoUnsignedTransaction {
   }
 }
 
-function _stringifyBoxAmounts<T>(output: BoxCandidate<bigint>): T {
+function stringifyBoxAmounts<T>(output: BoxCandidate<bigint>): T {
   return {
     ...output,
     value: output.value.toString(),
