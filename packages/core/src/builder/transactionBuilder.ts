@@ -75,8 +75,8 @@ export class TransactionBuilder {
   readonly #dataInputs: InputsCollection;
   readonly #outputs: OutputsCollection;
   readonly #settings: TransactionBuilderSettings;
-  readonly #creationHeight: number;
 
+  #creationHeight: number;
   #ensureInclusion?: Set<string>;
   #selectorCallbacks?: SelectorCallback[];
   #changeAddress?: ErgoAddress;
@@ -92,35 +92,35 @@ export class TransactionBuilder {
     this.#creationHeight = creationHeight;
   }
 
-  public get inputs(): InputsCollection {
+  get inputs(): InputsCollection {
     return this.#inputs;
   }
 
-  public get dataInputs(): InputsCollection {
+  get dataInputs(): InputsCollection {
     return this.#dataInputs;
   }
 
-  public get outputs(): OutputsCollection {
+  get outputs(): OutputsCollection {
     return this.#outputs;
   }
 
-  public get changeAddress(): ErgoAddress | undefined {
+  get changeAddress(): ErgoAddress | undefined {
     return this.#changeAddress;
   }
 
-  public get fee(): bigint | undefined {
+  get fee(): bigint | undefined {
     return this.#feeAmount;
   }
 
-  public get burning(): TokensCollection | undefined {
+  get burning(): TokensCollection | undefined {
     return this.#burning;
   }
 
-  public get settings(): TransactionBuilderSettings {
+  get settings(): TransactionBuilderSettings {
     return this.#settings;
   }
 
-  public get creationHeight(): number {
+  get creationHeight(): number {
     return this.#creationHeight;
   }
 
@@ -134,11 +134,16 @@ export class TransactionBuilder {
    *   .and.from(otherInputs);
    * ```
    */
-  public get and(): TransactionBuilder {
+  get and(): TransactionBuilder {
     return this;
   }
 
-  public from(
+  atHeight(height: number): TransactionBuilder {
+    this.#creationHeight = height;
+    return this;
+  }
+
+  from(
     inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>,
     options: InputsInclusionOptions = { ensureInclusion: false }
   ): TransactionBuilder {
@@ -159,7 +164,7 @@ export class TransactionBuilder {
     }
   }
 
-  public to(
+  to(
     outputs: OneOrMore<OutputBuilder>,
     options?: CollectionAddOptions
   ): TransactionBuilder {
@@ -167,7 +172,7 @@ export class TransactionBuilder {
     return this;
   }
 
-  public withDataFrom(
+  withDataFrom(
     dataInputs: OneOrMore<Box<Amount>>,
     options?: CollectionAddOptions
   ): TransactionBuilder {
@@ -176,9 +181,7 @@ export class TransactionBuilder {
     return this;
   }
 
-  public sendChangeTo(
-    address: ErgoAddress | Base58String | HexString
-  ): TransactionBuilder {
+  sendChangeTo(address: ErgoAddress | Base58String | HexString): TransactionBuilder {
     if (typeof address === "string") {
       this.#changeAddress = isHex(address)
         ? ErgoAddress.fromErgoTree(address, Network.Mainnet)
@@ -190,40 +193,40 @@ export class TransactionBuilder {
     return this;
   }
 
-  public payFee(amount: Amount): TransactionBuilder {
+  payFee(amount: Amount): TransactionBuilder {
     this.#feeAmount = ensureBigInt(amount);
     return this;
   }
 
-  public payMinFee(): TransactionBuilder {
+  payMinFee(): TransactionBuilder {
     this.payFee(RECOMMENDED_MIN_FEE_VALUE);
     return this;
   }
 
-  public burnTokens(tokens: OneOrMore<TokenAmount<Amount>>): TransactionBuilder {
+  burnTokens(tokens: OneOrMore<TokenAmount<Amount>>): TransactionBuilder {
     if (!this.#burning) this.#burning = new TokensCollection();
     this.#burning.add(tokens);
     return this;
   }
 
-  public configure(callback: ConfigureCallback): TransactionBuilder {
+  configure(callback: ConfigureCallback): TransactionBuilder {
     callback(this.#settings);
     return this;
   }
 
-  public configureSelector(selectorCallback: SelectorCallback): TransactionBuilder {
+  configureSelector(selectorCallback: SelectorCallback): TransactionBuilder {
     if (isUndefined(this.#selectorCallbacks)) this.#selectorCallbacks = [];
     this.#selectorCallbacks.push(selectorCallback);
     return this;
   }
 
-  public extend(plugins: FleetPlugin): TransactionBuilder {
+  extend(plugins: FleetPlugin): TransactionBuilder {
     if (!this.#plugins) this.#plugins = [];
     this.#plugins.push({ execute: plugins, pending: true });
     return this;
   }
 
-  public eject(ejector: (context: EjectorContext) => void): TransactionBuilder {
+  eject(ejector: (context: EjectorContext) => void): TransactionBuilder {
     ejector({
       inputs: this.inputs,
       dataInputs: this.dataInputs,
@@ -238,7 +241,7 @@ export class TransactionBuilder {
     return this;
   }
 
-  public build(): ErgoUnsignedTransaction {
+  build(): ErgoUnsignedTransaction {
     if (some(this.#plugins)) {
       const context = createPluginContext(this);
       for (const plugin of this.#plugins) {

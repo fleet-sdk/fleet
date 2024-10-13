@@ -171,6 +171,14 @@ describe("basic construction", () => {
     expect(builder.fee).toBe(fee);
   });
 
+  it("Should update creation height", () => {
+    const builder = new TransactionBuilder(1);
+    expect(builder.creationHeight).to.be.equal(1);
+
+    builder.atHeight(2);
+    expect(builder.creationHeight).to.be.equal(2);
+  });
+
   it("Should set min recommended fee amount", () => {
     const builder = new TransactionBuilder(height).from(regularBoxes).payMinFee();
 
