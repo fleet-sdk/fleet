@@ -45,12 +45,12 @@ export function estimateMinBoxValue(
 const DUMB_TOKEN_ID = "0000000000000000000000000000000000000000000000000000000000000000";
 
 export class OutputBuilder {
-  private readonly _address: ErgoAddress;
-  private readonly _tokens: TokensCollection;
-  private _value!: bigint;
-  private _valueEstimator?: BoxValueEstimationCallback;
-  private _creationHeight?: number;
-  private _registers: NonMandatoryRegisters;
+  readonly #address: ErgoAddress;
+  readonly #tokens: TokensCollection;
+  #value!: bigint;
+  #valueEstimator?: BoxValueEstimationCallback;
+  #creationHeight?: number;
+  #registers: NonMandatoryRegisters;
 
   constructor(
     value: Amount | BoxValueEstimationCallback,
@@ -59,43 +59,43 @@ export class OutputBuilder {
   ) {
     this.setValue(value);
 
-    this._creationHeight = creationHeight;
-    this._tokens = new TokensCollection();
-    this._registers = {};
+    this.#creationHeight = creationHeight;
+    this.#tokens = new TokensCollection();
+    this.#registers = {};
 
     if (typeof recipient === "string") {
-      this._address = isHex(recipient)
+      this.#address = isHex(recipient)
         ? ErgoAddress.fromErgoTree(recipient)
         : ErgoAddress.fromBase58(recipient);
     } else if (recipient instanceof ErgoTree) {
-      this._address = recipient.toAddress();
+      this.#address = recipient.toAddress();
     } else {
-      this._address = recipient;
+      this.#address = recipient;
     }
   }
 
   public get value(): bigint {
-    return isDefined(this._valueEstimator) ? this._valueEstimator(this) : this._value;
+    return isDefined(this.#valueEstimator) ? this.#valueEstimator(this) : this.#value;
   }
 
   public get address(): ErgoAddress {
-    return this._address;
+    return this.#address;
   }
 
   public get ergoTree(): ErgoTreeHex {
-    return this._address.ergoTree;
+    return this.#address.ergoTree;
   }
 
   public get creationHeight(): number | undefined {
-    return this._creationHeight;
+    return this.#creationHeight;
   }
 
   public get assets(): TokensCollection {
-    return this._tokens;
+    return this.#tokens;
   }
 
   public get additionalRegisters(): NonMandatoryRegisters {
-    return this._registers;
+    return this.#registers;
   }
 
   public get minting(): NewToken<bigint> | undefined {
@@ -104,12 +104,12 @@ export class OutputBuilder {
 
   public setValue(value: Amount | BoxValueEstimationCallback): OutputBuilder {
     if (typeof value === "function") {
-      this._valueEstimator = value;
+      this.#valueEstimator = value;
     } else {
-      this._value = ensureBigInt(value);
-      this._valueEstimator = undefined;
+      this.#value = ensureBigInt(value);
+      this.#valueEstimator = undefined;
 
-      if (this._value <= _0n) {
+      if (this.#value <= _0n) {
         throw new Error("An UTxO cannot be created without a minimum required amount.");
       }
     }
@@ -122,9 +122,9 @@ export class OutputBuilder {
     options?: TokenAddOptions
   ): OutputBuilder {
     if (tokens instanceof TokensCollection) {
-      this._tokens.add(tokens.toArray(), options);
+      this.#tokens.add(tokens.toArray(), options);
     } else {
-      this._tokens.add(tokens, options);
+      this.#tokens.add(tokens, options);
     }
 
     return this;
@@ -132,7 +132,6 @@ export class OutputBuilder {
 
   public addNfts(...tokenIds: TokenId[]): OutputBuilder {
     const tokens = tokenIds.map((tokenId) => ({ tokenId, amount: _1n }));
-
     return this.addTokens(tokens);
   }
 
@@ -148,9 +147,9 @@ export class OutputBuilder {
     if (
       isUndefined(options) ||
       options.replace === true ||
-      (options.replace === false && isUndefined(this._creationHeight))
+      (options.replace === false && isUndefined(this.#creationHeight))
     ) {
-      this._creationHeight = height;
+      this.#creationHeight = height;
     }
 
     return this;
@@ -169,13 +168,13 @@ export class OutputBuilder {
     }
 
     if (!areRegistersDenselyPacked(hexRegisters)) throw new InvalidRegistersPacking();
-    this._registers = hexRegisters;
+    this.#registers = hexRegisters;
 
     return this;
   }
 
   public eject(ejector: (context: { tokens: TokensCollection }) => void): OutputBuilder {
-    ejector({ tokens: this._tokens });
+    ejector({ tokens: this.#tokens });
     return this;
   }
 
@@ -217,7 +216,7 @@ export class OutputBuilder {
       value,
       ergoTree: this.ergoTree,
       creationHeight: this.creationHeight,
-      assets: this._tokens.toArray(DUMB_TOKEN_ID),
+      assets: this.#tokens.toArray(DUMB_TOKEN_ID),
       additionalRegisters: this.additionalRegisters
     };
 
