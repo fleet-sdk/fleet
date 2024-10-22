@@ -8,7 +8,7 @@ import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
 import { ErgoBoxCandidate } from "./ergoBoxCandidate";
 
 describe("ErgoUnsignedTransaction model", () => {
-  it("Should generate the right transactionId", () => {
+  it("Should generate the right transactionId and boxIds for outputs", () => {
     for (const tx of mockedUnsignedTransactions) {
       const unsigned = new ErgoUnsignedTransaction(
         tx.inputs.map((input) => new ErgoUnsignedInput(input)),
@@ -16,7 +16,10 @@ describe("ErgoUnsignedTransaction model", () => {
         tx.outputs.map((output) => new ErgoBoxCandidate(output))
       );
 
-      expect(unsigned.id).toBe(tx.id);
+      expect(unsigned.id).to.be.equal(tx.id);
+      expect(unsigned.outputs.map((x) => x.boxId)).to.be.deep.equal(
+        tx.outputs.map((x) => x.boxId)
+      );
     }
   });
 
@@ -79,5 +82,22 @@ describe("ErgoUnsignedTransaction model", () => {
       .build();
 
     expect(transaction.burning).toEqual({ nanoErgs: 0n, tokens: tokensToBurn });
+  });
+
+  it("Should filter change boxes", () => {
+    const transaction = new TransactionBuilder(1)
+      .from(regularBoxes)
+      .withDataFrom(regularBoxes[0])
+      .to(
+        new OutputBuilder(
+          SAFE_MIN_BOX_VALUE,
+          "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
+        )
+      )
+      .payMinFee()
+      .sendChangeTo("9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin")
+      .build();
+
+    expect(transaction.change).to.have.length(1);
   });
 });

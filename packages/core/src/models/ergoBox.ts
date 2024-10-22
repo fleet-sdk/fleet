@@ -61,9 +61,10 @@ export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
   }
 
   constructor(candidate: ErgoBoxCandidate<R>, transactionId: string, index: number);
+  constructor(candidate: BoxCandidate<Amount, R>, transactionId: string, index: number);
   constructor(box: Box<Amount, R>);
   constructor(
-    box: Box<Amount, R> | ErgoBoxCandidate<R>,
+    box: Box<Amount, R> | ErgoBoxCandidate<R> | BoxCandidate<Amount, R>,
     transactionId?: string,
     index?: number
   ) {
