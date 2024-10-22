@@ -30,10 +30,7 @@ export class ErgoUnsignedInput<
 
   constructor(box: InputBox<R>) {
     super(box);
-
-    if (box.extension) {
-      this.setContextVars(box.extension);
-    }
+    if (box.extension) this.setContextExtension(box.extension);
   }
 
   public setContextExtension(extension: ContextExtensionInput): ErgoUnsignedInput {

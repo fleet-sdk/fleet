@@ -1,30 +1,85 @@
-import type { Amount, Box, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
-import { ensureBigInt } from "@fleet-sdk/common";
+import type {
+  Amount,
+  Box,
+  NonMandatoryRegisters,
+  BoxCandidate,
+  TokenAmount
+} from "@fleet-sdk/common";
+import { FleetError, isDefined } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeBox } from "@fleet-sdk/serializer";
+import { ErgoBoxCandidate } from "./ergoBoxCandidate";
 
 export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
-  boxId!: string;
-  value!: bigint;
-  ergoTree!: string;
-  creationHeight!: number;
-  assets!: TokenAmount<bigint>[];
-  additionalRegisters!: R;
-  transactionId!: string;
-  index!: number;
+  #candidate: ErgoBoxCandidate<R>;
 
-  constructor(box: Box<Amount, R>) {
-    this.boxId = box.boxId;
-    this.ergoTree = box.ergoTree;
-    this.creationHeight = box.creationHeight;
-    this.value = ensureBigInt(box.value);
-    this.assets = box.assets.map((asset) => ({
-      tokenId: asset.tokenId,
-      amount: ensureBigInt(asset.amount)
-    }));
-    this.additionalRegisters = box.additionalRegisters;
-    this.transactionId = box.transactionId;
-    this.index = box.index;
+  #boxId?: string;
+  #transactionId: string;
+  #index: number;
+
+  get value(): bigint {
+    return this.#candidate.value;
+  }
+
+  get ergoTree(): string {
+    return this.#candidate.ergoTree;
+  }
+
+  get creationHeight(): number {
+    return this.#candidate.creationHeight;
+  }
+
+  get assets(): TokenAmount<bigint>[] {
+    return this.#candidate.assets;
+  }
+
+  get additionalRegisters(): R {
+    return this.#candidate.additionalRegisters;
+  }
+
+  get boxId(): string {
+    if (!this.#boxId) {
+      this.#boxId = hex.encode(blake2b256(serializeBox(this).toBytes()));
+    }
+
+    return this.#boxId;
+  }
+
+  get transactionId(): string {
+    return this.#transactionId;
+  }
+
+  get index(): number {
+    return this.#index;
+  }
+
+  get change(): boolean {
+    return !!this.#candidate.flags?.change;
+  }
+
+  constructor(candidate: ErgoBoxCandidate<R>, transactionId: string, index: number);
+  constructor(box: Box<Amount, R>);
+  constructor(
+    box: Box<Amount, R> | ErgoBoxCandidate<R>,
+    transactionId?: string,
+    index?: number
+  ) {
+    if (isBox(box)) {
+      this.#candidate = new ErgoBoxCandidate(box);
+      this.#transactionId = box.transactionId;
+      this.#index = box.index;
+      this.#boxId = box.boxId;
+    } else {
+      if (!transactionId || !index) {
+        throw new FleetError(
+          "TransactionId and Index must be provided for Box generation."
+        );
+      }
+
+      this.#candidate = box instanceof ErgoBoxCandidate ? box : new ErgoBoxCandidate(box);
+      this.#transactionId = transactionId;
+      this.#index = index;
+    }
   }
 
   public isValid(): boolean {
@@ -37,4 +92,9 @@ export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
 
     return box.boxId === hash;
   }
+}
+
+function isBox<T extends Amount>(box: Box<Amount> | BoxCandidate<Amount>): box is Box<T> {
+  const castedBox = box as Box<T>;
+  return !!castedBox.boxId && !!castedBox.transactionId && isDefined(castedBox.index);
 }
