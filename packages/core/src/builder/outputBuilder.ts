@@ -33,6 +33,7 @@ export const BOX_VALUE_PER_BYTE = BigInt(360);
 export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 
 export type BoxValueEstimationCallback = (outputBuilder: OutputBuilder) => bigint;
+export type OutputBuilderFlags = { change: boolean };
 
 export function estimateMinBoxValue(
   valuePerByte = BOX_VALUE_PER_BYTE
@@ -51,6 +52,7 @@ export class OutputBuilder {
   #valueEstimator?: BoxValueEstimationCallback;
   #creationHeight?: number;
   #registers: NonMandatoryRegisters;
+  #flags: OutputBuilderFlags = { change: false };
 
   constructor(
     value: Amount | BoxValueEstimationCallback,
@@ -62,6 +64,7 @@ export class OutputBuilder {
     this.#creationHeight = creationHeight;
     this.#tokens = new TokensCollection();
     this.#registers = {};
+    this.#flags = { change: false };
 
     if (typeof recipient === "string") {
       this.#address = isHex(recipient)
@@ -74,35 +77,39 @@ export class OutputBuilder {
     }
   }
 
-  public get value(): bigint {
+  get value(): bigint {
     return isDefined(this.#valueEstimator) ? this.#valueEstimator(this) : this.#value;
   }
 
-  public get address(): ErgoAddress {
+  get address(): ErgoAddress {
     return this.#address;
   }
 
-  public get ergoTree(): ErgoTreeHex {
+  get ergoTree(): ErgoTreeHex {
     return this.#address.ergoTree;
   }
 
-  public get creationHeight(): number | undefined {
+  get creationHeight(): number | undefined {
     return this.#creationHeight;
   }
 
-  public get assets(): TokensCollection {
+  get assets(): TokensCollection {
     return this.#tokens;
   }
 
-  public get additionalRegisters(): NonMandatoryRegisters {
+  get additionalRegisters(): NonMandatoryRegisters {
     return this.#registers;
   }
 
-  public get minting(): NewToken<bigint> | undefined {
+  get minting(): NewToken<bigint> | undefined {
     return this.assets.minting;
   }
 
-  public setValue(value: Amount | BoxValueEstimationCallback): OutputBuilder {
+  get flags(): OutputBuilderFlags {
+    return this.#flags;
+  }
+
+  setValue(value: Amount | BoxValueEstimationCallback): OutputBuilder {
     if (typeof value === "function") {
       this.#valueEstimator = value;
     } else {
@@ -117,7 +124,12 @@ export class OutputBuilder {
     return this;
   }
 
-  public addTokens(
+  setFlags(flags: Partial<OutputBuilderFlags>): OutputBuilder {
+    this.#flags = { ...this.#flags, ...flags };
+    return this;
+  }
+
+  addTokens(
     tokens: OneOrMore<TokenAmount<Amount>> | TokensCollection,
     options?: TokenAddOptions
   ): OutputBuilder {
@@ -130,20 +142,17 @@ export class OutputBuilder {
     return this;
   }
 
-  public addNfts(...tokenIds: TokenId[]): OutputBuilder {
+  addNfts(...tokenIds: TokenId[]): OutputBuilder {
     const tokens = tokenIds.map((tokenId) => ({ tokenId, amount: _1n }));
     return this.addTokens(tokens);
   }
 
-  public mintToken(token: NewToken<Amount>): OutputBuilder {
+  mintToken(token: NewToken<Amount>): OutputBuilder {
     this.assets.mint(token);
     return this;
   }
 
-  public setCreationHeight(
-    height: number,
-    options?: { replace: boolean }
-  ): OutputBuilder {
+  setCreationHeight(height: number, options?: { replace: boolean }): OutputBuilder {
     if (
       isUndefined(options) ||
       options.replace === true ||
@@ -155,7 +164,7 @@ export class OutputBuilder {
     return this;
   }
 
-  public setAdditionalRegisters<T extends AdditionalRegistersInput>(
+  setAdditionalRegisters<T extends AdditionalRegistersInput>(
     registers: SequentialNonMandatoryRegisters<T>
   ): OutputBuilder {
     const hexRegisters: NonMandatoryRegisters = {};
@@ -173,14 +182,12 @@ export class OutputBuilder {
     return this;
   }
 
-  public eject(ejector: (context: { tokens: TokensCollection }) => void): OutputBuilder {
+  eject(ejector: (context: { tokens: TokensCollection }) => void): OutputBuilder {
     ejector({ tokens: this.#tokens });
     return this;
   }
 
-  public build(
-    transactionInputs?: UnsignedInput[] | Box<Amount>[]
-  ): BoxCandidate<bigint> {
+  build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<bigint> {
     let tokens: TokenAmount<bigint>[];
 
     if (this.minting) {
