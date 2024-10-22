@@ -33,7 +33,7 @@ export const BOX_VALUE_PER_BYTE = BigInt(360);
 export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 
 export type BoxValueEstimationCallback = (outputBuilder: OutputBuilder) => bigint;
-export type OutputBuilderFlags = { change: boolean };
+export type TransactionOutputFlags = { change: boolean };
 
 export function estimateMinBoxValue(
   valuePerByte = BOX_VALUE_PER_BYTE
@@ -52,7 +52,7 @@ export class OutputBuilder {
   #valueEstimator?: BoxValueEstimationCallback;
   #creationHeight?: number;
   #registers: NonMandatoryRegisters;
-  #flags: OutputBuilderFlags = { change: false };
+  #flags: TransactionOutputFlags = { change: false };
 
   constructor(
     value: Amount | BoxValueEstimationCallback,
@@ -105,7 +105,7 @@ export class OutputBuilder {
     return this.assets.minting;
   }
 
-  get flags(): OutputBuilderFlags {
+  get flags(): TransactionOutputFlags {
     return this.#flags;
   }
 
@@ -124,7 +124,7 @@ export class OutputBuilder {
     return this;
   }
 
-  setFlags(flags: Partial<OutputBuilderFlags>): OutputBuilder {
+  setFlags(flags: Partial<TransactionOutputFlags>): OutputBuilder {
     this.#flags = { ...this.#flags, ...flags };
     return this;
   }
