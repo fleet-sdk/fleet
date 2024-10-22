@@ -3,12 +3,15 @@ import type {
   Box,
   NonMandatoryRegisters,
   BoxCandidate,
-  TokenAmount
+  TokenAmount,
+  PlainObjectType,
+  DataInput
 } from "@fleet-sdk/common";
 import { FleetError, isDefined } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeBox } from "@fleet-sdk/serializer";
 import { ErgoBoxCandidate } from "./ergoBoxCandidate";
+import { isUndefined } from "packages/common/src";
 
 export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
   #candidate: ErgoBoxCandidate<R>;
@@ -70,7 +73,7 @@ export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
       this.#index = box.index;
       this.#boxId = box.boxId;
     } else {
-      if (!transactionId || !index) {
+      if (!transactionId || isUndefined(index)) {
         throw new FleetError(
           "TransactionId and Index must be provided for Box generation."
         );
@@ -80,6 +83,24 @@ export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
       this.#transactionId = transactionId;
       this.#index = index;
     }
+  }
+
+  toPlainObject(type: "minimal"): DataInput;
+  toPlainObject(type: "EIP-12"): Box<string>;
+  toPlainObject(type: PlainObjectType): Box<string> | DataInput;
+  toPlainObject(type: PlainObjectType): Box<string> | DataInput {
+    if (type === "minimal") return { boxId: this.boxId };
+
+    return {
+      boxId: this.boxId,
+      ...this.#candidate.toPlainObject(),
+      transactionId: this.transactionId,
+      index: this.index
+    };
+  }
+
+  toCandidate(): ErgoBoxCandidate<R> {
+    return this.#candidate;
   }
 
   public isValid(): boolean {

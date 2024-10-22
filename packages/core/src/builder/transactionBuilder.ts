@@ -252,12 +252,12 @@ export class TransactionBuilder {
       }
     }
 
-    if (this._isMinting()) {
-      if (this._isMoreThanOneTokenBeingMinted()) {
+    if (this.#isMinting()) {
+      if (this.#isMoreThanOneTokenBeingMinted()) {
         throw new MalformedTransaction("only one token can be minted per transaction.");
       }
 
-      if (this._isTheSameTokenBeingMintedFromOutsideTheMintingBox()) {
+      if (this.#isTheSameTokenBeingMintedFromOutsideTheMintingBox()) {
         throw new NonStandardizedMinting(
           "EIP-4 tokens cannot be minted from outside of the minting box."
         );
@@ -292,6 +292,7 @@ export class TransactionBuilder {
     let inputs = selector.select(target);
 
     if (isDefined(this.#changeAddress)) {
+      const changeBoxes: OutputBuilder[] = [];
       const firstInputId = inputs[0].boxId;
       const manualMintingTokenId = target.tokens.some((x) => x.tokenId === firstInputId)
         ? firstInputId
@@ -302,7 +303,6 @@ export class TransactionBuilder {
       }
 
       let change = utxoDiff(utxoSum(inputs), target);
-      const changeBoxes: OutputBuilder[] = [];
 
       if (some(change.tokens)) {
         let minRequiredNanoErgs = estimateMinChangeValue({
@@ -331,11 +331,10 @@ export class TransactionBuilder {
 
         const chunkedTokens = chunk(change.tokens, this.#settings.maxTokensPerChangeBox);
         for (const tokens of chunkedTokens) {
-          const output = new OutputBuilder(
-            estimateMinBoxValue(),
-            this.#changeAddress,
-            this.#creationHeight
-          ).addTokens(tokens);
+          const output = new OutputBuilder(estimateMinBoxValue(), this.#changeAddress)
+            .setCreationHeight(this.#creationHeight)
+            .addTokens(tokens)
+            .setFlags({ change: true });
 
           change.nanoErgs -= output.value;
           changeBoxes.push(output);
@@ -343,33 +342,35 @@ export class TransactionBuilder {
       }
 
       if (change.nanoErgs > _0n) {
-        if (some(changeBoxes)) {
-          if (this.settings.shouldIsolateErgOnChange) {
-            outputs.add(new OutputBuilder(change.nanoErgs, this.#changeAddress));
-          } else {
-            const firstChangeBox = first(changeBoxes);
-            firstChangeBox.setValue(firstChangeBox.value + change.nanoErgs);
-          }
-
-          outputs.add(changeBoxes);
+        if (!changeBoxes.length || this.settings.shouldIsolateErgOnChange) {
+          changeBoxes.unshift(
+            new OutputBuilder(change.nanoErgs, this.#changeAddress)
+              .setCreationHeight(this.#creationHeight)
+              .setFlags({ change: true })
+          );
         } else {
-          outputs.add(new OutputBuilder(change.nanoErgs, this.#changeAddress));
+          const firstChangeBox = first(changeBoxes);
+          firstChangeBox.setValue(firstChangeBox.value + change.nanoErgs);
         }
       }
+
+      outputs.add(changeBoxes);
     }
 
     for (const input of inputs) {
       if (!input.isValid()) throw new InvalidInput(input.boxId);
     }
 
+    const buildedOutputs = outputs
+      .toArray()
+      .map((output) =>
+        output.setCreationHeight(this.#creationHeight, { replace: false }).build(inputs)
+      );
+
     const unsignedTransaction = new ErgoUnsignedTransaction(
       inputs,
       this.dataInputs.toArray(),
-      outputs
-        .toArray()
-        .map((output) =>
-          output.setCreationHeight(this.#creationHeight, { replace: false }).build(inputs)
-        )
+      buildedOutputs
     );
 
     let burning = unsignedTransaction.burning;
@@ -391,7 +392,7 @@ export class TransactionBuilder {
     return unsignedTransaction;
   }
 
-  private _getMintingOutput(): OutputBuilder | undefined {
+  #getMintingOutput(): OutputBuilder | undefined {
     for (const output of this.#outputs) {
       if (output.minting) return output;
     }
@@ -399,15 +400,15 @@ export class TransactionBuilder {
     return;
   }
 
-  private _isMinting(): boolean {
-    return this._getMintingOutput() !== undefined;
+  #isMinting(): boolean {
+    return this.#getMintingOutput() !== undefined;
   }
 
-  private _getMintingTokenId(): string | undefined {
-    return this._getMintingOutput()?.minting?.tokenId;
+  #getMintingTokenId(): string | undefined {
+    return this.#getMintingOutput()?.minting?.tokenId;
   }
 
-  private _isMoreThanOneTokenBeingMinted(): boolean {
+  #isMoreThanOneTokenBeingMinted(): boolean {
     let mintingCount = 0;
 
     for (const output of this.#outputs) {
@@ -420,8 +421,8 @@ export class TransactionBuilder {
     return false;
   }
 
-  private _isTheSameTokenBeingMintedFromOutsideTheMintingBox(): boolean {
-    const mintingTokenId = this._getMintingTokenId();
+  #isTheSameTokenBeingMintedFromOutsideTheMintingBox(): boolean {
+    const mintingTokenId = this.#getMintingTokenId();
     if (isUndefined(mintingTokenId)) return false;
 
     let count = 0;

@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "../builder";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
+import { ErgoBoxCandidate } from "./ergoBoxCandidate";
 
 describe("ErgoUnsignedTransaction model", () => {
   it("Should generate the right transactionId", () => {
@@ -12,14 +13,7 @@ describe("ErgoUnsignedTransaction model", () => {
       const unsigned = new ErgoUnsignedTransaction(
         tx.inputs.map((input) => new ErgoUnsignedInput(input)),
         tx.dataInputs.map((dataInput) => new ErgoUnsignedInput(dataInput)),
-        tx.outputs.map((output) => ({
-          ...output,
-          value: BigInt(output.value),
-          assets: output.assets.map((token) => ({
-            tokenId: token.tokenId,
-            amount: BigInt(token.amount)
-          }))
-        }))
+        tx.outputs.map((output) => new ErgoBoxCandidate(output))
       );
 
       expect(unsigned.id).toBe(tx.id);
@@ -31,14 +25,7 @@ describe("ErgoUnsignedTransaction model", () => {
       const unsigned = new ErgoUnsignedTransaction(
         tx.inputs.map((input) => new ErgoUnsignedInput(input)),
         tx.dataInputs.map((dataInput) => new ErgoUnsignedInput(dataInput)),
-        tx.outputs.map((output) => ({
-          ...output,
-          value: BigInt(output.value),
-          assets: output.assets.map((token) => ({
-            tokenId: token.tokenId,
-            amount: BigInt(token.amount)
-          }))
-        }))
+        tx.outputs.map((output) => new ErgoBoxCandidate(output))
       );
 
       expect(unsigned.toBytes()).toEqual(serializeTransaction(tx).toBytes());

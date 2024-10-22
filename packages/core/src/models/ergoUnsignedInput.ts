@@ -1,19 +1,17 @@
 import type {
   Amount,
   Box,
-  BuildOutputType,
+  PlainObjectType,
   ContextExtension,
-  DataInput,
-  EIP12UnsignedDataInput,
   EIP12UnsignedInput,
   NonMandatoryRegisters,
-  UnsignedInput
+  UnsignedInput,
+  DataInput,
+  EIP12UnsignedDataInput
 } from "@fleet-sdk/common";
 import type { ConstantInput } from "../builder";
 import { ErgoBox } from "./ergoBox";
 
-type InputType<T> = T extends "default" ? UnsignedInput : EIP12UnsignedInput;
-type DataInputType<T> = T extends "default" ? DataInput : EIP12UnsignedDataInput;
 type InputBox<R extends NonMandatoryRegisters> = Box<Amount, R> & {
   extension?: ContextExtension;
 };
@@ -24,8 +22,8 @@ export class ErgoUnsignedInput<
 > extends ErgoBox<R> {
   #extension?: ContextExtension;
 
-  public get extension(): ContextExtension | undefined {
-    return this.#extension;
+  get extension(): ContextExtension {
+    return this.#extension || {};
   }
 
   constructor(box: InputBox<R>) {
@@ -33,7 +31,7 @@ export class ErgoUnsignedInput<
     if (box.extension) this.setContextExtension(box.extension);
   }
 
-  public setContextExtension(extension: ContextExtensionInput): ErgoUnsignedInput {
+  setContextExtension(extension: ContextExtensionInput): ErgoUnsignedInput {
     const vars: ContextExtension = {};
     for (const key in extension) {
       const c = extension[key] as ConstantInput;
@@ -51,34 +49,21 @@ export class ErgoUnsignedInput<
   /**
    * @deprecated use `setContextExtension` instead.
    */
-  public setContextVars(extension: ContextExtensionInput): ErgoUnsignedInput {
+  setContextVars(extension: ContextExtensionInput): ErgoUnsignedInput {
     return this.setContextExtension(extension);
   }
 
-  public toUnsignedInputObject<T extends BuildOutputType>(type: T): InputType<T> {
-    return {
-      ...this.toPlainObject(type),
-      extension: this.#extension || {}
-    } as InputType<T>;
+  override toPlainObject(type: "EIP-12"): EIP12UnsignedInput;
+  override toPlainObject(type: "minimal"): UnsignedInput;
+  override toPlainObject(type: PlainObjectType): EIP12UnsignedInput | UnsignedInput;
+  override toPlainObject(type: PlainObjectType): EIP12UnsignedInput | UnsignedInput {
+    return { ...super.toPlainObject(type), extension: this.extension };
   }
 
-  public toPlainObject<T extends BuildOutputType>(type: T): DataInputType<T> {
-    if (type === "EIP-12") {
-      return {
-        boxId: this.boxId,
-        value: this.value.toString(),
-        ergoTree: this.ergoTree,
-        creationHeight: this.creationHeight,
-        assets: this.assets.map((asset) => ({
-          tokenId: asset.tokenId,
-          amount: asset.amount.toString()
-        })),
-        additionalRegisters: this.additionalRegisters,
-        transactionId: this.transactionId,
-        index: this.index
-      } as DataInputType<T>;
-    }
-
-    return { boxId: this.boxId } as DataInputType<T>;
+  toDataInputPlainObject(type: "EIP-12"): EIP12UnsignedDataInput;
+  toDataInputPlainObject(type: "minimal"): DataInput;
+  toDataInputPlainObject(type: PlainObjectType): EIP12UnsignedDataInput | DataInput;
+  toDataInputPlainObject(type: PlainObjectType): EIP12UnsignedDataInput | DataInput {
+    return super.toPlainObject(type);
   }
 }

@@ -10,4 +10,4 @@ export type SortingDirection = "asc" | "desc";
 
 export type FilterPredicate<T> = (item: T) => boolean;
 
-export type BuildOutputType = "default" | "EIP-12";
+export type PlainObjectType = "minimal" | "EIP-12";

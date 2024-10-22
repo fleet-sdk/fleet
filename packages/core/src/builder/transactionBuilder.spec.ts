@@ -354,8 +354,7 @@ describe("Building", () => {
           amount: "1"
         }
       ],
-      additionalRegisters: {},
-      flags: { change: false }
+      additionalRegisters: {}
     };
 
     const expectedBabelRecreatedBox = {
@@ -373,8 +372,7 @@ describe("Building", () => {
         R4: "08cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
         R5: "05c0a38601",
         R6: "0e2085add0fac1bff1be3b5ce325dc6ce47b4eb50456101f371c305cd600a2077129"
-      },
-      flags: { change: false }
+      }
     };
 
     const expectedFeeBox = {
@@ -383,8 +381,7 @@ describe("Building", () => {
         "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304",
       creationHeight: 97238,
       assets: [],
-      additionalRegisters: {},
-      flags: { change: false }
+      additionalRegisters: {}
     };
 
     const expectedChangeBox = {
@@ -402,8 +399,7 @@ describe("Building", () => {
           amount: "4"
         }
       ],
-      additionalRegisters: {},
-      flags: { change: true }
+      additionalRegisters: {}
     };
 
     const tx = new TransactionBuilder(97238)
@@ -762,13 +758,13 @@ describe("Building", () => {
 
     expect(change2.ergoTree).toBe(a1.ergoTree);
     expect(change2.creationHeight).toBe(height);
-    expect(change2.value).toBe(_estimateBoxValue(change2));
+    expect(change2.value).toBe(_estimateBoxValue(change2.toCandidate()));
     expect(change2.assets).toHaveLength(MAX_TOKENS_PER_BOX);
     expect(change2.additionalRegisters).toEqual({});
 
     expect(change3.ergoTree).toBe(a1.ergoTree);
     expect(change3.creationHeight).toBe(height);
-    expect(change3.value).toBe(_estimateBoxValue(change3));
+    expect(change3.value).toBe(_estimateBoxValue(change3.toCandidate()));
     expect(change3.assets).toHaveLength(72);
     expect(change3.additionalRegisters).toEqual({});
   });
@@ -800,7 +796,7 @@ describe("Building", () => {
 
       if (i > 0) {
         expect(transaction.outputs[i].value).toBe(
-          _estimateBoxValue(transaction.outputs[i])
+          _estimateBoxValue(transaction.outputs[i].toCandidate())
         );
       }
     }
@@ -825,7 +821,7 @@ describe("Building", () => {
 
       if (i > 0) {
         expect(transaction.outputs[i].value).toBe(
-          _estimateBoxValue(transaction.outputs[i])
+          _estimateBoxValue(transaction.outputs[i].toCandidate())
         );
       }
     }
@@ -870,7 +866,7 @@ describe("Building", () => {
     for (let i = 1; i < transaction.outputs.length; i++) {
       expect(transaction.outputs[i].assets).toHaveLength(tokensPerBox);
       expect(transaction.outputs[i].value).toBe(
-        _estimateBoxValue(transaction.outputs[i])
+        _estimateBoxValue(transaction.outputs[i].toCandidate())
       );
     }
   });

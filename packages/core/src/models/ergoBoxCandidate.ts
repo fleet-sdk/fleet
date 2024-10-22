@@ -31,4 +31,17 @@ export class ErgoBoxCandidate<R extends NonMandatoryRegisters = NonMandatoryRegi
   toBox(transactionId: string, index: number): ErgoBox<R> {
     return new ErgoBox(this, transactionId, index);
   }
+
+  toPlainObject(): BoxCandidate<string> {
+    return {
+      value: this.value.toString(),
+      ergoTree: this.ergoTree,
+      creationHeight: this.creationHeight,
+      assets: this.assets.map((asset) => ({
+        tokenId: asset.tokenId,
+        amount: asset.amount.toString()
+      })),
+      additionalRegisters: this.additionalRegisters
+    };
+  }
 }
