@@ -354,7 +354,8 @@ describe("Building", () => {
           amount: "1"
         }
       ],
-      additionalRegisters: {}
+      additionalRegisters: {},
+      flags: { change: false }
     };
 
     const expectedBabelRecreatedBox = {
@@ -372,7 +373,8 @@ describe("Building", () => {
         R4: "08cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
         R5: "05c0a38601",
         R6: "0e2085add0fac1bff1be3b5ce325dc6ce47b4eb50456101f371c305cd600a2077129"
-      }
+      },
+      flags: { change: false }
     };
 
     const expectedFeeBox = {
@@ -381,7 +383,8 @@ describe("Building", () => {
         "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304",
       creationHeight: 97238,
       assets: [],
-      additionalRegisters: {}
+      additionalRegisters: {},
+      flags: { change: false }
     };
 
     const expectedChangeBox = {
@@ -399,7 +402,8 @@ describe("Building", () => {
           amount: "4"
         }
       ],
-      additionalRegisters: {}
+      additionalRegisters: {},
+      flags: { change: true }
     };
 
     const tx = new TransactionBuilder(97238)
@@ -439,7 +443,7 @@ describe("Building", () => {
       .build()
       .toEIP12Object();
 
-    expect(tx.outputs).toEqual([
+    expect(tx.outputs).to.deep.equal([
       expectedSendingBox,
       expectedBabelRecreatedBox,
       expectedFeeBox,

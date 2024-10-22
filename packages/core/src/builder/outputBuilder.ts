@@ -28,6 +28,7 @@ import {
   type TokenAddOptions,
   TokensCollection
 } from "../models/collections/tokensCollection";
+import { ErgoBoxCandidate } from "../models/ergoBoxCandidate";
 
 export const BOX_VALUE_PER_BYTE = BigInt(360);
 export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
@@ -187,7 +188,7 @@ export class OutputBuilder {
     return this;
   }
 
-  build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): BoxCandidate<bigint> {
+  build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): ErgoBoxCandidate {
     let tokens: TokenAmount<bigint>[];
 
     if (this.minting) {
@@ -207,13 +208,16 @@ export class OutputBuilder {
 
     if (isUndefined(this.creationHeight)) throw new UndefinedCreationHeight();
 
-    return {
-      value: this.value,
-      ergoTree: this.ergoTree,
-      creationHeight: this.creationHeight,
-      assets: tokens,
-      additionalRegisters: this.additionalRegisters
-    };
+    return new ErgoBoxCandidate(
+      {
+        value: this.value,
+        ergoTree: this.ergoTree,
+        creationHeight: this.creationHeight,
+        assets: tokens,
+        additionalRegisters: this.additionalRegisters
+      },
+      this.#flags
+    );
   }
 
   estimateSize(value = SAFE_MIN_BOX_VALUE): number {
