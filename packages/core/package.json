@@ -38,9 +38,6 @@
     "@fleet-sdk/crypto": "workspace:^",
     "@fleet-sdk/serializer": "workspace:^"
   },
-  "devDependencies": {
-    "@fleet-sdk/mock-chain": "workspace:^"
-  },
   "engines": {
     "node": ">=18"
   },
