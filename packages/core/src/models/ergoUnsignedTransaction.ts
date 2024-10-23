@@ -4,35 +4,47 @@ import {
   type EIP12UnsignedTransaction,
   type UnsignedTransaction,
   utxoDiff,
-  utxoSum
+  utxoSum,
+  FleetError
 } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeTransaction } from "@fleet-sdk/serializer";
+import { TransactionBuilder } from "../builder";
 import type { ErgoUnsignedInput } from "./ergoUnsignedInput";
 import type { ErgoBox } from "./ergoBox";
 import type { ErgoBoxCandidate } from "./ergoBoxCandidate";
+import { ErgoUnsignedTransactionChain } from "./ergoUnsignedTransactionChain";
 
 type TransactionType<T> = T extends "default"
   ? UnsignedTransaction
   : EIP12UnsignedTransaction;
+
+export type ChainCallback = (
+  child: TransactionBuilder,
+  parent: ErgoUnsignedTransaction
+) => TransactionBuilder | ErgoUnsignedTransaction | ErgoUnsignedTransactionChain;
 
 export class ErgoUnsignedTransaction {
   readonly #inputs: ErgoUnsignedInput[];
   readonly #dataInputs: ErgoUnsignedInput[];
   readonly #outputCandidates: ErgoBoxCandidate[];
 
+  #child?: ErgoUnsignedTransaction;
   #outputs?: ErgoBox[];
   #change?: ErgoBox[];
   #id?: string;
+  #builder?: TransactionBuilder;
 
   constructor(
     inputs: ErgoUnsignedInput[],
     dataInputs: ErgoUnsignedInput[],
-    outputs: ErgoBoxCandidate[]
+    outputs: ErgoBoxCandidate[],
+    builder?: TransactionBuilder
   ) {
     this.#inputs = inputs;
     this.#dataInputs = dataInputs;
     this.#outputCandidates = outputs;
+    this.#builder = builder;
   }
 
   get id(): string {
@@ -76,13 +88,41 @@ export class ErgoUnsignedTransaction {
     return diff;
   }
 
+  get child(): ErgoUnsignedTransaction | undefined {
+    return this.#child;
+  }
+
+  chain(callback: ChainCallback): ErgoUnsignedTransactionChain {
+    if (!this.#builder) {
+      throw new FleetError(
+        "Cannot chain transactions without a parent TransactionBuilder"
+      );
+    }
+
+    const height = this.#builder.creationHeight;
+    const builder = new TransactionBuilder(height).from(this.change);
+    if (this.#builder.fee) builder.payFee(this.#builder.fee);
+    if (this.#builder.changeAddress) builder.sendChangeTo(this.#builder.changeAddress);
+
+    const response = callback(builder, this);
+    if (response instanceof TransactionBuilder) {
+      this.#child = response.build();
+    } else if (response instanceof ErgoUnsignedTransactionChain) {
+      this.#child = response.first();
+    } else {
+      this.#child = response;
+    }
+
+    return new ErgoUnsignedTransactionChain(this);
+  }
+
   toPlainObject(): UnsignedTransaction;
   toPlainObject<T extends PlainObjectType>(type: T): TransactionType<T>;
   toPlainObject<T extends PlainObjectType>(type?: T): TransactionType<T> {
     return {
-      inputs: this.inputs.map((input) => input.toPlainObject(type || "minimal")),
+      inputs: this.inputs.map((input) => input.toPlainObject(type ?? "minimal")),
       dataInputs: this.dataInputs.map((input) =>
-        input.toDataInputPlainObject(type || "minimal")
+        input.toDataInputPlainObject(type ?? "minimal")
       ),
       outputs: this.#outputCandidates.map((output) => output.toPlainObject())
     } as TransactionType<T>;
