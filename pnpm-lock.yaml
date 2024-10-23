@@ -110,6 +110,10 @@ importers:
       '@fleet-sdk/serializer':
         specifier: workspace:^
         version: link:../serializer
+    devDependencies:
+      '@fleet-sdk/mock-chain':
+        specifier: workspace:^
+        version: link:../mock-chain
 
   packages/crypto:
     dependencies:

@@ -1,6 +1,5 @@
 import { serializeTransaction } from "@fleet-sdk/serializer";
-import { regularBoxes, validBoxes } from "_test-vectors";
-import { mockedUnsignedTransactions } from "_test-vectors";
+import { regularBoxes, validBoxes, mockedUnsignedTransactions } from "_test-vectors";
 import { describe, expect, it } from "vitest";
 import {
   FEE_CONTRACT,

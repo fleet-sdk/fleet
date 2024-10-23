@@ -7,11 +7,10 @@ import type {
   PlainObjectType,
   DataInput
 } from "@fleet-sdk/common";
-import { FleetError, isDefined } from "@fleet-sdk/common";
+import { FleetError, isDefined, isUndefined } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeBox } from "@fleet-sdk/serializer";
 import { ErgoBoxCandidate } from "./ergoBoxCandidate";
-import { isUndefined } from "packages/common/src";
 
 export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
   #candidate: ErgoBoxCandidate<R>;

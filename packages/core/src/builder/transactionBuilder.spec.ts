@@ -25,7 +25,7 @@ import {
   RECOMMENDED_MIN_FEE_VALUE,
   TransactionBuilder
 } from "./transactionBuilder";
-import { mockUTxO } from "packages/mock-chain/src";
+import { mockUTxO } from "@fleet-sdk/mock-chain";
 
 const height = 844540;
 const a1 = {

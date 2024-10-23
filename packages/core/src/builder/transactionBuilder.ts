@@ -84,7 +84,7 @@ export class TransactionBuilder {
   #burning?: TokensCollection;
   #plugins?: PluginListItem[];
 
-  constructor(creationHeight: number, parent?: ErgoUnsignedTransaction) {
+  constructor(creationHeight: number) {
     this.#inputs = new InputsCollection();
     this.#dataInputs = new InputsCollection();
     this.#outputs = new OutputsCollection();
