@@ -14,7 +14,14 @@ import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
 import { ErgoBoxCandidate } from "./ergoBoxCandidate";
 import { ErgoAddress } from "./ergoAddress";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
-import type { Box, EIP12UnsignedInput, UnsignedTransaction } from "@fleet-sdk/common";
+import type {
+  Box,
+  DataInput,
+  EIP12UnsignedDataInput,
+  EIP12UnsignedInput,
+  UnsignedInput,
+  UnsignedTransaction
+} from "@fleet-sdk/common";
 
 describe("Model", () => {
   it("Should generate the right transactionId and boxIds for outputs", () => {
@@ -226,7 +233,9 @@ describe("Chaining", () => {
   it("Should convert to plain object", () => {
     const computeId = (tx: UnsignedTransaction) =>
       hex.encode(blake2b256(serializeTransaction(tx).toBytes()));
-    const isEip12Input = (x: Box): x is EIP12UnsignedInput =>
+    const isEip12Input = (
+      x: UnsignedInput | EIP12UnsignedDataInput | EIP12UnsignedInput | DataInput
+    ): x is EIP12UnsignedInput =>
       "value" in x && "additionalRegisters" && "ergoTree" in x && "assets" in x;
 
     const chain = new TransactionBuilder(height)
@@ -242,10 +251,16 @@ describe("Chaining", () => {
     const nodeTxns = chain.toPlainObject();
     const eip12Txns = chain.toEIP12Object();
 
+    // check correctness of ids
     for (let i = 0; i < chainArray.length; i++) {
       expect(computeId(nodeTxns[i])).to.be.equal(chainArray[i].id);
       expect(computeId(eip12Txns[i])).to.be.equal(chainArray[i].id);
     }
+
+    // check object structure
+    expect(nodeTxns.flatMap((x) => x.inputs).every((x) => !isEip12Input(x))).to.be.true;
+    expect(nodeTxns.flatMap((x) => x.dataInputs).every((x) => !isEip12Input(x))).to.be
+      .true;
 
     expect(eip12Txns.flatMap((x) => x.inputs).every(isEip12Input)).to.be.true;
     expect(eip12Txns.flatMap((x) => x.dataInputs).every(isEip12Input)).to.be.true;
