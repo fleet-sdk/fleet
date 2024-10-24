@@ -71,57 +71,57 @@ type InputsInclusionOptions = {
 };
 
 export class TransactionBuilder {
-  private readonly _inputs!: InputsCollection;
-  private readonly _dataInputs!: InputsCollection;
-  private readonly _outputs!: OutputsCollection;
-  private readonly _settings!: TransactionBuilderSettings;
-  private readonly _creationHeight!: number;
+  readonly #inputs: InputsCollection;
+  readonly #dataInputs: InputsCollection;
+  readonly #outputs: OutputsCollection;
+  readonly #settings: TransactionBuilderSettings;
 
-  private _ensureInclusion?: Set<string>;
-  private _selectorCallbacks?: SelectorCallback[];
-  private _changeAddress?: ErgoAddress;
-  private _feeAmount?: bigint;
-  private _burning?: TokensCollection;
-  private _plugins?: PluginListItem[];
+  #creationHeight: number;
+  #ensureInclusion?: Set<string>;
+  #selectorCallbacks?: SelectorCallback[];
+  #changeAddress?: ErgoAddress;
+  #feeAmount?: bigint;
+  #burning?: TokensCollection;
+  #plugins?: PluginListItem[];
 
   constructor(creationHeight: number) {
-    this._inputs = new InputsCollection();
-    this._dataInputs = new InputsCollection();
-    this._outputs = new OutputsCollection();
-    this._settings = new TransactionBuilderSettings();
-    this._creationHeight = creationHeight;
+    this.#inputs = new InputsCollection();
+    this.#dataInputs = new InputsCollection();
+    this.#outputs = new OutputsCollection();
+    this.#settings = new TransactionBuilderSettings();
+    this.#creationHeight = creationHeight;
   }
 
-  public get inputs(): InputsCollection {
-    return this._inputs;
+  get inputs(): InputsCollection {
+    return this.#inputs;
   }
 
-  public get dataInputs(): InputsCollection {
-    return this._dataInputs;
+  get dataInputs(): InputsCollection {
+    return this.#dataInputs;
   }
 
-  public get outputs(): OutputsCollection {
-    return this._outputs;
+  get outputs(): OutputsCollection {
+    return this.#outputs;
   }
 
-  public get changeAddress(): ErgoAddress | undefined {
-    return this._changeAddress;
+  get changeAddress(): ErgoAddress | undefined {
+    return this.#changeAddress;
   }
 
-  public get fee(): bigint | undefined {
-    return this._feeAmount;
+  get fee(): bigint | undefined {
+    return this.#feeAmount;
   }
 
-  public get burning(): TokensCollection | undefined {
-    return this._burning;
+  get burning(): TokensCollection | undefined {
+    return this.#burning;
   }
 
-  public get settings(): TransactionBuilderSettings {
-    return this._settings;
+  get settings(): TransactionBuilderSettings {
+    return this.#settings;
   }
 
-  public get creationHeight(): number {
-    return this._creationHeight;
+  get creationHeight(): number {
+    return this.#creationHeight;
   }
 
   /**
@@ -134,104 +134,99 @@ export class TransactionBuilder {
    *   .and.from(otherInputs);
    * ```
    */
-  public get and(): TransactionBuilder {
+  get and(): TransactionBuilder {
     return this;
   }
 
-  public from(
+  atHeight(height: number): TransactionBuilder {
+    this.#creationHeight = height;
+    return this;
+  }
+
+  from(
     inputs: OneOrMore<Box<Amount>> | CollectionLike<Box<Amount>>,
     options: InputsInclusionOptions = { ensureInclusion: false }
   ): TransactionBuilder {
     const items = isCollectionLike(inputs) ? inputs.toArray() : inputs;
     if (options.ensureInclusion) this.#ensureInclusionOf(items);
 
-    this._inputs.add(items);
+    this.#inputs.add(items);
     return this;
   }
 
   #ensureInclusionOf(inputs: OneOrMore<Box<Amount>>): void {
-    if (!this._ensureInclusion) this._ensureInclusion = new Set();
+    if (!this.#ensureInclusion) this.#ensureInclusion = new Set();
 
     if (Array.isArray(inputs)) {
-      for (const input of inputs) this._ensureInclusion.add(input.boxId);
+      for (const input of inputs) this.#ensureInclusion.add(input.boxId);
     } else {
-      this._ensureInclusion.add(inputs.boxId);
+      this.#ensureInclusion.add(inputs.boxId);
     }
   }
 
-  public to(
+  to(
     outputs: OneOrMore<OutputBuilder>,
     options?: CollectionAddOptions
   ): TransactionBuilder {
-    this._outputs.add(outputs, options);
-
+    this.#outputs.add(outputs, options);
     return this;
   }
 
-  public withDataFrom(
+  withDataFrom(
     dataInputs: OneOrMore<Box<Amount>>,
     options?: CollectionAddOptions
   ): TransactionBuilder {
-    this._dataInputs.add(dataInputs, options);
+    this.#dataInputs.add(dataInputs, options);
 
     return this;
   }
 
-  public sendChangeTo(
-    address: ErgoAddress | Base58String | HexString
-  ): TransactionBuilder {
+  sendChangeTo(address: ErgoAddress | Base58String | HexString): TransactionBuilder {
     if (typeof address === "string") {
-      this._changeAddress = isHex(address)
+      this.#changeAddress = isHex(address)
         ? ErgoAddress.fromErgoTree(address, Network.Mainnet)
         : ErgoAddress.fromBase58(address);
     } else {
-      this._changeAddress = address;
+      this.#changeAddress = address;
     }
 
     return this;
   }
 
-  public payFee(amount: Amount): TransactionBuilder {
-    this._feeAmount = ensureBigInt(amount);
-
+  payFee(amount: Amount): TransactionBuilder {
+    this.#feeAmount = ensureBigInt(amount);
     return this;
   }
 
-  public payMinFee(): TransactionBuilder {
+  payMinFee(): TransactionBuilder {
     this.payFee(RECOMMENDED_MIN_FEE_VALUE);
-
     return this;
   }
 
-  public burnTokens(tokens: OneOrMore<TokenAmount<Amount>>): TransactionBuilder {
-    if (!this._burning) {
-      this._burning = new TokensCollection();
-    }
-    this._burning.add(tokens);
-
+  burnTokens(tokens: OneOrMore<TokenAmount<Amount>>): TransactionBuilder {
+    if (!this.#burning) this.#burning = new TokensCollection();
+    this.#burning.add(tokens);
     return this;
   }
 
-  public configure(callback: ConfigureCallback): TransactionBuilder {
-    callback(this._settings);
-
+  configure(callback: ConfigureCallback): TransactionBuilder {
+    callback(this.#settings);
     return this;
   }
 
-  public configureSelector(selectorCallback: SelectorCallback): TransactionBuilder {
-    if (isUndefined(this._selectorCallbacks)) this._selectorCallbacks = [];
-    this._selectorCallbacks.push(selectorCallback);
+  configureSelector(selectorCallback: SelectorCallback): TransactionBuilder {
+    if (isUndefined(this.#selectorCallbacks)) this.#selectorCallbacks = [];
+    this.#selectorCallbacks.push(selectorCallback);
     return this;
   }
 
-  public extend(plugins: FleetPlugin): TransactionBuilder {
-    if (!this._plugins) this._plugins = [];
-    this._plugins.push({ execute: plugins, pending: true });
-
+  extend(plugins: FleetPlugin): TransactionBuilder {
+    if (!this.#plugins) this.#plugins = [];
+    this.#plugins.push({ execute: plugins, pending: true });
     return this;
   }
 
-  public eject(ejector: (context: EjectorContext) => void): TransactionBuilder {
+  eject(ejector: (context: EjectorContext) => void): TransactionBuilder {
     ejector({
       inputs: this.inputs,
       dataInputs: this.dataInputs,
@@ -246,10 +241,10 @@ export class TransactionBuilder {
     return this;
   }
 
-  public build(): ErgoUnsignedTransaction {
-    if (some(this._plugins)) {
+  build(): ErgoUnsignedTransaction {
+    if (some(this.#plugins)) {
       const context = createPluginContext(this);
-      for (const plugin of this._plugins) {
+      for (const plugin of this.#plugins) {
         if (plugin.pending) {
           plugin.execute(context);
           plugin.pending = false;
@@ -257,12 +252,12 @@ export class TransactionBuilder {
       }
     }
 
-    if (this._isMinting()) {
-      if (this._isMoreThanOneTokenBeingMinted()) {
+    if (this.#isMinting()) {
+      if (this.#isMoreThanOneTokenBeingMinted()) {
         throw new MalformedTransaction("only one token can be minted per transaction.");
       }
 
-      if (this._isTheSameTokenBeingMintedFromOutsideTheMintingBox()) {
+      if (this.#isTheSameTokenBeingMintedFromOutsideTheMintingBox()) {
         throw new NonStandardizedMinting(
           "EIP-4 tokens cannot be minted from outside of the minting box."
         );
@@ -272,31 +267,32 @@ export class TransactionBuilder {
     this.outputs
       .toArray()
       .map((output) =>
-        output.setCreationHeight(this._creationHeight, { replace: false })
+        output.setCreationHeight(this.#creationHeight, { replace: false })
       );
     const outputs = this.outputs.clone();
 
-    if (isDefined(this._feeAmount)) {
-      outputs.add(new OutputBuilder(this._feeAmount, FEE_CONTRACT));
+    if (isDefined(this.#feeAmount)) {
+      outputs.add(new OutputBuilder(this.#feeAmount, FEE_CONTRACT));
     }
 
     const selector = new BoxSelector(this.inputs.toArray());
-    if (this._ensureInclusion?.size) {
-      selector.ensureInclusion(Array.from(this._ensureInclusion));
+    if (this.#ensureInclusion?.size) {
+      selector.ensureInclusion(Array.from(this.#ensureInclusion));
     }
 
-    if (some(this._selectorCallbacks)) {
-      for (const selectorCallBack of this._selectorCallbacks) {
+    if (some(this.#selectorCallbacks)) {
+      for (const selectorCallBack of this.#selectorCallbacks) {
         selectorCallBack(selector);
       }
     }
 
-    const target = some(this._burning)
-      ? outputs.sum({ tokens: this._burning.toArray() })
+    const target = some(this.#burning)
+      ? outputs.sum({ tokens: this.#burning.toArray() })
       : outputs.sum();
     let inputs = selector.select(target);
 
-    if (isDefined(this._changeAddress)) {
+    if (isDefined(this.#changeAddress)) {
+      const changeBoxes: OutputBuilder[] = [];
       const firstInputId = inputs[0].boxId;
       const manualMintingTokenId = target.tokens.some((x) => x.tokenId === firstInputId)
         ? firstInputId
@@ -307,12 +303,11 @@ export class TransactionBuilder {
       }
 
       let change = utxoDiff(utxoSum(inputs), target);
-      const changeBoxes: OutputBuilder[] = [];
 
       if (some(change.tokens)) {
         let minRequiredNanoErgs = estimateMinChangeValue({
-          changeAddress: this._changeAddress,
-          creationHeight: this._creationHeight,
+          changeAddress: this.#changeAddress,
+          creationHeight: this.#creationHeight,
           tokens: change.tokens,
           maxTokensPerBox: this.settings.maxTokensPerChangeBox,
           baseIndex: this.outputs.length + 1
@@ -326,21 +321,20 @@ export class TransactionBuilder {
 
           change = utxoDiff(utxoSum(inputs), target);
           minRequiredNanoErgs = estimateMinChangeValue({
-            changeAddress: this._changeAddress,
-            creationHeight: this._creationHeight,
+            changeAddress: this.#changeAddress,
+            creationHeight: this.#creationHeight,
             tokens: change.tokens,
             maxTokensPerBox: this.settings.maxTokensPerChangeBox,
             baseIndex: this.outputs.length + 1
           });
         }
 
-        const chunkedTokens = chunk(change.tokens, this._settings.maxTokensPerChangeBox);
+        const chunkedTokens = chunk(change.tokens, this.#settings.maxTokensPerChangeBox);
         for (const tokens of chunkedTokens) {
-          const output = new OutputBuilder(
-            estimateMinBoxValue(),
-            this._changeAddress,
-            this._creationHeight
-          ).addTokens(tokens);
+          const output = new OutputBuilder(estimateMinBoxValue(), this.#changeAddress)
+            .setCreationHeight(this.#creationHeight)
+            .addTokens(tokens)
+            .setFlags({ change: true });
 
           change.nanoErgs -= output.value;
           changeBoxes.push(output);
@@ -348,33 +342,36 @@ export class TransactionBuilder {
       }
 
       if (change.nanoErgs > _0n) {
-        if (some(changeBoxes)) {
-          if (this.settings.shouldIsolateErgOnChange) {
-            outputs.add(new OutputBuilder(change.nanoErgs, this._changeAddress));
-          } else {
-            const firstChangeBox = first(changeBoxes);
-            firstChangeBox.setValue(firstChangeBox.value + change.nanoErgs);
-          }
-
-          outputs.add(changeBoxes);
+        if (!changeBoxes.length || this.settings.shouldIsolateErgOnChange) {
+          changeBoxes.unshift(
+            new OutputBuilder(change.nanoErgs, this.#changeAddress)
+              .setCreationHeight(this.#creationHeight)
+              .setFlags({ change: true })
+          );
         } else {
-          outputs.add(new OutputBuilder(change.nanoErgs, this._changeAddress));
+          const firstChangeBox = first(changeBoxes);
+          firstChangeBox.setValue(firstChangeBox.value + change.nanoErgs);
         }
       }
+
+      outputs.add(changeBoxes);
     }
 
     for (const input of inputs) {
       if (!input.isValid()) throw new InvalidInput(input.boxId);
     }
 
+    const buildedOutputs = outputs
+      .toArray()
+      .map((output) =>
+        output.setCreationHeight(this.#creationHeight, { replace: false }).build(inputs)
+      );
+
     const unsignedTransaction = new ErgoUnsignedTransaction(
       inputs,
       this.dataInputs.toArray(),
-      outputs
-        .toArray()
-        .map((output) =>
-          output.setCreationHeight(this._creationHeight, { replace: false }).build(inputs)
-        )
+      buildedOutputs,
+      this
     );
 
     let burning = unsignedTransaction.burning;
@@ -382,37 +379,40 @@ export class TransactionBuilder {
       throw new MalformedTransaction("it's not possible to burn ERG.");
     }
 
-    if (some(burning.tokens) && some(this._burning)) {
-      burning = utxoDiff(burning, { nanoErgs: _0n, tokens: this._burning.toArray() });
+    if (some(burning.tokens) && some(this.#burning)) {
+      burning = utxoDiff(burning, {
+        nanoErgs: _0n,
+        tokens: this.#burning.toArray()
+      });
     }
 
-    if (!this._settings.canBurnTokens && some(burning.tokens)) {
+    if (!this.#settings.canBurnTokens && some(burning.tokens)) {
       throw new NotAllowedTokenBurning();
     }
 
     return unsignedTransaction;
   }
 
-  private _getMintingOutput(): OutputBuilder | undefined {
-    for (const output of this._outputs) {
+  #getMintingOutput(): OutputBuilder | undefined {
+    for (const output of this.#outputs) {
       if (output.minting) return output;
     }
 
     return;
   }
 
-  private _isMinting(): boolean {
-    return this._getMintingOutput() !== undefined;
+  #isMinting(): boolean {
+    return this.#getMintingOutput() !== undefined;
   }
 
-  private _getMintingTokenId(): string | undefined {
-    return this._getMintingOutput()?.minting?.tokenId;
+  #getMintingTokenId(): string | undefined {
+    return this.#getMintingOutput()?.minting?.tokenId;
   }
 
-  private _isMoreThanOneTokenBeingMinted(): boolean {
+  #isMoreThanOneTokenBeingMinted(): boolean {
     let mintingCount = 0;
 
-    for (const output of this._outputs) {
+    for (const output of this.#outputs) {
       if (output.minting) {
         mintingCount++;
         if (mintingCount > 1) return true;
@@ -422,12 +422,12 @@ export class TransactionBuilder {
     return false;
   }
 
-  private _isTheSameTokenBeingMintedFromOutsideTheMintingBox(): boolean {
-    const mintingTokenId = this._getMintingTokenId();
+  #isTheSameTokenBeingMintedFromOutsideTheMintingBox(): boolean {
+    const mintingTokenId = this.#getMintingTokenId();
     if (isUndefined(mintingTokenId)) return false;
 
     let count = 0;
-    for (const output of this._outputs) {
+    for (const output of this.#outputs) {
       if (output.assets.contains(mintingTokenId)) {
         count++;
         if (count > 1) return true;

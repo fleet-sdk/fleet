@@ -16,7 +16,7 @@ describe("Construction", () => {
       expect(input.additionalRegisters).toBe(box.additionalRegisters);
       expect(input.transactionId).toBe(box.transactionId);
       expect(input.index).toBe(box.index);
-      expect(input.extension).toBeUndefined();
+      expect(input.extension).to.be.deep.equal({});
     }
   });
 });
@@ -45,7 +45,7 @@ describe("Tweaking", () => {
 describe("Unsigned input object conversion", () => {
   it("Should convert to default unsigned input object and set empty extension", () => {
     for (const box of regularBoxes) {
-      expect(new ErgoUnsignedInput(box).toUnsignedInputObject("default")).toEqual({
+      expect(new ErgoUnsignedInput(box).toPlainObject("minimal")).toEqual({
         boxId: box.boxId,
         extension: {}
       });
@@ -57,7 +57,7 @@ describe("Unsigned input object conversion", () => {
       expect(
         new ErgoUnsignedInput(box)
           .setContextExtension({ 0: "0580c0fc82aa02" })
-          .toUnsignedInputObject("default")
+          .toPlainObject("minimal")
       ).toEqual({
         boxId: box.boxId,
         extension: { 0: "0580c0fc82aa02" }
@@ -70,7 +70,7 @@ describe("Unsigned input object conversion", () => {
       expect(
         new ErgoUnsignedInput(box)
           .setContextExtension({ 0: "0580c0fc82aa02" })
-          .toUnsignedInputObject("EIP-12")
+          .toPlainObject("EIP-12")
       ).toEqual({
         boxId: box.boxId,
         value: box.value.toString(),
@@ -92,7 +92,7 @@ describe("Unsigned input object conversion", () => {
 describe("Unsigned data input object conversion", () => {
   it("Should convert to default data input object and set empty extension", () => {
     for (const box of regularBoxes) {
-      expect(new ErgoUnsignedInput(box).toPlainObject("default")).toEqual({
+      expect(new ErgoUnsignedInput(box).toDataInputPlainObject("minimal")).toEqual({
         boxId: box.boxId
       });
     }
@@ -103,7 +103,7 @@ describe("Unsigned data input object conversion", () => {
       expect(
         new ErgoUnsignedInput(box)
           .setContextExtension({ 0: "0580c0fc82aa02" })
-          .toPlainObject("default")
+          .toDataInputPlainObject("minimal")
       ).toEqual({
         boxId: box.boxId
       });
@@ -115,7 +115,7 @@ describe("Unsigned data input object conversion", () => {
       expect(
         new ErgoUnsignedInput(box)
           .setContextExtension({ 0: "0580c0fc82aa02" })
-          .toPlainObject("EIP-12")
+          .toDataInputPlainObject("EIP-12")
       ).toEqual({
         boxId: box.boxId,
         value: box.value.toString(),

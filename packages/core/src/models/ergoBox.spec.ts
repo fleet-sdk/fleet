@@ -1,4 +1,4 @@
-import type { NonMandatoryRegisters } from "@fleet-sdk/common";
+import type { Amount, BoxCandidate, NonMandatoryRegisters, Box } from "@fleet-sdk/common";
 import {
   invalidBoxes,
   manyTokensBoxes,
@@ -6,23 +6,42 @@ import {
   regularBoxes,
   validBoxes
 } from "_test-vectors";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import { ErgoBox } from "./ergoBox";
 
 describe("Construction", () => {
-  it("Should construct from a vanilla object", () => {
-    for (const box of regularBoxes) {
-      const ergoBox = new ErgoBox(box);
+  test.each(regularBoxes)("Should construct from a vanilla object", (tv) => {
+    const ergoBox = new ErgoBox(tv);
 
-      expect(ergoBox.boxId).toBe(box.boxId);
-      expect(ergoBox.value).toBe(box.value);
-      expect(ergoBox.ergoTree).toBe(box.ergoTree);
-      expect(ergoBox.assets).toEqual(box.assets);
-      expect(ergoBox.creationHeight).toBe(box.creationHeight);
-      expect(ergoBox.additionalRegisters).toBe(box.additionalRegisters);
-      expect(ergoBox.transactionId).toBe(box.transactionId);
-      expect(ergoBox.index).toBe(box.index);
-    }
+    expect(ergoBox.boxId).toBe(tv.boxId);
+    expect(ergoBox.value).toBe(tv.value);
+    expect(ergoBox.ergoTree).toBe(tv.ergoTree);
+    expect(ergoBox.assets).toEqual(tv.assets);
+    expect(ergoBox.creationHeight).toBe(tv.creationHeight);
+    expect(ergoBox.additionalRegisters).toBe(tv.additionalRegisters);
+    expect(ergoBox.transactionId).toBe(tv.transactionId);
+    expect(ergoBox.index).toBe(tv.index);
+  });
+
+  test.each(regularBoxes)("Should construct from a candidate and compute boxId", (tv) => {
+    const ergoBox = new ErgoBox(boxToCandidate(tv), tv.transactionId, tv.index);
+
+    expect(ergoBox.boxId).to.be.equal(tv.boxId);
+    expect(ergoBox.transactionId).to.be.equal(tv.transactionId);
+    expect(ergoBox.index).to.be.equal(tv.index);
+  });
+
+  it("Should throw if transactionId or index is not provided for box candidate", () => {
+    const box = regularBoxes[0];
+    const candidate = boxToCandidate(box);
+
+    expect(
+      () => new ErgoBox(candidate, undefined as unknown as string, box.index)
+    ).to.throw("TransactionId and Index must be provided for Box generation.");
+
+    expect(
+      () => new ErgoBox(candidate, box.transactionId, undefined as unknown as number)
+    ).to.throw("TransactionId and Index must be provided for Box generation.");
   });
 });
 
@@ -51,3 +70,13 @@ describe("Validation", () => {
     }
   });
 });
+
+function boxToCandidate(tv: Box<bigint>): BoxCandidate<Amount, NonMandatoryRegisters> {
+  return {
+    value: tv.value,
+    ergoTree: tv.ergoTree,
+    creationHeight: tv.creationHeight,
+    assets: tv.assets,
+    additionalRegisters: tv.additionalRegisters
+  };
+}

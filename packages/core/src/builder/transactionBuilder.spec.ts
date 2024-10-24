@@ -171,6 +171,14 @@ describe("basic construction", () => {
     expect(builder.fee).toBe(fee);
   });
 
+  it("Should update creation height", () => {
+    const builder = new TransactionBuilder(1);
+    expect(builder.creationHeight).to.be.equal(1);
+
+    builder.atHeight(2);
+    expect(builder.creationHeight).to.be.equal(2);
+  });
+
   it("Should set min recommended fee amount", () => {
     const builder = new TransactionBuilder(height).from(regularBoxes).payMinFee();
 
@@ -431,7 +439,7 @@ describe("Building", () => {
       .build()
       .toEIP12Object();
 
-    expect(tx.outputs).toEqual([
+    expect(tx.outputs).to.deep.equal([
       expectedSendingBox,
       expectedBabelRecreatedBox,
       expectedFeeBox,
@@ -750,13 +758,13 @@ describe("Building", () => {
 
     expect(change2.ergoTree).toBe(a1.ergoTree);
     expect(change2.creationHeight).toBe(height);
-    expect(change2.value).toBe(_estimateBoxValue(change2));
+    expect(change2.value).toBe(_estimateBoxValue(change2.toCandidate()));
     expect(change2.assets).toHaveLength(MAX_TOKENS_PER_BOX);
     expect(change2.additionalRegisters).toEqual({});
 
     expect(change3.ergoTree).toBe(a1.ergoTree);
     expect(change3.creationHeight).toBe(height);
-    expect(change3.value).toBe(_estimateBoxValue(change3));
+    expect(change3.value).toBe(_estimateBoxValue(change3.toCandidate()));
     expect(change3.assets).toHaveLength(72);
     expect(change3.additionalRegisters).toEqual({});
   });
@@ -788,7 +796,7 @@ describe("Building", () => {
 
       if (i > 0) {
         expect(transaction.outputs[i].value).toBe(
-          _estimateBoxValue(transaction.outputs[i])
+          _estimateBoxValue(transaction.outputs[i].toCandidate())
         );
       }
     }
@@ -813,7 +821,7 @@ describe("Building", () => {
 
       if (i > 0) {
         expect(transaction.outputs[i].value).toBe(
-          _estimateBoxValue(transaction.outputs[i])
+          _estimateBoxValue(transaction.outputs[i].toCandidate())
         );
       }
     }
@@ -858,7 +866,7 @@ describe("Building", () => {
     for (let i = 1; i < transaction.outputs.length; i++) {
       expect(transaction.outputs[i].assets).toHaveLength(tokensPerBox);
       expect(transaction.outputs[i].value).toBe(
-        _estimateBoxValue(transaction.outputs[i])
+        _estimateBoxValue(transaction.outputs[i].toCandidate())
       );
     }
   });

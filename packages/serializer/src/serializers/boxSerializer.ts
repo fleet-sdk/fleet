@@ -24,7 +24,7 @@ export function serializeBox(
 ): SigmaByteWriter;
 export function serializeBox(
   box: Box<Amount> | BoxCandidate<Amount>,
-  writer = new SigmaByteWriter(5_0000),
+  writer = new SigmaByteWriter(4_096),
   distinctTokenIds?: string[]
 ): SigmaByteWriter {
   writer.writeBigVLQ(ensureBigInt(box.value));
@@ -40,7 +40,6 @@ export function serializeBox(
 
 function isBox<T extends Amount>(box: Box<Amount> | BoxCandidate<Amount>): box is Box<T> {
   const castedBox = box as Box<T>;
-
   return isDefined(castedBox.transactionId) && isDefined(castedBox.index);
 }
 
@@ -51,7 +50,6 @@ function writeTokens(
 ): void {
   if (isEmpty(tokens)) {
     writer.write(0);
-
     return;
   }
 

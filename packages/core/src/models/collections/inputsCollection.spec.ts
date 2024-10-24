@@ -29,7 +29,9 @@ describe("inputs collection", () => {
     collection.add(regularBoxes);
 
     expect(collection).toHaveLength(regularBoxes.length);
-    expect(collection.toArray()).toEqual(regularBoxes);
+    expect(collection.toArray().map((x) => x.boxId)).toEqual(
+      regularBoxes.map((x) => x.boxId)
+    );
   });
 
   it("Should add a multiple items and map properly", () => {
@@ -49,7 +51,9 @@ describe("inputs collection", () => {
     );
 
     expect(collection).toHaveLength(regularBoxes.length);
-    expect(collection.toArray()).toEqual(regularBoxes);
+    expect(collection.toArray().map((x) => x.boxId)).toEqual(
+      regularBoxes.map((x) => x.boxId)
+    );
   });
 
   it("Should throw if box is already included", () => {

@@ -109,7 +109,7 @@ function buildKeyMapper(keys: ErgoHDKey[] | KeyMap) {
       if (secret) return secret;
     }
 
-    if (pskMap.size === 1) return pskMap.values().next().value;
+    if (pskMap.size === 1) return pskMap.values().next().value as ErgoHDKey;
 
     for (const pk of pskMap.keys()) {
       // try to determine the secret key from the input by checking the ErgoTree and Registers

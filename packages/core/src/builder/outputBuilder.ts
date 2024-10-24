@@ -28,11 +28,13 @@ import {
   type TokenAddOptions,
   TokensCollection
 } from "../models/collections/tokensCollection";
+import { ErgoBoxCandidate } from "../models/ergoBoxCandidate";
 
 export const BOX_VALUE_PER_BYTE = BigInt(360);
 export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 
 export type BoxValueEstimationCallback = (outputBuilder: OutputBuilder) => bigint;
+export type TransactionOutputFlags = { change: boolean };
 
 export function estimateMinBoxValue(
   valuePerByte = BOX_VALUE_PER_BYTE
@@ -45,12 +47,13 @@ export function estimateMinBoxValue(
 const DUMB_TOKEN_ID = "0000000000000000000000000000000000000000000000000000000000000000";
 
 export class OutputBuilder {
-  private readonly _address: ErgoAddress;
-  private readonly _tokens: TokensCollection;
-  private _value!: bigint;
-  private _valueEstimator?: BoxValueEstimationCallback;
-  private _creationHeight?: number;
-  private _registers: NonMandatoryRegisters;
+  readonly #address: ErgoAddress;
+  readonly #tokens: TokensCollection;
+  #value!: bigint;
+  #valueEstimator?: BoxValueEstimationCallback;
+  #creationHeight?: number;
+  #registers: NonMandatoryRegisters;
+  #flags: TransactionOutputFlags = { change: false };
 
   constructor(
     value: Amount | BoxValueEstimationCallback,
@@ -59,57 +62,62 @@ export class OutputBuilder {
   ) {
     this.setValue(value);
 
-    this._creationHeight = creationHeight;
-    this._tokens = new TokensCollection();
-    this._registers = {};
+    this.#creationHeight = creationHeight;
+    this.#tokens = new TokensCollection();
+    this.#registers = {};
+    this.#flags = { change: false };
 
     if (typeof recipient === "string") {
-      this._address = isHex(recipient)
+      this.#address = isHex(recipient)
         ? ErgoAddress.fromErgoTree(recipient)
         : ErgoAddress.fromBase58(recipient);
     } else if (recipient instanceof ErgoTree) {
-      this._address = recipient.toAddress();
+      this.#address = recipient.toAddress();
     } else {
-      this._address = recipient;
+      this.#address = recipient;
     }
   }
 
-  public get value(): bigint {
-    return isDefined(this._valueEstimator) ? this._valueEstimator(this) : this._value;
+  get value(): bigint {
+    return isDefined(this.#valueEstimator) ? this.#valueEstimator(this) : this.#value;
   }
 
-  public get address(): ErgoAddress {
-    return this._address;
+  get address(): ErgoAddress {
+    return this.#address;
   }
 
-  public get ergoTree(): ErgoTreeHex {
-    return this._address.ergoTree;
+  get ergoTree(): ErgoTreeHex {
+    return this.#address.ergoTree;
   }
 
-  public get creationHeight(): number | undefined {
-    return this._creationHeight;
+  get creationHeight(): number | undefined {
+    return this.#creationHeight;
   }
 
-  public get assets(): TokensCollection {
-    return this._tokens;
+  get assets(): TokensCollection {
+    return this.#tokens;
   }
 
-  public get additionalRegisters(): NonMandatoryRegisters {
-    return this._registers;
+  get additionalRegisters(): NonMandatoryRegisters {
+    return this.#registers;
   }
 
-  public get minting(): NewToken<bigint> | undefined {
+  get minting(): NewToken<bigint> | undefined {
     return this.assets.minting;
   }
 
-  public setValue(value: Amount | BoxValueEstimationCallback): OutputBuilder {
-    if (typeof value === "function") {
-      this._valueEstimator = value;
-    } else {
-      this._value = ensureBigInt(value);
-      this._valueEstimator = undefined;
+  get flags(): TransactionOutputFlags {
+    return this.#flags;
+  }
 
-      if (this._value <= _0n) {
+  setValue(value: Amount | BoxValueEstimationCallback): OutputBuilder {
+    if (typeof value === "function") {
+      this.#valueEstimator = value;
+    } else {
+      this.#value = ensureBigInt(value);
+      this.#valueEstimator = undefined;
+
+      if (this.#value <= _0n) {
         throw new Error("An UTxO cannot be created without a minimum required amount.");
       }
     }
@@ -117,46 +125,47 @@ export class OutputBuilder {
     return this;
   }
 
-  public addTokens(
+  setFlags(flags: Partial<TransactionOutputFlags>): OutputBuilder {
+    this.#flags = { ...this.#flags, ...flags };
+    return this;
+  }
+
+  addTokens(
     tokens: OneOrMore<TokenAmount<Amount>> | TokensCollection,
     options?: TokenAddOptions
   ): OutputBuilder {
     if (tokens instanceof TokensCollection) {
-      this._tokens.add(tokens.toArray(), options);
+      this.#tokens.add(tokens.toArray(), options);
     } else {
-      this._tokens.add(tokens, options);
+      this.#tokens.add(tokens, options);
     }
 
     return this;
   }
 
-  public addNfts(...tokenIds: TokenId[]): OutputBuilder {
+  addNfts(...tokenIds: TokenId[]): OutputBuilder {
     const tokens = tokenIds.map((tokenId) => ({ tokenId, amount: _1n }));
-
     return this.addTokens(tokens);
   }
 
-  public mintToken(token: NewToken<Amount>): OutputBuilder {
+  mintToken(token: NewToken<Amount>): OutputBuilder {
     this.assets.mint(token);
     return this;
   }
 
-  public setCreationHeight(
-    height: number,
-    options?: { replace: boolean }
-  ): OutputBuilder {
+  setCreationHeight(height: number, options?: { replace: boolean }): OutputBuilder {
     if (
       isUndefined(options) ||
       options.replace === true ||
-      (options.replace === false && isUndefined(this._creationHeight))
+      (options.replace === false && isUndefined(this.#creationHeight))
     ) {
-      this._creationHeight = height;
+      this.#creationHeight = height;
     }
 
     return this;
   }
 
-  public setAdditionalRegisters<T extends AdditionalRegistersInput>(
+  setAdditionalRegisters<T extends AdditionalRegistersInput>(
     registers: SequentialNonMandatoryRegisters<T>
   ): OutputBuilder {
     const hexRegisters: NonMandatoryRegisters = {};
@@ -169,19 +178,17 @@ export class OutputBuilder {
     }
 
     if (!areRegistersDenselyPacked(hexRegisters)) throw new InvalidRegistersPacking();
-    this._registers = hexRegisters;
+    this.#registers = hexRegisters;
 
     return this;
   }
 
-  public eject(ejector: (context: { tokens: TokensCollection }) => void): OutputBuilder {
-    ejector({ tokens: this._tokens });
+  eject(ejector: (context: { tokens: TokensCollection }) => void): OutputBuilder {
+    ejector({ tokens: this.#tokens });
     return this;
   }
 
-  public build(
-    transactionInputs?: UnsignedInput[] | Box<Amount>[]
-  ): BoxCandidate<bigint> {
+  build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): ErgoBoxCandidate {
     let tokens: TokenAmount<bigint>[];
 
     if (this.minting) {
@@ -201,13 +208,16 @@ export class OutputBuilder {
 
     if (isUndefined(this.creationHeight)) throw new UndefinedCreationHeight();
 
-    return {
-      value: this.value,
-      ergoTree: this.ergoTree,
-      creationHeight: this.creationHeight,
-      assets: tokens,
-      additionalRegisters: this.additionalRegisters
-    };
+    return new ErgoBoxCandidate(
+      {
+        value: this.value,
+        ergoTree: this.ergoTree,
+        creationHeight: this.creationHeight,
+        assets: tokens,
+        additionalRegisters: this.additionalRegisters
+      },
+      this.#flags
+    );
   }
 
   estimateSize(value = SAFE_MIN_BOX_VALUE): number {
@@ -217,7 +227,7 @@ export class OutputBuilder {
       value,
       ergoTree: this.ergoTree,
       creationHeight: this.creationHeight,
-      assets: this._tokens.toArray(DUMB_TOKEN_ID),
+      assets: this.#tokens.toArray(DUMB_TOKEN_ID),
       additionalRegisters: this.additionalRegisters
     };
 

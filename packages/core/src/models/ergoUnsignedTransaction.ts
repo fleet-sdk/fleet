@@ -1,54 +1,86 @@
 import {
-  type BoxCandidate,
   type BoxSummary,
-  type BuildOutputType,
+  type PlainObjectType,
   type EIP12UnsignedTransaction,
   type UnsignedTransaction,
   utxoDiff,
-  utxoSum
+  utxoSum,
+  FleetError
 } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeTransaction } from "@fleet-sdk/serializer";
+import { TransactionBuilder } from "../builder";
 import type { ErgoUnsignedInput } from "./ergoUnsignedInput";
-
-type Input = ErgoUnsignedInput;
-type Output = BoxCandidate<bigint>;
-type ReadOnlyInputs = readonly Input[];
-type ReadOnlyOutputs = readonly Output[];
+import type { ErgoBox } from "./ergoBox";
+import type { ErgoBoxCandidate } from "./ergoBoxCandidate";
+import { ErgoUnsignedTransactionChain } from "./ergoUnsignedTransactionChain";
 
 type TransactionType<T> = T extends "default"
   ? UnsignedTransaction
   : EIP12UnsignedTransaction;
 
-export class ErgoUnsignedTransaction {
-  private readonly _inputs!: ReadOnlyInputs;
-  private readonly _dataInputs!: ReadOnlyInputs;
-  private readonly _outputs!: ReadOnlyOutputs;
+export type ChainCallback = (
+  child: TransactionBuilder,
+  parent: ErgoUnsignedTransaction
+) => TransactionBuilder | ErgoUnsignedTransaction | ErgoUnsignedTransactionChain;
 
-  constructor(inputs: Input[], dataInputs: Input[], outputs: Output[]) {
-    this._inputs = Object.freeze(inputs);
-    this._dataInputs = Object.freeze(dataInputs);
-    this._outputs = Object.freeze(outputs);
+export class ErgoUnsignedTransaction {
+  readonly #inputs: ErgoUnsignedInput[];
+  readonly #dataInputs: ErgoUnsignedInput[];
+  readonly #outputCandidates: ErgoBoxCandidate[];
+
+  #child?: ErgoUnsignedTransaction;
+  #outputs?: ErgoBox[];
+  #change?: ErgoBox[];
+  #id?: string;
+  #builder?: TransactionBuilder;
+
+  constructor(
+    inputs: ErgoUnsignedInput[],
+    dataInputs: ErgoUnsignedInput[],
+    outputs: ErgoBoxCandidate[],
+    builder?: TransactionBuilder
+  ) {
+    this.#inputs = inputs;
+    this.#dataInputs = dataInputs;
+    this.#outputCandidates = outputs;
+    this.#builder = builder;
   }
 
   get id(): string {
-    return hex.encode(blake2b256(this.toBytes()));
+    if (!this.#id) {
+      this.#id = hex.encode(blake2b256(this.toBytes()));
+    }
+
+    return this.#id;
   }
 
-  get inputs(): ReadOnlyInputs {
-    return this._inputs;
+  get inputs(): ErgoUnsignedInput[] {
+    return this.#inputs;
   }
 
-  get dataInputs(): ReadOnlyInputs {
-    return this._dataInputs;
+  get dataInputs(): ErgoUnsignedInput[] {
+    return this.#dataInputs;
   }
 
-  get outputs(): ReadOnlyOutputs {
-    return this._outputs;
+  get outputs(): ErgoBox[] {
+    if (!this.#outputs) {
+      this.#outputs = this.#outputCandidates.map((x, i) => x.toBox(this.id, i));
+    }
+
+    return this.#outputs;
+  }
+
+  get change(): ErgoBox[] {
+    if (!this.#change) {
+      this.#change = this.outputs.filter((x) => x.change);
+    }
+
+    return this.#change;
   }
 
   get burning(): BoxSummary {
-    const diff = utxoDiff(utxoSum(this.inputs), utxoSum(this.outputs));
+    const diff = utxoDiff(utxoSum(this.inputs), utxoSum(this.#outputCandidates));
     if (diff.tokens.length > 0) {
       diff.tokens = diff.tokens.filter((x) => x.tokenId !== this.inputs[0].boxId);
     }
@@ -56,17 +88,43 @@ export class ErgoUnsignedTransaction {
     return diff;
   }
 
+  get child(): ErgoUnsignedTransaction | undefined {
+    return this.#child;
+  }
+
+  chain(callback: ChainCallback): ErgoUnsignedTransactionChain {
+    if (!this.#builder) {
+      throw new FleetError(
+        "Cannot chain transactions without a parent TransactionBuilder"
+      );
+    }
+
+    const height = this.#builder.creationHeight;
+    const builder = new TransactionBuilder(height).from(this.change);
+    if (this.#builder.fee) builder.payFee(this.#builder.fee);
+    if (this.#builder.changeAddress) builder.sendChangeTo(this.#builder.changeAddress);
+
+    const response = callback(builder, this);
+    if (response instanceof TransactionBuilder) {
+      this.#child = response.build();
+    } else if (response instanceof ErgoUnsignedTransactionChain) {
+      this.#child = response.first();
+    } else {
+      this.#child = response;
+    }
+
+    return new ErgoUnsignedTransactionChain(this);
+  }
+
   toPlainObject(): UnsignedTransaction;
-  toPlainObject<T extends BuildOutputType>(outputType: T): TransactionType<T>;
-  toPlainObject<T extends BuildOutputType>(outputType?: T): TransactionType<T> {
+  toPlainObject<T extends PlainObjectType>(type: T): TransactionType<T>;
+  toPlainObject<T extends PlainObjectType>(type?: T): TransactionType<T> {
     return {
-      inputs: this.inputs.map((input) =>
-        input.toUnsignedInputObject(outputType || "default")
-      ),
+      inputs: this.inputs.map((input) => input.toPlainObject(type ?? "minimal")),
       dataInputs: this.dataInputs.map((input) =>
-        input.toPlainObject(outputType || "default")
+        input.toDataInputPlainObject(type ?? "minimal")
       ),
-      outputs: this.outputs.map((output) => _stringifyBoxAmounts(output))
+      outputs: this.#outputCandidates.map((output) => output.toPlainObject())
     } as TransactionType<T>;
   }
 
@@ -76,20 +134,9 @@ export class ErgoUnsignedTransaction {
 
   toBytes(): Uint8Array {
     return serializeTransaction({
-      inputs: this.inputs.map((input) => input.toUnsignedInputObject("default")),
-      dataInputs: this.dataInputs.map((input) => input.toPlainObject("default")),
-      outputs: this.outputs
+      inputs: this.inputs,
+      dataInputs: this.dataInputs,
+      outputs: this.#outputCandidates
     }).toBytes();
   }
-}
-
-function _stringifyBoxAmounts<T>(output: BoxCandidate<bigint>): T {
-  return {
-    ...output,
-    value: output.value.toString(),
-    assets: output.assets.map((token) => ({
-      tokenId: token.tokenId,
-      amount: token.amount.toString()
-    }))
-  } as T;
 }
