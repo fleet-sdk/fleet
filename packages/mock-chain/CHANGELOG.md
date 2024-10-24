@@ -1,5 +1,13 @@
 # @fleet-sdk/mock-chain
 
+## 0.8.0
+
+### Patch Changes
+
+- Updated dependencies [9f8b5ee]
+  - @fleet-sdk/core@0.8.0
+  - @fleet-sdk/wallet@0.8.0
+
 ## 0.7.0
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @fleet-sdk/core
 
+## 0.8.0
+
+### Minor Changes
+
+- 9f8b5ee: Add transaction chain building
+
 ## 0.7.0
 
 ### Minor Changes
