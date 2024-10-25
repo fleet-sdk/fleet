@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      run: pnpx pkg-pr-new publish './packages/*' './plugins/*' --no-template --pnpm --compact
+      - run: pnpx pkg-pr-new publish './packages/*' './plugins/*' --no-template --pnpm --compact
 
   build-and-test-bun:
     name: "[bun] build and test"
