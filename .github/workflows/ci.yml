@@ -75,17 +75,6 @@ jobs:
       - run: pnpm -r build
       - run: pnpm run test:unit
 
-  publish-preview:
-    name: "Publish preview"
-    runs-on: ubuntu-latest
-    needs: build-and-test-node
-    if: success()
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-    steps:
-      - run: pnpx pkg-pr-new publish './packages/*' './plugins/*' --no-template --pnpm --compact
-
   build-and-test-bun:
     name: "[bun] build and test"
     runs-on: ubuntu-latest
@@ -137,3 +126,35 @@ jobs:
 
       - name: Test using edge-runtime
         run: pnpm run test:unit-edge
+
+  publish-preview:
+    name: "Publish preview"
+    runs-on: ubuntu-latest
+    needs: build-and-test-node
+    if: success()
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Enable corepack
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm -r build
+
+      - name: Publish
+        run: pnpx pkg-pr-new publish './packages/*' './plugins/*' --no-template --pnpm --compact
