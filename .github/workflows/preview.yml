@@ -15,11 +15,12 @@ jobs:
       - name: Checkout code
       - uses: actions/checkout@v4
 
+      - name: Setup pnpm
       - uses: pnpm/action-setup@v2
         with:
           version: 9
 
-      - name: corepack enable
+      - name: Enable corepack
       - uses: actions/setup-node@v3
         with:
           node-version: 20
@@ -31,4 +32,5 @@ jobs:
       - name: Build
         run: pnpm -r build
 
+      - name: Publish
       - run: pnpx pkg-pr-new publish './packages/*' './plugins/*' --no-template --pnpm
