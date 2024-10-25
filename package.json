@@ -1,6 +1,6 @@
 {
   "private": "true",
-  "repository": "fleet-sdk/fleet",
+  "repository": "github:fleet-sdk/fleet",
   "license": "MIT",
   "type": "module",
   "scripts": {

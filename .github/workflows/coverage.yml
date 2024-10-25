@@ -1,24 +1,26 @@
 name: Coverage
 
 on:
-  push:
-    branches: ["master"]
   pull_request:
-    branches: ["master"]
+  push:
+    branches:
+      - "master"
+    tags:
+      - "!**"
 
 jobs:
   coverage:
     name: Check and submit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
       - name: Collect coverage
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "pnpm"
@@ -28,7 +30,7 @@ jobs:
 
       - name: Submit report
         if: success() || failure()
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/coverage-final.json
