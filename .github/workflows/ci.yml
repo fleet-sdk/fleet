@@ -75,6 +75,17 @@ jobs:
       - run: pnpm -r build
       - run: pnpm run test:unit
 
+  publish-preview:
+    name: "Publish preview"
+    runs-on: ubuntu-latest
+    needs: build-and-test-node
+    if: success()
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+    steps:
+      run: pnpx pkg-pr-new publish './packages/*' './plugins/*' --no-template --pnpm --compact
+
   build-and-test-bun:
     name: "[bun] build and test"
     runs-on: ubuntu-latest

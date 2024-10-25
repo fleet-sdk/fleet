@@ -1,9 +1,9 @@
 name: Release
 
-on:
-  push:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - master
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
