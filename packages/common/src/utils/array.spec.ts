@@ -158,6 +158,10 @@ describe("Chunk arrays", () => {
     expect(chunk(array, 10)).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]);
     expect(chunk(array, 20)).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]);
   });
+
+  it("Should return empty array if the input is empty", () => {
+    expect(chunk([], 2)).toEqual([]);
+  });
 });
 
 describe("Array ordering", () => {
