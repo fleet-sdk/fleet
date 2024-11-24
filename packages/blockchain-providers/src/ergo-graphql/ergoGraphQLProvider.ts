@@ -351,15 +351,18 @@ function buildGqlBoxQueries(query: GraphQLBoxQuery & SkipAndTake) {
     ].flat()
   );
 
-  return chunk(ergoTrees, MAX_ARGS).map((chunk) => ({
+  const baseQuery = {
     spent: false,
     boxIds: query.where.boxId ? [query.where.boxId] : undefined,
-    ergoTrees: chunk,
     ergoTreeTemplateHash: query.where.templateHash,
     tokenId: query.where.tokenId,
     skip: query.skip ?? 0,
     take: query.take ?? PAGE_SIZE
-  }));
+  };
+
+  return isEmpty(ergoTrees)
+    ? [baseQuery]
+    : chunk(ergoTrees, MAX_ARGS).map((chunk) => ({ ergoTrees: chunk, ...baseQuery }));
 }
 
 function buildGqlUnconfirmedTxQueries(
@@ -376,12 +379,18 @@ function buildGqlUnconfirmedTxQueries(
     ].flat()
   );
 
-  return chunk(addresses, MAX_ARGS).map((chunk) => ({
-    addresses: chunk.length ? chunk : undefined,
+  const baseQuery = {
     transactionIds: query.where.transactionId ? [query.where.transactionId] : undefined,
     skip: query.skip ?? 0,
     take: query.take ?? PAGE_SIZE
-  }));
+  };
+
+  return isEmpty(addresses)
+    ? [baseQuery]
+    : chunk(addresses, MAX_ARGS).map((chunk) => ({
+        addresses: chunk.length ? chunk : undefined,
+        ...baseQuery
+      }));
 }
 
 function buildGqlConfirmedTxQueries(
