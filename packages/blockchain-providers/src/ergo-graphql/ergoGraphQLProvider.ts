@@ -387,10 +387,7 @@ function buildGqlUnconfirmedTxQueries(
 
   return isEmpty(addresses)
     ? [baseQuery]
-    : chunk(addresses, MAX_ARGS).map((chunk) => ({
-        addresses: chunk.length ? chunk : undefined,
-        ...baseQuery
-      }));
+    : chunk(addresses, MAX_ARGS).map((chunk) => ({ addresses: chunk, ...baseQuery }));
 }
 
 function buildGqlConfirmedTxQueries(
@@ -398,8 +395,8 @@ function buildGqlConfirmedTxQueries(
 ) {
   return buildGqlUnconfirmedTxQueries(
     query as TransactionQuery<GraphQLUnconfirmedTransactionWhere>
-  ).map((q) => ({
-    ...q,
+  ).map((baseQuery) => ({
+    ...baseQuery,
     headerId: query.where.headerId,
     minHeight: query.where.minHeight,
     onlyRelevantOutputs: query.where.onlyRelevantOutputs
