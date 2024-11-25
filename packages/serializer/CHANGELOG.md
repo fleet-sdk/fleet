@@ -1,5 +1,15 @@
 # @fleet-sdk/serializer
 
+## 0.8.0
+
+### Patch Changes
+
+- a47a5fd: Fix types for nested `SColl[SBytes]` creation.
+- Updated dependencies [36adc61]
+- Updated dependencies [b2ce7aa]
+  - @fleet-sdk/common@0.8.0
+  - @fleet-sdk/crypto@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

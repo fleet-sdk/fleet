@@ -1,5 +1,20 @@
 # @fleet-sdk/mock-chain
 
+## 0.8.0
+
+### Patch Changes
+
+- b2ce7aa: Upgrade external dependencies
+- Updated dependencies [9f8b5ee]
+- Updated dependencies [a47a5fd]
+- Updated dependencies [36adc61]
+- Updated dependencies [b2ce7aa]
+  - @fleet-sdk/core@0.8.0
+  - @fleet-sdk/serializer@0.8.0
+  - @fleet-sdk/common@0.8.0
+  - @fleet-sdk/crypto@0.8.0
+  - @fleet-sdk/wallet@0.8.0
+
 ## 0.7.0
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.8.0
+
+### Patch Changes
+
+- Updated dependencies [9f8b5ee]
+- Updated dependencies [36adc61]
+  - @fleet-sdk/core@0.8.0
+  - @fleet-sdk/common@0.8.0
+
 ## 0.7.0
 
 ### Patch Changes

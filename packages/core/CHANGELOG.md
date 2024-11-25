@@ -1,5 +1,20 @@
 # @fleet-sdk/core
 
+## 0.8.0
+
+### Minor Changes
+
+- 9f8b5ee: Add transaction chain building
+
+### Patch Changes
+
+- Updated dependencies [a47a5fd]
+- Updated dependencies [36adc61]
+- Updated dependencies [b2ce7aa]
+  - @fleet-sdk/serializer@0.8.0
+  - @fleet-sdk/common@0.8.0
+  - @fleet-sdk/crypto@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

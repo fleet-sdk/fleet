@@ -1,5 +1,13 @@
 # @fleet-sdk/crypto
 
+## 0.8.0
+
+### Patch Changes
+
+- b2ce7aa: Upgrade external dependencies
+- Updated dependencies [36adc61]
+  - @fleet-sdk/common@0.8.0
+
 ## 0.6.4
 
 ### Patch Changes
