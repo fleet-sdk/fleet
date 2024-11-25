@@ -124,6 +124,12 @@ describe("Constructor proxies types", () => {
         [false, false]
       ]).data
     ).toMatchTypeOf<boolean[][]>();
+    expectTypeOf(
+      SColl(SColl(SByte), [Uint8Array.from([1, 2, 3]), Uint8Array.from([4, 5, 6])]).data
+    ).toMatchTypeOf<Uint8Array[]>();
+    expectTypeOf(SColl(SColl(SByte), ["deadbeef", "cafe"]).data).toMatchTypeOf<
+      Uint8Array[]
+    >();
 
     expectTypeOf(SPair(SInt(1), SBool(false)).data).toMatchTypeOf<[number, boolean]>();
     expectTypeOf(SPair(SBool(true), SInt(1)).data).toMatchTypeOf<[boolean, number]>();
