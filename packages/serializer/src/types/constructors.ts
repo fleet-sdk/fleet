@@ -112,11 +112,16 @@ type SUnit = (value?: undefined) => SConstant<undefined, SUnitType>;
 export const SUnit: SUnit = monoProxy(SUnitType, undefined, true);
 
 type SColl = {
-  <D, T extends SType>(type: SConstructor<D, T>): SConstructor<D[], T>;
   <D, T extends SByteType>(
     type: SConstructor<D, T>,
     elements: ByteInput | D[]
   ): SConstant<Uint8Array, T>;
+  <D, T extends SByteType>(
+    type: SConstructor<D, T>,
+    elements: ByteInput[]
+  ): SConstant<Uint8Array[], T>;
+
+  <D, T extends SType>(type: SConstructor<D, T>): SConstructor<D[], T>;
   <D, T extends SType>(type: SConstructor<D, T>, elements: D[]): SConstant<D[], T>;
 };
 
