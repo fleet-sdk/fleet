@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.8.0
+
+### Patch Changes
+
+- 36adc61: Fix `chunk` when passing an empty input array.
+
 ## 0.6.4
 
 ### Patch Changes
