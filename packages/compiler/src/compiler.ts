@@ -15,15 +15,43 @@ import {
 } from "sigmastate-js/main";
 import { CompilerOutput } from "./compilerOutput";
 
+export type NamedConstantsMap = {
+  [key: string]: string | Value | SConstant;
+};
+
 type CompilerOptionsBase = {
+  /**
+   * Optional version number of the ErgoTree output.
+   * @default 1
+   */
   version?: number;
+
+  /**
+   * Map of named constants.
+   * @default {}
+   */
   map?: NamedConstantsMap;
+
+  /**
+   * Segregate Sigma constants in the ErgoTree output.
+   * @default true
+   */
   segregateConstants?: boolean;
+
+  /**
+   * Network type, either "mainnet" or "testnet".
+   * @default "mainnet"
+   */
   network?: "mainnet" | "testnet";
 };
 
 export type CompilerOptionsForErgoTreeV0 = CompilerOptionsBase & {
   version?: 0;
+
+  /**
+   * Include size in the ErgoTree header.
+   * @default false
+   */
   includeSize?: boolean;
 };
 
@@ -33,10 +61,6 @@ export type CompilerOptionsForErgoTreeV1 = CompilerOptionsBase & {
 
 export type CompilerOptions = CompilerOptionsForErgoTreeV0 | CompilerOptionsForErgoTreeV1;
 
-export type NamedConstantsMap = {
-  [key: string]: string | Value | SConstant;
-};
-
 export const compilerDefaults: Required<CompilerOptions> = {
   version: 1,
   map: {},
@@ -44,6 +68,13 @@ export const compilerDefaults: Required<CompilerOptions> = {
   network: "mainnet"
 };
 
+/**
+ * Compiles a given ErgoScript with specified compiler options.
+ *
+ * @param script - The script to be compiled.
+ * @param options - Optional compiler options to customize the compilation process.
+ * @returns The output of the compilation process.
+ */
 export function compile(script: string, options?: CompilerOptions): CompilerOutput {
   const opt = ensureDefaults(options, compilerDefaults);
   assert(opt.version < 8, `Version should be lower than 8, got ${opt.version}`);
