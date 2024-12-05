@@ -3,7 +3,8 @@ import {
   ensureDefaults,
   ergoTreeHeaderFlags,
   isEmpty,
-  isHex
+  isHex,
+  Network
 } from "@fleet-sdk/common";
 import { SConstant } from "@fleet-sdk/serializer";
 import {
@@ -62,7 +63,10 @@ export function compile(script: string, options?: CompilerOptions): CompilerOutp
     script
   );
 
-  return new CompilerOutput(tree);
+  return new CompilerOutput(
+    tree,
+    opt.network === "mainnet" ? Network.Mainnet : Network.Testnet
+  );
 }
 
 export function parseNamedConstantsMap(

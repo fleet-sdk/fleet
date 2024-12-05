@@ -1,27 +1,27 @@
-import { ErgoTree } from "@fleet-sdk/core";
+import { ErgoTree, type Network } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import type { ErgoTree as SigmaErgoTree, Value as SigmaValue } from "sigmastate-js/main";
 import { ContractTemplate } from "./contractTemplate";
 
 export class CompilerOutput extends ErgoTree {
-  private readonly _tree: SigmaErgoTree;
-  private _template?: ContractTemplate;
+  readonly #tree: SigmaErgoTree;
+  #template?: ContractTemplate;
 
-  constructor(tree: SigmaErgoTree) {
-    super(hex.decode(tree.toHex()));
-    this._tree = tree;
+  constructor(tree: SigmaErgoTree, network?: Network) {
+    super(hex.decode(tree.toHex()), network);
+    this.#tree = tree;
   }
 
   get template(): ContractTemplate {
-    if (!this._template) {
-      const templateBytes = hex.decode(this._tree.templateHex());
-      this._template = new ContractTemplate(templateBytes);
+    if (!this.#template) {
+      const templateBytes = hex.decode(this.#tree.templateHex());
+      this.#template = new ContractTemplate(templateBytes);
     }
 
-    return this._template;
+    return this.#template;
   }
 
   get constants(): SigmaValue[] {
-    return this._tree.constants();
+    return this.#tree.constants();
   }
 }
