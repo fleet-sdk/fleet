@@ -107,7 +107,21 @@ describe("ErgoScript Compiler", () => {
     }
   });
 
-  it("Should use default if not compiler options is set", () => {
+  it("Should compile for testnet", () => {
+    const testnetScript = 'PK("3WzH5yEJongYHmBJnoMs3zeK3t3fouMi3pigKdEURWcD61pU6Eve")';
+    expect(() => compile(testnetScript, { network: "testnet" })).not.to.throw();
+  });
+
+  it("Should compile for mainnet", () => {
+    const mainnetScript = 'PK("9f3iPJTiciBYA6DnTeGy98CvrwyEhiP7wNrhDrQ1QeKPRhTmaqQ")';
+
+    // should default to mainnet
+    expect(() => compile(mainnetScript)).not.to.throw();
+    // explicitly set mainnet
+    expect(() => compile(mainnetScript, { network: "mainnet" })).not.to.throw();
+  });
+
+  it("Should use default if no compiler options is set", () => {
     const { version, segregateConstants } = compilerDefaults;
 
     const tree = compile("sigmaProp(HEIGHT > 100)");
