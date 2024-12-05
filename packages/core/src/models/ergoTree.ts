@@ -1,22 +1,30 @@
-import { ergoTreeHeaderFlags, type HexString, Network } from "@fleet-sdk/common";
+import {
+  ergoTreeHeaderFlags,
+  Network,
+  type Base58String,
+  type HexString
+} from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { ErgoAddress } from "./ergoAddress";
 
 const VERSION_MASK = 0x07;
 
 export class ErgoTree {
-  private _bytes: Uint8Array;
+  #bytes: Uint8Array;
+  #network: Network;
 
-  constructor(input: HexString | Uint8Array) {
+  constructor(input: HexString | Uint8Array, network?: Network) {
     if (typeof input === "string") {
-      this._bytes = hex.decode(input);
+      this.#bytes = hex.decode(input);
     } else {
-      this._bytes = input;
+      this.#bytes = input;
     }
+
+    this.#network = network ?? Network.Mainnet;
   }
 
   get header(): number {
-    return this._bytes[0];
+    return this.#bytes[0];
   }
 
   get version(): number {
@@ -32,14 +40,18 @@ export class ErgoTree {
   }
 
   toBytes(): Uint8Array {
-    return this._bytes;
+    return this.#bytes;
   }
 
   toHex(): HexString {
     return hex.encode(this.toBytes());
   }
 
-  toAddress(network = Network.Mainnet): ErgoAddress {
-    return ErgoAddress.fromErgoTree(this.toHex(), network);
+  toAddress(network?: Network): ErgoAddress {
+    return ErgoAddress.fromErgoTree(this.toHex(), network ?? this.#network);
+  }
+
+  encode(network?: Network): Base58String {
+    return this.toAddress(network).encode();
   }
 }
