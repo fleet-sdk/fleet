@@ -28,7 +28,6 @@ type CompilerOptionsBase = {
 
   /**
    * Map of named constants.
-   * @default {}
    */
   map?: NamedConstantsMap;
 
