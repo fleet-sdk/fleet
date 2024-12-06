@@ -1,6 +1,8 @@
 import { hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
 import { ErgoTree } from "./ergoTree";
+import { Network } from "@fleet-sdk/common";
+import { ErgoAddress } from "./ergoAddress";
 
 describe("ErgoTree model", () => {
   test.each([
@@ -54,5 +56,57 @@ describe("ErgoTree model", () => {
     const treeHex = "100104c801d191a37300";
     const tree = new ErgoTree(treeHex);
     expect(tree.toAddress().ergoTree).to.be.equal(treeHex);
+  });
+});
+
+describe("Encoding", () => {
+  const treeHex = "100104c801d191a37300";
+
+  it("Should default to mainnet", () => {
+    const tree = new ErgoTree(treeHex);
+    expect(tree.toAddress().network).to.be.equal(Network.Mainnet);
+  });
+
+  it("Should override encoding network from constructor params", () => {
+    const mainnetTree = new ErgoTree(treeHex, Network.Mainnet);
+    expect(mainnetTree.toAddress().network).to.be.equal(Network.Mainnet);
+
+    const testnetTree = new ErgoTree(treeHex, Network.Testnet);
+    expect(testnetTree.toAddress().network).to.be.equal(Network.Testnet);
+  });
+
+  it("Should explicitly encode for testnet", () => {
+    const tree = new ErgoTree(treeHex);
+    expect(tree.toAddress(Network.Testnet).network).to.be.equal(Network.Testnet);
+  });
+
+  it("Should explicitly encode for mainnet", () => {
+    const tree = new ErgoTree(treeHex);
+    expect(tree.toAddress(Network.Mainnet).network).to.be.equal(Network.Mainnet);
+  });
+
+  it("Should explicitly encode for a network despite of constructor params", () => {
+    const tree1 = new ErgoTree(treeHex, Network.Mainnet);
+    expect(tree1.toAddress(Network.Testnet).network).to.be.equal(Network.Testnet);
+
+    const tree2 = new ErgoTree(treeHex, Network.Testnet);
+    expect(tree2.toAddress(Network.Mainnet).network).to.be.equal(Network.Mainnet);
+  });
+
+  it("Should encode to Base58 string", () => {
+    // should default to mainnet
+    expect(ErgoAddress.decode(new ErgoTree(treeHex).encode()).network).to.be.equal(
+      Network.Mainnet
+    );
+
+    // should encode for testnet
+    expect(
+      ErgoAddress.decode(new ErgoTree(treeHex).encode(Network.Testnet)).network
+    ).to.be.equal(Network.Testnet);
+
+    // should override encoding network from constructor params
+    expect(
+      ErgoAddress.decode(new ErgoTree(treeHex, Network.Testnet).encode()).network
+    ).to.be.equal(Network.Testnet);
   });
 });

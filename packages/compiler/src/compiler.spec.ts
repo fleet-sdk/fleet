@@ -8,6 +8,7 @@ import {
   type CompilerOptions,
   parseNamedConstantsMap
 } from "./compiler";
+import { ErgoAddress, Network } from "@fleet-sdk/core";
 
 const compilerTestVectors: {
   name: string;
@@ -107,7 +108,29 @@ describe("ErgoScript Compiler", () => {
     }
   });
 
-  it("Should use default if not compiler options is set", () => {
+  const testnetScript = 'PK("3WzH5yEJongYHmBJnoMs3zeK3t3fouMi3pigKdEURWcD61pU6Eve")';
+  const mainnetScript = 'PK("9f3iPJTiciBYA6DnTeGy98CvrwyEhiP7wNrhDrQ1QeKPRhTmaqQ")';
+
+  it("Should compile for testnet", () => {
+    expect(() => compile(testnetScript, { network: "testnet" })).not.to.throw();
+  });
+
+  it("should override network from compiler options", () => {
+    const testnetTree = compile(testnetScript, { network: "testnet" });
+    expect(ErgoAddress.decode(testnetTree.encode()).network).to.be.equal(Network.Testnet);
+
+    const mainnetTree = compile(mainnetScript, { network: "mainnet" });
+    expect(ErgoAddress.decode(mainnetTree.encode()).network).to.be.equal(Network.Mainnet);
+  });
+
+  it("Should compile for mainnet", () => {
+    // should default to mainnet
+    expect(() => compile(mainnetScript)).not.to.throw();
+    // explicitly set mainnet
+    expect(() => compile(mainnetScript, { network: "mainnet" })).not.to.throw();
+  });
+
+  it("Should use default if no compiler options is set", () => {
     const { version, segregateConstants } = compilerDefaults;
 
     const tree = compile("sigmaProp(HEIGHT > 100)");
