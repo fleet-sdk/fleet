@@ -1,5 +1,12 @@
 # @fleet-sdk/core
 
+## 0.8.1
+
+### Patch Changes
+
+- c0a3d35: Override ErgoTree encoding network from constructor params
+- c0a3d35: Add `ErgoTree.encode()` method
+
 ## 0.8.0
 
 ### Minor Changes

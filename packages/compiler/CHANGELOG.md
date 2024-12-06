@@ -1,5 +1,14 @@
 # @fleet-sdk/compiler
 
+## 0.8.1
+
+### Patch Changes
+
+- 8ccb516: Add `network` flag to compiler options
+- Updated dependencies [c0a3d35]
+- Updated dependencies [c0a3d35]
+  - @fleet-sdk/core@0.8.1
+
 ## 0.8.0
 
 ### Patch Changes

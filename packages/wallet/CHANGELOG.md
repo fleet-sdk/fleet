@@ -1,5 +1,13 @@
 # @fleet-sdk/wallet
 
+## 0.8.1
+
+### Patch Changes
+
+- Updated dependencies [c0a3d35]
+- Updated dependencies [c0a3d35]
+  - @fleet-sdk/core@0.8.1
+
 ## 0.8.0
 
 ### Patch Changes
