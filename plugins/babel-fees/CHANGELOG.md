@@ -1,5 +1,13 @@
 # @fleet-sdk/babel-fees-plugin
 
+## 0.1.18
+
+### Patch Changes
+
+- Updated dependencies [c0a3d35]
+- Updated dependencies [c0a3d35]
+  - @fleet-sdk/core@0.8.1
+
 ## 0.1.17
 
 ### Patch Changes
