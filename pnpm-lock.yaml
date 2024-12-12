@@ -15,8 +15,8 @@ importers:
         specifier: ^2.27.10
         version: 2.27.10
       '@edge-runtime/vm':
-        specifier: ^4.0.4
-        version: 4.0.4
+        specifier: ^5.0.0
+        version: 5.0.0
       '@fleet-sdk/common':
         specifier: workspace:^
         version: link:packages/common
@@ -24,11 +24,11 @@ importers:
         specifier: workspace:^
         version: link:packages/crypto
       '@types/diff':
-        specifier: ^5.2.3
-        version: 5.2.3
+        specifier: ^6.0.0
+        version: 6.0.0
       '@vitest/coverage-v8':
         specifier: ^2.1.8
-        version: 2.1.8(vitest@2.1.8(@edge-runtime/vm@4.0.4)(@types/node@20.9.0)(happy-dom@15.11.7))
+        version: 2.1.8(vitest@2.1.8(@edge-runtime/vm@5.0.0)(@types/node@20.9.0)(happy-dom@15.11.7))
       ergo-lib-wasm-nodejs:
         specifier: ^0.28.0
         version: 0.28.0
@@ -61,7 +61,7 @@ importers:
         version: 5.1.4(typescript@5.7.2)(vite@5.4.11(@types/node@20.9.0))
       vitest:
         specifier: ^2.1.8
-        version: 2.1.8(@edge-runtime/vm@4.0.4)(@types/node@20.9.0)(happy-dom@15.11.7)
+        version: 2.1.8(@edge-runtime/vm@5.0.0)(@types/node@20.9.0)(happy-dom@15.11.7)
 
   packages/blockchain-providers:
     dependencies:
@@ -346,13 +346,13 @@ packages:
   '@changesets/write@0.3.2':
     resolution: {integrity: sha512-kDxDrPNpUgsjDbWBvUo27PzKX4gqeKOlhibaOXDJA6kuBisGqNHv/HwGJrAu8U/dSf8ZEFIeHIPtvSlZI1kULw==}
 
-  '@edge-runtime/primitives@5.1.1':
-    resolution: {integrity: sha512-osrHE4ObQ3XFkvd1sGBLkheV2mcHUqJI/Bum2AWA0R3U78h9lif3xZAdl6eLD/XnW4xhsdwjPUejLusXbjvI4Q==}
-    engines: {node: '>=16'}
+  '@edge-runtime/primitives@6.0.0':
+    resolution: {integrity: sha512-FqoxaBT+prPBHBwE1WXS1ocnu/VLTQyZ6NMUBAdbP7N2hsFTTxMC/jMu2D/8GAlMQfxeuppcPuCUk/HO3fpIvA==}
+    engines: {node: '>=18'}
 
-  '@edge-runtime/vm@4.0.4':
-    resolution: {integrity: sha512-LqPw+yaSPpCNnVZl5XoHQAySEzlnZiC9gReUuQHMh9GI03KKqwpVqWkIK1UfK116Yww7f2WZuAgnY/nhHwTsJA==}
-    engines: {node: '>=16'}
+  '@edge-runtime/vm@5.0.0':
+    resolution: {integrity: sha512-NKBGBSIKUG584qrS1tyxVpX/AKJKQw5HgjYEnPLC0QsTw79JrGn+qUr8CXFb955Iy7GUdiiUv1rJ6JBGvaKb6w==}
+    engines: {node: '>=18'}
 
   '@ergo-graphql/types@0.5.1':
     resolution: {integrity: sha512-VAGIBOSdK+uSn0mMWAWLF78hCLP8DzDh1hXEVLvUNkOBxg/L53SIUo9PJc9JgkhL6z09ArqdehrpAuwHJpHptg==}
@@ -813,8 +813,8 @@ packages:
   '@tokenizer/token@0.3.0':
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
 
-  '@types/diff@5.2.3':
-    resolution: {integrity: sha512-K0Oqlrq3kQMaO2RhfrNQX5trmt+XLyom88zS0u84nnIcLvFnRUMRRHmrGny5GSM+kNO9IZLARsdQHDzkhAgmrQ==}
+  '@types/diff@6.0.0':
+    resolution: {integrity: sha512-dhVCYGv3ZSbzmQaBSagrv1WJ6rXCdkyTcDyoNu1MD8JohI7pR7k8wdZEm+mvdxRKXyHVwckFzWU1vJc+Z29MlA==}
 
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
@@ -2462,11 +2462,11 @@ snapshots:
       human-id: 1.0.2
       prettier: 2.8.8
 
-  '@edge-runtime/primitives@5.1.1': {}
+  '@edge-runtime/primitives@6.0.0': {}
 
-  '@edge-runtime/vm@4.0.4':
+  '@edge-runtime/vm@5.0.0':
     dependencies:
-      '@edge-runtime/primitives': 5.1.1
+      '@edge-runtime/primitives': 6.0.0
 
   '@ergo-graphql/types@0.5.1': {}
 
@@ -2754,7 +2754,7 @@ snapshots:
 
   '@tokenizer/token@0.3.0': {}
 
-  '@types/diff@5.2.3': {}
+  '@types/diff@6.0.0': {}
 
   '@types/estree@1.0.6': {}
 
@@ -2765,7 +2765,7 @@ snapshots:
       undici-types: 5.26.5
     optional: true
 
-  '@vitest/coverage-v8@2.1.8(vitest@2.1.8(@edge-runtime/vm@4.0.4)(@types/node@20.9.0)(happy-dom@15.11.7))':
+  '@vitest/coverage-v8@2.1.8(vitest@2.1.8(@edge-runtime/vm@5.0.0)(@types/node@20.9.0)(happy-dom@15.11.7))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -2779,7 +2779,7 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.1.8(@edge-runtime/vm@4.0.4)(@types/node@20.9.0)(happy-dom@15.11.7)
+      vitest: 2.1.8(@edge-runtime/vm@5.0.0)(@types/node@20.9.0)(happy-dom@15.11.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -4237,7 +4237,7 @@ snapshots:
       '@types/node': 20.9.0
       fsevents: 2.3.3
 
-  vitest@2.1.8(@edge-runtime/vm@4.0.4)(@types/node@20.9.0)(happy-dom@15.11.7):
+  vitest@2.1.8(@edge-runtime/vm@5.0.0)(@types/node@20.9.0)(happy-dom@15.11.7):
     dependencies:
       '@vitest/expect': 2.1.8
       '@vitest/mocker': 2.1.8(vite@5.4.11(@types/node@20.9.0))
@@ -4260,7 +4260,7 @@ snapshots:
       vite-node: 2.1.8(@types/node@20.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@edge-runtime/vm': 4.0.4
+      '@edge-runtime/vm': 5.0.0
       '@types/node': 20.9.0
       happy-dom: 15.11.7
     transitivePeerDependencies:

@@ -26,10 +26,10 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@changesets/cli": "^2.27.10",
-    "@edge-runtime/vm": "^4.0.4",
+    "@edge-runtime/vm": "^5.0.0",
     "@fleet-sdk/common": "workspace:^",
     "@fleet-sdk/crypto": "workspace:^",
-    "@types/diff": "^5.2.3",
+    "@types/diff": "^6.0.0",
     "@vitest/coverage-v8": "^2.1.8",
     "ergo-lib-wasm-nodejs": "^0.28.0",
     "fast-check": "^3.23.1",

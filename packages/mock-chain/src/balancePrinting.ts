@@ -24,7 +24,7 @@ export function stringifyBalance(
       metaName("nanoerg", metadata),
       metaAmount("nanoerg", balance.nanoergs, metadata),
       width
-    )
+    ),
   ];
 
   if (some(balance.tokens)) {
@@ -85,8 +85,8 @@ function log<T>(value: string, part: ArrayChange<T>) {
   const colored = part.added
     ? pc.green(`+ ${value}`)
     : part.removed
-      ? pc.red(`- ${value}`)
-      : pc.gray(`  ${value}`);
+    ? pc.red(`- ${value}`)
+    : pc.gray(`  ${value}`);
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log(colored);
