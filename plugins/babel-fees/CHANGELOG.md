@@ -1,5 +1,12 @@
 # @fleet-sdk/babel-fees-plugin
 
+## 0.1.19
+
+### Patch Changes
+
+- @fleet-sdk/core@0.8.2
+- @fleet-sdk/serializer@0.8.2
+
 ## 0.1.18
 
 ### Patch Changes
