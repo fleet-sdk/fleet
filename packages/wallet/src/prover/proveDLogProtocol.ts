@@ -31,7 +31,6 @@ export function sign(message: Uint8Array, secretKey: Uint8Array) {
   }
 
   // This branch is ignored in the coverage report because it depends on randomness.
-
   throw new FleetError("Failed to generate signature");
 }
 /* v8 ignore stop */
@@ -50,15 +49,15 @@ export function genSignature(
 ): undefined | Uint8Array {
   const sk = bigintBE.encode(secretKey);
   const pk = G.multiply(sk).toRawBytes();
-  const r = genRandomSecret();
-  const w = G.multiply(r).toRawBytes();
+  const k = genRandomSecret();
+  const w = G.multiply(k).toRawBytes();
   const c = fiatShamirHash(genCommitment(pk, w, message));
 
   // The next line is ignored in the coverage report because it depends on randomness.
   /* v8 ignore next */
   if (c === 0n) throw new FleetError("Failed to generate challenge");
 
-  const z = umod(sk * c + r, CURVE.n);
+  const z = umod(sk * c + k, CURVE.n);
   const signature = concatBytes(bigintBE.decode(c), bigintBE.decode(z));
 
   // The next line is ignored in the coverage report because it depends on randomness.
@@ -112,14 +111,14 @@ export function verify(message: Uint8Array, proof: Uint8Array, publicKey: Uint8A
   if (!proof || proof.length !== ERGO_SCHNORR_SIG_LEN) return false;
   if (!validateEcPoint(publicKey)) throw new FleetError("Invalid Public Key.");
 
-  const pc = bigintBE.encode(proof.slice(0, ERGO_SOUNDNESS_BYTES));
-  const pz = bigintBE.encode(proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN));
+  const c = bigintBE.encode(proof.slice(0, ERGO_SOUNDNESS_BYTES));
+  const z = bigintBE.encode(proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN));
 
-  const vt = ECPoint.fromHex(publicKey).multiply(CURVE.n - pc);
-  const vw = G.multiply(pz).add(vt).toRawBytes();
-  const vc = fiatShamirHash(genCommitment(publicKey, vw, message));
+  const t = ECPoint.fromHex(publicKey).multiply(CURVE.n - c);
+  const w = G.multiply(z).add(t).toRawBytes();
+  const c2 = fiatShamirHash(genCommitment(publicKey, w, message));
 
-  return vc === pc;
+  return c2 === c;
 }
 
 /**
