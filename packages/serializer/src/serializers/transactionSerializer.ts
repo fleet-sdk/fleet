@@ -1,7 +1,6 @@
 import {
   type Amount,
   type BoxCandidate,
-  type ContextExtension,
   type DataInput,
   isDefined,
   type UnsignedInput
@@ -46,24 +45,24 @@ function writeInput(writer: SigmaByteWriter, input: UnsignedInput): void {
   writeExtension(writer, input.extension);
 }
 
-function writeExtension(writer: SigmaByteWriter, extension: ContextExtension): void {
+function writeExtension(
+  writer: SigmaByteWriter,
+  extension: Record<string, string | undefined>
+): void {
   const keys = Object.keys(extension);
   let length = 0;
 
   for (const key of keys) {
-    const ext = extension[key as unknown as keyof ContextExtension];
-    if (isDefined(ext)) {
-      length++;
-    }
+    if (isDefined(extension[key])) length++;
   }
 
   writer.writeVLQ(length);
   if (length === 0) return;
 
   for (const key of keys) {
-    const ext = extension[key as unknown as keyof ContextExtension];
-    if (isDefined(ext)) {
-      writer.writeVLQ(Number(key)).writeHex(ext);
+    const val = extension[key];
+    if (isDefined(val)) {
+      writer.writeVLQ(Number(key)).writeHex(val);
     }
   }
 }
