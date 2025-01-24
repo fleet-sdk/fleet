@@ -3,9 +3,28 @@ import {
   zigZagDecode,
   zigZagDecodeBigInt,
   zigZagEncode,
-  zigZagEncodeBigInt
+  zigZagEncodeBigInt,
+  zigZag32
 } from "./zigZag";
 import fc from "fast-check";
+
+describe("ZigZag 32-bit codec", () => {
+  const tv = [
+    { input: 0, output: 0n },
+    { input: 2147483647, output: 18446744073709551614n }, // max i32 max
+    { input: -2147483648, output: 18446744073709551615n }, // min i32
+    { input: 1, output: 2n },
+    { input: -1, output: 1n }
+  ];
+
+  test.each(tv)("Should encode %i", (t) => {
+    expect(zigZag32.encode(t.input)).to.be.equal(t.output);
+  });
+
+  test.each(tv)("Should decode %i", (t) => {
+    expect(zigZag32.decode(t.output)).to.be.equal(t.input);
+  });
+});
 
 describe("ZigZag encoding", () => {
   it("Should encode", () => {

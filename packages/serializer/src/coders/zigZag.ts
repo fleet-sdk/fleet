@@ -15,8 +15,27 @@ import { _1n, _63n } from "@fleet-sdk/common";
  * @returns ZigZag-encoded value
  */
 export function zigZagEncode(input: number): number {
-  return (input << 1) ^ (input >> 63);
+  return (input << 1) ^ (input >> 31);
 }
+
+const u64 = (v: bigint) => BigInt.asUintN(64, v);
+// const i64 = (v: bigint) => BigInt.asIntN(64, v);
+const i32 = (v: bigint) => BigInt.asIntN(32, v);
+const u32 = (v: bigint) => BigInt.asUintN(32, v);
+
+/**
+ * 32-bit ZigZag encoding.
+ */
+export const zigZag32 = {
+  encode: (input: bigint | number): bigint => {
+    const v = i32(BigInt(input));
+    return u64(i32(v << 1n) ^ i32(v >> 31n));
+  },
+  decode: (input: bigint): number => {
+    const v = u32(input);
+    return Number((v >> 1n) ^ -(v & 1n));
+  }
+};
 
 /**
  * Decode a ZigZag-encoded value.

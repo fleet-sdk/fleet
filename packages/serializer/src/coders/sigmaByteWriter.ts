@@ -1,7 +1,7 @@
 import { blake2b256, type Coder, hex } from "@fleet-sdk/crypto";
 import { bigIntToHex } from "./bigint";
 import { writeBigVLQ, writeVLQ } from "./vlq";
-import { zigZagEncode, zigZagEncodeBigInt } from "./zigZag";
+import { zigZagEncode, zigZag32, zigZagEncodeBigInt } from "./zigZag";
 
 export class SigmaByteWriter {
   readonly #bytes: Uint8Array;
@@ -36,8 +36,7 @@ export class SigmaByteWriter {
   }
 
   public writeInt(value: number): SigmaByteWriter {
-    this.writeLong(BigInt(value));
-    return this;
+    return this.writeBigVLQ(zigZag32.encode(value));
   }
 
   public writeLong(value: bigint): SigmaByteWriter {
