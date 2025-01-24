@@ -52,7 +52,7 @@ export const intVectors: ConstantTestVector<number>[] = [
   { hex: "04800f", value: 960 },
   { hex: "04808008", value: 65536 },
   { hex: "04808023", value: 286720 },
-  { hex: "04feffffffffffffffff01", value: 2147483647 }, // int32 max
+  { hex: "04feffffffffffffffff01", value: 2147483647 } // int32 max
 ];
 
 export const longVectors: ConstantTestVector<bigint | string>[] = [
