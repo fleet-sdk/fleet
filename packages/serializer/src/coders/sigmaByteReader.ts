@@ -2,7 +2,8 @@ import { isEmpty } from "@fleet-sdk/common";
 import { type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { hexToBigInt } from "./bigint";
 import { readBigVLQ, readVLQ } from "./vlq";
-import { zigZagDecode, zigZagDecodeBigInt } from "./zigZag";
+import { zigZag32, zigZag64 } from "./zigZag";
+import { MAX_I8, MAX_U8 } from "./numRanges";
 
 export class SigmaByteReader {
   readonly #bytes: Uint8Array;
@@ -17,7 +18,7 @@ export class SigmaByteReader {
     this.#cursor = 0;
   }
 
-  public readBoolean(): boolean {
+  public readBool(): boolean {
     return this.readByte() === 0x01;
   }
 
@@ -52,19 +53,24 @@ export class SigmaByteReader {
     return readVLQ(this);
   }
 
-  public readShort(): number {
-    return Number(zigZagDecode(readVLQ(this)));
+  public readI8(): number {
+    const byte = this.readByte();
+    return byte > MAX_I8 ? byte - (MAX_U8 + 1) : byte;
   }
 
-  public readInt(): number {
-    return Number(this.readLong());
+  public readI16(): number {
+    return zigZag32.decode(readBigVLQ(this));
   }
 
-  public readLong(): bigint {
-    return zigZagDecodeBigInt(readBigVLQ(this));
+  public readI32(): number {
+    return zigZag32.decode(readBigVLQ(this));
   }
 
-  public readBigInt(): bigint {
+  public readI64(): bigint {
+    return zigZag64.decode(readBigVLQ(this));
+  }
+
+  public readI256(): bigint {
     const len = readVLQ(this);
     return hexToBigInt(hex.encode(this.readBytes(len)));
   }

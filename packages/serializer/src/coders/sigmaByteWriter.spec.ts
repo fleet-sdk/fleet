@@ -3,6 +3,16 @@ import { blake2b256, hex, sha256 } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
 import { MAX_CONSTANT_LENGTH } from "../sigmaConstant";
 import { SigmaByteWriter } from "./sigmaByteWriter";
+import {
+  MIN_I16,
+  MAX_I16,
+  MIN_I32,
+  MAX_I32,
+  MIN_I64,
+  MAX_I64,
+  MIN_I256,
+  MAX_I256
+} from "./numRanges";
 
 describe("Sigma Writer", () => {
   it("Should put a single byte at time", () => {
@@ -38,8 +48,8 @@ describe("Sigma Writer", () => {
 
   it("Should put a boolean", () => {
     const sigmaBuffer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
-    sigmaBuffer.writeBoolean(true);
-    sigmaBuffer.writeBoolean(false);
+    sigmaBuffer.writeBool(true);
+    sigmaBuffer.writeBool(false);
 
     expect(sigmaBuffer).toHaveLength(2);
     expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x01, 0x00]));
@@ -71,13 +81,37 @@ describe("Sigma Writer", () => {
 
     const all = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     for (const tv of testVectors) {
-      all.writeShort(tv.int);
-      expect(new SigmaByteWriter(tv.hex.length).writeShort(tv.int).encode(hex)).toBe(
+      all.writeI16(tv.int);
+      expect(new SigmaByteWriter(tv.hex.length).writeI16(tv.int).encode(hex)).toBe(
         tv.hex
       );
     }
 
     expect(all.encode(hex)).toEqual(testVectors.map((x) => x.hex).join(""));
+  });
+
+  it("Should fail for out of range values", () => {
+    const sigmaBuffer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
+
+    // Short
+    const i16Err = "out of range for a 16-bit integer";
+    expect(() => sigmaBuffer.writeI16(MIN_I16 - 1)).to.throw(i16Err);
+    expect(() => sigmaBuffer.writeI16(MAX_I16 + 1)).to.throw(i16Err);
+
+    // Int
+    const i32Err = "out of range for a 32-bit integer";
+    expect(() => sigmaBuffer.writeI32(MIN_I32 - 1)).to.throw(i32Err);
+    expect(() => sigmaBuffer.writeI32(MAX_I32 + 1)).to.throw(i32Err);
+
+    // Long
+    const i64Err = "out of range for a 64-bit integer";
+    expect(() => sigmaBuffer.writeI64(MIN_I64 - 1n)).to.throw(i64Err);
+    expect(() => sigmaBuffer.writeI64(MAX_I64 + 1n)).to.throw(i64Err);
+
+    // BigInt
+    const i256Err = "out of range for a 256-bit integer";
+    expect(() => sigmaBuffer.writeI256(MIN_I256 - 1n)).to.throw(i256Err);
+    expect(() => sigmaBuffer.writeI256(MAX_I256 + 1n)).to.throw(i256Err);
   });
 
   it("Should write a checksum based on the current stream content", () => {

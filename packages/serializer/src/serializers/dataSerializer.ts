@@ -12,17 +12,17 @@ export const dataSerializer = {
     if (type.embeddable) {
       switch (type.code) {
         case descriptors.bool.code:
-          return writer.writeBoolean(data as boolean);
+          return writer.writeBool(data as boolean);
         case descriptors.byte.code:
           return writer.write(data as number);
         case descriptors.short.code:
-          return writer.writeShort(data as number);
+          return writer.writeI16(data as number);
         case descriptors.int.code:
-          return writer.writeInt(data as number);
+          return writer.writeI32(data as number);
         case descriptors.long.code:
-          return writer.writeLong(data as bigint);
+          return writer.writeI64(data as bigint);
         case descriptors.bigInt.code:
-          return writer.writeBigInt(data as bigint);
+          return writer.writeI256(data as bigint);
         case descriptors.groupElement.code:
           return writer.writeBytes(data as Uint8Array);
         case descriptors.sigmaProp.code: {
@@ -90,17 +90,17 @@ export const dataSerializer = {
     if (type.embeddable) {
       switch (type.code) {
         case descriptors.bool.code:
-          return reader.readBoolean();
+          return reader.readBool();
         case descriptors.byte.code:
-          return reader.readByte();
+          return reader.readI8();
         case descriptors.short.code:
-          return reader.readShort();
+          return reader.readI16();
         case descriptors.int.code:
-          return reader.readInt();
+          return reader.readI32();
         case descriptors.long.code:
-          return reader.readLong();
+          return reader.readI64();
         case descriptors.bigInt.code:
-          return reader.readBigInt();
+          return reader.readI256();
         case descriptors.groupElement.code:
           return reader.readBytes(GROUP_ELEMENT_LENGTH);
         case descriptors.sigmaProp.code: {

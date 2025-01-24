@@ -1,5 +1,5 @@
 import { ensureBigInt } from "@fleet-sdk/common";
-import { hex, randomBytes, utf8 } from "@fleet-sdk/crypto";
+import { hex, randomBytes } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
 import {
   bigintVectors,
@@ -31,6 +31,20 @@ import {
   SUnit
 } from "./types/";
 import { STuple } from "./types/constructors";
+import { Value$ } from "sigmastate-js/main";
+import fc from "fast-check";
+import {
+  MAX_I16,
+  MAX_I256,
+  MAX_I32,
+  MAX_I64,
+  MAX_I8,
+  MIN_I16,
+  MIN_I256,
+  MIN_I32,
+  MIN_I64,
+  MIN_I8
+} from "./coders/numRanges";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
@@ -309,61 +323,53 @@ describe("Tuple serialization", () => {
 });
 
 describe("Positive fuzzy tests", () => {
-  function randomInt(min: number, max: number) {
-    const mn = Math.ceil(min);
-    const mx = Math.floor(max);
-    return Math.floor(Math.random() * (mx - mn + 1)) + mn;
-  }
-
-  function getRandomBigInt(bytes: number) {
-    return BigInt(`0x${hex.encode(randomBytes(bytes))}`);
-  }
-
-  function randomBigInt(min: bigint, max: bigint) {
-    // increase the chances of negative numbers generation;
-    const rand =
-      getRandomBigInt(1) % 2n === 0n ? getRandomBigInt(1) : getRandomBigInt(1) * -1n;
-
-    return (rand * (max - min + 1n) + min) / 10_000n;
-  }
-
-  // https://docs.scala-lang.org/overviews/scala-book/built-in-types.html
-
   test("SByte fuzzing", () => {
-    for (let i = 0; i < 100; i++) {
-      const value = randomInt(0, 127);
-      expect(SConstant.from(SByte(value).toHex()).data).toBe(value);
-    }
+    fc.assert(
+      fc.property(fc.integer({ min: MIN_I8, max: MAX_I8 }), (val) => {
+        const serialized = SByte(val).toHex();
+        expect(serialized).to.be.equal(Value$.ofByte(val).toHex()); // ensure compatibility with sigmastate-js
+        expect(SConstant.from(serialized).data).to.be.equal(val);
+      })
+    );
   });
 
   test("SShort fuzzing", () => {
-    for (let i = 0; i < 100; i++) {
-      const value = randomInt(-32_768, 32_767);
-      expect(SConstant.from(SShort(value).toHex()).data).toBe(value);
-    }
+    fc.assert(
+      fc.property(fc.integer({ min: MIN_I16, max: MAX_I16 }), (val) => {
+        const serialized = SShort(val).toHex();
+        expect(serialized).to.be.equal(Value$.ofShort(val).toHex()); // ensure compatibility with sigmastate-js
+        expect(SConstant.from(serialized).data).to.be.equal(val);
+      })
+    );
   });
 
   test("SInt fuzzing", () => {
-    for (let i = 0; i < 100; i++) {
-      const value = randomInt(-2_147_483_648, 2_147_483_647);
-      expect(SConstant.from(SInt(value).toHex()).data).toBe(value);
-    }
+    fc.assert(
+      fc.property(fc.integer({ min: MIN_I32, max: MAX_I32 }), (val) => {
+        const serialized = SInt(val).toHex();
+        expect(serialized).to.be.equal(Value$.ofInt(val).toHex()); // ensure compatibility with sigmastate-js
+        expect(SConstant.from(serialized).data).to.be.equal(val);
+      })
+    );
   });
 
   test("SLong fuzzing", () => {
-    for (let i = 0; i < 100; i++) {
-      const value = randomBigInt(-9_223_372_036_854_775_808n, 9_223_372_036_854_775_807n);
-      expect(SConstant.from(SLong(value).toHex()).data).toBe(value);
-    }
+    fc.assert(
+      fc.property(fc.bigInt({ min: MIN_I64, max: MAX_I64 }), (val) => {
+        const serialized = SLong(val).toHex();
+        expect(serialized).to.be.equal(Value$.ofLong(val).toHex()); // ensure compatibility with sigmastate-js
+        expect(SConstant.from(serialized).data).to.be.equal(val);
+      })
+    );
   });
 
   test("SBigInt fuzzing", () => {
-    for (let i = 0; i < 1000; i++) {
-      const value = randomBigInt(
-        -9_223_372_036_854_775_808_000n,
-        9_223_372_036_854_775_807_000n
-      );
-      expect(SConstant.from(SBigInt(value).toHex()).data).toBe(value);
-    }
+    fc.assert(
+      fc.property(fc.bigInt({ min: MIN_I256, max: MAX_I256 }), (val) => {
+        const serialized = SBigInt(val).toHex();
+        expect(serialized).to.be.equal(Value$.ofBigInt(val).toHex()); // ensure compatibility with sigmastate-js
+        expect(SConstant.from(serialized).data).to.be.equal(val);
+      })
+    );
   });
 });
