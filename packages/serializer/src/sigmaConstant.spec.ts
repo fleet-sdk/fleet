@@ -13,7 +13,15 @@ import {
   sigmaPropVectors,
   tupleTestVectors
 } from "./_test-vectors/constantVectors";
-import { SigmaByteWriter } from "./coders";
+import {
+  MAX_I16,
+  MAX_I32,
+  MAX_I64,
+  MIN_I16,
+  MIN_I32,
+  MIN_I64,
+  SigmaByteWriter
+} from "./coders";
 import { dataSerializer } from "./serializers";
 import { decode, parse, SConstant, stypeof } from "./sigmaConstant";
 import type { SGroupElementType } from "./types";
@@ -338,21 +346,21 @@ describe("Positive fuzzy tests", () => {
 
   test("SShort fuzzing", () => {
     for (let i = 0; i < 100; i++) {
-      const value = randomInt(-32_768, 32_767);
+      const value = randomInt(MIN_I16, MAX_I16);
       expect(SConstant.from(SShort(value).toHex()).data).toBe(value);
     }
   });
 
   test("SInt fuzzing", () => {
     for (let i = 0; i < 100; i++) {
-      const value = randomInt(-2_147_483_648, 2_147_483_647);
+      const value = randomInt(MIN_I32, MAX_I32);
       expect(SConstant.from(SInt(value).toHex()).data).toBe(value);
     }
   });
 
   test("SLong fuzzing", () => {
     for (let i = 0; i < 100; i++) {
-      const value = randomBigInt(-9_223_372_036_854_775_808n, 9_223_372_036_854_775_807n);
+      const value = randomBigInt(MIN_I64, MAX_I64);
       expect(SConstant.from(SLong(value).toHex()).data).toBe(value);
     }
   });

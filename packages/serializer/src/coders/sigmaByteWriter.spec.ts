@@ -2,7 +2,15 @@ import { concatBytes } from "@fleet-sdk/common";
 import { blake2b256, hex, sha256 } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
 import { MAX_CONSTANT_LENGTH } from "../sigmaConstant";
-import { SigmaByteWriter } from "./sigmaByteWriter";
+import {
+  MAX_I16,
+  MAX_I32,
+  MAX_I64,
+  MIN_I16,
+  MIN_I32,
+  MIN_I64,
+  SigmaByteWriter
+} from "./sigmaByteWriter";
 
 describe("Sigma Writer", () => {
   it("Should put a single byte at time", () => {
@@ -78,6 +86,25 @@ describe("Sigma Writer", () => {
     }
 
     expect(all.encode(hex)).toEqual(testVectors.map((x) => x.hex).join(""));
+  });
+
+  it("Should fail for out of range values", () => {
+    const sigmaBuffer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
+
+    // Short
+    const i16Err = "out of range for a 16-bit integer";
+    expect(() => sigmaBuffer.writeShort(MIN_I16 - 1)).to.throw(i16Err);
+    expect(() => sigmaBuffer.writeShort(MAX_I16 + 1)).to.throw(i16Err);
+
+    // Int
+    const i32Err = "out of range for a 32-bit integer";
+    expect(() => sigmaBuffer.writeInt(MIN_I32 - 1)).to.throw(i32Err);
+    expect(() => sigmaBuffer.writeInt(MAX_I32 + 1)).to.throw(i32Err);
+
+    // Long
+    const i64Err = "out of range for a 64-bit integer";
+    expect(() => sigmaBuffer.writeLong(MIN_I64 - 1n)).to.throw(i64Err);
+    expect(() => sigmaBuffer.writeLong(MAX_I64 + 1n)).to.throw(i64Err);
   });
 
   it("Should write a checksum based on the current stream content", () => {

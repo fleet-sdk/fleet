@@ -3,6 +3,15 @@ import { bigIntToHex } from "./bigint";
 import { writeBigVLQ, writeVLQ } from "./vlq";
 import { zigZagEncode, zigZag32, zigZagEncodeBigInt } from "./zigZag";
 
+export const MIN_I16 = -0x8000;
+export const MAX_I16 = 0x7fff;
+
+export const MIN_I32 = -0x80000000;
+export const MAX_I32 = 0x7fffffff;
+
+export const MIN_I64 = -BigInt("0x8000000000000000");
+export const MAX_I64 = BigInt("0x7fffffffffffffff");
+
 export class SigmaByteWriter {
   readonly #bytes: Uint8Array;
   #cursor: number;
@@ -31,15 +40,29 @@ export class SigmaByteWriter {
   }
 
   public writeShort(value: number): SigmaByteWriter {
+    if (value < MIN_I16 || value > MAX_I16) {
+      throw new RangeError(`Value ${value} is out of range for a 16-bit integer`);
+    }
+
     this.writeVLQ(zigZagEncode(value));
     return this;
   }
 
   public writeInt(value: number): SigmaByteWriter {
+    if (value < MIN_I32 || value > MAX_I32) {
+      throw new RangeError(`Value ${value} is out of range for a 32-bit integer`);
+    }
+
     return this.writeBigVLQ(zigZag32.encode(value));
   }
 
   public writeLong(value: bigint): SigmaByteWriter {
+    if (value < MIN_I64 || value > MAX_I64) {
+      throw new RangeError(
+        `Value ${value} is out of range for a 64-bit integer, ${MIN_I64}, ${MAX_I64}`
+      );
+    }
+
     this.writeBigVLQ(zigZagEncodeBigInt(value));
     return this;
   }
