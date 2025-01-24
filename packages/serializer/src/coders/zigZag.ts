@@ -18,6 +18,8 @@ export function zigZagEncode(input: number): number {
   return (input << 1) ^ (input >> 31);
 }
 
+const _31n = BigInt(31);
+
 const u64 = (v: bigint) => BigInt.asUintN(64, v);
 // const i64 = (v: bigint) => BigInt.asIntN(64, v);
 const i32 = (v: bigint) => BigInt.asIntN(32, v);
@@ -29,11 +31,11 @@ const u32 = (v: bigint) => BigInt.asUintN(32, v);
 export const zigZag32 = {
   encode: (input: bigint | number): bigint => {
     const v = i32(BigInt(input));
-    return u64(i32(v << 1n) ^ i32(v >> 31n));
+    return u64(i32(v << _1n) ^ i32(v >> _31n));
   },
   decode: (input: bigint): number => {
     const v = u32(input);
-    return Number((v >> 1n) ^ -(v & 1n));
+    return Number((v >> _1n) ^ -(v & _1n));
   }
 };
 
