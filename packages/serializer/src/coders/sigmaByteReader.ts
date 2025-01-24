@@ -18,7 +18,7 @@ export class SigmaByteReader {
     this.#cursor = 0;
   }
 
-  public readBoolean(): boolean {
+  public readBool(): boolean {
     return this.readByte() === 0x01;
   }
 
@@ -53,25 +53,24 @@ export class SigmaByteReader {
     return readVLQ(this);
   }
 
-  public readShort(): number {
-    return zigZag32.decode(readBigVLQ(this));
-  }
-
   public readI8(): number {
     const byte = this.readByte();
-
     return byte > MAX_I8 ? byte - (MAX_U8 + 1) : byte;
   }
 
-  public readInt(): number {
+  public readI16(): number {
     return zigZag32.decode(readBigVLQ(this));
   }
 
-  public readLong(): bigint {
+  public readI32(): number {
+    return zigZag32.decode(readBigVLQ(this));
+  }
+
+  public readI64(): bigint {
     return zigZag64.decode(readBigVLQ(this));
   }
 
-  public readBigInt(): bigint {
+  public readI256(): bigint {
     const len = readVLQ(this);
     return hexToBigInt(hex.encode(this.readBytes(len)));
   }

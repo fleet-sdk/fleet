@@ -26,7 +26,7 @@ export class SigmaByteWriter {
     this.#cursor = 0;
   }
 
-  public writeBoolean(value: boolean): SigmaByteWriter {
+  public writeBool(value: boolean): SigmaByteWriter {
     this.write(value === true ? 0x01 : 0x00);
 
     return this;
@@ -40,7 +40,7 @@ export class SigmaByteWriter {
     return writeBigVLQ(this, value);
   }
 
-  public writeShort(value: number): SigmaByteWriter {
+  public writeI16(value: number): SigmaByteWriter {
     if (value < MIN_I16 || value > MAX_I16) {
       throw new RangeError(`Value ${value} is out of range for a 16-bit integer`);
     }
@@ -49,7 +49,7 @@ export class SigmaByteWriter {
     return this;
   }
 
-  public writeInt(value: number): SigmaByteWriter {
+  public writeI32(value: number): SigmaByteWriter {
     if (value < MIN_I32 || value > MAX_I32) {
       throw new RangeError(`Value ${value} is out of range for a 32-bit integer`);
     }
@@ -57,12 +57,21 @@ export class SigmaByteWriter {
     return this.writeBigVLQ(zigZag32.encode(value));
   }
 
-  public writeLong(value: bigint): SigmaByteWriter {
+  public writeI64(value: bigint): SigmaByteWriter {
     if (value < MIN_I64 || value > MAX_I64) {
       throw new RangeError(`Value ${value} is out of range for a 64-bit integer`);
     }
 
     return this.writeBigVLQ(zigZag64.encode(value));
+  }
+
+  public writeI256(value: bigint): SigmaByteWriter {
+    if (value < MIN_I256 || value > MAX_I256) {
+      throw new RangeError(`Value ${value} is out of range for a 256-bit integer`);
+    }
+
+    const hex = bigIntToHex(value);
+    return this.writeVLQ(hex.length / 2).writeHex(hex);
   }
 
   public write(byte: number): SigmaByteWriter {
@@ -99,15 +108,6 @@ export class SigmaByteWriter {
     if (bitOffset > 0) this.#cursor++;
 
     return this;
-  }
-
-  public writeBigInt(value: bigint): SigmaByteWriter {
-    if (value < MIN_I256 || value > MAX_I256) {
-      throw new RangeError(`Value ${value} is out of range for a 256-bit integer`);
-    }
-
-    const hex = bigIntToHex(value);
-    return this.writeVLQ(hex.length / 2).writeHex(hex);
   }
 
   public writeChecksum(length = 4, hashFn = blake2b256): SigmaByteWriter {
