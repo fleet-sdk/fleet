@@ -33,13 +33,17 @@ export const boolVectors: ConstantTestVector<boolean>[] = [
 export const byteVectors: ConstantTestVector<number>[] = [
   { hex: "0201", value: 1 },
   { hex: "0202", value: 2 },
-  { hex: "024c", value: 76 }
+  { hex: "024c", value: 76 },
+  { hex: "027f", value: 127 }, // max i8
+  { hex: "0280", value: -128 } // min i8
 ];
 
 export const shortVectors: ConstantTestVector<number>[] = [
   { hex: "0302", value: 1 },
   { hex: "0303", value: -2 },
-  { hex: "0322", value: 17 }
+  { hex: "0322", value: 17 },
+  { hex: "03feff03", value: 32767 }, // max i16
+  { hex: "03ffff03", value: -32768 } // min i16
 ];
 
 export const intVectors: ConstantTestVector<number>[] = [
@@ -52,7 +56,8 @@ export const intVectors: ConstantTestVector<number>[] = [
   { hex: "04800f", value: 960 },
   { hex: "04808008", value: 65536 },
   { hex: "04808023", value: 286720 },
-  { hex: "04feffffffffffffffff01", value: 2147483647 } // int32 max
+  { hex: "04feffffffffffffffff01", value: 2147483647 }, // max i32
+  { hex: "04ffffffffffffffffff01", value: -2147483648 } // min i32
 ];
 
 export const longVectors: ConstantTestVector<bigint | string>[] = [
@@ -76,7 +81,9 @@ export const longVectors: ConstantTestVector<bigint | string>[] = [
   { hex: "0580809d80d0bf9901", value: 337543627513856n },
   { hex: "058080cba684a68201", value: 286526435581952n },
   { hex: "058080b4ccd4dfc603", value: 1000000000000000n },
-  { hex: "058080a0f6f4acdbe01b", value: 1000000000000000000n }
+  { hex: "058080a0f6f4acdbe01b", value: 1000000000000000000n },
+  { hex: "05feffffffffffffffff01", value: 9223372036854775807n }, // max i64
+  { hex: "05ffffffffffffffffff01", value: -9223372036854775808n } // min i64
 ];
 
 export const bigintVectors: ConstantTestVector<string>[] = [

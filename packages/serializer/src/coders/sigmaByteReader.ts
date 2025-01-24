@@ -3,6 +3,7 @@ import { type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { hexToBigInt } from "./bigint";
 import { readBigVLQ, readVLQ } from "./vlq";
 import { zigZagDecode, zigZagDecodeBigInt, zigZag32 } from "./zigZag";
+import { MAX_I8, MAX_U8 } from "./numRanges";
 
 export class SigmaByteReader {
   readonly #bytes: Uint8Array;
@@ -54,6 +55,12 @@ export class SigmaByteReader {
 
   public readShort(): number {
     return Number(zigZagDecode(readVLQ(this)));
+  }
+
+  public readI8(): number {
+    const byte = this.readByte();
+
+    return byte > MAX_I8 ? byte - (MAX_U8 + 1) : byte;
   }
 
   public readInt(): number {

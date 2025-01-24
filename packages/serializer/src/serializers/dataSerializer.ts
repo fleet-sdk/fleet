@@ -92,7 +92,7 @@ export const dataSerializer = {
         case descriptors.bool.code:
           return reader.readBoolean();
         case descriptors.byte.code:
-          return reader.readByte();
+          return reader.readI8();
         case descriptors.short.code:
           return reader.readShort();
         case descriptors.int.code:
