@@ -2,15 +2,17 @@ import { concatBytes } from "@fleet-sdk/common";
 import { blake2b256, hex, sha256 } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
 import { MAX_CONSTANT_LENGTH } from "../sigmaConstant";
+import { SigmaByteWriter } from "./sigmaByteWriter";
 import {
-  MAX_I16,
-  MAX_I32,
-  MAX_I64,
   MIN_I16,
+  MAX_I16,
   MIN_I32,
+  MAX_I32,
   MIN_I64,
-  SigmaByteWriter
-} from "./sigmaByteWriter";
+  MAX_I64,
+  MIN_I256,
+  MAX_I256
+} from "./numRanges";
 
 describe("Sigma Writer", () => {
   it("Should put a single byte at time", () => {
@@ -105,6 +107,11 @@ describe("Sigma Writer", () => {
     const i64Err = "out of range for a 64-bit integer";
     expect(() => sigmaBuffer.writeLong(MIN_I64 - 1n)).to.throw(i64Err);
     expect(() => sigmaBuffer.writeLong(MAX_I64 + 1n)).to.throw(i64Err);
+
+    // BigInt
+    const i256Err = "out of range for a 256-bit integer";
+    expect(() => sigmaBuffer.writeBigInt(MIN_I256 - 1n)).to.throw(i256Err);
+    expect(() => sigmaBuffer.writeBigInt(MAX_I256 + 1n)).to.throw(i256Err);
   });
 
   it("Should write a checksum based on the current stream content", () => {

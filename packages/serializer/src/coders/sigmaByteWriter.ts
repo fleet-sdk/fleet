@@ -2,15 +2,16 @@ import { blake2b256, type Coder, hex } from "@fleet-sdk/crypto";
 import { bigIntToHex } from "./bigint";
 import { writeBigVLQ, writeVLQ } from "./vlq";
 import { zigZagEncode, zigZag32, zigZagEncodeBigInt } from "./zigZag";
-
-export const MIN_I16 = -0x8000;
-export const MAX_I16 = 0x7fff;
-
-export const MIN_I32 = -0x80000000;
-export const MAX_I32 = 0x7fffffff;
-
-export const MIN_I64 = -BigInt("0x8000000000000000");
-export const MAX_I64 = BigInt("0x7fffffffffffffff");
+import {
+  MIN_I16,
+  MAX_I16,
+  MIN_I32,
+  MAX_I32,
+  MIN_I64,
+  MAX_I64,
+  MIN_I256,
+  MAX_I256
+} from "./numRanges";
 
 export class SigmaByteWriter {
   readonly #bytes: Uint8Array;
@@ -58,9 +59,7 @@ export class SigmaByteWriter {
 
   public writeLong(value: bigint): SigmaByteWriter {
     if (value < MIN_I64 || value > MAX_I64) {
-      throw new RangeError(
-        `Value ${value} is out of range for a 64-bit integer, ${MIN_I64}, ${MAX_I64}`
-      );
+      throw new RangeError(`Value ${value} is out of range for a 64-bit integer`);
     }
 
     this.writeBigVLQ(zigZagEncodeBigInt(value));
@@ -104,6 +103,10 @@ export class SigmaByteWriter {
   }
 
   public writeBigInt(value: bigint): SigmaByteWriter {
+    if (value < MIN_I256 || value > MAX_I256) {
+      throw new RangeError(`Value ${value} is out of range for a 256-bit integer`);
+    }
+
     const hex = bigIntToHex(value);
     return this.writeVLQ(hex.length / 2).writeHex(hex);
   }
