@@ -12,3 +12,11 @@ export const MAX_I32 = 0x7fffffff;
 
 export const MIN_I64 = -BigInt("0x8000000000000000");
 export const MAX_I64 = BigInt("0x7fffffffffffffff");
+
+export const MIN_I256 = -BigInt(
+  "0x8000000000000000000000000000000000000000000000000000000000000000"
+);
+
+export const MAX_I256 = BigInt(
+  "0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+);
