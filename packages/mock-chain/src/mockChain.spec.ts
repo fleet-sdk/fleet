@@ -447,6 +447,10 @@ describe("Contract execution and chain mocking", () => {
   });
 
   it("Should fail with wrong keys", () => {
+    const consoleMock = vi.spyOn(console, "log").mockImplementation(() => {
+      return;
+    });
+
     const params = { height: 38478, timestamp: new Date().getTime() };
     const chain = new MockChain(params);
     const bob = chain.newParty().withBalance({ nanoergs: 1000000000n });
