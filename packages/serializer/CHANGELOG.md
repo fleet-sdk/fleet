@@ -1,5 +1,15 @@
 # @fleet-sdk/serializer
 
+## 0.8.2
+
+### Patch Changes
+
+- 66d6fc9: Fix `ZigZag` encoding for 32-bit integers
+- 1c8541a: Fix signed `SByte` parsing
+- Updated dependencies [9a244b5]
+- Updated dependencies [1b07c4a]
+  - @fleet-sdk/crypto@0.8.2
+
 ## 0.8.0
 
 ### Patch Changes
