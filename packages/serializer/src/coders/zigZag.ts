@@ -9,19 +9,10 @@ import { _1n, _63n } from "@fleet-sdk/common";
  * @see https://developers.google.com/protocol-buffers/docs/encoding#types
  */
 
-/**
- * Encode a signed integer.
- * @param input Signed integer
- * @returns ZigZag-encoded value
- */
-export function zigZagEncode(input: number): number {
-  return (input << 1) ^ (input >> 31);
-}
-
 const _31n = BigInt(31);
 
 const u64 = (v: bigint) => BigInt.asUintN(64, v);
-// const i64 = (v: bigint) => BigInt.asIntN(64, v);
+const i64 = (v: bigint) => BigInt.asIntN(64, v);
 const i32 = (v: bigint) => BigInt.asIntN(32, v);
 const u32 = (v: bigint) => BigInt.asUintN(32, v);
 
@@ -40,28 +31,13 @@ export const zigZag32 = {
 };
 
 /**
- * Decode a ZigZag-encoded value.
- * @param input ZigZag-encoded value
- * @returns Signed integer
+ * 64-bit ZigZag encoding.
  */
-export function zigZagDecode(input: number): number {
-  return (input >> 1) ^ -(input & 1);
-}
-
-/**
- * Encode a signed big integer.
- * @param input Signed big integer
- * @returns ZigZag-encoded value
- */
-export function zigZagEncodeBigInt(input: bigint): bigint {
-  return (input << _1n) ^ (input >> _63n);
-}
-
-/**
- * Decode a ZigZag-encoded value.
- * @param input ZigZag-encoded value
- * @returns Signed big integer
- */
-export function zigZagDecodeBigInt(input: bigint): bigint {
-  return (input >> _1n) ^ -(input & _1n);
-}
+export const zigZag64 = {
+  encode: (input: bigint): bigint => {
+    return u64((input << _1n) ^ (input >> _63n));
+  },
+  decode: (input: bigint): bigint => {
+    return i64((input >> _1n) ^ -(input & _1n));
+  }
+};

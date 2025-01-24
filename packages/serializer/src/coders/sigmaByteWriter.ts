@@ -1,7 +1,7 @@
 import { blake2b256, type Coder, hex } from "@fleet-sdk/crypto";
 import { bigIntToHex } from "./bigint";
 import { writeBigVLQ, writeVLQ } from "./vlq";
-import { zigZagEncode, zigZag32, zigZagEncodeBigInt } from "./zigZag";
+import { zigZag32, zigZag64 } from "./zigZag";
 import {
   MIN_I16,
   MAX_I16,
@@ -45,7 +45,7 @@ export class SigmaByteWriter {
       throw new RangeError(`Value ${value} is out of range for a 16-bit integer`);
     }
 
-    this.writeVLQ(zigZagEncode(value));
+    this.writeBigVLQ(zigZag32.encode(value));
     return this;
   }
 
@@ -62,8 +62,7 @@ export class SigmaByteWriter {
       throw new RangeError(`Value ${value} is out of range for a 64-bit integer`);
     }
 
-    this.writeBigVLQ(zigZagEncodeBigInt(value));
-    return this;
+    return this.writeBigVLQ(zigZag64.encode(value));
   }
 
   public write(byte: number): SigmaByteWriter {

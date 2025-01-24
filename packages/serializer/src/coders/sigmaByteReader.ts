@@ -2,7 +2,7 @@ import { isEmpty } from "@fleet-sdk/common";
 import { type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { hexToBigInt } from "./bigint";
 import { readBigVLQ, readVLQ } from "./vlq";
-import { zigZagDecode, zigZagDecodeBigInt, zigZag32 } from "./zigZag";
+import { zigZag32, zigZag64 } from "./zigZag";
 import { MAX_I8, MAX_U8 } from "./numRanges";
 
 export class SigmaByteReader {
@@ -54,7 +54,7 @@ export class SigmaByteReader {
   }
 
   public readShort(): number {
-    return Number(zigZagDecode(readVLQ(this)));
+    return zigZag32.decode(readBigVLQ(this));
   }
 
   public readI8(): number {
@@ -68,7 +68,7 @@ export class SigmaByteReader {
   }
 
   public readLong(): bigint {
-    return zigZagDecodeBigInt(readBigVLQ(this));
+    return zigZag64.decode(readBigVLQ(this));
   }
 
   public readBigInt(): bigint {
