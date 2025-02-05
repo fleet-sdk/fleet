@@ -3788,7 +3788,7 @@ snapshots:
 
   sigmajs-crypto-facade@0.0.7:
     dependencies:
-      '@noble/hashes': 1.1.4
+      '@noble/hashes': 1.7.1
 
   sigmastate-js@0.4.6:
     dependencies:
