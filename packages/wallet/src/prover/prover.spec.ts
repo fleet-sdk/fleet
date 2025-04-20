@@ -17,6 +17,8 @@ import { Prover } from "./prover";
 const height = 1234209;
 const externalAddress = "9gN8gmyaDBuWPZLn8zj9uZxnLUj4TE9rtedtLGNjf6cUhTmoTwc";
 
+const toBytes = (input: string | undefined | null) => hex.decode(input ?? "");
+
 describe("Transaction signing", () => {
   it("Should sign a transaction with a single secret and a single input", async () => {
     // generate keys
@@ -41,7 +43,7 @@ describe("Transaction signing", () => {
     const signedTx = prover.signTransaction(unsignedTx, [rootKey]);
 
     // verify
-    const proof = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
+    const proof = toBytes(signedTx.inputs[0].spendingProof?.proofBytes);
 
     // verify using own verifier
     expect(prover.verify(unsignedTx, proof, rootKey)).to.be.true;
@@ -79,7 +81,7 @@ describe("Transaction signing", () => {
     const signedTx = prover.signTransaction(unsignedTx, [rootKey, child1]);
 
     // verify
-    const proof = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
+    const proof = toBytes(signedTx.inputs[0].spendingProof?.proofBytes);
 
     // verify using own verifier
     expect(prover.verify(unsignedTx, proof, child1)).to.be.true;
@@ -119,7 +121,7 @@ describe("Transaction signing", () => {
     ]);
 
     // verify
-    const proof = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
+    const proof = toBytes(signedTx.inputs[0].spendingProof?.proofBytes);
 
     // verify using own verifier
     expect(prover.verify(unsignedTx, proof, rootKey)).to.be.true;
@@ -161,8 +163,8 @@ describe("Transaction signing", () => {
 
     // verify
     const txBytes = unsignedTx.toBytes();
-    const proof0 = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
-    const proof1 = hex.decode(signedTx.inputs[1].spendingProof.proofBytes);
+    const proof0 = toBytes(signedTx.inputs[0].spendingProof?.proofBytes);
+    const proof1 = toBytes(signedTx.inputs[1].spendingProof?.proofBytes);
 
     // verify using own verifier
     expect(prover.verify(txBytes, proof0, rootKey)).to.be.true;
@@ -208,9 +210,9 @@ describe("Transaction signing", () => {
 
     // verify
     const txBytes = unsignedTx.toBytes();
-    const proof0 = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
-    const proof1 = hex.decode(signedTx.inputs[1].spendingProof.proofBytes);
-    const proof2 = hex.decode(signedTx.inputs[2].spendingProof.proofBytes);
+    const proof0 = toBytes(signedTx.inputs[0].spendingProof?.proofBytes);
+    const proof1 = toBytes(signedTx.inputs[1].spendingProof?.proofBytes);
+    const proof2 = toBytes(signedTx.inputs[2].spendingProof?.proofBytes);
 
     expect(prover.verify(txBytes, proof0, rootKey)).to.be.false; // inverted by the mapper
     expect(prover.verify(txBytes, proof0, child2)).to.be.true; // inverted by the mapper
@@ -250,8 +252,8 @@ describe("Transaction signing", () => {
 
     // verify
     const txBytes = unsignedTx.toBytes();
-    const proof0 = hex.decode(signedTx.inputs[0].spendingProof.proofBytes);
-    const proof1 = hex.decode(signedTx.inputs[1].spendingProof.proofBytes);
+    const proof0 = toBytes(signedTx.inputs[0].spendingProof?.proofBytes);
+    const proof1 = toBytes(signedTx.inputs[1].spendingProof?.proofBytes);
 
     expect(prover.verify(txBytes, proof0, rootKey)).to.be.false; // inverted by the mapper
     expect(prover.verify(txBytes, proof0, child1)).to.be.true; // inverted by the mapper
@@ -319,14 +321,14 @@ describe("Transaction signing", () => {
 
     // verify all inputs using own verifier
     for (const input of signedTx.inputs) {
-      const proof = hex.decode(input.spendingProof.proofBytes);
+      const proof = toBytes(input.spendingProof?.proofBytes);
       expect(prover.verify(txBytes, proof, rootKey)).to.be.true;
     }
 
     // verify all inputs using sigma-rust for comparison
     const addr = Address.from_public_key(rootKey.publicKey);
     for (const input of signedTx.inputs) {
-      const proof = hex.decode(input.spendingProof.proofBytes);
+      const proof = toBytes(input.spendingProof?.proofBytes);
       expect(verify_signature(addr, txBytes, proof)).to.be.true;
     }
   });
@@ -380,42 +382,42 @@ describe("Transaction proof verification", () => {
 
   it("Should verify from bytes", () => {
     const prover = new Prover();
-    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+    const proof = signedTx.inputs[0].spendingProof?.proofBytes ?? "";
 
     expect(prover.verify(unsignedTx.toBytes(), proof, rootKey)).to.be.true;
   });
 
   it("Should verify from hex", () => {
     const prover = new Prover();
-    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+    const proof = signedTx.inputs[0].spendingProof?.proofBytes ?? "";
 
     expect(prover.verify(hex.encode(unsignedTx.toBytes()), proof, rootKey)).to.be.true;
   });
 
   it("Should verify from SignedTransaction", () => {
     const prover = new Prover();
-    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+    const proof = signedTx.inputs[0].spendingProof?.proofBytes ?? "";
 
     expect(prover.verify(signedTx, proof, rootKey)).to.be.true;
   });
 
   it("Should verify from ErgoUnsignedTransaction", () => {
     const prover = new Prover();
-    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+    const proof = signedTx.inputs[0].spendingProof?.proofBytes ?? "";
 
     expect(prover.verify(unsignedTx, proof, rootKey)).to.be.true;
   });
 
   it("Should verify from EIP12UnsignedTransaction", () => {
     const prover = new Prover();
-    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+    const proof = signedTx.inputs[0].spendingProof?.proofBytes ?? "";
 
     expect(prover.verify(unsignedTx.toEIP12Object(), proof, rootKey)).to.be.true;
   });
 
   it("Should verify from PlainObject", () => {
     const prover = new Prover();
-    const proof = signedTx.inputs[0].spendingProof.proofBytes;
+    const proof = signedTx.inputs[0].spendingProof?.proofBytes ?? "";
 
     expect(prover.verify(unsignedTx.toPlainObject(), proof, rootKey)).to.be.true;
   });

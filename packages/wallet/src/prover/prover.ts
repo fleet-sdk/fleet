@@ -83,8 +83,12 @@ export class Prover implements ISigmaProver {
         ...message,
         inputs: message.inputs.map((input) => ({
           ...input,
+          spendingProof: undefined, // remove spendingProof from inputs
           extension:
-            "extension" in input ? input.extension : input.spendingProof.extension
+            "extension" in input
+              ? input.extension
+              : /* v8 ignore next */
+                (input.spendingProof?.extension ?? {})
         }))
       }).toBytes();
     }

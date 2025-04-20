@@ -13,7 +13,7 @@ export type ProverResult = {
 
 export type SignedInput = {
   readonly boxId: BoxId;
-  readonly spendingProof: ProverResult;
+  readonly spendingProof: ProverResult | null;
 };
 
 export type UnsignedInput = {
