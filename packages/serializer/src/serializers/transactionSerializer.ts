@@ -1,21 +1,26 @@
-import {
-  type Amount,
-  type BoxCandidate,
-  type DataInput,
-  isDefined,
-  type UnsignedInput
+import type {
+  Amount,
+  BoxCandidate,
+  DataInput,
+  SignedInput,
+  SignedTransaction,
+  UnsignedInput
 } from "@fleet-sdk/common";
+import { isDefined } from "@fleet-sdk/common";
 import { SigmaByteWriter } from "../coders";
 import { serializeBox } from "./boxSerializer";
+import { hex } from "@fleet-sdk/crypto";
 
 export type MinimalUnsignedTransaction = {
-  inputs: readonly UnsignedInput[];
-  dataInputs: readonly DataInput[];
-  outputs: readonly BoxCandidate<Amount>[];
+  inputs: UnsignedInput[];
+  dataInputs: DataInput[];
+  outputs: BoxCandidate<Amount>[];
 };
 
+type Nullish<T> = T | null | undefined;
+
 export function serializeTransaction(
-  transaction: MinimalUnsignedTransaction
+  transaction: MinimalUnsignedTransaction | SignedTransaction
 ): SigmaByteWriter {
   const writer = new SigmaByteWriter(100_000);
 
@@ -39,16 +44,43 @@ export function serializeTransaction(
   return writer;
 }
 
-function writeInput(writer: SigmaByteWriter, input: UnsignedInput): void {
+function writeInput(writer: SigmaByteWriter, input: UnsignedInput | SignedInput): void {
   writer.writeHex(input.boxId);
-  writer.write(0); // empty proof
+
+  if (isSignedInput(input)) {
+    writeProof(writer, input.spendingProof?.proofBytes);
+    writeExtension(writer, input.spendingProof?.extension);
+    return;
+  }
+
+  writeProof(writer, null);
   writeExtension(writer, input.extension);
+}
+
+function isSignedInput(input: UnsignedInput | SignedInput): input is SignedInput {
+  return (input as SignedInput).spendingProof !== undefined;
+}
+
+function writeProof(writer: SigmaByteWriter, proof: Nullish<string>): void {
+  if (!proof) {
+    writer.write(0);
+    return;
+  }
+
+  const bytes = hex.decode(proof);
+  writer.writeVLQ(bytes.length);
+  writer.writeBytes(bytes);
 }
 
 function writeExtension(
   writer: SigmaByteWriter,
-  extension: Record<string, string | undefined>
+  extension: Nullish<Record<string, string | undefined>>
 ): void {
+  if (!extension) {
+    writer.write(0);
+    return;
+  }
+
   const keys = Object.keys(extension);
   let length = 0;
 
