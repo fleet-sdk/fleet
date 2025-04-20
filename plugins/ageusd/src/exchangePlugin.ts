@@ -39,14 +39,6 @@ function buildErrorMsgFor(action: ActionType, coin: CoinType, bank: AgeUSDBank):
 
 export function AgeUSDExchangePlugin(
   bank: AgeUSDBank,
-  action: AgeUSDMintAction
-): FleetPlugin;
-export function AgeUSDExchangePlugin(
-  bank: AgeUSDBank,
-  action: AgeUSDRedeemAction
-): FleetPlugin;
-export function AgeUSDExchangePlugin(
-  bank: AgeUSDBank,
   action: AgeUSDExchangeAction
 ): FleetPlugin {
   const amount = big(action.amount);

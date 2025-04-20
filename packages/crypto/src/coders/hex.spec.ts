@@ -2,9 +2,15 @@ import fc from "fast-check";
 import { describe, expect, it, test } from "vitest";
 import { hex } from "./hex";
 
+const HEX_CHARS = "0123456789abcdef";
+type HexOpt = Omit<fc.StringConstraints, "unit">;
+
 const ui8a = (bytes: number[]) => Uint8Array.from(bytes);
+const hexNum = () => fc.integer({ min: 0, max: 15 }).map((n) => HEX_CHARS[n]);
+const hexString = (opt: HexOpt = {}) => fc.string({ ...opt, unit: hexNum() });
+
 const paddedHexArb = fc
-  .mixedCase(fc.hexaString({ size: "medium" }))
+  .mixedCase(hexString({ size: "medium" }))
   .map((v) => (v.length % 2 ? v.padStart(v.length + 1, "0") : v));
 
 describe("Fuzzy hex <-> bytes roundtrip", () => {
