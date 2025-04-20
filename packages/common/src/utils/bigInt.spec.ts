@@ -211,6 +211,7 @@ describe("min and max functions", () => {
 
 describe("percent()", () => {
   it("Should return default precision amount percentage", () => {
+    expect(percent(200n, 5n)).to.be.equal(10n); // 5%
     expect(percent(3498n, 1n)).to.be.equal(34n); // 1%
     expect(percent(3498n, 2n)).to.be.equal(69n); // 2%
     expect(percent(3498n, 10n)).to.be.equal(349n); // 10%
