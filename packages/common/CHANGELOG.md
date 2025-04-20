@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.8.3
+
+### Patch Changes
+
+- 9c04d3c: Add `SignedTransaction` serialization
+
 ## 0.8.0
 
 ### Patch Changes
