@@ -6,6 +6,7 @@ type NumberLike = string | number | bigint | boolean;
 
 export const _0n = BigInt(0);
 export const _1n = BigInt(1);
+export const _2n = BigInt(2);
 export const _7n = BigInt(7);
 export const _10n = BigInt(10);
 export const _63n = BigInt(63);
@@ -125,21 +126,19 @@ export function decimalize(value: Amount, options?: FormattingOptions | number):
 }
 
 /**
- * Format a bigint percentage into a decimal string with options
- * @param value
- * @param percentage
- * @param precision
+ * Calculates the percentage of a bigint value with a specified precision.
+ *
+ * @param value - The input value to calculate the percentage of
+ * @param percentage - The percentage to calculate (e.g., 500n for 5.00%)
+ * @param precision - The number of decimal places for the percentage (defaults to 2n)
+ * @returns The calculated percentage of the input value
  *
  * @example
- * ```
- * percent(3498n, 1n) // 34n(1%)
- * percent(3498n, 2n) // 69n(2%)
- * percent(3498n, 10n) // 349n(10%)
- * ```
- *
+ * For 5% of 200 with 2 decimal places:
+ * percent(200n, 500n) // returns 10n
  */
-export function percent(value: bigint, percentage: bigint, precision = 2n) {
-  return (value * percentage) / 10n ** precision;
+export function percent(value: bigint, percentage: bigint, precision = _2n): bigint {
+  return (value * percentage) / _10n ** precision;
 }
 
 function buildFormattedDecimal(
