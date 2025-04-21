@@ -1,5 +1,15 @@
 # @fleet-sdk/ageusd-plugin
 
+## 0.1.17
+
+### Patch Changes
+
+- c66a0b4: Fix `AgeUSDExchangePlugin` constructor definition
+- Updated dependencies [9c04d3c]
+  - @fleet-sdk/serializer@0.8.3
+  - @fleet-sdk/common@0.8.3
+  - @fleet-sdk/core@0.8.3
+
 ## 0.1.16
 
 ### Patch Changes
