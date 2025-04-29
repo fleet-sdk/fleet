@@ -1,5 +1,11 @@
 # @fleet-sdk/mock-chain
 
+## 0.8.4
+
+### Patch Changes
+
+- 0ce3a99: Improve `sigmastate-interpreter` error handling.
+
 ## 0.8.3
 
 ### Patch Changes
