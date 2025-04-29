@@ -36,7 +36,7 @@ describe("Transaction executor", () => {
     expect(() => execute(unsigned, [key])).to.throw();
   });
 
-  it("Should not execute transaction", () => {
+  it("Should execute transaction", () => {
     const bob = new KeyedMockChainParty(chain, "bob");
     const input = mockUTxO({
       ergoTree: bob.address.ergoTree,

@@ -24,10 +24,18 @@ export const BLOCKCHAIN_PARAMETERS: BlockchainParameters = {
   blockVersion: 3
 };
 
-export type TransactionExecutionResult = {
-  success: boolean;
-  reason?: string;
+export type TransactionExecutionSuccess = {
+  success: true;
 };
+
+export type TransactionExecutionFailure = {
+  success: false;
+  reason: Error;
+};
+
+export type TransactionExecutionResult =
+  | TransactionExecutionSuccess
+  | TransactionExecutionFailure;
 
 export type ExecutionParameters = {
   context?: BlockchainStateContext;
@@ -77,6 +85,6 @@ export function execute(
 
     return { success: true };
   } catch (e) {
-    return { success: false, reason: (e as Error).message };
+    return { success: false, reason: e as Error };
   }
 }

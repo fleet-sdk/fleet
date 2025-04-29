@@ -472,7 +472,7 @@ describe("Contract execution and chain mocking", () => {
     // should throw if { throw: true }
     expect(() =>
       chain.execute(unsignedTransaction, { signers: [alice], throw: true })
-    ).to.throw();
+    ).to.throw("Tree root should be real but was UnprovenSchnorr");
 
     // should not throw if { throw: false }
     expect(() =>
@@ -481,15 +481,11 @@ describe("Contract execution and chain mocking", () => {
 
     // log error message if { log: true }
     expect(() =>
-      chain.execute(unsignedTransaction, {
-        signers: [alice],
-        log: true,
-        throw: false
-      })
+      chain.execute(unsignedTransaction, { signers: [alice], log: true, throw: false })
     ).not.to.throw();
 
     expect(consoleMock.mock.calls[0][0]).to.include(
-      "Tree root should be real but was UnprovenSchnorr"
+      "AssertionError: assertion failed: Tree root should be real but was UnprovenSchnorr"
     );
 
     // should not affect balances

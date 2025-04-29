@@ -165,10 +165,10 @@ export class MockChain {
 
     if (!result.success) {
       if (options?.log) {
-        log(pc.red(`${pc.bgRed(pc.bold(" Error "))} ${result.reason}`));
+        log(pc.red(`${pc.bgRed(pc.bold(" Error "))} ${extractMsg(result.reason)}`));
       }
 
-      if (options?.throw !== false) throw new Error(result.reason);
+      if (options?.throw !== false) throw result.reason;
       return false;
     }
 
@@ -236,4 +236,8 @@ function decodeString(bytes?: ByteInput): string | undefined {
   const c = decode<Uint8Array>(bytes);
   if (!c || c.type.toString() !== "SColl[SByte]") return;
   return utf8.encode(c.data);
+}
+
+function extractMsg(e: Error) {
+  return String(e).replace("java.lang.", ""); // clean java prefix if present
 }
