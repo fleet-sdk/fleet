@@ -1,7 +1,6 @@
-import { first } from "@fleet-sdk/common";
+import { first, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
 import { describe, expect, it } from "vitest";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "../../builder/outputBuilder";
-import { RECOMMENDED_MIN_FEE_VALUE } from "../../builder/transactionBuilder";
 import { NotFoundError } from "../../errors";
 import { OutputsCollection } from "./outputsCollection";
 
