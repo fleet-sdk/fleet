@@ -16,7 +16,7 @@ export function mockUTxO(mock: MockBoxOptions): Box<bigint> {
     value: mock.value ?? SAFE_MIN_BOX_VALUE,
     ergoTree: mock.ergoTree,
     assets: mock.assets ?? [],
-    creationHeight: mock.creationHeight ?? 0,
+    creationHeight: mock.creationHeight ?? 849741,
     additionalRegisters: mock.additionalRegisters ?? {},
 
     transactionId: mock.transactionId ?? getRandomId(),

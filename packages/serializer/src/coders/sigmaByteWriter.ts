@@ -17,7 +17,7 @@ export class SigmaByteWriter {
   readonly #bytes: Uint8Array;
   #cursor: number;
 
-  public get length() {
+  get length() {
     return this.#cursor;
   }
 
@@ -26,70 +26,69 @@ export class SigmaByteWriter {
     this.#cursor = 0;
   }
 
-  public writeBool(value: boolean): SigmaByteWriter {
+  writeBool(value: boolean): SigmaByteWriter {
     this.write(value === true ? 0x01 : 0x00);
-
     return this;
   }
 
-  public writeVLQ(value: number): SigmaByteWriter {
+  writeUInt(value: number): SigmaByteWriter {
     return writeVLQ(this, value);
   }
 
-  public writeBigVLQ(value: bigint): SigmaByteWriter {
+  writeBigUInt(value: bigint): SigmaByteWriter {
     return writeBigVLQ(this, value);
   }
 
-  public writeI16(value: number): SigmaByteWriter {
+  writeI16(value: number): SigmaByteWriter {
     if (value < MIN_I16 || value > MAX_I16) {
       throw new RangeError(`Value ${value} is out of range for a 16-bit integer`);
     }
 
-    this.writeBigVLQ(zigZag32.encode(value));
+    this.writeBigUInt(zigZag32.encode(value));
     return this;
   }
 
-  public writeI32(value: number): SigmaByteWriter {
+  writeI32(value: number): SigmaByteWriter {
     if (value < MIN_I32 || value > MAX_I32) {
       throw new RangeError(`Value ${value} is out of range for a 32-bit integer`);
     }
 
-    return this.writeBigVLQ(zigZag32.encode(value));
+    return this.writeBigUInt(zigZag32.encode(value));
   }
 
-  public writeI64(value: bigint): SigmaByteWriter {
+  writeI64(value: bigint): SigmaByteWriter {
     if (value < MIN_I64 || value > MAX_I64) {
       throw new RangeError(`Value ${value} is out of range for a 64-bit integer`);
     }
 
-    return this.writeBigVLQ(zigZag64.encode(value));
+    return this.writeBigUInt(zigZag64.encode(value));
   }
 
-  public writeI256(value: bigint): SigmaByteWriter {
+  writeI256(value: bigint): SigmaByteWriter {
     if (value < MIN_I256 || value > MAX_I256) {
       throw new RangeError(`Value ${value} is out of range for a 256-bit integer`);
     }
 
     const hex = bigIntToHex(value);
-    return this.writeVLQ(hex.length / 2).writeHex(hex);
+    return this.writeUInt(hex.length / 2).writeHex(hex);
   }
 
-  public write(byte: number): SigmaByteWriter {
+  write(byte: number): SigmaByteWriter {
     this.#bytes[this.#cursor++] = byte;
     return this;
   }
 
-  public writeBytes(bytes: ArrayLike<number>): SigmaByteWriter {
+  writeBytes(bytes: ArrayLike<number>): SigmaByteWriter {
     this.#bytes.set(bytes, this.#cursor);
     this.#cursor += bytes.length;
     return this;
   }
 
-  public writeHex(bytesHex: string): SigmaByteWriter {
+  writeHex(bytesHex: string): SigmaByteWriter {
     return this.writeBytes(hex.decode(bytesHex));
   }
 
-  public writeBits(bits: ArrayLike<boolean>): SigmaByteWriter {
+  writeBits(bits: ArrayLike<boolean>): SigmaByteWriter {
     let bitOffset = 0;
 
     for (let i = 0; i < bits.length; i++) {
@@ -110,16 +109,16 @@ export class SigmaByteWriter {
     return this;
   }
 
-  public writeChecksum(length = 4, hashFn = blake2b256): SigmaByteWriter {
+  writeChecksum(length = 4, hashFn = blake2b256): SigmaByteWriter {
     const hash = hashFn(this.toBytes());
     return this.writeBytes(length ? hash.subarray(0, length) : hash);
   }
 
-  public encode<T>(coder: Coder<Uint8Array, T>): T {
+  encode<T>(coder: Coder<Uint8Array, T>): T {
     return coder.encode(this.toBytes());
   }
 
-  public toBytes(): Uint8Array {
+  toBytes(): Uint8Array {
     if (this.#cursor === this.#bytes.length) return this.#bytes;
     return this.#bytes.subarray(0, this.#cursor);
   }
