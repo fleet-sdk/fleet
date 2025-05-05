@@ -297,6 +297,17 @@ describe("startsWith()", () => {
     expect(startsWith(array, array)).toBeTruthy();
   });
 
+  it("Should return true if starts with target with offset", () => {
+    //      index: 0, 1, 2, 3, 4, 5, 6, 7
+    const array = [1, 2, 4, 5, 6, 7, 8, 9];
+
+    expect(startsWith(array, [2, 4], 1)).toBeTruthy();
+    expect(startsWith(array, [6, 7], 4)).toBeTruthy();
+    expect(startsWith(array, [9, 10], 7)).toBeFalsy();
+    expect(startsWith(array, [1], 0)).toBeTruthy();
+    expect(startsWith(array, array)).toBeTruthy();
+  });
+
   it("Should return false for not starts with target", () => {
     const array = [1, 2, 4, 5, 0];
 
