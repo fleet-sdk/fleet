@@ -1,19 +1,31 @@
 import {
-  type Amount,
-  type Box,
-  type BoxCandidate,
   byteSizeOf,
   ensureBigInt,
+  ergoTreeHeaderFlags,
+  FEE_CONTRACT,
   isDefined,
   isEmpty,
   isUndefined,
-  type NonMandatoryRegisters,
-  some,
-  type TokenAmount
+  some
 } from "@fleet-sdk/common";
-import { estimateVLQSize, SigmaByteWriter } from "../coders";
+import type {
+  Amount,
+  Box,
+  BoxCandidate,
+  NonMandatoryRegisters,
+  TokenAmount
+} from "@fleet-sdk/common";
+import { estimateVLQSize, SigmaByteReader, SigmaByteWriter } from "../coders";
+import { blake2b256, hex, validateEcPoint } from "@fleet-sdk/crypto";
+import type { ByteInput } from "../types/constructors";
+import { SConstant } from "../sigmaConstant";
 
 const MAX_UINT16_VALUE = 65535;
+
+const FEE_CONTRACT_BYTES = hex.decode(FEE_CONTRACT);
+const P2PK_CONTRACT_PREFIX = hex.decode("0008cd");
+const COMPRESSED_PK_LENGTH = 33;
+const P2PK_CONTRACT_LENGTH = P2PK_CONTRACT_PREFIX.length + COMPRESSED_PK_LENGTH;
 
 export function serializeBox(box: Box<Amount>): SigmaByteWriter;
 export function serializeBox(box: Box<Amount>, writer: SigmaByteWriter): SigmaByteWriter;
@@ -27,15 +39,15 @@ export function serializeBox(
   writer = new SigmaByteWriter(4_096),
   distinctTokenIds?: string[]
 ): SigmaByteWriter {
-  writer.writeBigVLQ(ensureBigInt(box.value));
+  writer.writeBigUInt(ensureBigInt(box.value));
   writer.writeHex(box.ergoTree);
-  writer.writeVLQ(box.creationHeight);
+  writer.writeUInt(box.creationHeight);
   writeTokens(writer, box.assets, distinctTokenIds);
   writeRegisters(writer, box.additionalRegisters);
 
   if (isDefined(distinctTokenIds)) return writer;
   if (!isBox(box)) throw new Error("Invalid box type.");
-  return writer.writeHex(box.transactionId).writeVLQ(box.index);
+  return writer.writeHex(box.transactionId).writeUInt(box.index);
 }
 
 function isBox<T extends Amount>(box: Box<Amount> | BoxCandidate<Amount>): box is Box<T> {
@@ -53,16 +65,16 @@ function writeTokens(
     return;
   }
 
-  writer.writeVLQ(tokens.length);
+  writer.writeUInt(tokens.length);
   if (some(tokenIds)) {
     tokens.map((token) =>
       writer
-        .writeVLQ(tokenIds.indexOf(token.tokenId))
-        .writeBigVLQ(ensureBigInt(token.amount))
+        .writeUInt(tokenIds.indexOf(token.tokenId))
+        .writeBigUInt(ensureBigInt(token.amount))
     );
   } else {
     tokens.map((token) =>
-      writer.writeHex(token.tokenId).writeBigVLQ(ensureBigInt(token.amount))
+      writer.writeHex(token.tokenId).writeBigUInt(ensureBigInt(token.amount))
     );
   }
 }
@@ -75,7 +87,7 @@ function writeRegisters(writer: SigmaByteWriter, registers: NonMandatoryRegister
     if (registers[key as keyof NonMandatoryRegisters]) length++;
   }
 
-  writer.writeVLQ(length);
+  writer.writeUInt(length);
   if (length === 0) return;
 
   for (const key of keys) {
@@ -121,4 +133,89 @@ export function estimateBoxSize(
   size += estimateVLQSize(isBox(box) ? box.index : MAX_UINT16_VALUE);
 
   return size;
+}
+
+export function deserializeBox(input: ByteInput): Box<bigint>;
+export function deserializeBox(
+  input: ByteInput,
+  distinctTokenIds: string[]
+): BoxCandidate<bigint>;
+export function deserializeBox(
+  input: ByteInput,
+  distinctTokenIds?: string[]
+): BoxCandidate<bigint> | Box<bigint> {
+  const reader = new SigmaByteReader(input);
+
+  const candidate = {
+    value: reader.readBigUInt(),
+    ergoTree: hex.encode(readErgoTree(reader)),
+    creationHeight: reader.readUInt(),
+    assets: readTokens(reader, distinctTokenIds),
+    additionalRegisters: readRegisters(reader)
+  };
+
+  if (distinctTokenIds) return candidate;
+
+  return {
+    boxId: hex.encode(blake2b256(input)),
+    transactionId: hex.encode(reader.readBytes(32)),
+    index: reader.readUInt(),
+    ...candidate
+  };
+}
+
+function readErgoTree(reader: SigmaByteReader): Uint8Array {
+  // handles miner fee contract
+  if (reader.matchBytes(FEE_CONTRACT_BYTES)) {
+    return reader.readBytes(FEE_CONTRACT_BYTES.length);
+  }
+
+  // handles P2PK contracts
+  if (
+    reader.matchBytes(P2PK_CONTRACT_PREFIX) &&
+    validateEcPoint(reader.peekBytes(COMPRESSED_PK_LENGTH, P2PK_CONTRACT_PREFIX.length))
+  ) {
+    return reader.readBytes(P2PK_CONTRACT_LENGTH);
+  }
+
+  // handles contracts with the size flag enabled
+  const header = reader.readByte();
+  const hasSize = (header & ergoTreeHeaderFlags.sizeInclusion) !== 0;
+  if (!hasSize) {
+    throw new Error("ErgoTree parsing without the size flag is not supported.");
+  }
+
+  const size = reader.readUInt();
+  return new SigmaByteWriter(1 + 4 + size) // header + vlq size + body
+    .write(header)
+    .writeUInt(size)
+    .writeBytes(reader.readBytes(size))
+    .toBytes();
+}
+
+function readTokens(reader: SigmaByteReader, tokenIds?: string[]): TokenAmount<bigint>[] {
+  const tokens: TokenAmount<bigint>[] = [];
+  const count = reader.readUInt();
+
+  for (let i = 0; i < count; i++) {
+    tokens.push({
+      tokenId: tokenIds ? tokenIds[reader.readUInt()] : hex.encode(reader.readBytes(32)),
+      amount: reader.readBigUInt()
+    });
+  }
+
+  return tokens;
+}
+
+function readRegisters(reader: SigmaByteReader): NonMandatoryRegisters {
+  const registers: NonMandatoryRegisters = {};
+  const count = reader.readUInt();
+
+  for (let i = 0; i < count; i++) {
+    // const key = reader.readByte();
+    const value = SConstant.from(reader).toHex();
+    registers[`R${(i + 4).toString()}` as keyof NonMandatoryRegisters] = value;
+  }
+
+  return registers;
 }

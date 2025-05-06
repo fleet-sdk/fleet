@@ -25,20 +25,20 @@ export function serializeTransaction(
   const writer = new SigmaByteWriter(100_000);
 
   // write inputs
-  writer.writeVLQ(transaction.inputs.length);
+  writer.writeUInt(transaction.inputs.length);
   transaction.inputs.map((input) => writeInput(writer, input));
 
   // write data inputs
-  writer.writeVLQ(transaction.dataInputs.length);
+  writer.writeUInt(transaction.dataInputs.length);
   transaction.dataInputs.map((dataInput) => writer.writeHex(dataInput.boxId));
 
   // write distinct token IDs
   const distinctTokenIds = getDistinctTokenIds(transaction.outputs);
-  writer.writeVLQ(distinctTokenIds.length);
+  writer.writeUInt(distinctTokenIds.length);
   distinctTokenIds.map((tokenId) => writer.writeHex(tokenId));
 
   // write outputs
-  writer.writeVLQ(transaction.outputs.length);
+  writer.writeUInt(transaction.outputs.length);
   transaction.outputs.map((output) => serializeBox(output, writer, distinctTokenIds));
 
   return writer;
@@ -68,7 +68,7 @@ function writeProof(writer: SigmaByteWriter, proof: Nullish<string>): void {
   }
 
   const bytes = hex.decode(proof);
-  writer.writeVLQ(bytes.length);
+  writer.writeUInt(bytes.length);
   writer.writeBytes(bytes);
 }
 
@@ -88,13 +88,13 @@ function writeExtension(
     if (isDefined(extension[key])) length++;
   }
 
-  writer.writeVLQ(length);
+  writer.writeUInt(length);
   if (length === 0) return;
 
   for (const key of keys) {
     const val = extension[key];
     if (isDefined(val)) {
-      writer.writeVLQ(Number(key)).writeHex(val);
+      writer.writeUInt(Number(key)).writeHex(val);
     }
   }
 }
