@@ -27,13 +27,6 @@ const P2PK_CONTRACT_PREFIX = hex.decode("0008cd");
 const COMPRESSED_PK_LENGTH = 33;
 const P2PK_CONTRACT_LENGTH = P2PK_CONTRACT_PREFIX.length + COMPRESSED_PK_LENGTH;
 
-export function serializeBox(box: Box<Amount>): SigmaByteWriter;
-export function serializeBox(box: Box<Amount>, writer: SigmaByteWriter): SigmaByteWriter;
-export function serializeBox(
-  box: BoxCandidate<Amount>,
-  writer: SigmaByteWriter,
-  distinctTokenIds: string[]
-): SigmaByteWriter;
 export function serializeBox(
   box: Box<Amount> | BoxCandidate<Amount>,
   writer = new SigmaByteWriter(4_096),
@@ -205,7 +198,7 @@ export function deserializeBox(
   const begin = reader.cursor; // save the current cursor position to track the read bytes
 
   const box: Box<bigint> = {
-    boxId: "", // will be calculated later
+    boxId: "", // placeholder, will be calculated later
     value: reader.readBigUInt(),
     ergoTree: hex.encode(readErgoTree(reader)),
     creationHeight: reader.readUInt(),
@@ -221,14 +214,14 @@ export function deserializeBox(
 
 function readErgoTree(reader: SigmaByteReader): Uint8Array {
   // handles miner fee contract
-  if (reader.matchBytes(FEE_CONTRACT_BYTES)) {
+  if (reader.match(FEE_CONTRACT_BYTES)) {
     return reader.readBytes(FEE_CONTRACT_BYTES.length);
   }
 
   // handles P2PK contracts
   if (
-    reader.matchBytes(P2PK_CONTRACT_PREFIX) &&
-    validateEcPoint(reader.peekBytes(COMPRESSED_PK_LENGTH, P2PK_CONTRACT_PREFIX.length))
+    reader.match(P2PK_CONTRACT_PREFIX) &&
+    validateEcPoint(reader.peek(COMPRESSED_PK_LENGTH, P2PK_CONTRACT_PREFIX.length))
   ) {
     return reader.readBytes(P2PK_CONTRACT_LENGTH);
   }

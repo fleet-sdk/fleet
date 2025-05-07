@@ -90,15 +90,15 @@ export class SigmaByteReader {
   /**
    * Returns bytes without advancing the cursor.
    */
-  peekBytes(length: number, offset = 0): Uint8Array {
+  peek(count: number, offset = 0): Uint8Array {
     const begin = this.#cursor + offset;
-    return this.#bytes.subarray(begin, begin + length);
+    return this.#bytes.subarray(begin, begin + count);
   }
 
   /**
    * Checks if the current position in the byte array starts with the given bytes.
    */
-  matchBytes(bytes: Uint8Array, offset = 0): boolean {
+  match(bytes: Uint8Array, offset = 0): boolean {
     return startsWith(this.#bytes, bytes, this.#cursor + offset);
   }
 }

@@ -114,6 +114,27 @@ export class SigmaByteWriter {
     return this.writeBytes(length ? hash.subarray(0, length) : hash);
   }
 
+  /**
+   * Writes a length-delimited array of items to the byte stream using a provided
+   * serializer function.
+   *
+   * @typeParam T - The type of items in the array.
+   * @param items - The array of items to serialize and write.
+   * @param serializer - A function that serializes each item and writes it using the provided SigmaByteWriter.
+   * @returns The current instance of SigmaByteWriter for method chaining.
+   */
+  writeArray<T>(
+    items: T[],
+    serializer: (item: T, writer: SigmaByteWriter) => void
+  ): SigmaByteWriter {
+    this.writeUInt(items.length);
+    for (const item of items) {
+      serializer(item, this);
+    }
+
+    return this;
+  }
+
   encode<T>(coder: Coder<Uint8Array, T>): T {
     return coder.encode(this.toBytes());
   }
