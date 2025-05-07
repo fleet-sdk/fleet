@@ -128,6 +128,8 @@ export class SigmaByteWriter {
     serializer: (item: T, writer: SigmaByteWriter) => void
   ): SigmaByteWriter {
     this.writeUInt(items.length);
+    if (items.length === 0) return this;
+
     for (const item of items) {
       serializer(item, this);
     }

@@ -84,21 +84,18 @@ function writeExtension(
   }
 
   const keys = Object.keys(extension);
-  let length = 0;
+  const values: [string, string][] = [];
 
   for (const key of keys) {
-    if (isDefined(extension[key])) length++;
+    const value = extension[key];
+    if (!value) continue;
+
+    values.push([key, value]);
   }
 
-  writer.writeUInt(length);
-  if (length === 0) return;
-
-  for (const key of keys) {
-    const val = extension[key];
-    if (isDefined(val)) {
-      writer.writeUInt(Number(key)).writeHex(val);
-    }
-  }
+  writer.writeArray(values, ([key, value], w) =>
+    w.writeUInt(Number(key)).writeHex(value)
+  );
 }
 
 function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {

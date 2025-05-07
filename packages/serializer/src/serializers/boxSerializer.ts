@@ -4,9 +4,7 @@ import {
   ergoTreeHeaderFlags,
   FEE_CONTRACT,
   isDefined,
-  isEmpty,
-  isUndefined,
-  some
+  isUndefined
 } from "@fleet-sdk/common";
 import type {
   Amount,
@@ -53,40 +51,31 @@ function writeTokens(
   tokens: TokenAmount<Amount>[],
   tokenIds?: string[]
 ): void {
-  if (isEmpty(tokens)) {
-    writer.write(0);
-    return;
-  }
-
-  writer.writeUInt(tokens.length);
-  if (some(tokenIds)) {
-    tokens.map((token) =>
-      writer
+  if (tokenIds) {
+    writer.writeArray(tokens, (token, w) =>
+      w
         .writeUInt(tokenIds.indexOf(token.tokenId))
         .writeBigUInt(ensureBigInt(token.amount))
     );
   } else {
-    tokens.map((token) =>
-      writer.writeHex(token.tokenId).writeBigUInt(ensureBigInt(token.amount))
+    writer.writeArray(tokens, (token, w) =>
+      w.writeHex(token.tokenId).writeBigUInt(ensureBigInt(token.amount))
     );
   }
 }
 
 function writeRegisters(writer: SigmaByteWriter, registers: NonMandatoryRegisters): void {
   const keys = Object.keys(registers).sort();
-  let length = 0;
+  const values: string[] = [];
 
   for (const key of keys) {
-    if (registers[key as keyof NonMandatoryRegisters]) length++;
+    const value = registers[key as keyof NonMandatoryRegisters];
+    if (!value) continue;
+
+    values.push(value);
   }
 
-  writer.writeUInt(length);
-  if (length === 0) return;
-
-  for (const key of keys) {
-    const register = registers[key as keyof NonMandatoryRegisters];
-    if (isDefined(register)) writer.writeHex(register);
-  }
+  writer.writeArray(values, (value, w) => w.writeHex(value));
 }
 
 /**
@@ -177,7 +166,7 @@ export function deserializeEmbeddedBox(
     .writeHex(transactionId)
     .writeUInt(index);
 
-  const box = {
+  return {
     boxId: hex.encode(blake2b256(fullBoxWriter.toBytes())),
     value,
     ergoTree,
@@ -187,8 +176,6 @@ export function deserializeEmbeddedBox(
     transactionId,
     index
   };
-
-  return box;
 }
 
 export function deserializeBox(
