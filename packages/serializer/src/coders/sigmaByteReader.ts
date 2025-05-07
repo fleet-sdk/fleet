@@ -13,6 +13,14 @@ export class SigmaByteReader {
     return this.#bytes.length === this.#cursor;
   }
 
+  get bytes(): Uint8Array {
+    return this.#bytes;
+  }
+
+  get cursor(): number {
+    return this.#cursor;
+  }
+
   constructor(bytes: ByteInput) {
     this.#bytes = ensureBytes(bytes);
     this.#cursor = 0;

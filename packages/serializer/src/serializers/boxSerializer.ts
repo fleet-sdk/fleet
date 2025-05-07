@@ -135,33 +135,88 @@ export function estimateBoxSize(
   return size;
 }
 
-export function deserializeBox(input: ByteInput): Box<bigint>;
-export function deserializeBox(
-  input: ByteInput,
-  distinctTokenIds: string[]
-): BoxCandidate<bigint>;
-export function deserializeBox(
-  input: ByteInput,
-  distinctTokenIds?: string[]
-): BoxCandidate<bigint> | Box<bigint> {
-  const reader = new SigmaByteReader(input);
+/**
+ * Deserializes a box embedded in a transaction.
+ *
+ * It efficiently calculates the box ID by accumulating the serialized data during
+ * deserialization and applying blake2b256 hashing, avoiding redundant serialization
+ * operations.
+ *
+ * @param reader - SigmaByteReader containing the serialized box data
+ * @param distinctTokenIds - Array of TokenIDs referenced in the parent transaction
+ * @param transactionId - ID of the transaction containing this box
+ * @param index - Index position of the box in the transaction outputs
+ * @returns A fully deserialized Box with all properties including boxId
+ */
+export function deserializeEmbeddedBox(
+  reader: SigmaByteReader,
+  distinctTokenIds: string[],
+  transactionId: string,
+  index: number
+): Box<bigint> {
+  // SigmaByteReader moves the cursor on read, so we need to save the current position to
+  // track read bytes.
+  let begin = reader.cursor;
 
-  const candidate = {
+  const value = reader.readBigUInt();
+  const ergoTree = hex.encode(readErgoTree(reader));
+  const creationHeight = reader.readUInt();
+
+  // Calculating the BoxID needs the full box data, so to avoid serialization road-trips,
+  // we will accumulate the the box data in a SigmaByteWriter and then calculate the hash
+  // from the its bytes.
+  const fullBoxWriter = new SigmaByteWriter(4_096) // max size of a box
+    .writeBytes(reader.bytes.subarray(begin, reader.cursor)); // copy the bytes read so far
+
+  const assets = readTokens(reader, distinctTokenIds);
+
+  // TokenIDs need to be written in the full box writer
+  fullBoxWriter.writeUInt(assets.length);
+  for (const asset of assets) {
+    fullBoxWriter.writeHex(asset.tokenId).writeBigUInt(asset.amount);
+  }
+
+  begin = reader.cursor; // save the current cursor position again to track the registers bytes
+  const additionalRegisters = readRegisters(reader);
+
+  fullBoxWriter
+    .writeBytes(reader.bytes.subarray(begin, reader.cursor)) // write the registers
+    .writeHex(transactionId)
+    .writeUInt(index);
+
+  const box = {
+    boxId: hex.encode(blake2b256(fullBoxWriter.toBytes())),
+    value,
+    ergoTree,
+    creationHeight,
+    assets,
+    additionalRegisters,
+    transactionId,
+    index
+  };
+
+  return box;
+}
+
+export function deserializeBox(
+  input: ByteInput | SigmaByteReader
+): BoxCandidate<bigint> | Box<bigint> {
+  const reader = input instanceof SigmaByteReader ? input : new SigmaByteReader(input);
+  const begin = reader.cursor; // save the current cursor position to track the read bytes
+
+  const box: Box<bigint> = {
+    boxId: "", // will be calculated later
     value: reader.readBigUInt(),
     ergoTree: hex.encode(readErgoTree(reader)),
     creationHeight: reader.readUInt(),
-    assets: readTokens(reader, distinctTokenIds),
-    additionalRegisters: readRegisters(reader)
-  };
-
-  if (distinctTokenIds) return candidate;
-
-  return {
-    boxId: hex.encode(blake2b256(input)),
+    assets: readTokens(reader),
+    additionalRegisters: readRegisters(reader),
     transactionId: hex.encode(reader.readBytes(32)),
-    index: reader.readUInt(),
-    ...candidate
+    index: reader.readUInt()
   };
+
+  box.boxId = hex.encode(blake2b256(reader.bytes.subarray(begin, reader.cursor)));
+  return box;
 }
 
 function readErgoTree(reader: SigmaByteReader): Uint8Array {
