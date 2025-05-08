@@ -1,15 +1,10 @@
-import {
-  type Box,
-  byteSizeOf,
-  ensureBigInt,
-  FEE_CONTRACT,
-  first
-} from "@fleet-sdk/common";
+import { type Box, byteSizeOf, ensureBigInt, first } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { manyTokensBoxes, regularBoxes, validBoxes } from "_test-vectors";
 import { describe, expect, it, test } from "vitest";
-import { boxVectors } from "../_test-vectors/boxVectors";
+import { boxVectors, deserializationTestVectors } from "../_test-vectors/boxVectors";
 import { estimateBoxSize, deserializeBox, serializeBox } from "./boxSerializer";
+import { SigmaByteReader } from "../coders";
 import { mockUTxO } from "packages/mock-chain/src";
 
 describe("ErgoBox serialization", () => {
@@ -87,75 +82,6 @@ describe("ErgoBox serialization", () => {
     expect(() => estimateBoxSize(output)).toThrow();
   });
 
-  const deserializationTestVectors = [
-    {
-      name: "size flag, with tokens and additional registers",
-      box: mockUTxO({
-        ergoTree:
-          "1999030f0400040204020404040405feffffffffffffffff0105feffffffffffffffff01050004d00f040004000406050005000580dac409d819d601b2a5730000d602e4c6a70404d603db63087201d604db6308a7d605b27203730100d606b27204730200d607b27203730300d608b27204730400d6099973058c720602d60a999973068c7205027209d60bc17201d60cc1a7d60d99720b720cd60e91720d7307d60f8c720802d6107e720f06d6117e720d06d612998c720702720fd6137e720c06d6147308d6157e721206d6167e720a06d6177e720906d6189c72117217d6199c72157217d1ededededededed93c27201c2a793e4c672010404720293b27203730900b27204730a00938c7205018c720601938c7207018c72080193b17203730b9593720a730c95720e929c9c721072117e7202069c7ef07212069a9c72137e7214067e9c720d7e72020506929c9c721372157e7202069c7ef0720d069a9c72107e7214067e9c72127e7202050695ed720e917212730d907216a19d721872139d72197210ed9272189c721672139272199c7216721091720b730e",
-        assets: [
-          {
-            tokenId: "50fdc80e168c153e472bd7e3dd18a4a0b9e90c550206fdbdb789ee8afdd3b1a9",
-            amount: 1n
-          }
-        ],
-        additionalRegisters: {
-          R4: "05cab4cd9a03",
-          R5: "04bc8968",
-          R6: "0e20f7ef73c4a4ab91b84bb0a2905108d534114472ec057be3a57a9dfc9b1fbd85c1"
-        }
-      })
-    },
-    {
-      name: "size flag, ergotree v1, with additional registers but no tokens",
-      box: mockUTxO({
-        ergoTree: "19090104c801d191a37300",
-        additionalRegisters: { R4: "05cab4cd9a03" }
-      })
-    },
-    {
-      name: "size flag, ergotree v0, with tokens but not additional registers",
-      box: mockUTxO({
-        ergoTree: "0806d191a304c801",
-        assets: [
-          {
-            tokenId: "50fdc80e168c153e472bd7e3dd18a4a0b9e90c550206fdbdb789ee8afdd3b1a9",
-            amount: 1298743323231n
-          }
-        ]
-      })
-    },
-    {
-      name: "fee contract, no tokens, no additional registers",
-      box: mockUTxO({ ergoTree: FEE_CONTRACT })
-    },
-    {
-      name: "p2pk contract, with multiple tokens, but no additional registers",
-      box: mockUTxO({
-        ergoTree:
-          "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
-        assets: [
-          {
-            tokenId: "de5ee573c6a492c129d51119649bfeaedfc9afa6f54af576e62e1f7f3bbd4207",
-            amount: 1581138830n
-          },
-          {
-            tokenId: "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489",
-            amount: 1002634n
-          },
-          {
-            tokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
-            amount: 50n
-          },
-          {
-            tokenId: "74251ce2cb4eb2024a1a155e19ad1d1f58ff8b9e6eb034a3bb1fd58802757d23",
-            amount: 200000000000n
-          }
-        ]
-      })
-    }
-  ];
-
   test.each(deserializationTestVectors)(
     "roundtrip box serialization, case: $name",
     ({ name, box }) => {
@@ -167,6 +93,17 @@ describe("ErgoBox serialization", () => {
       expect(deserialized.boxId).toEqual(boxId);
     }
   );
+
+  it("Should deserialize from SigmaByteReader", () => {
+    const box = deserializationTestVectors[0].box;
+
+    const serialized = serializeBox(box).toBytes();
+    const deserialized = deserializeBox(new SigmaByteReader(serialized));
+    expect(deserialized).toEqual(box);
+
+    const boxId = hex.encode(blake2b256(serialized));
+    expect(deserialized.boxId).toEqual(boxId);
+  });
 
   it("Should fail to parse box without the size flag for a unknown contract", () => {
     const box = mockUTxO({
