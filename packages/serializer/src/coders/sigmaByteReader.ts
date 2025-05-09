@@ -26,6 +26,17 @@ export class SigmaByteReader {
     this.#cursor = 0;
   }
 
+  readArray<T>(readFn: (reader: SigmaByteReader, index: number) => T): Array<T> {
+    const length = this.readUInt();
+    const items = new Array<T>(length);
+
+    for (let i = 0; i < length; i++) {
+      items[i] = readFn(this, i);
+    }
+
+    return items;
+  }
+
   readBool(): boolean {
     return this.readByte() === 0x01;
   }

@@ -147,27 +147,27 @@ export function deserializeEmbeddedBox(
   // Calculating the BoxID needs the full box data, so to avoid serialization road-trips,
   // we will accumulate the the box data in a SigmaByteWriter and then calculate the hash
   // from the its bytes.
-  const fullBoxWriter = new SigmaByteWriter(4_096) // max size of a box
+  const boxIdWriter = new SigmaByteWriter(4_096) // max size of a box
     .writeBytes(reader.bytes.subarray(begin, reader.cursor)); // copy the bytes read so far
 
   const assets = readTokens(reader, distinctTokenIds);
 
   // TokenIDs need to be written in the full box writer
-  fullBoxWriter.writeUInt(assets.length);
+  boxIdWriter.writeUInt(assets.length);
   for (const asset of assets) {
-    fullBoxWriter.writeHex(asset.tokenId).writeBigUInt(asset.amount);
+    boxIdWriter.writeHex(asset.tokenId).writeBigUInt(asset.amount);
   }
 
   begin = reader.cursor; // save the current cursor position again to track the registers bytes
   const additionalRegisters = readRegisters(reader);
 
-  fullBoxWriter
+  boxIdWriter
     .writeBytes(reader.bytes.subarray(begin, reader.cursor)) // write the registers
     .writeHex(transactionId)
     .writeUInt(index);
 
   return {
-    boxId: hex.encode(blake2b256(fullBoxWriter.toBytes())),
+    boxId: hex.encode(blake2b256(boxIdWriter.toBytes())),
     value,
     ergoTree,
     creationHeight,
@@ -229,17 +229,10 @@ function readErgoTree(reader: SigmaByteReader): Uint8Array {
 }
 
 function readTokens(reader: SigmaByteReader, tokenIds?: string[]): TokenAmount<bigint>[] {
-  const tokens: TokenAmount<bigint>[] = [];
-  const count = reader.readUInt();
-
-  for (let i = 0; i < count; i++) {
-    tokens.push({
-      tokenId: tokenIds ? tokenIds[reader.readUInt()] : hex.encode(reader.readBytes(32)),
-      amount: reader.readBigUInt()
-    });
-  }
-
-  return tokens;
+  return reader.readArray((r) => ({
+    tokenId: tokenIds ? tokenIds[r.readUInt()] : hex.encode(r.readBytes(32)),
+    amount: r.readBigUInt()
+  }));
 }
 
 function readRegisters(reader: SigmaByteReader): NonMandatoryRegisters {

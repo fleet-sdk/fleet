@@ -11,11 +11,7 @@ import {
 } from "@fleet-sdk/common";
 import { ErgoMessage, ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { blake2b256, type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
-import {
-  type MinimalUnsignedTransaction,
-  serializeBox,
-  serializeTransaction
-} from "@fleet-sdk/serializer";
+import { serializeBox, serializeTransaction } from "@fleet-sdk/serializer";
 import type { ErgoHDKey } from "../ergoHDKey";
 import { sign, verify } from "./proveDLogProtocol";
 
@@ -26,7 +22,7 @@ export type KeyMap = Record<number, ErgoHDKey> & { _?: ErgoHDKey[] };
 export type Message =
   | SignedTransaction
   | ErgoUnsignedTransaction
-  | MinimalUnsignedTransaction
+  | UnsignedTransaction
   | ErgoMessage
   | ByteInput
   | Base58String;

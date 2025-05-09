@@ -1,32 +1,22 @@
 import type {
   Amount,
   BoxCandidate,
-  DataInput,
   SignedInput,
   SignedTransaction,
   UnsignedInput,
   UnsignedTransaction
 } from "@fleet-sdk/common";
-import { isDefined } from "@fleet-sdk/common";
 import { SigmaByteReader, SigmaByteWriter } from "../coders";
 import { deserializeEmbeddedBox, serializeBox } from "./boxSerializer";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import type { ByteInput } from "../types/constructors";
 import { SConstant } from "../sigmaConstant";
 
-export type MinimalUnsignedTransaction = {
-  inputs: UnsignedInput[];
-  dataInputs: DataInput[];
-  outputs: BoxCandidate<Amount>[];
-};
-
 type Nullish<T> = T | null | undefined;
-
 type Input = UnsignedInput | SignedInput;
+type Transaction = UnsignedTransaction | SignedTransaction;
 
-export function serializeTransaction(
-  transaction: MinimalUnsignedTransaction | SignedTransaction
-): SigmaByteWriter {
+export function serializeTransaction(transaction: Transaction): SigmaByteWriter {
   const tokenIds = getDistinctTokenIds(transaction.outputs);
 
   return new SigmaByteWriter(100_000)
@@ -105,45 +95,14 @@ function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {
   return Array.from(tokenIds);
 }
 
-export function deserializeTransaction<T extends SignedTransaction | UnsignedTransaction>(
-  input: ByteInput
-): T {
+export function deserializeTransaction<T extends Transaction>(input: ByteInput): T {
   const reader = new SigmaByteReader(input);
 
-  const inputCount = reader.readUInt();
-  const inputs: (SignedInput | UnsignedInput)[] = [];
-  for (let i = 0; i < inputCount; i++) {
-    inputs.push(readInput(reader));
-  }
-
-  // The transaction ID is computed by serializing inputs as unsigned (excluding proofs),
-  // even for signed transactions.
-  const txIdBytes = inputs.some(isSignedInput)
-    ? new SigmaByteWriter(input.length)
-        .writeArray(inputs, (input, writer) => writeUnsignedInput(writer, input)) // write inputs as unsigned
-        .writeBytes(reader.bytes.subarray(reader.cursor))
-        .toBytes()
-    : reader.bytes;
-
-  const id = hex.encode(blake2b256(txIdBytes));
-
-  const dataInputCount = reader.readUInt();
-  const dataInputs: DataInput[] = [];
-  for (let i = 0; i < dataInputCount; i++) {
-    dataInputs.push({ boxId: hex.encode(reader.readBytes(32)) });
-  }
-
-  const distinctTokenCount = reader.readUInt();
-  const distinctTokenIds: string[] = [];
-  for (let i = 0; i < distinctTokenCount; i++) {
-    distinctTokenIds.push(hex.encode(reader.readBytes(32)));
-  }
-
-  const outputCount = reader.readUInt();
-  const outputs: BoxCandidate<Amount>[] = [];
-  for (let i = 0; i < outputCount; i++) {
-    outputs.push(deserializeEmbeddedBox(reader, distinctTokenIds, id, i));
-  }
+  const inputs = reader.readArray(readInput);
+  const id = computeId(reader, inputs);
+  const dataInputs = reader.readArray((r) => ({ boxId: hex.encode(r.readBytes(32)) }));
+  const tokenIds = reader.readArray((r) => hex.encode(r.readBytes(32)));
+  const outputs = reader.readArray((r, i) => deserializeEmbeddedBox(r, tokenIds, id, i));
 
   return {
     id,
@@ -168,4 +127,17 @@ function readInput(reader: SigmaByteReader): SignedInput | UnsignedInput {
   return proofBytes
     ? { boxId, spendingProof: { proofBytes, extension } }
     : { boxId, extension };
+}
+
+/**
+ * Computes the transaction ID by serializing inputs as unsigned (excluding proofs),
+ * even for signed transactions.
+ */
+function computeId(reader: SigmaByteReader, inputs: Input[]): string {
+  const bytes = new SigmaByteWriter(reader.bytes.length)
+    .writeArray(inputs, (input, writer) => writeUnsignedInput(writer, input)) // write inputs as unsigned
+    .writeBytes(reader.bytes.subarray(reader.cursor))
+    .toBytes();
+
+  return hex.encode(blake2b256(bytes));
 }
