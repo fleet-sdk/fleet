@@ -128,6 +128,8 @@ jobs:
         run: pnpm run test:unit-edge
 
   publish-preview:
+    permissions:
+      pull-requests: write # to be able to comment on the pull requests
     name: "Publish preview"
     runs-on: ubuntu-latest
     needs: build-and-test-node
