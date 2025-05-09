@@ -20,12 +20,9 @@ import {
   OutputBuilder,
   SAFE_MIN_BOX_VALUE
 } from "./outputBuilder";
-import {
-  FEE_CONTRACT,
-  RECOMMENDED_MIN_FEE_VALUE,
-  TransactionBuilder
-} from "./transactionBuilder";
+import { TransactionBuilder } from "./transactionBuilder";
 import { mockUTxO } from "packages/mock-chain/src";
+import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
 
 const height = 844540;
 const a1 = {

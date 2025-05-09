@@ -1,7 +1,11 @@
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
-import { unsignedTransactionVectors } from "../_test-vectors/transactionVectors";
-import { serializeTransaction } from "./transactionSerializer";
+import {
+  deserializableTxVectors,
+  raffleSignedTransaction,
+  unsignedTransactionVectors
+} from "../_test-vectors/transactionVectors";
+import { deserializeTransaction, serializeTransaction } from "./transactionSerializer";
 import signedTransactionVectors from "../_test-vectors/signedTransactions.json";
 import { isEmpty } from "@fleet-sdk/common";
 
@@ -17,7 +21,26 @@ describe("Transaction serializer", () => {
   );
 
   test.each(signedTransactionVectors)("should serialize signed transaction", (tv) => {
-    expect(hex.encode(serializeTransaction(tv.json).toBytes())).toBe(tv.hex);
+    expect(serializeTransaction(tv.json).encode(hex)).toBe(tv.hex);
+  });
+
+  test.each(deserializableTxVectors)(
+    "should roundtrip transaction serialization, case: $name",
+    ({ name, tx }) => {
+      const serialized = serializeTransaction(tx).toBytes();
+      const deserialized = deserializeTransaction(serialized);
+
+      expect(deserialized).toMatchObject(tx);
+    }
+  );
+
+  it("should calculate the correct transaction id on deserialization", () => {
+    const tv = raffleSignedTransaction; // signed transaction
+
+    const serialized = serializeTransaction(tv).encode(hex);
+    const deserialized = deserializeTransaction(serialized);
+
+    expect(deserialized.id).toBe(tv.id);
   });
 
   it("should serialize if input extension is undefined", () => {
@@ -31,6 +54,6 @@ describe("Transaction serializer", () => {
       }
     }
 
-    expect(hex.encode(serializeTransaction(tx).toBytes())).toEqual(tv.hex);
+    expect(serializeTransaction(tx).encode(hex)).toEqual(tv.hex);
   });
 });

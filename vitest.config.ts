@@ -20,6 +20,7 @@ export default defineConfig({
         "**/dist/**",
         "**/common/src/types/index.ts", // probably a vitest bug
         "**/common/src/types/enums.ts", // no need to test enums directly
+        "**/common/src/constants.ts", // no need to test constants directly
         "**/src/index.ts"
       ]
     }

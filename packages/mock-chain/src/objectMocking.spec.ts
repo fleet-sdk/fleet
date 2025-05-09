@@ -15,7 +15,7 @@ describe("mockUTxO()", () => {
     expect(utxo.value).to.be.equal(SAFE_MIN_BOX_VALUE);
     expect(utxo.ergoTree).to.be.equal(ergoTree);
     expect(utxo.assets).to.be.empty;
-    expect(utxo.creationHeight).to.be.equal(0);
+    expect(utxo.creationHeight).to.be.equal(849741);
     expect(utxo.additionalRegisters).to.be.empty;
 
     expect(utxo.transactionId).to.have.length(64);

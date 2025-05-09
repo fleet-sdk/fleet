@@ -74,7 +74,7 @@ export const typeSerializer = {
 
           // Generic tuple
           writer.write(descriptors.tuple.genericTupleTypeCode);
-          writer.writeVLQ(len);
+          writer.writeUInt(len);
         }
       }
 
@@ -141,7 +141,7 @@ export const typeSerializer = {
 
     switch (byte) {
       case descriptors.tuple.genericTupleTypeCode: {
-        const len = r.readVlq();
+        const len = r.readUInt();
         const wrapped = new Array<SType>(len);
         for (let i = 0; i < len; i++) {
           wrapped[i] = this.deserialize(r);

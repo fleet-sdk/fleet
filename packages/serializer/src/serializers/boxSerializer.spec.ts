@@ -1,11 +1,13 @@
 import { type Box, byteSizeOf, ensureBigInt, first } from "@fleet-sdk/common";
-import { hex } from "@fleet-sdk/crypto";
+import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { manyTokensBoxes, regularBoxes, validBoxes } from "_test-vectors";
-import { describe, expect, it } from "vitest";
-import { boxVectors } from "../_test-vectors/boxVectors";
-import { estimateBoxSize, serializeBox } from "./boxSerializer";
+import { describe, expect, it, test } from "vitest";
+import { boxVectors, deserializationTestVectors } from "../_test-vectors/boxVectors";
+import { estimateBoxSize, deserializeBox, serializeBox } from "./boxSerializer";
+import { SigmaByteReader } from "../coders";
+import { mockUTxO } from "packages/mock-chain/src";
 
-describe("Serialize ErgoBox", () => {
+describe("ErgoBox serialization", () => {
   it.each(boxVectors)("Should serialize [$json.boxId]", (tv) => {
     expect(serializeBox(tv.json).encode(hex)).toBe(tv.hex);
   });
@@ -78,5 +80,39 @@ describe("Serialize ErgoBox", () => {
     };
 
     expect(() => estimateBoxSize(output)).toThrow();
+  });
+
+  test.each(deserializationTestVectors)(
+    "roundtrip box serialization, case: $name",
+    ({ name, box }) => {
+      const serialized = serializeBox(box).toBytes();
+      const deserialized = deserializeBox(serialized);
+      expect(deserialized).toEqual(box);
+
+      const boxId = hex.encode(blake2b256(serialized));
+      expect(deserialized.boxId).toEqual(boxId);
+    }
+  );
+
+  it("Should deserialize from SigmaByteReader", () => {
+    const box = deserializationTestVectors[0].box;
+
+    const serialized = serializeBox(box).toBytes();
+    const deserialized = deserializeBox(new SigmaByteReader(serialized));
+    expect(deserialized).toEqual(box);
+
+    const boxId = hex.encode(blake2b256(serialized));
+    expect(deserialized.boxId).toEqual(boxId);
+  });
+
+  it("Should fail to parse box without the size flag for a unknown contract", () => {
+    const box = mockUTxO({
+      ergoTree:
+        "1014040004000e208c27dd9d8a35aac1e3167d58858c0a8b4059b277da790552e37eba22df9b903504000400040204020101040205a0c21e040204080500040c040204a0c21e0402050a05c8010402d806d601b2a5730000d602b5db6501fed9010263ed93e4c67202050ec5a7938cb2db63087202730100017302d603b17202d604e4c6b272027303000605d605d90105049590720573047204e4c6b272029972057305000605d606b07202860273067307d901063c400163d803d6088c720601d6098c720801d60a8c72060286029a72097308ededed8c72080293c2b2a5720900d0cde4c6720a040792c1b2a5720900730992da720501997209730ae4c6720a0605ea02d1ededededededed93cbc27201e4c6a7060e927203730b93db63087201db6308a793e4c6720104059db07202730cd9010741639a8c720701e4c68c72070206057e72030593e4c6720105049ae4c6a70504730d92c1720199c1a77e9c9a7203730e730f058c72060292da720501998c72060173109972049d9c720473117312b2ad7202d9010763cde4c672070407e4c6b2a5731300040400"
+    });
+
+    expect(() => deserializeBox(serializeBox(box).toBytes())).toThrow(
+      "ErgoTree parsing without the size flag is not supported."
+    );
   });
 });

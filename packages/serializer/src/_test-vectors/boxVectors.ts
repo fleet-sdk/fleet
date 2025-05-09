@@ -1,4 +1,5 @@
-import type { Amount, Box } from "@fleet-sdk/common";
+import { FEE_CONTRACT, type Amount, type Box } from "@fleet-sdk/common";
+import { mockUTxO } from "packages/mock-chain/src";
 
 export const boxVectors: {
   hex: string;
@@ -14,6 +15,25 @@ export const boxVectors: {
       ergoTree:
         "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
       additionalRegisters: {},
+      assets: [
+        {
+          tokenId: "50fdc80e168c153e472bd7e3dd18a4a0b9e90c550206fdbdb789ee8afdd3b1a9",
+          amount: "1"
+        }
+      ]
+    },
+    hex: "c0843d0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63cdee330150fdc80e168c153e472bd7e3dd18a4a0b9e90c550206fdbdb789ee8afdd3b1a90100ae11d207f0989945f63909d2f703b2640acf4f654a8fdadd23570a640f9d12ee00"
+  },
+  {
+    json: {
+      boxId: "135baecae94f7ec20caf981800166d450bd1dde4b959e5fdd0e2751b679d94dd",
+      transactionId: "ae11d207f0989945f63909d2f703b2640acf4f654a8fdadd23570a640f9d12ee",
+      value: "1000000",
+      creationHeight: 849741,
+      index: 0,
+      ergoTree:
+        "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+      additionalRegisters: { R4: undefined },
       assets: [
         {
           tokenId: "50fdc80e168c153e472bd7e3dd18a4a0b9e90c550206fdbdb789ee8afdd3b1a9",
@@ -208,5 +228,74 @@ export const boxVectors: {
       }
     },
     hex: "90bbe2ee371014040004000e208c27dd9d8a35aac1e3167d58858c0a8b4059b277da790552e37eba22df9b903504000400040204020101040205a0c21e040204080500040c040204a0c21e0402050a05c8010402d806d601b2a5730000d602b5db6501fed9010263ed93e4c67202050ec5a7938cb2db63087202730100017302d603b17202d604e4c6b272027303000605d605d90105049590720573047204e4c6b272029972057305000605d606b07202860273067307d901063c400163d803d6088c720601d6098c720801d60a8c72060286029a72097308ededed8c72080293c2b2a5720900d0cde4c6720a040792c1b2a5720900730992da720501997209730ae4c6720a0605ea02d1ededededededed93cbc27201e4c6a7060e927203730b93db63087201db6308a793e4c6720104059db07202730cd9010741639a8c720701e4c68c72070206057e72030593e4c6720105049ae4c6a70504730d92c1720199c1a77e9c9a7203730e730f058c72060292da720501998c72060173109972049d9c720473117312b2ad7202d9010763cde4c672070407e4c6b2a5731300040400db843401011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f010305cab4cd9a0304bc89680e20f7ef73c4a4ab91b84bb0a2905108d534114472ec057be3a57a9dfc9b1fbd85c1f1ab205c16865eeadb8eeade83d3de93fbb6cf203da15a8a485dc449c71b663a00"
+  }
+];
+
+export const deserializationTestVectors = [
+  {
+    name: "size flag, with tokens and additional registers",
+    box: mockUTxO({
+      ergoTree:
+        "1999030f0400040204020404040405feffffffffffffffff0105feffffffffffffffff01050004d00f040004000406050005000580dac409d819d601b2a5730000d602e4c6a70404d603db63087201d604db6308a7d605b27203730100d606b27204730200d607b27203730300d608b27204730400d6099973058c720602d60a999973068c7205027209d60bc17201d60cc1a7d60d99720b720cd60e91720d7307d60f8c720802d6107e720f06d6117e720d06d612998c720702720fd6137e720c06d6147308d6157e721206d6167e720a06d6177e720906d6189c72117217d6199c72157217d1ededededededed93c27201c2a793e4c672010404720293b27203730900b27204730a00938c7205018c720601938c7207018c72080193b17203730b9593720a730c95720e929c9c721072117e7202069c7ef07212069a9c72137e7214067e9c720d7e72020506929c9c721372157e7202069c7ef0720d069a9c72107e7214067e9c72127e7202050695ed720e917212730d907216a19d721872139d72197210ed9272189c721672139272199c7216721091720b730e",
+      assets: [
+        {
+          tokenId: "50fdc80e168c153e472bd7e3dd18a4a0b9e90c550206fdbdb789ee8afdd3b1a9",
+          amount: 1n
+        }
+      ],
+      additionalRegisters: {
+        R4: "05cab4cd9a03",
+        R5: "04bc8968",
+        R6: "0e20f7ef73c4a4ab91b84bb0a2905108d534114472ec057be3a57a9dfc9b1fbd85c1"
+      }
+    })
+  },
+  {
+    name: "size flag, ergotree v1, with additional registers but no tokens",
+    box: mockUTxO({
+      ergoTree: "19090104c801d191a37300",
+      additionalRegisters: { R4: "05cab4cd9a03" }
+    })
+  },
+  {
+    name: "size flag, ergotree v0, with tokens but not additional registers",
+    box: mockUTxO({
+      ergoTree: "0806d191a304c801",
+      assets: [
+        {
+          tokenId: "50fdc80e168c153e472bd7e3dd18a4a0b9e90c550206fdbdb789ee8afdd3b1a9",
+          amount: 1298743323231n
+        }
+      ]
+    })
+  },
+  {
+    name: "fee contract, no tokens, no additional registers",
+    box: mockUTxO({ ergoTree: FEE_CONTRACT })
+  },
+  {
+    name: "p2pk contract, with multiple tokens, but no additional registers",
+    box: mockUTxO({
+      ergoTree:
+        "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+      assets: [
+        {
+          tokenId: "de5ee573c6a492c129d51119649bfeaedfc9afa6f54af576e62e1f7f3bbd4207",
+          amount: 1581138830n
+        },
+        {
+          tokenId: "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489",
+          amount: 1002634n
+        },
+        {
+          tokenId: "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
+          amount: 50n
+        },
+        {
+          tokenId: "74251ce2cb4eb2024a1a155e19ad1d1f58ff8b9e6eb034a3bb1fd58802757d23",
+          amount: 200000000000n
+        }
+      ]
+    })
   }
 ];

@@ -1,4 +1,4 @@
-import type { UnsignedTransaction } from "@fleet-sdk/common";
+import type { SignedTransaction, UnsignedTransaction } from "@fleet-sdk/common";
 
 export const unsignedTransactionVectors: {
   name: string;
@@ -595,5 +595,394 @@ export const unsignedTransactionVectors: {
         }
       ]
     }
+  }
+];
+
+export const raffleSignedTransaction = {
+  id: "569b9f36b41c0dc0a6c488eea12fe803b7a6bd97d2b92079d455f6d0dd9080a2",
+  inputs: [
+    {
+      boxId: "6394efce52392141d67cdc70d9474ff85fea07df49530e85b9d26fbe43362bc4",
+      spendingProof: {
+        proofBytes:
+          "b8b2b17792bccd7fc27f6b53203524da6d3d3863c556ba0a530c25df1c1a49c41df8728fad61ba4f4fb6621fb602498dd830055da030d35a",
+        extension: {
+          "0": "1101d00f",
+          "1": "1a02240008cd03b8b4b552caf9dbd5173eb5b1e441dc8f47630abe01105009f2716fee8e834506240008cd023625de27837c0d91735145f7330fb1867cfe23b8e27b20e2a7d31bc825ef4f8e"
+        }
+      }
+    },
+    {
+      boxId: "0d12f7a3872db6673765fb245035040c8b21cfe70ab73f49249d38c424bcd113",
+      spendingProof: {
+        proofBytes:
+          "ff8213f8c7c0451986e0404026fa8c0ead0f7192f1a6e3edb5ae413311db6e1f444c4e9606d5b3de288bcf4ac71a0f6f1062be7cef82c202",
+        extension: {}
+      }
+    }
+  ],
+  dataInputs: [],
+  outputs: [
+    {
+      boxId: "bfef0e91e167b37a3fdbe1cf0c23d6856865e0803ac62a5a116038a022664dab",
+      value: 15000000n,
+      ergoTree:
+        "19b70632040004000e20af97b783aeb7276a072a894c089bfebdd6ac8ab50bd40edc523dce2ce42cd12401010402040204000502050204020406040404000400040204080e20a311ddfab7e82e39036b94dd52044ca044215d8b97f3d5f25d43a168d0182875040004020e208d2b06d64a3bbe6d5a72070499ae86f6e107b388dfb652ece1f2b270f31f2fa304000404040e05000402040405d00f04060500040c040604000402040004040402040404000402050a05100404050005d00f04040500050005d00f05000100d803d601b2a5730000d602db63087201d603b2720273010095938c7203017302d17303d809d604b27202730400d6058c720402d606db6308a7d607b27206730500d6088c720702d609e4c6a70411d60ae4c6a7050ed60b8c720701d60c9683070193e4c672010411720993e4c67201050e720a93c27201c2a7937203b27206730600938c720401720b92c17201c1a793b17202b17206959372059a72087307d1720c959372059972087308d812d60db2a5730900d60edb6308720dd60fc5a7d610b27209730a00d611b2a5730b00d612db63087211d613e4c672110411d614b27213730c00d615b27209730d00d616b27209730e00d6179a9a721472157216d618e4c67211051ad619e4e3011ad61ae4c67211071ad61be4e30011d61cb1721bd61dc17211d61eb27213730f00d196831e01720c93cbc2720d7310938cb2720e73110001720f93b1720e731293c1720d721093cbc272117313938cb2721273140001720b90b17212731593b172137316927214731793b27213731800721593b2721373190072168f7217731a91b27213731b00731c93b27213731d00721093b17218731e93b27218731f00720a93b27218732000cbb2721973210093b27218732200cbb2721973230092b1e4c67211061a732493b2721a732500720f93b2721a732600cbb0721b830002d9011f4d0eb38c721f017a8c721f0293e4c672110804721c92721d9a9c9c732772107e721c059c7328721092721db2720973290093b0721b732ad9011f599a8c721f018c721f02732befaeb4a5732cb1a5d9011f63aedb6308721fd901214d0e938c722101720f919c721e7215732d919c721e7216732e919c721e99732f72177330d17331",
+      assets: [
+        {
+          tokenId: "74e4d58add8c75f6f60c04bc20f077270f3083b0fa0c199d8f2e356b5e10e9b1",
+          amount: 1n
+        },
+        {
+          tokenId: "df4beade44143b716c32f1bb8d6238dd01600a18f8619a4bc3b7fb34cfa4753d",
+          amount: 999999998n
+        }
+      ],
+      creationHeight: 1695302,
+      additionalRegisters: {
+        R4: "1104c801c80180a8d6b9078087a70e",
+        R5: "0e20edb662d009b16812a2bd2ffd1b926b965d62040ade9241fdc4b88237a99dfebe"
+      },
+      transactionId: "569b9f36b41c0dc0a6c488eea12fe803b7a6bd97d2b92079d455f6d0dd9080a2",
+      index: 0
+    },
+    {
+      boxId: "ee91f384e156b24373ea5b2406b463f205984df108dac58ca2d3566bc9740363",
+      value: 15000000n,
+      ergoTree:
+        "19950108040004020400040004000e20df4beade44143b716c32f1bb8d6238dd01600a18f8619a4bc3b7fb34cfa4753d05020400d805d601db6308b2a5730000d602b27201730100d603b2db6308a7730200d6048c720301d605b2a4730300d196830401938cb27201730400017305938c7202017204938c72020299998c7203027ee4c67205080405730693b2e4c67205071a7307007204",
+      assets: [
+        {
+          tokenId: "6394efce52392141d67cdc70d9474ff85fea07df49530e85b9d26fbe43362bc4",
+          amount: 1000000000n
+        }
+      ],
+      creationHeight: 1695302,
+      additionalRegisters: {
+        R4: "0e0f5469636b65745265706f546f6b656e",
+        R5: "0e00",
+        R6: "0e0130"
+      },
+      transactionId: "569b9f36b41c0dc0a6c488eea12fe803b7a6bd97d2b92079d455f6d0dd9080a2",
+      index: 1
+    },
+    {
+      boxId: "7284c29e7a9941a8eae29aee38622d802f19561bdf53337d087cd959e4bdf489",
+      value: 1195000000n,
+      ergoTree:
+        "19cf052404000400040c040204060406040404000e20f23fd8c734a5e217c7efe671190e1ab0be7f777ce3c6686d1c8feaee86fc262d0400040004020402050a050004020404040201010e2005c331a7c66ca70aedafa4ea4d65f65d711aef0821b51a6f02c07ad07a0c7f8304000e20c5c2936541aa8b3e9614ca2df228c080fae9a5c9b2f328bd2c4c4881f6e000060400040205080402040a040404020500040205a01f05a01f040204020400d810d601b2a5730000d602db63087201d603db6308a7d604e4c6a7071ad605b27204730100d606b17203d607e4c6a70411d608b27207730200d609e4c6a70804d60a7e720905d60bb2a5730300d60cb4a573049a72097305d60dc5a7d60eb2a5730600d60fdb6308720ed610b2720f730700d19683180193cbc272017308938cb27202730900018cb27203730a0001938cb27202730b0001720593b172029a7206730c93c172019999c1a79c9c730d7208720a720893e4c672010411720793e4c67201051ae4c6a7051a93e4c672010604720993e4c672010705730e95ef937206730f93b2db63087201731000b27203731100731293cbc2720b731393e4c6720b041ae4c6a7061a938cb2db6308720b73140001720593c1720b7208afdb0c0e720cd9011104d803d613b2720c721100d614db63087213d615e4c6721304119683090193cbc272137315938cb2721473160001720593b17214731793c172139c7318720893b27215731900b27207731a0093b27215731b00720893e4c6721305049a7211731c93e4c672130605731d93e4c67213070e720d93b1720f731e938c721001720d938c7210029c731f720a93e4c6720e07118302057320720893e4c6720e080e720593e4c6720e09108302047209732193c1720e9c7208720a93b27204732200cbb0720c830002d901113c0e63b38c7211017ab2e4c68c7211020411732300efaea5d9011163ed94c57211c5720eaedb63087211d901134d0e938c721301720d",
+      assets: [
+        {
+          tokenId: "df4beade44143b716c32f1bb8d6238dd01600a18f8619a4bc3b7fb34cfa4753d",
+          amount: 1n
+        }
+      ],
+      creationHeight: 1695302,
+      additionalRegisters: {
+        R4: "11079003c801c80180dac409d00f96f9ce018087a70e",
+        R5: "1a0320edb662d009b16812a2bd2ffd1b926b965d62040ade9241fdc4b88237a99dfebe20b894faef6f944647dac930d195680808a3fd7c660308196f2a0f4e94dc8c0fa820d217c8109e3bb5535c96d04875649efdb07b211b59bd0d1c62681baa8b8e0f11",
+        R6: "1a02045465737414536f6d65206465736372697074696f6e732e2e2e",
+        R7: "1a02206394efce52392141d67cdc70d9474ff85fea07df49530e85b9d26fbe43362bc4203851ae49debc087ff742ec6b70d461d54997173be5d50ba4ee1cac0e260850ce",
+        R8: "0402"
+      },
+      transactionId: "569b9f36b41c0dc0a6c488eea12fe803b7a6bd97d2b92079d455f6d0dd9080a2",
+      index: 2
+    },
+    {
+      boxId: "734fcae73d4a7729f8c14c0b39a060ca6f93ae933b07d176b56233a4f338c7f2",
+      value: 15000000n,
+      ergoTree:
+        "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304",
+      assets: [],
+      creationHeight: 1695302,
+      additionalRegisters: {},
+      transactionId: "569b9f36b41c0dc0a6c488eea12fe803b7a6bd97d2b92079d455f6d0dd9080a2",
+      index: 3
+    },
+    {
+      boxId: "44e46ec02820d18985ad733e04f0ce1bff7ce0cbecf329a0f8b8f238969d3d2a",
+      value: 157516100000n,
+      ergoTree:
+        "0008cd023625de27837c0d91735145f7330fb1867cfe23b8e27b20e2a7d31bc825ef4f8e",
+      assets: [
+        {
+          tokenId: "4cccf7e1072b31ffd46819b317ec22900125f5c284fe5f48a5ab765a0dc4646b",
+          amount: 1999n
+        },
+        {
+          tokenId: "0808146416deee934d68c3c664e44e59dd28137f508ada35c5d7023e932f5bfb",
+          amount: 1999n
+        },
+        {
+          tokenId: "4d43aac602925a7bebe8f0ca9b807de6d12b0d38fa431b441a0ddb9da18f14f0",
+          amount: 1999n
+        },
+        {
+          tokenId: "47303b1562e0daa1bb5e60800bf94c1d00b5cbd9822597902cf8d0891163e303",
+          amount: 999n
+        },
+        {
+          tokenId: "6bd0539b01fffb7089f62c8273c4ea011e5afbf56abd36bce3e06df76d23950e",
+          amount: 999n
+        },
+        {
+          tokenId: "b6f370819d260ab71ea604003166b8f3f50b396547f1871caf3b792b82ed9c18",
+          amount: 999n
+        },
+        {
+          tokenId: "d2979568702864ed64a66fd8e463a4deac40414789e043412c4a6acc36244f27",
+          amount: 999n
+        },
+        {
+          tokenId: "ca6207d95a30008aced30383f7a4d7f480bec9b0c5f8837b53b10e7325a7a25c",
+          amount: 999n
+        },
+        {
+          tokenId: "0efd122a1ee77629173d58172cdfb95291011a63639fd566c662dad2f6b9d717",
+          amount: 998n
+        },
+        {
+          tokenId: "9bed938ef060681c491fb5a9449b2d016ae4d70027ed37b7ba8edb9024236fd4",
+          amount: 1n
+        },
+        {
+          tokenId: "18c4789bf5be7ca1f8fa948d545410f48b00f26c306a8b07fc70510acc7f2955",
+          amount: 1n
+        },
+        {
+          tokenId: "19b12e031b016194d9392abd206b05b720151405a6f63836e9af9b14e0c5e8b8",
+          amount: 1n
+        },
+        {
+          tokenId: "cb846674811fce92dc27f0eb7c383d4c4eef6e6d822106314e6b73c0ec7d844f",
+          amount: 1n
+        },
+        {
+          tokenId: "8ad7115184b29508615d7a43280287eacad8da4f3d71a2249f8cf076fb0ac325",
+          amount: 1n
+        },
+        {
+          tokenId: "2b6ee7dbee4fb54bb2208ceb94fbfd6e7d6b6d34a3e81a1a051246045320a6b1",
+          amount: 1n
+        },
+        {
+          tokenId: "983a0bbd7c7812c99cacc1deea91ad0a66d230d2e5e1a214e07ae5a8f19cd285",
+          amount: 1n
+        },
+        {
+          tokenId: "1f99db8f22d5b8a893a15ca0f2d2c82f27af105a0df4c56cb0c1693682dd717b",
+          amount: 1n
+        },
+        {
+          tokenId: "38b1726143ae6d0b994a847cb60753832a3cd11f1c85f964cda339a6ec18cb27",
+          amount: 1n
+        },
+        {
+          tokenId: "062a8e4347075de1b941e1df33a289208603f53604a2412e2c6f1d46643fbb2a",
+          amount: 1n
+        },
+        {
+          tokenId: "b315facd2e470447b2b71742a67d7f75bf5634f0fd892e8b705bbc415a24bffe",
+          amount: 1n
+        },
+        {
+          tokenId: "fd527aec6d1002684d92d4b01edcdc41735d70fcf4f810eba97fc6af303afd71",
+          amount: 1n
+        },
+        {
+          tokenId: "53d789de7b995f1c70d0f2a5bd21a0215bb98249583bc421ba8ac1ac5ee19b6b",
+          amount: 1n
+        },
+        {
+          tokenId: "a401b300df54c68a92bf7a9378b88b5aafb31fdd4519d8b2fee90bcd8a1e50d4",
+          amount: 1n
+        },
+        {
+          tokenId: "217e87287fd1789dbd35e125216ddd2d9008e54bd15a306f5243ca95cc769a9f",
+          amount: 1n
+        },
+        {
+          tokenId: "0599a724747cff93e7ff4632de47a2066a04873266911d9ad37cc3c5e2db557d",
+          amount: 1n
+        },
+        {
+          tokenId: "b07116c93d89375b413e8b999b4d516765a1cbf62c8ad371f58ea614d223c125",
+          amount: 1n
+        },
+        {
+          tokenId: "f8c961dacc8205cb87cecb489425f29a4e025329e0768aea2bb0090200dc9e9c",
+          amount: 1n
+        },
+        {
+          tokenId: "0ee65950a205f621ee1f2dca4f4486f3abe6a212b8af67e32fe25cb6ff11269b",
+          amount: 1n
+        },
+        {
+          tokenId: "cff034f703d03360c8d0c0f7bce5b583c846cb25736bb39f170effe84ce5f606",
+          amount: 1n
+        },
+        {
+          tokenId: "93c229fd5f3c5c86552f5fa2388f2b2d67277d6931346f556cbd8659f1e3d291",
+          amount: 1n
+        },
+        {
+          tokenId: "1c8dd09bea3e543693d83f071383913636a946d5212433196169791d9be26926",
+          amount: 1n
+        },
+        {
+          tokenId: "315f8b2f359b0a075e37956ddcb5a1b01c1e0f0bbd11ab6f29bb63bb3dac5dcc",
+          amount: 1n
+        },
+        {
+          tokenId: "e4e827c2075562040dbed13d1f9df4aa7997deffee4d5f9b70fa143ddc21d318",
+          amount: 1n
+        },
+        {
+          tokenId: "65f44be8b1d8170c19d8fb7e04dde54ed417dfad0a5dd75e484e703f932cd378",
+          amount: 1n
+        },
+        {
+          tokenId: "3ef6a5d12e8805d5b230cd0449ea583a31af4f5b401c89d5cb6c64507155607b",
+          amount: 1n
+        },
+        {
+          tokenId: "23a0a5e17283e365fba81e740009dc1a914094f659beb1d7dc0016660ddfe595",
+          amount: 1n
+        },
+        {
+          tokenId: "c594fec99373a13ac3b427194c7e7a7ba655aef9ed67784933cbed96947b0be5",
+          amount: 1n
+        },
+        {
+          tokenId: "05e94d88deae5a3a226ae6e6525c2c5a31336383bf5b25cbd8bc528dd28cd7e0",
+          amount: 1n
+        },
+        {
+          tokenId: "9efbd10417d7257acf30fd2ce05d87a799e2f7eae381b4ae227d2134e4597430",
+          amount: 1n
+        },
+        {
+          tokenId: "0a400456dbd989b6fe3fb0657bb1e0b549393ecf47f5d1a40153ea7459952e4d",
+          amount: 1n
+        },
+        {
+          tokenId: "2f267741a770ce2298d2c9a32e2c7c6437ec08d3e47d17d3e39ad4ff477b4ca6",
+          amount: 1n
+        },
+        {
+          tokenId: "daba905eec3a0820ca871b48dc262d07fe40fa575f607898f9bdff1e546a754b",
+          amount: 1n
+        },
+        {
+          tokenId: "da039d2d79666f4f45638da400610d7895e1b9349ff77719be2b090269de502e",
+          amount: 1n
+        },
+        {
+          tokenId: "b6039680491bfb9fe1ed0f9c4099c62e0935f3ec6fcd31475d5bda09150fd747",
+          amount: 1n
+        },
+        {
+          tokenId: "e3100c00a3457968aa2bd2aee4e973fd57a5c61306340eaffcdfbe70c7ffee73",
+          amount: 1n
+        },
+        {
+          tokenId: "b2dce8dd5ed8c94756620d71a756c7cc2243cc791c429662b143ff04070f8fb0",
+          amount: 1n
+        },
+        {
+          tokenId: "02407e5bbd0944b63dd80c2198642b80a99a3351364b29576bffd34efb396a77",
+          amount: 1n
+        },
+        {
+          tokenId: "5aded41671c6b7868c98232bb3a1da63a0274bf04bb50f2ceeaabcc38d3169d6",
+          amount: 1n
+        },
+        {
+          tokenId: "c90fbf556e52d54802c4d17b725dd2496e143e7cfd7e641752f4ed75a685a924",
+          amount: 1n
+        },
+        {
+          tokenId: "1e1fd8b00c0a103bfc703f44bd37495578ae01e2431440124bc2a90035428841",
+          amount: 1n
+        },
+        {
+          tokenId: "b317b8fe54aed1857d71d8fd8c0c2097e2ca10495b29b9397099f7fe13ebafa7",
+          amount: 1n
+        },
+        {
+          tokenId: "7d2ed04b780493550fc6250c56306be56b241d20876e455cb031e174696676fd",
+          amount: 1n
+        },
+        {
+          tokenId: "ed086bebbf2adebb55233e5a80f104a168894b721fddb158b5a0a08686171c38",
+          amount: 1n
+        },
+        {
+          tokenId: "fcc804cd8e92d9642eecff884154da954a49a1fbb85d20e6330dfd2a2fea23e3",
+          amount: 1n
+        },
+        {
+          tokenId: "fc6be8ea6960a047118ad021388212ad228cb173eefa6010fc243d9b1d597bb3",
+          amount: 1n
+        },
+        {
+          tokenId: "2bd3445e39f3f12d121580497c4ee777107a8d4bddc975478f3828025460b70e",
+          amount: 1n
+        },
+        {
+          tokenId: "aeba6450faf1abb69a88cab56984cb53da5a0c93793974f7a4ab277092ad7a82",
+          amount: 1n
+        },
+        {
+          tokenId: "45932b98740c0a074ec4826bf66029f03813961c292ba4185c57235fee49daac",
+          amount: 1n
+        },
+        {
+          tokenId: "58a0b64268ab8e17f8b9fed9f5f970ef028ef84b8709509e8d7c9a926c6027f5",
+          amount: 1n
+        },
+        {
+          tokenId: "b5d6af4afe83f167d7696def8a785bd55395dc81eca55ec1fa28c6aa53bbcfc9",
+          amount: 12000n
+        },
+        {
+          tokenId: "362acadb91689c757f2b5e45a42bdada7a6da8fd1ac83bc876082c0221c442c1",
+          amount: 1n
+        },
+        {
+          tokenId: "f319c3d558d12b78463f65d09f392005f9e0b5adbd2b3bef97a993fda24092a4",
+          amount: 1000000000n
+        }
+      ],
+      creationHeight: 1695302,
+      additionalRegisters: {},
+      transactionId: "569b9f36b41c0dc0a6c488eea12fe803b7a6bd97d2b92079d455f6d0dd9080a2",
+      index: 4
+    }
+  ]
+};
+
+export const deserializableTxVectors: {
+  name: string;
+  tx: SignedTransaction | UnsignedTransaction;
+}[] = [
+  { name: "Unsigned transaction without tokens", tx: unsignedTransactionVectors[2].json },
+  {
+    name: "Unsigned transaction with many tokens",
+    tx: unsignedTransactionVectors[4].json
+  },
+  {
+    name: "Unsinged transaction with data inputs",
+    tx: {
+      ...unsignedTransactionVectors[4].json,
+      dataInputs: [
+        { boxId: "6394efce52392141d67cdc70d9474ff85fea07df49530e85b9d26fbe43362bc4" },
+        { boxId: "0d12f7a3872db6673765fb245035040c8b21cfe70ab73f49249d38c424bcd113" }
+      ]
+    }
+  },
+  {
+    name: "raffle signed transaction",
+    tx: raffleSignedTransaction
   }
 ];

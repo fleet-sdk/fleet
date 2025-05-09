@@ -1,63 +1,56 @@
 import type {
   Amount,
   BoxCandidate,
-  DataInput,
   SignedInput,
   SignedTransaction,
-  UnsignedInput
+  UnsignedInput,
+  UnsignedTransaction
 } from "@fleet-sdk/common";
-import { isDefined } from "@fleet-sdk/common";
-import { SigmaByteWriter } from "../coders";
-import { serializeBox } from "./boxSerializer";
-import { hex } from "@fleet-sdk/crypto";
-
-export type MinimalUnsignedTransaction = {
-  inputs: UnsignedInput[];
-  dataInputs: DataInput[];
-  outputs: BoxCandidate<Amount>[];
-};
+import { SigmaByteReader, SigmaByteWriter } from "../coders";
+import { deserializeEmbeddedBox, serializeBox } from "./boxSerializer";
+import { blake2b256, hex } from "@fleet-sdk/crypto";
+import type { ByteInput } from "../types/constructors";
+import { SConstant } from "../sigmaConstant";
 
 type Nullish<T> = T | null | undefined;
+type Input = UnsignedInput | SignedInput;
+type Transaction = UnsignedTransaction | SignedTransaction;
 
-export function serializeTransaction(
-  transaction: MinimalUnsignedTransaction | SignedTransaction
-): SigmaByteWriter {
-  const writer = new SigmaByteWriter(100_000);
+export function serializeTransaction(transaction: Transaction): SigmaByteWriter {
+  const tokenIds = getDistinctTokenIds(transaction.outputs);
 
-  // write inputs
-  writer.writeVLQ(transaction.inputs.length);
-  transaction.inputs.map((input) => writeInput(writer, input));
-
-  // write data inputs
-  writer.writeVLQ(transaction.dataInputs.length);
-  transaction.dataInputs.map((dataInput) => writer.writeHex(dataInput.boxId));
-
-  // write distinct token IDs
-  const distinctTokenIds = getDistinctTokenIds(transaction.outputs);
-  writer.writeVLQ(distinctTokenIds.length);
-  distinctTokenIds.map((tokenId) => writer.writeHex(tokenId));
-
-  // write outputs
-  writer.writeVLQ(transaction.outputs.length);
-  transaction.outputs.map((output) => serializeBox(output, writer, distinctTokenIds));
-
-  return writer;
+  return new SigmaByteWriter(100_000)
+    .writeArray<Input>(transaction.inputs, (input, w) => writeInput(w, input))
+    .writeArray(transaction.dataInputs, (dataInput, w) => w.writeHex(dataInput.boxId))
+    .writeArray(tokenIds, (tokenId, w) => w.writeHex(tokenId))
+    .writeArray(transaction.outputs, (output, w) => serializeBox(output, w, tokenIds));
 }
 
-function writeInput(writer: SigmaByteWriter, input: UnsignedInput | SignedInput): void {
-  writer.writeHex(input.boxId);
-
+function writeInput(writer: SigmaByteWriter, input: Input): void {
   if (isSignedInput(input)) {
-    writeProof(writer, input.spendingProof?.proofBytes);
-    writeExtension(writer, input.spendingProof?.extension);
+    writeSignedInput(writer, input);
     return;
   }
 
-  writeProof(writer, null);
-  writeExtension(writer, input.extension);
+  writeUnsignedInput(writer, input);
 }
 
-function isSignedInput(input: UnsignedInput | SignedInput): input is SignedInput {
+function writeSignedInput(writer: SigmaByteWriter, input: SignedInput): void {
+  writer.writeHex(input.boxId);
+  writeProof(writer, input.spendingProof?.proofBytes);
+  writeExtension(writer, input.spendingProof?.extension);
+}
+
+function writeUnsignedInput(writer: SigmaByteWriter, input: Input): void {
+  writer.writeHex(input.boxId);
+  writeProof(writer, null);
+  writeExtension(
+    writer,
+    isSignedInput(input) ? input.spendingProof?.extension : input.extension
+  );
+}
+
+function isSignedInput(input: Input): input is SignedInput {
   return (input as SignedInput).spendingProof !== undefined;
 }
 
@@ -68,8 +61,7 @@ function writeProof(writer: SigmaByteWriter, proof: Nullish<string>): void {
   }
 
   const bytes = hex.decode(proof);
-  writer.writeVLQ(bytes.length);
-  writer.writeBytes(bytes);
+  writer.writeUInt(bytes.length).writeBytes(bytes);
 }
 
 function writeExtension(
@@ -82,21 +74,18 @@ function writeExtension(
   }
 
   const keys = Object.keys(extension);
-  let length = 0;
+  const values: [string, string][] = [];
 
   for (const key of keys) {
-    if (isDefined(extension[key])) length++;
+    const value = extension[key];
+    if (!value) continue;
+
+    values.push([key, value]);
   }
 
-  writer.writeVLQ(length);
-  if (length === 0) return;
-
-  for (const key of keys) {
-    const val = extension[key];
-    if (isDefined(val)) {
-      writer.writeVLQ(Number(key)).writeHex(val);
-    }
-  }
+  writer.writeArray(values, ([key, value], w) =>
+    w.writeUInt(Number(key)).writeHex(value)
+  );
 }
 
 function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {
@@ -104,4 +93,51 @@ function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {
   outputs.flatMap((output) => output.assets.map((asset) => tokenIds.add(asset.tokenId)));
 
   return Array.from(tokenIds);
+}
+
+export function deserializeTransaction<T extends Transaction>(input: ByteInput): T {
+  const reader = new SigmaByteReader(input);
+
+  const inputs = reader.readArray(readInput);
+  const id = computeId(reader, inputs);
+  const dataInputs = reader.readArray((r) => ({ boxId: hex.encode(r.readBytes(32)) }));
+  const tokenIds = reader.readArray((r) => hex.encode(r.readBytes(32)));
+  const outputs = reader.readArray((r, i) => deserializeEmbeddedBox(r, tokenIds, id, i));
+
+  return {
+    id,
+    inputs,
+    dataInputs,
+    outputs
+  } as T;
+}
+
+function readInput(reader: SigmaByteReader): SignedInput | UnsignedInput {
+  const boxId = hex.encode(reader.readBytes(32));
+
+  const proofLength = reader.readUInt();
+  const proofBytes = proofLength > 0 ? hex.encode(reader.readBytes(proofLength)) : null;
+
+  const extensionLength = reader.readUInt();
+  const extension: Record<string, string> = {};
+  for (let i = 0; i < extensionLength; i++) {
+    extension[reader.readUInt()] = SConstant.from(reader).toHex();
+  }
+
+  return proofBytes
+    ? { boxId, spendingProof: { proofBytes, extension } }
+    : { boxId, extension };
+}
+
+/**
+ * Computes the transaction ID by serializing inputs as unsigned (excluding proofs),
+ * even for signed transactions.
+ */
+function computeId(reader: SigmaByteReader, inputs: Input[]): string {
+  const bytes = new SigmaByteWriter(reader.bytes.length)
+    .writeArray(inputs, (input, writer) => writeUnsignedInput(writer, input)) // write inputs as unsigned
+    .writeBytes(reader.bytes.subarray(reader.cursor))
+    .toBytes();
+
+  return hex.encode(blake2b256(bytes));
 }
