@@ -9,9 +9,9 @@ on:
       - "!**"
 
 jobs:
-  permissions:
-    contents: read
   coverage:
+    permissions:
+      contents: read
     name: Check and submit
     runs-on: ubuntu-latest
     steps:

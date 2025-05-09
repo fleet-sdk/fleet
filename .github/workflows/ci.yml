@@ -103,6 +103,8 @@ jobs:
 
   build-and-test-other-envs:
     name: "[happy-dom, edge-runtime] test"
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
