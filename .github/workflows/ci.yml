@@ -13,11 +13,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  permissions:
-    contents: read
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +37,9 @@ jobs:
   format:
     name: Format
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
       - uses: actions/checkout@v4
 
@@ -55,6 +58,9 @@ jobs:
   build-and-test-node:
     name: "[node] build and test"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -80,6 +86,8 @@ jobs:
   build-and-test-bun:
     name: "[bun] build and test"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -103,9 +111,9 @@ jobs:
 
   build-and-test-other-envs:
     name: "[happy-dom, edge-runtime] test"
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-    runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -132,10 +140,10 @@ jobs:
         run: pnpm run test:unit-edge
 
   publish-preview:
-    permissions:
-      pull-requests: write # to be able to comment on the pull requests
     name: "Publish preview"
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # to be able to comment on the pull requests
     needs: build-and-test-node
     if: success()
     timeout-minutes: 20
