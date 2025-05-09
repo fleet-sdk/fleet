@@ -13,6 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  permissions:
+    contents: read
   lint:
     name: Lint
     runs-on: ubuntu-latest
