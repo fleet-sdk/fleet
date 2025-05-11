@@ -16,10 +16,12 @@ export class SConstant<D = unknown, T extends SType = SType> {
     this.#data = type.coerce(data) as D;
   }
 
-  static from<D, T extends SType = SType>(bytes: ByteInput): SConstant<D, T> {
-    assert(bytes.length > 0, "Empty constant bytes.");
+  static from<D, T extends SType = SType>(
+    bytes: ByteInput | SigmaByteReader
+  ): SConstant<D, T> {
+    const reader = bytes instanceof SigmaByteReader ? bytes : new SigmaByteReader(bytes);
+    if (reader.isEmpty) throw new Error("Empty constant bytes.");
 
-    const reader = new SigmaByteReader(bytes);
     const type = typeSerializer.deserialize(reader);
     const data = dataSerializer.deserialize(type, reader);
 

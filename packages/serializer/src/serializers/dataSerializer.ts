@@ -47,7 +47,7 @@ export const dataSerializer = {
         assert(Array.isArray(data), `SColl expected an array, got ${typeof data}.`);
       }
 
-      writer.writeVLQ(data.length);
+      writer.writeUInt(data.length);
       switch (type.elementsType.code) {
         case descriptors.bool.code: {
           return writer.writeBits(data as boolean[]);
@@ -114,7 +114,7 @@ export const dataSerializer = {
     } else {
       switch (type.code) {
         case descriptors.coll.code: {
-          const length = reader.readVlq();
+          const length = reader.readUInt();
           const embeddedType = (type as SCollType).elementsType;
 
           switch (embeddedType.code) {

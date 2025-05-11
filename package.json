@@ -50,6 +50,9 @@
   "pnpm": {
     "requiredScripts": [
       "build"
+    ],
+    "onlyBuiltDependencies": [
+      "esbuild"
     ]
   }
 }

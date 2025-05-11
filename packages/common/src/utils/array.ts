@@ -205,19 +205,16 @@ export function areEqualBy<T>(
  * startsWith(array, target2); // false
  * ```
  */
-export function startsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolean {
-  if (array === target) {
-    return true;
-  }
-
-  if (target.length > array.length) {
-    return false;
-  }
+export function startsWith<T>(
+  array: ArrayLike<T>,
+  target: ArrayLike<T>,
+  offset = 0
+): boolean {
+  if (array === target) return true;
+  if (target.length > array.length) return false;
 
   for (let i = 0; i < target.length; i++) {
-    if (target[i] !== array[i]) {
-      return false;
-    }
+    if (target[i] !== array[i + offset]) return false;
   }
 
   return true;
@@ -239,16 +236,10 @@ export function startsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolea
  * ```
  */
 export function endsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>): boolean {
-  if (array === target) {
-    return true;
-  }
-
-  if (target.length > array.length) {
-    return false;
-  }
+  if (array === target) return true;
+  if (target.length > array.length) return false;
 
   const offset = array.length - target.length;
-
   for (let i = target.length - 1; i >= 0; i--) {
     if (target[i] !== array[i + offset]) {
       return false;

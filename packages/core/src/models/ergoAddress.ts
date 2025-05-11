@@ -28,8 +28,8 @@ import {
 const P2PK_ERGOTREE_PREFIX = hex.decode("0008cd");
 const P2PK_ERGOTREE_LENGTH = 36;
 
-const P2SH_ERGOTREE_SUFFIX = hex.decode("d40801");
 const P2SH_ERGOTREE_PREFIX = hex.decode("00ea02d193b4cbe4e3010e040004300e18");
+const P2SH_ERGOTREE_SUFFIX = hex.decode("d40801");
 const P2SH_ERGOTREE_LENGTH = 44;
 const P2SH_HASH_LENGTH = 24;
 

@@ -1,4 +1,4 @@
-import { isEmpty } from "@fleet-sdk/common";
+import { isEmpty, startsWith } from "@fleet-sdk/common";
 import { type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { hexToBigInt } from "./bigint";
 import { readBigVLQ, readVLQ } from "./vlq";
@@ -9,8 +9,16 @@ export class SigmaByteReader {
   readonly #bytes: Uint8Array;
   #cursor: number;
 
-  public get isEmpty(): boolean {
-    return isEmpty(this.#bytes);
+  get isEmpty(): boolean {
+    return this.#bytes.length === this.#cursor;
+  }
+
+  get bytes(): Uint8Array {
+    return this.#bytes;
+  }
+
+  get cursor(): number {
+    return this.#cursor;
   }
 
   constructor(bytes: ByteInput) {
@@ -18,11 +26,22 @@ export class SigmaByteReader {
     this.#cursor = 0;
   }
 
-  public readBool(): boolean {
+  readArray<T>(readFn: (reader: SigmaByteReader, index: number) => T): Array<T> {
+    const length = this.readUInt();
+    const items = new Array<T>(length);
+
+    for (let i = 0; i < length; i++) {
+      items[i] = readFn(this, i);
+    }
+
+    return items;
+  }
+
+  readBool(): boolean {
     return this.readByte() === 0x01;
   }
 
-  public readBits(length: number): ArrayLike<boolean> {
+  readBits(length: number): ArrayLike<boolean> {
     const bits = new Array<boolean>(length);
     let bitOffset = 0;
 
@@ -41,37 +60,56 @@ export class SigmaByteReader {
     return bits;
   }
 
-  public readByte(): number {
+  readByte(): number {
     return this.#bytes[this.#cursor++];
   }
 
-  public readBytes(length: number): Uint8Array {
+  readBytes(length: number): Uint8Array {
     return this.#bytes.subarray(this.#cursor, (this.#cursor += length));
   }
 
-  public readVlq(): number {
+  readUInt(): number {
     return readVLQ(this);
   }
 
-  public readI8(): number {
+  readBigUInt(): bigint {
+    return readBigVLQ(this);
+  }
+
+  readI8(): number {
     const byte = this.readByte();
     return byte > MAX_I8 ? byte - (MAX_U8 + 1) : byte;
   }
 
-  public readI16(): number {
+  readI16(): number {
     return zigZag32.decode(readBigVLQ(this));
   }
 
-  public readI32(): number {
+  readI32(): number {
     return zigZag32.decode(readBigVLQ(this));
   }
 
-  public readI64(): bigint {
+  readI64(): bigint {
     return zigZag64.decode(readBigVLQ(this));
   }
 
-  public readI256(): bigint {
+  readI256(): bigint {
     const len = readVLQ(this);
     return hexToBigInt(hex.encode(this.readBytes(len)));
+  }
+
+  /**
+   * Returns bytes without advancing the cursor.
+   */
+  peek(count: number, offset = 0): Uint8Array {
+    const begin = this.#cursor + offset;
+    return this.#bytes.subarray(begin, begin + count);
+  }
+
+  /**
+   * Checks if the current position in the byte array starts with the given bytes.
+   */
+  match(bytes: Uint8Array, offset = 0): boolean {
+    return startsWith(this.#bytes, bytes, this.#cursor + offset);
   }
 }

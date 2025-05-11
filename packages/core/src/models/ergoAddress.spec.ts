@@ -1,7 +1,6 @@
-import { AddressType, Network } from "@fleet-sdk/common";
+import { AddressType, Network, FEE_CONTRACT } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
-import { FEE_CONTRACT } from "../builder";
 import {
   ergoTsTestVectors,
   FEE_MAINNET_ADDRESS_TV,
