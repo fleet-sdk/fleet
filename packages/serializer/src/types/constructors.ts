@@ -1,9 +1,9 @@
-import { isEmpty } from "@fleet-sdk/common";
+import { type Box, isEmpty } from "@fleet-sdk/common";
 import { SConstant } from "../sigmaConstant";
 import type { SType } from "./base";
 import { descriptors } from "./descriptors";
 import { SCollType, STupleType } from "./generics";
-import { SUnitType } from "./monomorphics";
+import { SBoxType, SUnitType } from "./monomorphics";
 import {
   SBigIntType,
   SBoolType,
@@ -108,8 +108,11 @@ export const SSigmaProp = monoProxy<SSigmaPropType, SConstant<Uint8Array>>(
   descriptors.sigmaProp
 );
 
-type SUnit = (value?: undefined) => SConstant<undefined, SUnitType>;
-export const SUnit: SUnit = monoProxy(SUnitType, undefined, true);
+type SUnit = () => SConstant<undefined, SUnitType>;
+export const SUnit = monoProxy(SUnitType, undefined, true) as unknown as SUnit;
+
+type SBox = (value?: undefined) => SConstant<Box<bigint>, SBoxType>;
+export const SBox: SBox = monoProxy(SBoxType, undefined, true);
 
 type SColl = {
   <D, T extends SByteType>(

@@ -1,4 +1,3 @@
-import { assert, isUndefined } from "@fleet-sdk/common";
 import { type ByteInput, hex } from "@fleet-sdk/crypto";
 import { SigmaByteReader, SigmaByteWriter } from "./coders";
 import { dataSerializer } from "./serializers/dataSerializer";

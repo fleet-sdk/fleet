@@ -61,6 +61,7 @@ export const descriptors = {
   groupElement: new SGroupElementType(),
   sigmaProp: new SSigmaPropType(),
   unit: new SUnitType(),
+  box: new SUnitType(),
   coll: collDescriptor,
   tuple: tupleDescriptor
 } satisfies { [key: string]: Descriptor };
