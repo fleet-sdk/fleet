@@ -14,6 +14,8 @@ export const typeSerializer = {
       writer.write(type.code);
     } else if (type.code === descriptors.unit.code) {
       writer.write(type.code);
+    } else if (type.code === descriptors.box.code) {
+      writer.write(type.code);
     } else if (isColl(type)) {
       if (type.elementsType.embeddable) {
         writer.write(descriptors.coll.simpleCollTypeCode + type.elementsType.code);
@@ -149,9 +151,10 @@ export const typeSerializer = {
 
         return new STupleType(wrapped);
       }
-      case descriptors.unit.code: {
+      case descriptors.unit.code:
         return descriptors.unit;
-      }
+      case descriptors.box.code:
+        return descriptors.box;
     }
 
     throw new Error("Not implemented.");

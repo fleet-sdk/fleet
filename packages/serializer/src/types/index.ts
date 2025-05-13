@@ -14,5 +14,6 @@ export {
   SSigmaProp,
   SUnit,
   SColl,
-  SPair
+  SPair,
+  SBox
 } from "./constructors";

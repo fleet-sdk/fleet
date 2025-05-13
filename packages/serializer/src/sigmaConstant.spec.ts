@@ -1,5 +1,5 @@
-import { ensureBigInt } from "@fleet-sdk/common";
-import { hex, randomBytes } from "@fleet-sdk/crypto";
+import { type Box, ensureBigInt } from "@fleet-sdk/common";
+import { hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
 import {
   bigintVectors,
@@ -9,6 +9,7 @@ import {
   groupElementVectors,
   intVectors,
   longVectors,
+  sBoxVectors,
   shortVectors,
   sigmaPropVectors,
   tupleTestVectors
@@ -16,7 +17,7 @@ import {
 import { SigmaByteWriter } from "./coders";
 import { dataSerializer } from "./serializers";
 import { decode, parse, SConstant, stypeof } from "./sigmaConstant";
-import type { SGroupElementType } from "./types";
+import type { SGroupElementType, SPrimitiveType } from "./types";
 import {
   SBigInt,
   SBool,
@@ -30,7 +31,7 @@ import {
   STupleType,
   SUnit
 } from "./types/";
-import { STuple } from "./types/constructors";
+import { SBox, STuple } from "./types/constructors";
 import { Value$ } from "sigmastate-js/main";
 import fc from "fast-check";
 import {
@@ -45,6 +46,7 @@ import {
   MIN_I64,
   MIN_I8
 } from "./coders/numRanges";
+import { SPair } from "../dist";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
@@ -274,6 +276,25 @@ describe("Not implemented types", () => {
     expect(() => {
       SConstant.from("deadbeef");
     }).to.throw();
+  });
+});
+
+describe("SBox serialization", () => {
+  test.each(sBoxVectors)("SBox serialization bytes", (tv) => {
+    const sconst = SBox(tv.value);
+    expect(sconst.toHex()).to.be.equal(tv.hex);
+    expect(sconst.type.toString()).to.be.equal("SBox");
+  });
+
+  test.each(sBoxVectors)("SBox roundtrip", (tv) => {
+    expect(SBox(SConstant.from<Box>(tv.hex).data).toHex()).to.be.equal(tv.hex);
+  });
+
+  it("Should not embed SBox", () => {
+    // @ts-expect-error SBox is not compatible with SColl
+    expect(() => SColl(SBox, [sBoxVectors[0].value])).toThrow();
+    // @ts-expect-error SBox is not compatible with SPair
+    expect(() => SPair(SBox(sBoxVectors[0].value), SBox(sBoxVectors[1]))).toThrow();
   });
 });
 

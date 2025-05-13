@@ -1,3 +1,5 @@
+import type { Box } from "@fleet-sdk/common";
+import type { SConstant } from "../sigmaConstant";
 import { SMonomorphicType } from "./base";
 
 export class SUnitType extends SMonomorphicType<undefined> {
@@ -7,5 +9,15 @@ export class SUnitType extends SMonomorphicType<undefined> {
 
   toString(): string {
     return "SUnit";
+  }
+}
+
+export class SBoxType extends SMonomorphicType<SConstant<Box<bigint>>> {
+  get code(): 0x63 {
+    return 0x63;
+  }
+
+  toString(): string {
+    return "SBox";
   }
 }

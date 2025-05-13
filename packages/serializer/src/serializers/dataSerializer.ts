@@ -1,8 +1,9 @@
-import { assert } from "@fleet-sdk/common";
+import { assert, type Box } from "@fleet-sdk/common";
 import type { SigmaByteReader, SigmaByteWriter } from "../coders";
 import type { SConstant } from "../sigmaConstant";
 import { isColl, isTuple, type SCollType, type STupleType, type SType } from "../types";
 import { descriptors } from "../types/descriptors";
+import { deserializeBox, serializeBox } from "./boxSerializer";
 
 const GROUP_ELEMENT_LENGTH = 33;
 const PROVE_DLOG_OP = 0xcd;
@@ -80,6 +81,7 @@ export const dataSerializer = {
     }
 
     if (type.code === descriptors.unit.code) return writer;
+    if (type.code === descriptors.box.code) return serializeBox(data as Box, writer);
 
     throw Error(
       `Serialization error: '0x${type.code.toString(16)}' type not implemented.`
@@ -139,6 +141,8 @@ export const dataSerializer = {
         }
         case descriptors.unit.code:
           return undefined;
+        case descriptors.box.code:
+          return deserializeBox(reader);
       }
     }
 
