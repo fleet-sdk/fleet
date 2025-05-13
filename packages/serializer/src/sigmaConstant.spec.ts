@@ -290,7 +290,7 @@ describe("SBox serialization", () => {
     expect(SBox(SConstant.from<Box>(tv.hex).data).toHex()).to.be.equal(tv.hex);
   });
 
-  it("Should not embed SBox in a SColl", () => {
+  it("Should not embed SBox", () => {
     // @ts-expect-error SBox is not compatible with SColl
     expect(() => SColl(SBox, [sBoxVectors[0].value])).toThrow();
     // @ts-expect-error SBox is not compatible with SPair
