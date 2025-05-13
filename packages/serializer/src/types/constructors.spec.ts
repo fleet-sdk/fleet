@@ -51,13 +51,9 @@ describe("Constructor proxies", () => {
 
 describe("SPair constructor", () => {
   it("Should throw if params contains different types", () => {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    expect(() => SPair(SBool(true) as any, SBool() as any)).to.throw(
-      "Invalid tuple declaration."
-    );
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    expect(() => SPair(SBool() as any, SBool(true)) as any).to.throw(
-      "Invalid tuple declaration."
-    );
+    // @ts-expect-error invalid pair construction
+    expect(() => SPair(SBool(true), SBool())).to.throw("Invalid tuple declaration.");
+    // @ts-expect-error invalid pair construction
+    expect(() => SPair(SBool(), SBool(true))).to.throw("Invalid tuple declaration.");
   });
 });

@@ -111,8 +111,8 @@ export const SSigmaProp = monoProxy<SSigmaPropType, SConstant<Uint8Array>>(
 type SUnit = () => SConstant<undefined, SUnitType>;
 export const SUnit = monoProxy(SUnitType, undefined, true) as unknown as SUnit;
 
-type SBox = (value?: undefined) => SConstant<Box<bigint>, SBoxType>;
-export const SBox: SBox = monoProxy(SBoxType, undefined, true);
+type SBox = (value?: Box) => SConstant<Box<bigint>, SBoxType>;
+export const SBox = monoProxy(SBoxType, undefined, true) as unknown as SBox;
 
 type SColl = {
   <D, T extends SByteType>(
