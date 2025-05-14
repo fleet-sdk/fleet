@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.8.2/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "ignore": [
       "**/coverage/*",
@@ -28,7 +28,8 @@
     "rules": {
       "recommended": true,
       "style": {
-        "noParameterAssign": "off"
+        "noParameterAssign": "off",
+        "noYodaExpression": "error"
       },
       "correctness": {
         "noUnusedImports": "error"
