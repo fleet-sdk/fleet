@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.8.5
+
+### Patch Changes
+
+- 07bafd5: Add offset support to `startsWith`
+
 ## 0.8.3
 
 ### Patch Changes
