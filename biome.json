@@ -28,11 +28,14 @@
     "rules": {
       "recommended": true,
       "style": {
-        "noParameterAssign": { "level": "off" }
+        "noParameterAssign": "off"
+      },
+      "correctness": {
+        "noUnusedImports": "error"
       },
       "suspicious": {
-        "noConsoleLog": { "level": "error" },
-        "noAssignInExpressions": { "level": "off" }
+        "noConsoleLog": "error",
+        "noAssignInExpressions": "off"
       }
     }
   }

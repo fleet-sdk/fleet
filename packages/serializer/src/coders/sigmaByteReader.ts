@@ -1,4 +1,4 @@
-import { isEmpty, startsWith } from "@fleet-sdk/common";
+import { startsWith } from "@fleet-sdk/common";
 import { type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { hexToBigInt } from "./bigint";
 import { MAX_I8, MAX_U8 } from "./numRanges";

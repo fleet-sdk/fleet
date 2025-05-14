@@ -32,7 +32,7 @@ import {
 } from "./coders/numRanges";
 import { dataSerializer } from "./serializers";
 import { SConstant, decode, parse, stypeof } from "./sigmaConstant";
-import type { SGroupElementType, SPrimitiveType } from "./types";
+import type { SGroupElementType } from "./types";
 import {
   SBigInt,
   SBool,

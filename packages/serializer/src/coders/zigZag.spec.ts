@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import { describe, expect, it, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { MAX_I32, MAX_I64, MIN_I32, MIN_I64 } from "./numRanges";
 import { zigZag32, zigZag64 } from "./zigZag";
 
