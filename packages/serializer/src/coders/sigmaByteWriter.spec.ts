@@ -29,9 +29,7 @@ describe("Sigma Writer", () => {
     sigmaBuffer.writeBytes([0x15, 0x0c]);
 
     expect(sigmaBuffer).toHaveLength(6);
-    expect(sigmaBuffer.toBytes()).toEqual(
-      Uint8Array.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c])
-    );
+    expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]));
   });
 
   it("Should put multiple hex string", () => {
@@ -41,9 +39,7 @@ describe("Sigma Writer", () => {
     sigmaBuffer.writeHex("150c");
 
     expect(sigmaBuffer).toHaveLength(6);
-    expect(sigmaBuffer.toBytes()).toEqual(
-      Uint8Array.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c])
-    );
+    expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]));
   });
 
   it("Should put a boolean", () => {
@@ -82,9 +78,7 @@ describe("Sigma Writer", () => {
     const all = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     for (const tv of testVectors) {
       all.writeI16(tv.int);
-      expect(new SigmaByteWriter(tv.hex.length).writeI16(tv.int).encode(hex)).toBe(
-        tv.hex
-      );
+      expect(new SigmaByteWriter(tv.hex.length).writeI16(tv.int).encode(hex)).toBe(tv.hex);
     }
 
     expect(all.encode(hex)).toEqual(testVectors.map((x) => x.hex).join(""));
@@ -144,8 +138,6 @@ describe("Sigma Writer", () => {
     const customHashFn = new SigmaByteWriter(MAX_CONSTANT_LENGTH)
       .writeBytes(bytes)
       .writeChecksum(10, sha256);
-    expect(customHashFn.toBytes()).to.be.deep.equal(
-      concatBytes(bytes, shaHash.subarray(0, 10))
-    );
+    expect(customHashFn.toBytes()).to.be.deep.equal(concatBytes(bytes, shaHash.subarray(0, 10)));
   });
 });

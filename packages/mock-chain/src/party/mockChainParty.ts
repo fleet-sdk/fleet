@@ -80,10 +80,7 @@ export abstract class MockChainParty {
     return this.addUTxOs(utxos);
   }
 
-  addBalance(
-    balance: AddBalance,
-    additionalRegisters?: NonMandatoryRegisters
-  ): MockChainParty {
+  addBalance(balance: AddBalance, additionalRegisters?: NonMandatoryRegisters): MockChainParty {
     this.addUTxOs({
       value: balance.nanoergs || SAFE_MIN_BOX_VALUE,
       assets: balance.tokens || [],
@@ -100,10 +97,7 @@ export abstract class MockChainParty {
    * @param utxos
    * @returns
    */
-  withBalance(
-    balance: AddBalance,
-    additionalRegisters?: NonMandatoryRegisters
-  ): MockChainParty {
+  withBalance(balance: AddBalance, additionalRegisters?: NonMandatoryRegisters): MockChainParty {
     return this.addBalance(balance, additionalRegisters);
   }
 

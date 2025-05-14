@@ -22,12 +22,8 @@ describe("assert() function", () => {
 
   it("Should throw if condition is not met", () => {
     expect(() => assert(a + b > 3, "string error msg")).to.throw("string error msg");
-    expect(() => assert(a + b > 3, new Error("Error instance msg"))).to.throw(
-      "Error instance msg"
-    );
-    expect(() => assert(a + b > 3, () => "function error msg")).to.throw(
-      "function error msg"
-    );
+    expect(() => assert(a + b > 3, new Error("Error instance msg"))).to.throw("Error instance msg");
+    expect(() => assert(a + b > 3, () => "function error msg")).to.throw("function error msg");
   });
 
   it("Should lazily build error message", () => {

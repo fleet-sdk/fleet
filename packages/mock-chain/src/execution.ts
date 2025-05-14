@@ -33,9 +33,7 @@ export type TransactionExecutionFailure = {
   reason: Error;
 };
 
-export type TransactionExecutionResult =
-  | TransactionExecutionSuccess
-  | TransactionExecutionFailure;
+export type TransactionExecutionResult = TransactionExecutionSuccess | TransactionExecutionFailure;
 
 export type ExecutionParameters = {
   context?: BlockchainStateContext;
@@ -51,9 +49,7 @@ export function execute(
 ): TransactionExecutionResult {
   for (const key of keys) {
     if (!key.hasPrivateKey()) {
-      throw new Error(
-        `ErgoHDKey '${hex.encode(key.publicKey)}' must have a private key.`
-      );
+      throw new Error(`ErgoHDKey '${hex.encode(key.publicKey)}' must have a private key.`);
     }
   }
 

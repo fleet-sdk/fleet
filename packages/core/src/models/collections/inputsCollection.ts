@@ -1,10 +1,4 @@
-import {
-  type Amount,
-  type Box,
-  type BoxId,
-  Collection,
-  type OneOrMore
-} from "@fleet-sdk/common";
+import { type Amount, type Box, type BoxId, Collection, type OneOrMore } from "@fleet-sdk/common";
 import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "../../errors";
 import { ErgoUnsignedInput } from "../ergoUnsignedInput";

@@ -30,10 +30,7 @@ export function serializeBox(
   writer = new SigmaByteWriter(4_096),
   distinctTokenIds?: string[]
 ): SigmaByteWriter {
-  writer
-    .writeBigUInt(ensureBigInt(box.value))
-    .writeHex(box.ergoTree)
-    .writeUInt(box.creationHeight);
+  writer.writeBigUInt(ensureBigInt(box.value)).writeHex(box.ergoTree).writeUInt(box.creationHeight);
 
   writeTokens(writer, box.assets, distinctTokenIds);
   writeRegisters(writer, box.additionalRegisters);
@@ -55,9 +52,7 @@ function writeTokens(
 ): void {
   if (tokenIds) {
     writer.writeArray(tokens, (token, w) =>
-      w
-        .writeUInt(tokenIds.indexOf(token.tokenId))
-        .writeBigUInt(ensureBigInt(token.amount))
+      w.writeUInt(tokenIds.indexOf(token.tokenId)).writeBigUInt(ensureBigInt(token.amount))
     );
   } else {
     writer.writeArray(tokens, (token, w) =>

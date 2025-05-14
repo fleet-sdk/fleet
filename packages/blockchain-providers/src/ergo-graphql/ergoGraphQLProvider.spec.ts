@@ -115,14 +115,10 @@ describe("ergo-graphql provider", () => {
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
       };
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(resolve(mockedData));
-      const tree0 =
-        "0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d";
-      const tree1 =
-        "0008cd02c6ef80b5a3f433b3c315943ece9335e1b5ff531c47f09c962d7d7c885370c0b2";
-      const tree2 =
-        "0008cd03479af981aac1aa68bf10cc7d934f42193b3b796055cd9ef581ab377395496bdb";
-      const tree3 =
-        "0008cd03d3a3ee637d3883ccaa231b882d090550b07a149131c52bf54f27551a266cf7af";
+      const tree0 = "0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d";
+      const tree1 = "0008cd02c6ef80b5a3f433b3c315943ece9335e1b5ff531c47f09c962d7d7c885370c0b2";
+      const tree2 = "0008cd03479af981aac1aa68bf10cc7d934f42193b3b796055cd9ef581ab377395496bdb";
+      const tree3 = "0008cd03d3a3ee637d3883ccaa231b882d090550b07a149131c52bf54f27551a266cf7af";
       const ergoTrees = [tree0, tree1, tree2, tree3];
 
       await _client.getBoxes({
@@ -175,9 +171,7 @@ describe("ergo-graphql provider", () => {
         mempool: { boxes: mockedGraphQLBoxes.slice(2, 4) }
       };
 
-      const fetchSpy = vi
-        .spyOn(global, "fetch")
-        .mockResolvedValueOnce(resolve(mockedData));
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
@@ -195,9 +189,7 @@ describe("ergo-graphql provider", () => {
       // should include mempool boxes
       const unconfirmed = response.filter((b) => !b.confirmed);
       expect(unconfirmed).to.have.length(mockedData.mempool.boxes.length);
-      expect(unconfirmed.map(_boxId)).to.have.members(
-        mockedData.mempool.boxes.map(_boxId)
-      );
+      expect(unconfirmed.map(_boxId)).to.have.members(mockedData.mempool.boxes.map(_boxId));
 
       expect(fetchSpy).toHaveBeenCalledOnce();
     });
@@ -208,9 +200,7 @@ describe("ergo-graphql provider", () => {
         mempool: { boxes: mockedGraphQLBoxes.slice(0, 4) }
       };
 
-      const fetchSpy = vi
-        .spyOn(global, "fetch")
-        .mockResolvedValueOnce(resolve(mockedData));
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(4);
@@ -223,9 +213,7 @@ describe("ergo-graphql provider", () => {
 
     it("Should return empty array when response is empty", async () => {
       const mockedData = { boxes: [], mempool: { boxes: [] } };
-      const fetchSpy = vi
-        .spyOn(global, "fetch")
-        .mockResolvedValueOnce(resolve(mockedData));
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolve(mockedData));
 
       const response = await _client.getBoxes(_dumbQuery);
       expect(response).to.be.empty;
@@ -241,9 +229,7 @@ describe("ergo-graphql provider", () => {
       mockedData.boxes[0].beingSpent = true;
       mockedData.mempool.boxes[0].beingSpent = true;
 
-      const fetchSpy = vi
-        .spyOn(global, "fetch")
-        .mockResolvedValueOnce(resolve(mockedData));
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
@@ -265,9 +251,7 @@ describe("ergo-graphql provider", () => {
       // this should be ignored for this case, as it's not a mempool aware operation
       mockedData.boxes[0].beingSpent = true;
 
-      const fetchSpy = vi
-        .spyOn(global, "fetch")
-        .mockResolvedValueOnce(resolve(mockedData));
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
@@ -279,9 +263,7 @@ describe("ergo-graphql provider", () => {
       expect(response).to.have.length(2);
 
       expect(response.map(_boxId)).to.have.all.members(mockedData.boxes.map(_boxId));
-      expect(response.map(_boxId)).not.to.have.members(
-        mockedData.mempool.boxes.map(_boxId)
-      );
+      expect(response.map(_boxId)).not.to.have.members(mockedData.mempool.boxes.map(_boxId));
 
       expect(fetchSpy).toHaveBeenCalledOnce();
 
@@ -295,9 +277,7 @@ describe("ergo-graphql provider", () => {
         mempool: { boxes: mockedGraphQLBoxes.slice(10, 12) }
       };
 
-      const fetchSpy = vi
-        .spyOn(global, "fetch")
-        .mockResolvedValueOnce(resolve(mockedData));
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolve(mockedData));
 
       expect(mockedData.boxes).to.have.length(2);
       expect(mockedData.mempool.boxes).to.have.length(2);
@@ -309,9 +289,7 @@ describe("ergo-graphql provider", () => {
       expect(response).to.have.length(2);
 
       expect(response.map(_boxId)).not.to.have.members(mockedData.boxes.map(_boxId));
-      expect(response.map(_boxId)).to.have.all.members(
-        mockedData.mempool.boxes.map(_boxId)
-      );
+      expect(response.map(_boxId)).to.have.all.members(mockedData.mempool.boxes.map(_boxId));
 
       expect(fetchSpy).toHaveBeenCalledOnce();
       const call = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string);
@@ -336,13 +314,11 @@ describe("ergo-graphql provider", () => {
         boxesCount += boxes.length;
       }
 
-      expect(boxesCount).to.be.equal(
-        mockedGraphQLBoxes.filter((x) => !x.beingSpent).length
-      );
+      expect(boxesCount).to.be.equal(mockedGraphQLBoxes.filter((x) => !x.beingSpent).length);
       expect(fetchSpy).toBeCalledTimes(4);
 
-      const [firstCall, secondCall, thirdCall, fourthCall] = fetchSpy.mock.calls.map(
-        (call) => JSON.parse(call[1]?.body as string)
+      const [firstCall, secondCall, thirdCall, fourthCall] = fetchSpy.mock.calls.map((call) =>
+        JSON.parse(call[1]?.body as string)
       );
       expect(firstCall.query).to.be.equal(ALL_BOXES_QUERY);
       expect(firstCall.variables.skip).to.be.equal(0);
@@ -374,13 +350,11 @@ describe("ergo-graphql provider", () => {
         boxesCount += boxes.length;
       }
 
-      expect(boxesCount).to.be.equal(
-        mockedGraphQLBoxes.filter((x) => !x.beingSpent).length
-      );
+      expect(boxesCount).to.be.equal(mockedGraphQLBoxes.filter((x) => !x.beingSpent).length);
       expect(fetchSpy).toBeCalledTimes(4);
 
-      const [firstCall, secondCall, thirdCall, fourthCall] = fetchSpy.mock.calls.map(
-        (call) => JSON.parse(call[1]?.body as string)
+      const [firstCall, secondCall, thirdCall, fourthCall] = fetchSpy.mock.calls.map((call) =>
+        JSON.parse(call[1]?.body as string)
       );
       expect(firstCall.query).to.be.equal(ALL_BOXES_QUERY);
       expect(firstCall.variables.skip).to.be.equal(0);
@@ -422,9 +396,7 @@ describe("ergo-graphql provider", () => {
       }
 
       expect(hasDuplicatesBy(allBoxes, (box) => box.boxId)).to.be.false;
-      expect(allBoxes).to.have.length(
-        mockedGraphQLBoxes.filter((x) => !x.beingSpent).length
-      );
+      expect(allBoxes).to.have.length(mockedGraphQLBoxes.filter((x) => !x.beingSpent).length);
       expect(fetchSpy).toBeCalledTimes(5);
     });
   });
@@ -515,25 +487,19 @@ describe("ergo-graphql provider", () => {
 
       expect(response).to.have.length(mockedGraphQLTransactions.length);
       expect(fetchSpy).toHaveBeenCalledTimes(3);
-      expect(
-        JSON.parse(fetchSpy.mock.calls[0]?.[1]?.body as string).variables
-      ).to.be.deep.equal({
+      expect(JSON.parse(fetchSpy.mock.calls[0]?.[1]?.body as string).variables).to.be.deep.equal({
         transactionIds: ["txId"],
         skip: 0,
         take: 50
       });
 
-      expect(
-        JSON.parse(fetchSpy.mock.calls[1]?.[1]?.body as string).variables
-      ).to.be.deep.equal({
+      expect(JSON.parse(fetchSpy.mock.calls[1]?.[1]?.body as string).variables).to.be.deep.equal({
         transactionIds: ["txId"],
         skip: 50,
         take: 50
       });
 
-      expect(
-        JSON.parse(fetchSpy.mock.calls[2]?.[1]?.body as string).variables
-      ).to.be.deep.equal({
+      expect(JSON.parse(fetchSpy.mock.calls[2]?.[1]?.body as string).variables).to.be.deep.equal({
         transactionIds: ["txId"],
         skip: 100,
         take: 50
@@ -631,25 +597,19 @@ describe("ergo-graphql provider", () => {
       expect(response).to.have.length(mockedGraphQLTransactions.length);
       expect(fetchSpy).toHaveBeenCalledTimes(3);
       expect(fetchSpy.mock.calls[0]?.[0]).to.be.equal("https://gql.example2.com/");
-      expect(
-        JSON.parse(fetchSpy.mock.calls[0]?.[1]?.body as string).variables
-      ).to.be.deep.equal({
+      expect(JSON.parse(fetchSpy.mock.calls[0]?.[1]?.body as string).variables).to.be.deep.equal({
         transactionIds: ["txId"],
         skip: 0,
         take: 50
       });
 
-      expect(
-        JSON.parse(fetchSpy.mock.calls[1]?.[1]?.body as string).variables
-      ).to.be.deep.equal({
+      expect(JSON.parse(fetchSpy.mock.calls[1]?.[1]?.body as string).variables).to.be.deep.equal({
         transactionIds: ["txId"],
         skip: 50,
         take: 50
       });
 
-      expect(
-        JSON.parse(fetchSpy.mock.calls[2]?.[1]?.body as string).variables
-      ).to.be.deep.equal({
+      expect(JSON.parse(fetchSpy.mock.calls[2]?.[1]?.body as string).variables).to.be.deep.equal({
         transactionIds: ["txId"],
         skip: 100,
         take: 50
@@ -661,9 +621,7 @@ describe("ergo-graphql provider", () => {
     const mockData =
       '{"data":{"blockHeaders":[{"headerId":"d49","timestamp":"169","version":3,"adProofsRoot":"534","stateRoot":"19e","transactionsRoot":"330","nBits":"117","extensionHash":"062","powSolutions":{"pk":"027","w":"027","n":"ba9","d":"0"},"height":1100449,"difficulty":"220","parentId":"90a","votes":[0,0,0]},{"headerId":"90a","timestamp":"169","version":3,"adProofsRoot":"d97","stateRoot":"e1a","transactionsRoot":"a28","nBits":"117","extensionHash":"062","powSolutions":{"pk":"030","w":"027","n":"5e4","d":"0"},"height":1100448,"difficulty":"220","parentId":"802","votes":[0,0,0]}]}}';
     const mockDataJSON = JSON.parse(mockData);
-    const fetchSpy = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(resolveString(mockData));
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.getHeaders({ take: 2 });
@@ -698,9 +656,7 @@ describe("ergo-graphql provider", () => {
 
   it("Should return empty LastHeaders when response is corrupted", async () => {
     const mockData = "{}";
-    const fetchSpy = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(resolveString(mockData));
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.getHeaders({ take: 2 });
@@ -710,9 +666,7 @@ describe("ergo-graphql provider", () => {
 
   it("Should return true when transaction is valid", async () => {
     const mockData = '{"data":{"checkTransaction": "txId"}}';
-    const fetchSpy = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(resolveString(mockData));
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.checkTransaction({
@@ -728,9 +682,7 @@ describe("ergo-graphql provider", () => {
 
   it("Should return false when transaction is invalid", async () => {
     const mockData = '{"errors":[{"message":"Transaction is invalid"}]}';
-    const fetchSpy = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(resolveString(mockData));
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.checkTransaction({
@@ -749,9 +701,7 @@ describe("ergo-graphql provider", () => {
 
   it("Should return txId that is returned by the node", async () => {
     const mockData = '{"data":{"submitTransaction": "txId"}}';
-    const fetchSpy = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(resolveString(mockData));
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.submitTransaction({
@@ -767,9 +717,7 @@ describe("ergo-graphql provider", () => {
 
   it("Should return error when an error occurs on transaction submitting", async () => {
     const mockData = '{"errors":[{"message":"Transaction not accepted by the node"}]}';
-    const fetchSpy = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(resolveString(mockData));
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolveString(mockData));
 
     const client = new ErgoGraphQLProvider("https://gql.example.com/");
     const response = await client.submitTransaction({

@@ -34,10 +34,7 @@ export interface ISigmaProver {
 }
 
 export class Prover implements ISigmaProver {
-  signTransaction(
-    message: UnsignedTransaction,
-    keys: ErgoHDKey[] | KeyMap
-  ): SignedTransaction {
+  signTransaction(message: UnsignedTransaction, keys: ErgoHDKey[] | KeyMap): SignedTransaction {
     const getKeyFor = buildKeyMapper(keys);
     const txData = flattenTransactionObject(message);
     const txBytes = serializeTransaction(txData).toBytes();
@@ -132,8 +129,7 @@ function includesPubKey(
 ): boolean {
   return (
     ergoTree.includes(pubKey) ||
-    (registers &&
-      Object.keys(registers).some((k) => registers[k as RKey]?.includes(pubKey)))
+    (registers && Object.keys(registers).some((k) => registers[k as RKey]?.includes(pubKey)))
   );
 }
 

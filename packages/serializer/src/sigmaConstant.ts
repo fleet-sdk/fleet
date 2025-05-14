@@ -15,9 +15,7 @@ export class SConstant<D = unknown, T extends SType = SType> {
     this.#data = type.coerce(data) as D;
   }
 
-  static from<D, T extends SType = SType>(
-    bytes: ByteInput | SigmaByteReader
-  ): SConstant<D, T> {
+  static from<D, T extends SType = SType>(bytes: ByteInput | SigmaByteReader): SConstant<D, T> {
     const reader = bytes instanceof SigmaByteReader ? bytes : new SigmaByteReader(bytes);
     if (reader.isEmpty) throw new Error("Empty constant bytes.");
 
@@ -92,10 +90,7 @@ export function parse<T>(constant: ByteInput, mode: "strict"): T;
 /** @deprecated use `decode` instead */
 export function parse<T>(constant: ByteInput | undefined, mode: "safe"): T | undefined;
 /** @deprecated use `decode` instead */
-export function parse<T>(
-  constant: ByteInput | undefined,
-  mode: "strict" | "safe" = "strict"
-) {
+export function parse<T>(constant: ByteInput | undefined, mode: "strict" | "safe" = "strict") {
   if (mode === "strict") return SConstant.from<T>(constant ?? "").data;
   if (!constant) return;
 

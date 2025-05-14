@@ -11,10 +11,7 @@ import {
 import { SByte, SColl, SInt } from "@fleet-sdk/serializer";
 import { getTokenPrice, isBabelContractForTokenId, isValidBabelBox } from "./utils";
 
-export function BabelSwapPlugin(
-  babelBox: Box<Amount>,
-  token: TokenAmount<Amount>
-): FleetPlugin {
+export function BabelSwapPlugin(babelBox: Box<Amount>, token: TokenAmount<Amount>): FleetPlugin {
   if (!isValidBabelBox(babelBox)) throw new Error("Invalid Babel Box.");
 
   if (!isBabelContractForTokenId(babelBox.ergoTree, token.tokenId)) {

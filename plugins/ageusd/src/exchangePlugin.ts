@@ -30,17 +30,13 @@ function minting(params: unknown): params is AgeUSDMintAction {
 }
 
 function buildErrorMsgFor(action: ActionType, coin: CoinType, bank: AgeUSDBank): string {
-  const amount =
-    action === "minting" ? bank.getAvailable(coin) : bank.getRedeemable(coin);
+  const amount = action === "minting" ? bank.getAvailable(coin) : bank.getRedeemable(coin);
   const verb = action === "minting" ? "mint" : "redeem";
 
   return `Unable to ${verb} more than ${amount} ${coin} coins.`;
 }
 
-export function AgeUSDExchangePlugin(
-  bank: AgeUSDBank,
-  action: AgeUSDExchangeAction
-): FleetPlugin {
+export function AgeUSDExchangePlugin(bank: AgeUSDBank, action: AgeUSDExchangeAction): FleetPlugin {
   const amount = big(action.amount);
   let stableDelta = _0n;
   let reserveDelta = _0n;
@@ -51,9 +47,7 @@ export function AgeUSDExchangePlugin(
   let uiFeeAmount = _0n;
 
   if (minting(action)) {
-    assert(bank.canMint(amount, action.mint), () =>
-      buildErrorMsgFor("minting", action.mint, bank)
-    );
+    assert(bank.canMint(amount, action.mint), () => buildErrorMsgFor("minting", action.mint, bank));
 
     circulationDelta = amount;
     nanoergsDelta += bank.getMintingCostFor(amount, action.mint, "base");
@@ -106,12 +100,8 @@ export function AgeUSDExchangePlugin(
         })
         .addTokens(nft)
         .setAdditionalRegisters({
-          R4: SLong(
-            SConstant.from<bigint>(box.additionalRegisters.R4).data - stableDelta
-          ).toHex(),
-          R5: SLong(
-            SConstant.from<bigint>(box.additionalRegisters.R5).data - reserveDelta
-          ).toHex()
+          R4: SLong(SConstant.from<bigint>(box.additionalRegisters.R4).data - stableDelta).toHex(),
+          R5: SLong(SConstant.from<bigint>(box.additionalRegisters.R5).data - reserveDelta).toHex()
         }),
       { index: 0 }
     );
@@ -121,13 +111,12 @@ export function AgeUSDExchangePlugin(
     }
 
     if (action.recipient) {
-      const recipient = new OutputBuilder(
-        recipientAmount,
-        action.recipient
-      ).setAdditionalRegisters({
-        R4: SLong(circulationDelta).toHex(),
-        R5: SLong(nanoergsDelta).toHex()
-      });
+      const recipient = new OutputBuilder(recipientAmount, action.recipient).setAdditionalRegisters(
+        {
+          R4: SLong(circulationDelta).toHex(),
+          R5: SLong(nanoergsDelta).toHex()
+        }
+      );
 
       if (stableDelta < _0n) {
         recipient.addTokens({

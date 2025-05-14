@@ -12,8 +12,7 @@ export const boxVectors: {
       value: "1000000",
       creationHeight: 849741,
       index: 0,
-      ergoTree:
-        "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+      ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
       additionalRegisters: {},
       assets: [
         {
@@ -31,8 +30,7 @@ export const boxVectors: {
       value: "1000000",
       creationHeight: 849741,
       index: 0,
-      ergoTree:
-        "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+      ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
       additionalRegisters: { R4: undefined },
       assets: [
         {
@@ -50,8 +48,7 @@ export const boxVectors: {
       value: "108181578",
       creationHeight: 843679,
       index: 1,
-      ergoTree:
-        "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+      ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
       additionalRegisters: {},
       assets: [
         {
@@ -161,8 +158,7 @@ export const boxVectors: {
       value: "1000000",
       creationHeight: 843402,
       index: 0,
-      ergoTree:
-        "0008cd02200a1c1b8fa17ec82de54bcaef96f23d7b34196c0410f6f578abdbf163b14b25",
+      ergoTree: "0008cd02200a1c1b8fa17ec82de54bcaef96f23d7b34196c0410f6f578abdbf163b14b25",
       additionalRegisters: {},
       assets: [
         {
@@ -180,8 +176,7 @@ export const boxVectors: {
       value: "143459798",
       creationHeight: 800000,
       index: 2,
-      ergoTree:
-        "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+      ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
       additionalRegisters: {},
       assets: [
         {
@@ -199,8 +194,7 @@ export const boxVectors: {
       value: "1000000",
       creationHeight: 800000,
       index: 0,
-      ergoTree:
-        "0008cd0357ab5c00616362607d7d9e7000f35f4451a35dd99228b36a38f1461e4308e484",
+      ergoTree: "0008cd0357ab5c00616362607d7d9e7000f35f4451a35dd99228b36a38f1461e4308e484",
       additionalRegisters: {},
       assets: []
     },
@@ -276,8 +270,7 @@ export const deserializationTestVectors = [
   {
     name: "p2pk contract, with multiple tokens, but no additional registers",
     box: mockUTxO({
-      ergoTree:
-        "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+      ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
       assets: [
         {
           tokenId: "de5ee573c6a492c129d51119649bfeaedfc9afa6f54af576e62e1f7f3bbd4207",

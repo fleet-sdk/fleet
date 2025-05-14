@@ -35,8 +35,7 @@ export function utxoSum(boxes: readonly BoxAmounts[], tokenId?: TokenId) {
 
   for (const box of boxes) {
     if (isUndefined(tokenId) || tokenId === NANOERGS_TOKEN_ID) {
-      balances[NANOERGS_TOKEN_ID] =
-        (balances[NANOERGS_TOKEN_ID] || _0n) + ensureBigInt(box.value);
+      balances[NANOERGS_TOKEN_ID] = (balances[NANOERGS_TOKEN_ID] || _0n) + ensureBigInt(box.value);
     }
 
     if (tokenId !== NANOERGS_TOKEN_ID) {
@@ -45,8 +44,7 @@ export function utxoSum(boxes: readonly BoxAmounts[], tokenId?: TokenId) {
           continue;
         }
 
-        balances[token.tokenId] =
-          (balances[token.tokenId] || _0n) + ensureBigInt(token.amount);
+        balances[token.tokenId] = (balances[token.tokenId] || _0n) + ensureBigInt(token.amount);
       }
     }
   }
@@ -130,11 +128,7 @@ const MAX_NON_MANDATORY_REGISTER_INDEX = 9;
  */
 export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boolean {
   let lastIndex = 0;
-  for (
-    let i = MIN_NON_MANDATORY_REGISTER_INDEX;
-    i <= MAX_NON_MANDATORY_REGISTER_INDEX;
-    i++
-  ) {
+  for (let i = MIN_NON_MANDATORY_REGISTER_INDEX; i <= MAX_NON_MANDATORY_REGISTER_INDEX; i++) {
     const key = `R${i}` as keyof NonMandatoryRegisters;
     if (registers[key]) {
       if (i === MIN_NON_MANDATORY_REGISTER_INDEX) {
@@ -158,10 +152,7 @@ export function areRegistersDenselyPacked(registers: NonMandatoryRegisters): boo
  * @param utxos
  * @param filterParams
  */
-export function utxoFilter<T extends Amount>(
-  utxos: Box<T>[],
-  filterParams: UTxOFilterParams<T>
-) {
+export function utxoFilter<T extends Amount>(utxos: Box<T>[], filterParams: UTxOFilterParams<T>) {
   if (isEmpty(filterParams) || isEmpty(utxos)) {
     return utxos;
   }
@@ -183,8 +174,7 @@ export function utxoFilter<T extends Amount>(
   if (isDefined(max.aggregatedDistinctTokens)) {
     const tokenIds = _getDistinctTokenIds(filtered, max.aggregatedDistinctTokens);
     filtered = filtered.filter(
-      (utxo) =>
-        isEmpty(utxo.assets) || utxo.assets.every((token) => tokenIds.has(token.tokenId))
+      (utxo) => isEmpty(utxo.assets) || utxo.assets.every((token) => tokenIds.has(token.tokenId))
     );
   }
 

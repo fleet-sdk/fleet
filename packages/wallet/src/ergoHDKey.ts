@@ -80,10 +80,7 @@ export class ErgoHDKey {
     return this.#address;
   }
 
-  static async fromMnemonic(
-    mnemonic: string,
-    options?: FromMnemonicOptions
-  ): Promise<ErgoHDKey> {
+  static async fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<ErgoHDKey> {
     return ErgoHDKey.fromMasterSeed(
       await mnemonicToSeed(mnemonic, options?.passphrase),
       options?.path
@@ -114,16 +111,12 @@ export class ErgoHDKey {
   /** @deprecated use the default constructor instead */
   static fromExtendedKey(options: PublicKeyOptions): ErgoHDKey;
   /** @deprecated use the default constructor instead */
-  static fromExtendedKey(
-    keyOrOptions: string | PrivateKeyOptions | PublicKeyOptions
-  ): ErgoHDKey {
+  static fromExtendedKey(keyOrOptions: string | PrivateKeyOptions | PublicKeyOptions): ErgoHDKey {
     if (typeof keyOrOptions !== "string") {
       return new ErgoHDKey(keyOrOptions);
     }
 
-    const xKey = isHex(keyOrOptions)
-      ? base58check.encode(hex.decode(keyOrOptions))
-      : keyOrOptions;
+    const xKey = isHex(keyOrOptions) ? base58check.encode(hex.decode(keyOrOptions)) : keyOrOptions;
     return new ErgoHDKey(HDKey.fromExtendedKey(xKey));
   }
 

@@ -24,8 +24,6 @@ describe("createGqlOperation() types", () => {
       throwOnNonNetworkErrors: false,
       url
     });
-    expectTypeOf(notThrowable).toMatchTypeOf<
-      GraphQLOperation<GraphQLResponse, GraphQLVariables>
-    >();
+    expectTypeOf(notThrowable).toMatchTypeOf<GraphQLOperation<GraphQLResponse, GraphQLVariables>>();
   });
 });

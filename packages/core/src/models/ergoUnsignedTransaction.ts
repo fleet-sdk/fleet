@@ -15,9 +15,7 @@ import type { ErgoBoxCandidate } from "./ergoBoxCandidate";
 import type { ErgoUnsignedInput } from "./ergoUnsignedInput";
 import { ErgoUnsignedTransactionChain } from "./ergoUnsignedTransactionChain";
 
-type TransactionType<T> = T extends "default"
-  ? UnsignedTransaction
-  : EIP12UnsignedTransaction;
+type TransactionType<T> = T extends "default" ? UnsignedTransaction : EIP12UnsignedTransaction;
 
 export type ChainCallback = (
   child: TransactionBuilder,
@@ -94,9 +92,7 @@ export class ErgoUnsignedTransaction {
 
   chain(callback: ChainCallback): ErgoUnsignedTransactionChain {
     if (!this.#builder) {
-      throw new FleetError(
-        "Cannot chain transactions without a parent TransactionBuilder"
-      );
+      throw new FleetError("Cannot chain transactions without a parent TransactionBuilder");
     }
 
     const height = this.#builder.creationHeight;
@@ -121,9 +117,7 @@ export class ErgoUnsignedTransaction {
   toPlainObject<T extends PlainObjectType>(type?: T): TransactionType<T> {
     return {
       inputs: this.inputs.map((input) => input.toPlainObject(type ?? "minimal")),
-      dataInputs: this.dataInputs.map((input) =>
-        input.toDataInputPlainObject(type ?? "minimal")
-      ),
+      dataInputs: this.dataInputs.map((input) => input.toDataInputPlainObject(type ?? "minimal")),
       outputs: this.#outputCandidates.map((output) => output.toPlainObject())
     } as TransactionType<T>;
   }

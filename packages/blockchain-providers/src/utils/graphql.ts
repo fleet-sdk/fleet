@@ -30,19 +30,17 @@ export interface GraphQLErrorResponse {
   errors: GraphQLError[];
 }
 
-export type GraphQLResponse<T = unknown> =
-  | GraphQLSuccessResponse<T>
-  | GraphQLErrorResponse;
+export type GraphQLResponse<T = unknown> = GraphQLSuccessResponse<T> | GraphQLErrorResponse;
 
 export type GraphQLOperation<R extends GraphQLResponse, V extends GraphQLVariables> = (
   variables?: V,
   url?: string
 ) => Promise<R>;
 
-export type GraphQLRequiredUrlOperation<
-  R extends GraphQLResponse,
-  V extends GraphQLVariables
-> = (variables: V | undefined, url: string) => Promise<R>;
+export type GraphQLRequiredUrlOperation<R extends GraphQLResponse, V extends GraphQLVariables> = (
+  variables: V | undefined,
+  url: string
+) => Promise<R>;
 
 interface RequestParams {
   operationName?: string | null;
@@ -77,9 +75,7 @@ export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariab
 export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariables>(
   query: string,
   options?: GraphQLRequestOptions
-):
-  | GraphQLOperation<GraphQLResponse<R>, V>
-  | GraphQLRequiredUrlOperation<GraphQLResponse<R>, V> {
+): GraphQLOperation<GraphQLResponse<R>, V> | GraphQLRequiredUrlOperation<GraphQLResponse<R>, V> {
   return async (variables?: V, url?: string): Promise<GraphQLResponse<R>> => {
     url = url ?? options?.url;
     if (!url) throw new Error("URL is required");
@@ -98,11 +94,7 @@ export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariab
       }
     });
 
-    if (
-      options?.throwOnNonNetworkErrors &&
-      some(response.errors) &&
-      isEmpty(response.data)
-    ) {
+    if (options?.throwOnNonNetworkErrors && some(response.errors) && isEmpty(response.data)) {
       const msg = response.errors[0].message;
       throw new BlockchainProviderError(msg, { cause: response.errors });
     }

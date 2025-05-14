@@ -40,13 +40,9 @@ export type ImplementorFeePercentageOptions = {
   address: string;
 };
 
-type ImplementorFeeOptions =
-  | ImplementorFeeCallbackOptions
-  | ImplementorFeePercentageOptions;
+type ImplementorFeeOptions = ImplementorFeeCallbackOptions | ImplementorFeePercentageOptions;
 
-function isImplementorFeeCallbackParams(
-  params: unknown
-): params is ImplementorFeeCallbackOptions {
+function isImplementorFeeCallbackParams(params: unknown): params is ImplementorFeeCallbackOptions {
   return isDefined((params as ImplementorFeeCallbackOptions).callback);
 }
 
@@ -58,11 +54,7 @@ export class AgeUSDBank {
   private _bankBox!: AgeUSDBankBox;
   private _implementorFeeOptions?: ImplementorFeeCallbackOptions;
 
-  constructor(
-    bankBox: Box<Amount>,
-    oracleBox: Box<Amount>,
-    params: AgeUSDBankParameters
-  ) {
+  constructor(bankBox: Box<Amount>, oracleBox: Box<Amount>, params: AgeUSDBankParameters) {
     this._params = params;
     this.bankBox = bankBox;
     this.oracleBox = oracleBox;
@@ -248,10 +240,7 @@ export class AgeUSDBank {
     return percent(nanoergs, _2n);
   }
 
-  protected getReserveRatio(
-    baseReserves: bigint,
-    circulatingStableCoins: bigint
-  ): bigint {
+  protected getReserveRatio(baseReserves: bigint, circulatingStableCoins: bigint): bigint {
     if (baseReserves === _0n || this._oracleRate === _0n) return _0n;
 
     let rate = baseReserves * _100n;
@@ -284,8 +273,7 @@ export class AgeUSDBank {
 
     return coin === "stable"
       ? amount <= this.circulatingStableCoins
-      : this.getReserveRatioFor("redeeming", amount, "reserve") >=
-          this._params.minReserveRatio;
+      : this.getReserveRatioFor("redeeming", amount, "reserve") >= this._params.minReserveRatio;
   }
 
   getReserveRatioFor(action: ActionType, amount: Amount, coin: CoinType): bigint {
@@ -310,12 +298,7 @@ export class AgeUSDBank {
     return this.getReserveRatio(newReserve, newCirculatingStable);
   }
 
-  getFeeAmountFor(
-    amount: Amount,
-    coin: CoinType,
-    type?: FeeType,
-    txFee?: Amount
-  ): bigint {
+  getFeeAmountFor(amount: Amount, coin: CoinType, type?: FeeType, txFee?: Amount): bigint {
     amount = big(amount);
     const price = coin === "stable" ? this.stableCoinPrice : this.reserveCoinPrice;
     const base = price * amount;
@@ -331,12 +314,7 @@ export class AgeUSDBank {
     return fee;
   }
 
-  getMintingCostFor(
-    amount: Amount,
-    coin: CoinType,
-    type?: ReturnType,
-    txFee?: Amount
-  ): bigint {
+  getMintingCostFor(amount: Amount, coin: CoinType, type?: ReturnType, txFee?: Amount): bigint {
     amount = big(amount);
     const price = coin === "stable" ? this.stableCoinPrice : this.reserveCoinPrice;
     const baseAmount = price * amount;
@@ -350,12 +328,7 @@ export class AgeUSDBank {
     return cost;
   }
 
-  getRedeemingAmountFor(
-    amount: Amount,
-    coin: CoinType,
-    type?: ReturnType,
-    txFee?: Amount
-  ) {
+  getRedeemingAmountFor(amount: Amount, coin: CoinType, type?: ReturnType, txFee?: Amount) {
     amount = big(amount);
     const price = coin === "stable" ? this.stableCoinPrice : this.reserveCoinPrice;
     const baseAmount = price * amount;

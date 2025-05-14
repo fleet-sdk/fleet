@@ -1,17 +1,7 @@
 import { hex, utf8 } from "@fleet-sdk/crypto";
 import { validBoxes } from "_test-vectors";
 import type { SConstant } from "../sigmaConstant";
-import {
-  SBigInt,
-  SBool,
-  SByte,
-  SColl,
-  SGroupElement,
-  SInt,
-  SLong,
-  SPair,
-  SShort
-} from "../types";
+import { SBigInt, SBool, SByte, SColl, SGroupElement, SInt, SLong, SPair, SShort } from "../types";
 import { type SConstructor, STuple } from "../types/constructors";
 
 const u8a = (input: number[]) => Uint8Array.from(input);
@@ -442,25 +432,21 @@ export const collVectors: GenericTypeTestVector[] = [
       ]
     }
   ]),
-  ...buildCollVectors(
-    "SColl[(SColl[SByte], SColl[SByte])]",
-    SPair(SColl(SByte), SColl(SByte)),
-    [
-      {
-        hex: "0c3c0e0e02240008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf573339694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443240008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59333967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a",
-        value: [
-          [
-            hex.decode("0008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf57") /* biome-ignore format: */,
-            hex.decode("39694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443") /* biome-ignore format: */
-          ],
-          [
-            hex.decode("0008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59") /* biome-ignore format: */,
-            hex.decode("3967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a") /* biome-ignore format: */
-          ]
+  ...buildCollVectors("SColl[(SColl[SByte], SColl[SByte])]", SPair(SColl(SByte), SColl(SByte)), [
+    {
+      hex: "0c3c0e0e02240008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf573339694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443240008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59333967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a",
+      value: [
+        [
+          hex.decode("0008cd03f2d7187f56156cbedde84dffd873f59db7c0e16408c475145a0415317d85cf57") /* biome-ignore format: */,
+          hex.decode("39694a6b696558536f6f6b4c74615972384a5a3841386e4b75657639647a524d77786b476a75795165626e5167436a387a6443") /* biome-ignore format: */
+        ],
+        [
+          hex.decode("0008cd02d481d399b808586e94dfd907439b2671999e1d7a97b1705d3363707930a6ec59") /* biome-ignore format: */,
+          hex.decode("3967386569796970477666557a675239586a6761423577597641426f447a535969716a754a6b39676769446b334a533476454a") /* biome-ignore format: */
         ]
-      }
-    ]
-  ),
+      ]
+    }
+  ]),
   ...buildCollVectors("SColl[SColl[(SInt, SInt)]]", SColl(SPair(SInt, SInt)), [
     {
       hex: "0c0c580202020406080208060402",
@@ -527,10 +513,7 @@ export const tupleTestVectors: GenericTypeTestVector[] = [
   {
     name: "(SColl[SByte], SGroupElement)",
     sconst: SPair(
-      SColl(
-        SByte,
-        hex.decode("8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006")
-      ),
+      SColl(SByte, hex.decode("8743542e50d2195907ce017595f8adf1f496c796d9bcc1148ff9ec94d0bf5006")),
       SGroupElement(
         hex.decode("036ebe10da76e99b081b5893635db7518a062bd0f89b07fc056ad9b77c2abce607")
       )

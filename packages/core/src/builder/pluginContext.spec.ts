@@ -74,9 +74,7 @@ describe("Plugin context", () => {
   it("Should burn tokens, plugin context allowed", () => {
     const burnTokensMethod = vi.spyOn(builder, "burnTokens");
 
-    builder
-      .from(regularBoxes)
-      .configure((settings) => settings.allowTokenBurningFromPlugins(true));
+    builder.from(regularBoxes).configure((settings) => settings.allowTokenBurningFromPlugins(true));
 
     context.burnTokens([
       {

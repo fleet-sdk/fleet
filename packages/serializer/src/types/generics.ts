@@ -8,10 +8,7 @@ export class SCollType<T extends SType = SType> extends SGenericType<T> {
   }
 
   override coerce<I, O>(elements: I[]): O[] | Uint8Array {
-    if (
-      this.elementsType.code === descriptors.byte.code &&
-      !(elements instanceof Uint8Array)
-    ) {
+    if (this.elementsType.code === descriptors.byte.code && !(elements instanceof Uint8Array)) {
       return typeof elements === "string"
         ? hex.decode(elements)
         : Uint8Array.from(elements as ArrayLike<number>);

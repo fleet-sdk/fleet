@@ -100,12 +100,11 @@ export type ChainProviderUnconfirmedTransaction<T> = {
   timestamp: number;
 };
 
-export type ChainProviderConfirmedTransaction<T> =
-  ChainProviderUnconfirmedTransaction<T> & {
-    height: number;
-    index: number;
-    headerId: HexString;
-  };
+export type ChainProviderConfirmedTransaction<T> = ChainProviderUnconfirmedTransaction<T> & {
+  height: number;
+  index: number;
+  headerId: HexString;
+};
 
 export type TransactionEvaluationError = {
   success: false;
@@ -122,12 +121,8 @@ export type TransactionReductionSuccess = {
   reducedTransaction: HexString;
 };
 
-export type TransactionEvaluationResult =
-  | TransactionEvaluationError
-  | TransactionEvaluationSuccess;
-export type TransactionReductionResult =
-  | TransactionEvaluationError
-  | TransactionReductionSuccess;
+export type TransactionEvaluationResult = TransactionEvaluationError | TransactionEvaluationSuccess;
+export type TransactionReductionResult = TransactionEvaluationError | TransactionReductionSuccess;
 
 /**
  * Represents a blockchain provider that can interact with the blockchain.
@@ -190,7 +185,5 @@ export interface IBlockchainProvider<I> {
   /**
    * Evaluate a transaction and return Base16-encoded evaluation result.
    */
-  reduceTransaction(
-    transaction: UnsignedTransaction
-  ): Promise<TransactionReductionResult>;
+  reduceTransaction(transaction: UnsignedTransaction): Promise<TransactionReductionResult>;
 }

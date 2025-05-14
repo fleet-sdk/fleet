@@ -74,9 +74,7 @@ export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
       this.#boxId = box.boxId;
     } else {
       if (!transactionId || isUndefined(index)) {
-        throw new FleetError(
-          "TransactionId and Index must be provided for Box generation."
-        );
+        throw new FleetError("TransactionId and Index must be provided for Box generation.");
       }
 
       this.#candidate = box instanceof ErgoBoxCandidate ? box : new ErgoBoxCandidate(box);

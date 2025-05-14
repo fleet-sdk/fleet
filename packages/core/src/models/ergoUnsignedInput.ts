@@ -37,8 +37,7 @@ export class ErgoUnsignedInput<
       const c = extension[key] as ConstantInput;
       if (!c) continue;
 
-      vars[key as unknown as keyof ContextExtension] =
-        typeof c === "string" ? c : c.toHex();
+      vars[key as unknown as keyof ContextExtension] = typeof c === "string" ? c : c.toHex();
     }
 
     this.#extension = vars;

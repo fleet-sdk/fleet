@@ -11,8 +11,7 @@ import { ErgoAddress, ErgoTree, TokensCollection } from "../models";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE, estimateMinBoxValue } from "./outputBuilder";
 
 const address = "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c";
-const ergoTreeHex =
-  "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7";
+const ergoTreeHex = "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7";
 const height = 816992;
 
 describe("Constructor", () => {
@@ -144,9 +143,7 @@ describe("Token handling", () => {
   });
 
   it("Should add distinct tokens", () => {
-    builder
-      .addTokens({ tokenId: tokenA, amount: 50n })
-      .addTokens({ tokenId: tokenB, amount: 10n });
+    builder.addTokens({ tokenId: tokenA, amount: 50n }).addTokens({ tokenId: tokenB, amount: 10n });
 
     expect(builder.assets).toHaveLength(2);
     const tokens = builder.assets.toArray();
@@ -196,9 +193,7 @@ describe("Token handling", () => {
       .addTokens({ tokenId: tokenA, amount: "50" })
       .addTokens({ tokenId: tokenB, amount: 10n });
     expect(builder.assets).toHaveLength(2);
-    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(
-      50n
-    );
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
 
     builder.addTokens({ tokenId: tokenA, amount: 100n });
     expect(builder.assets).toHaveLength(2);
@@ -209,9 +204,7 @@ describe("Token handling", () => {
 
   it("Should add multiple tokens and sum if the same tokenId is added more than one time", () => {
     builder.addTokens({ tokenId: tokenA, amount: "50" });
-    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(
-      50n
-    );
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
     expect(builder.assets).toHaveLength(1);
 
     builder.addTokens([
@@ -226,9 +219,7 @@ describe("Token handling", () => {
 
   it("Should not sum if the same tokenId is added more than one time", () => {
     builder.addTokens({ tokenId: tokenA, amount: "50" });
-    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(
-      50n
-    );
+    expect(builder.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
     expect(builder.assets).toHaveLength(1);
 
     builder.addTokens(
@@ -246,9 +237,7 @@ describe("Token handling", () => {
   });
 
   it("Should remove tokens from the list using context ejector", () => {
-    builder
-      .addTokens({ tokenId: tokenA, amount: 50n })
-      .addTokens({ tokenId: tokenB, amount: 10n });
+    builder.addTokens({ tokenId: tokenA, amount: 50n }).addTokens({ tokenId: tokenB, amount: 10n });
     expect(builder.assets).toHaveLength(2);
 
     builder.eject(({ tokens }) => tokens.remove(tokenA));

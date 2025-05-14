@@ -62,8 +62,7 @@ export const unsignedTransactionVectors: {
         {
           value: 1000000n,
           creationHeight: 942037,
-          ergoTree:
-            "0008cd0348e16be5a28374456769eb474fa637f3733e6a5e55dc4f047528ab470b39c77b",
+          ergoTree: "0008cd0348e16be5a28374456769eb474fa637f3733e6a5e55dc4f047528ab470b39c77b",
           additionalRegisters: {
             R4: "05908001",
             R5: "05a8d49eef1d"
@@ -78,8 +77,7 @@ export const unsignedTransactionVectors: {
         {
           value: 20000000n,
           creationHeight: 942037,
-          ergoTree:
-            "0008cd02d49458ef115476eda3d109d1aa9e6a9b7fb6624e595ec45da16f91d093f34516",
+          ergoTree: "0008cd02d49458ef115476eda3d109d1aa9e6a9b7fb6624e595ec45da16f91d093f34516",
           additionalRegisters: {},
           assets: []
         },
@@ -94,8 +92,7 @@ export const unsignedTransactionVectors: {
         {
           value: 83594173n,
           creationHeight: 942037,
-          ergoTree:
-            "0008cd0348e16be5a28374456769eb474fa637f3733e6a5e55dc4f047528ab470b39c77b",
+          ergoTree: "0008cd0348e16be5a28374456769eb474fa637f3733e6a5e55dc4f047528ab470b39c77b",
           additionalRegisters: {},
           assets: [
             {
@@ -155,8 +152,7 @@ export const unsignedTransactionVectors: {
           boxId: "0ef3684d3500b11d4ab8d8965bb6360ec186b12616e310e9497c03653d88e83d",
           value: 1000000000n,
           creationHeight: 889914,
-          ergoTree:
-            "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+          ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
           additionalRegisters: {},
           assets: []
         },
@@ -191,8 +187,7 @@ export const unsignedTransactionVectors: {
           boxId: "a52cea531b25b1f9ec4f6be8e5443611c3b857b62f67495250e196c88166e1fa",
           value: 3048548850n,
           creationHeight: 889914,
-          ergoTree:
-            "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+          ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
           additionalRegisters: {},
           assets: [
             {
@@ -365,8 +360,7 @@ export const unsignedTransactionVectors: {
           boxId: "11beed33735ab766b7c12833eb22110fefee2e9d3c35cc63b63f99c3750b1a1f",
           value: 6801414185n,
           creationHeight: 943396,
-          ergoTree:
-            "0008cd027304abbaebe8bb3a9e963dfa9fa4964d7d001e6a1bd225eadc84048ae49b627c",
+          ergoTree: "0008cd027304abbaebe8bb3a9e963dfa9fa4964d7d001e6a1bd225eadc84048ae49b627c",
           additionalRegisters: {},
           assets: []
         },
@@ -430,8 +424,7 @@ export const unsignedTransactionVectors: {
           boxId: "90f94439d57d47a762cecb9daca1c30acc39ddc497c151a3462f701df9bea27e",
           value: 967798476n,
           creationHeight: 936250,
-          ergoTree:
-            "0008cd02f31eb1d87a89b28cee6a4a458380c4651965bfe9096ef5c31e4452400a846189",
+          ergoTree: "0008cd02f31eb1d87a89b28cee6a4a458380c4651965bfe9096ef5c31e4452400a846189",
           additionalRegisters: {},
           assets: [
             {
@@ -566,8 +559,7 @@ export const unsignedTransactionVectors: {
       outputs: [
         {
           value: 1000000n,
-          ergoTree:
-            "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+          ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
           assets: [
             {
               tokenId: "9a06d9e545a41fd51eeffc5e20d818073bf820c635e2a9d922269913e0de369d",
@@ -587,8 +579,7 @@ export const unsignedTransactionVectors: {
         },
         {
           value: 9200000n,
-          ergoTree:
-            "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
+          ergoTree: "0008cd038d39af8c37583609ff51c6a577efe60684119da2fbd0d75f9c72372886a58a63",
           assets: [],
           additionalRegisters: {},
           creationHeight: 942700
@@ -702,8 +693,7 @@ export const raffleSignedTransaction = {
     {
       boxId: "44e46ec02820d18985ad733e04f0ce1bff7ce0cbecf329a0f8b8f238969d3d2a",
       value: 157516100000n,
-      ergoTree:
-        "0008cd023625de27837c0d91735145f7330fb1867cfe23b8e27b20e2a7d31bc825ef4f8e",
+      ergoTree: "0008cd023625de27837c0d91735145f7330fb1867cfe23b8e27b20e2a7d31bc825ef4f8e",
       assets: [
         {
           tokenId: "4cccf7e1072b31ffd46819b317ec22900125f5c284fe5f48a5ab765a0dc4646b",

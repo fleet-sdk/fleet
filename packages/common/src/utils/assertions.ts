@@ -52,9 +52,7 @@ export function assertInstanceOf<T>(obj: T, expected: Constructable): asserts ob
   const condition = obj instanceof expected;
 
   if (!condition) {
-    throw new Error(
-      `Expected an instance of '${expected.name}', got '${getTypeName(obj)}'.`
-    );
+    throw new Error(`Expected an instance of '${expected.name}', got '${getTypeName(obj)}'.`);
   }
 }
 

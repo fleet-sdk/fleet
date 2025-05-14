@@ -187,8 +187,8 @@ describe("Compiler constants map parsing", () => {
   });
 
   it("Should throw is unsupported type is passed", () => {
-    expect(() =>
-      parseNamedConstantsMap({ invalidHex: 23 as unknown as HexString })
-    ).to.throw("Unsupported constant object mapping.");
+    expect(() => parseNamedConstantsMap({ invalidHex: 23 as unknown as HexString })).to.throw(
+      "Unsupported constant object mapping."
+    );
   });
 });

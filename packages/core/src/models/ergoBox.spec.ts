@@ -35,9 +35,9 @@ describe("Construction", () => {
     const box = regularBoxes[0];
     const candidate = boxToCandidate(box);
 
-    expect(
-      () => new ErgoBox(candidate, undefined as unknown as string, box.index)
-    ).to.throw("TransactionId and Index must be provided for Box generation.");
+    expect(() => new ErgoBox(candidate, undefined as unknown as string, box.index)).to.throw(
+      "TransactionId and Index must be provided for Box generation."
+    );
 
     expect(
       () => new ErgoBox(candidate, box.transactionId, undefined as unknown as number)

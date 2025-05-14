@@ -31,9 +31,9 @@ describe("exponentialRetry", () => {
   it("should throw error if operation fails after all attempts", async () => {
     const operation = vi.fn().mockRejectedValue(new Error("Failed"));
 
-    await expect(
-      exponentialRetry(operation, { attempts: 3, delay: 10 })
-    ).rejects.toThrowError("Failed");
+    await expect(exponentialRetry(operation, { attempts: 3, delay: 10 })).rejects.toThrowError(
+      "Failed"
+    );
     expect(operation).toHaveBeenCalledTimes(4); // 1 initial attempt + 3 retries
   });
 });
@@ -45,9 +45,7 @@ describe("request", () => {
 
   it("should make a successful request and return the parsed response", async () => {
     const mockResponse = { data: "response" };
-    const fetchMock = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValue(resolveData(mockResponse));
+    const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(resolveData(mockResponse));
 
     const parserMock = {
       parse: vi.fn().mockReturnValue(mockResponse),
@@ -60,36 +58,26 @@ describe("request", () => {
       query: { param: "value" }
     });
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://example.com/api/data?param=value",
-      undefined
-    );
+    expect(fetchMock).toHaveBeenCalledWith("https://example.com/api/data?param=value", undefined);
     expect(parserMock.parse).toHaveBeenCalledWith(JSON.stringify(mockResponse));
     expect(result).toEqual(mockResponse);
   });
 
   it("should make a successful request and return the parsed response without setting base property", async () => {
     const mockResponse = { data: "response" };
-    const fetchMock = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValue(resolveData(mockResponse));
+    const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(resolveData(mockResponse));
 
     const result = await request("https://example.com/api/data", {
       query: { param: "value" }
     });
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://example.com/api/data?param=value",
-      undefined
-    );
+    expect(fetchMock).toHaveBeenCalledWith("https://example.com/api/data?param=value", undefined);
     expect(result).toEqual(mockResponse);
   });
 
   it("should make a successful request and return the parsed response without setting base and query property", async () => {
     const mockResponse = { data: "response" };
-    const fetchMock = vi
-      .spyOn(global, "fetch")
-      .mockResolvedValue(resolveData(mockResponse));
+    const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(resolveData(mockResponse));
 
     const result = await request("https://example.com/api/data");
 
@@ -200,10 +188,7 @@ describe("request", () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://example.com/api/data?param=value",
-      undefined
-    ); // initial attempt
+    expect(fetchMock).toHaveBeenCalledWith("https://example.com/api/data?param=value", undefined); // initial attempt
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://fallback1.com/api/data?param=value1",
@@ -248,10 +233,7 @@ describe("request", () => {
     ).rejects.toThrowError("Failed");
 
     expect(fetchMock).toHaveBeenCalledTimes(6); // 1 initial attempt + 5 retries
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://example.com/api/data?param=value",
-      undefined
-    ); // initial attempt
+    expect(fetchMock).toHaveBeenCalledWith("https://example.com/api/data?param=value", undefined); // initial attempt
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://fallback1.com/api/data?param=value1",
@@ -265,10 +247,7 @@ describe("request", () => {
       "https://fallback3.com/api/data?param=value3",
       undefined
     );
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://example.com/api/data?param=value",
-      undefined
-    );
+    expect(fetchMock).toHaveBeenCalledWith("https://example.com/api/data?param=value", undefined);
     expect(fetchMock).toHaveBeenCalledWith(
       "https://fallback1.com/api/data?param=value1",
       undefined

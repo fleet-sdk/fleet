@@ -92,9 +92,7 @@ describe("ErgoMessage construction", () => {
     expect(fromData.encode(Network.Mainnet)).to.be.equal(tv.encoded.mainnet);
     expect(fromData.encode(Network.Testnet)).to.be.equal(tv.encoded.testnet);
 
-    const fromHash = ErgoMessage.decode(
-      ErgoMessage.fromBase58(tv.encoded.mainnet).encode()
-    );
+    const fromHash = ErgoMessage.decode(ErgoMessage.fromBase58(tv.encoded.mainnet).encode());
     expect(fromHash.toString()).to.be.equal(tv.encoded.mainnet);
     expect(fromHash.toString(Network.Testnet)).to.be.equal(tv.encoded.testnet);
   });
@@ -107,9 +105,7 @@ describe("ErgoMessage construction", () => {
 
   it("Should throw when invalid encoded message hash", () => {
     const invalidChecksum = "AdQ5WCyibKZvCFkCAShhic5Z6cP3sG3KFp5ZSdb7gDfBL6b4Sy";
-    expect(() => ErgoMessage.decode(invalidChecksum)).to.throw(
-      "Invalid encoded message hash"
-    );
+    expect(() => ErgoMessage.decode(invalidChecksum)).to.throw("Invalid encoded message hash");
 
     const invalidType = "9et2sWchC9o4894aaVDzcgfCyDoBV8nNvtnk5hSW3fzBbSwoX31"; // p2pk
     expect(() => ErgoMessage.decode(invalidType)).to.throw("Invalid message type");
@@ -121,8 +117,6 @@ describe("Serialization", () => {
     const message = ErgoMessage.fromData("hello world");
     const bytes = message.serialize().toBytes();
 
-    expect(bytes).to.be.deep.equal(
-      Uint8Array.from([0x0, message.network, ...message.hash])
-    );
+    expect(bytes).to.be.deep.equal(Uint8Array.from([0x0, message.network, ...message.hash]));
   });
 });

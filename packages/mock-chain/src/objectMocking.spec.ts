@@ -6,8 +6,7 @@ import { mockHeaders, mockUTxO } from "./objectMocking";
 
 describe("mockUTxO()", () => {
   it("Should set default values when omitted", () => {
-    const ergoTree =
-      "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d";
+    const ergoTree = "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d";
 
     const utxo = mockUTxO({ ergoTree });
 
@@ -26,8 +25,7 @@ describe("mockUTxO()", () => {
 
   it("Should transform a candidate in a valid UTxO", () => {
     const candidate: BoxCandidate<bigint> = {
-      ergoTree:
-        "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
       creationHeight: 804138,
       value: 1000000n,
       assets: [

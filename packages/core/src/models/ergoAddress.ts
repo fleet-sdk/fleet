@@ -1,9 +1,4 @@
-import {
-  AddressType,
-  type Base58String,
-  type HexString,
-  Network
-} from "@fleet-sdk/common";
+import { AddressType, type Base58String, type HexString, Network } from "@fleet-sdk/common";
 import { concatBytes, endsWith, first, startsWith } from "@fleet-sdk/common";
 import {
   type ByteInput,
@@ -34,10 +29,7 @@ const P2SH_ERGOTREE_LENGTH = 44;
 const P2SH_HASH_LENGTH = 24;
 
 function getErgoTreeType(ergoTree: Uint8Array): AddressType {
-  if (
-    ergoTree.length === P2PK_ERGOTREE_LENGTH &&
-    startsWith(ergoTree, P2PK_ERGOTREE_PREFIX)
-  ) {
+  if (ergoTree.length === P2PK_ERGOTREE_LENGTH && startsWith(ergoTree, P2PK_ERGOTREE_PREFIX)) {
     return AddressType.P2PK;
   }
 

@@ -57,11 +57,7 @@ describe("outputs collection", () => {
     expect(collection.at(1)).toBe(second);
 
     const fistPlacedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, address, height);
-    const secondPlacedOutput = new OutputBuilder(
-      SAFE_MIN_BOX_VALUE * 4n,
-      address,
-      height
-    );
+    const secondPlacedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 4n, address, height);
     const newLen = collection.add([fistPlacedOutput, secondPlacedOutput], {
       index: 1
     });

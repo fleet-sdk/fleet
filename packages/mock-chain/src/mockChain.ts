@@ -1,10 +1,4 @@
-import {
-  type HexString,
-  ensureDefaults,
-  first,
-  isUndefined,
-  some
-} from "@fleet-sdk/common";
+import { type HexString, ensureDefaults, first, isUndefined, some } from "@fleet-sdk/common";
 import type { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { type ByteInput, utf8 } from "@fleet-sdk/crypto";
 import { decode } from "@fleet-sdk/serializer";
@@ -13,11 +7,7 @@ import type { BlockchainParameters } from "sigmastate-js/main";
 import { printDiff } from "./balancePrinting";
 import { BLOCKCHAIN_PARAMETERS, execute } from "./execution";
 import { mockBlockchainStateContext } from "./objectMocking";
-import {
-  KeyedMockChainParty,
-  type MockChainParty,
-  NonKeyedMockChainParty
-} from "./party";
+import { KeyedMockChainParty, type MockChainParty, NonKeyedMockChainParty } from "./party";
 
 const BLOCK_TIME_MS = 120000;
 

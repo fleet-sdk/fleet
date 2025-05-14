@@ -95,18 +95,16 @@ describe("Encoding", () => {
 
   it("Should encode to Base58 string", () => {
     // should default to mainnet
-    expect(ErgoAddress.decode(new ErgoTree(treeHex).encode()).network).to.be.equal(
-      Network.Mainnet
-    );
+    expect(ErgoAddress.decode(new ErgoTree(treeHex).encode()).network).to.be.equal(Network.Mainnet);
 
     // should encode for testnet
-    expect(
-      ErgoAddress.decode(new ErgoTree(treeHex).encode(Network.Testnet)).network
-    ).to.be.equal(Network.Testnet);
+    expect(ErgoAddress.decode(new ErgoTree(treeHex).encode(Network.Testnet)).network).to.be.equal(
+      Network.Testnet
+    );
 
     // should override encoding network from constructor params
-    expect(
-      ErgoAddress.decode(new ErgoTree(treeHex, Network.Testnet).encode()).network
-    ).to.be.equal(Network.Testnet);
+    expect(ErgoAddress.decode(new ErgoTree(treeHex, Network.Testnet).encode()).network).to.be.equal(
+      Network.Testnet
+    );
   });
 });

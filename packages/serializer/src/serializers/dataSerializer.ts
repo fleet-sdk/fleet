@@ -83,9 +83,7 @@ export const dataSerializer = {
     if (type.code === descriptors.unit.code) return writer;
     if (type.code === descriptors.box.code) return serializeBox(data as Box, writer);
 
-    throw Error(
-      `Serialization error: '0x${type.code.toString(16)}' type not implemented.`
-    );
+    throw Error(`Serialization error: '0x${type.code.toString(16)}' type not implemented.`);
   },
 
   deserialize(type: SType, reader: SigmaByteReader): unknown {
@@ -135,9 +133,7 @@ export const dataSerializer = {
           }
         }
         case descriptors.tuple.code: {
-          return (type as STupleType).elementsType.map((t) =>
-            this.deserialize(t, reader)
-          );
+          return (type as STupleType).elementsType.map((t) => this.deserialize(t, reader));
         }
         case descriptors.unit.code:
           return undefined;

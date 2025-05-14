@@ -129,10 +129,8 @@ describe("Contract execution and chain mocking", () => {
     return;
   });
 
-  const SIGUSD_TOKEN_ID =
-    "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04";
-  const SIGRSV_TOKEN_ID =
-    "003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0";
+  const SIGUSD_TOKEN_ID = "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04";
+  const SIGRSV_TOKEN_ID = "003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0";
 
   afterEach(() => {
     consoleMock.mockReset();
@@ -470,9 +468,9 @@ describe("Contract execution and chain mocking", () => {
     expect(() => chain.execute(unsignedTransaction, { signers: [alice] })).to.throw();
 
     // should throw if { throw: true }
-    expect(() =>
-      chain.execute(unsignedTransaction, { signers: [alice], throw: true })
-    ).to.throw("Tree root should be real but was UnprovenSchnorr");
+    expect(() => chain.execute(unsignedTransaction, { signers: [alice], throw: true })).to.throw(
+      "Tree root should be real but was UnprovenSchnorr"
+    );
 
     // should not throw if { throw: false }
     expect(() =>

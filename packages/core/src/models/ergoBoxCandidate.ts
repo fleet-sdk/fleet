@@ -1,9 +1,4 @@
-import type {
-  Amount,
-  BoxCandidate,
-  NonMandatoryRegisters,
-  TokenAmount
-} from "@fleet-sdk/common";
+import type { Amount, BoxCandidate, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import type { TransactionOutputFlags } from "../builder";
 import { ErgoBox } from "./ergoBox";

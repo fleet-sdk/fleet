@@ -44,10 +44,7 @@ function writeSignedInput(writer: SigmaByteWriter, input: SignedInput): void {
 function writeUnsignedInput(writer: SigmaByteWriter, input: Input): void {
   writer.writeHex(input.boxId);
   writeProof(writer, null);
-  writeExtension(
-    writer,
-    isSignedInput(input) ? input.spendingProof?.extension : input.extension
-  );
+  writeExtension(writer, isSignedInput(input) ? input.spendingProof?.extension : input.extension);
 }
 
 function isSignedInput(input: Input): input is SignedInput {
@@ -83,9 +80,7 @@ function writeExtension(
     values.push([key, value]);
   }
 
-  writer.writeArray(values, ([key, value], w) =>
-    w.writeUInt(Number(key)).writeHex(value)
-  );
+  writer.writeArray(values, ([key, value], w) => w.writeUInt(Number(key)).writeHex(value));
 }
 
 function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {
@@ -124,9 +119,7 @@ function readInput(reader: SigmaByteReader): SignedInput | UnsignedInput {
     extension[reader.readUInt()] = SConstant.from(reader).toHex();
   }
 
-  return proofBytes
-    ? { boxId, spendingProof: { proofBytes, extension } }
-    : { boxId, extension };
+  return proofBytes ? { boxId, spendingProof: { proofBytes, extension } } : { boxId, extension };
 }
 
 /**

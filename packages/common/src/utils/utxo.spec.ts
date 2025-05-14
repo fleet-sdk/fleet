@@ -28,9 +28,9 @@ describe("UTxO sum", () => {
   });
 
   it("Should not return undefined results for empty arrays", () => {
-    expect(
-      utxoSum([], "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")
-    ).toBe(0n);
+    expect(utxoSum([], "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b")).toBe(
+      0n
+    );
 
     expect(utxoSum([]).nanoErgs).toBe(0n);
     expect(utxoSum([]).tokens).toStrictEqual([]);
@@ -252,9 +252,9 @@ describe("Densely pack check - areRegistersDenselyPacked()", () => {
 describe("UTxO filter", () => {
   it("Should filter by max UTxO count", () => {
     expect(utxoFilter(regularBoxes, { max: { count: 2 } })).to.has.length(2);
-    expect(
-      utxoFilter(regularBoxes, { max: { count: regularBoxes.length } })
-    ).to.has.length(regularBoxes.length);
+    expect(utxoFilter(regularBoxes, { max: { count: regularBoxes.length } })).to.has.length(
+      regularBoxes.length
+    );
   });
 
   it("Should filter by max distinct tokens count", () => {
@@ -326,8 +326,7 @@ describe("ensureUTxOBigInt()", () => {
       boxId: "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
       transactionId: "22525acc8b9438ded1e0fef41bb38ac57b8be23c650c82dd8ba545ccdc0b97c2",
       index: 0,
-      ergoTree:
-        "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
       creationHeight: 804138,
       value: "1000000",
       assets: [
@@ -343,8 +342,7 @@ describe("ensureUTxOBigInt()", () => {
       boxId: "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
       transactionId: "22525acc8b9438ded1e0fef41bb38ac57b8be23c650c82dd8ba545ccdc0b97c2",
       index: 0,
-      ergoTree:
-        "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
       creationHeight: 804138,
       value: 1000000n,
       assets: [

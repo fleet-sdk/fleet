@@ -93,15 +93,10 @@ export function compile(script: string, options?: CompilerOptions): CompilerOutp
     script
   );
 
-  return new CompilerOutput(
-    tree,
-    opt.network === "mainnet" ? Network.Mainnet : Network.Testnet
-  );
+  return new CompilerOutput(tree, opt.network === "mainnet" ? Network.Mainnet : Network.Testnet);
 }
 
-export function parseNamedConstantsMap(
-  map: NamedConstantsMap
-): SigmaCompilerNamedConstantsMap {
+export function parseNamedConstantsMap(map: NamedConstantsMap): SigmaCompilerNamedConstantsMap {
   if (isEmpty(map)) return map;
 
   const sigmaMap: SigmaCompilerNamedConstantsMap = {};

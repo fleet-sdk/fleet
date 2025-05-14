@@ -29,8 +29,7 @@ describe("Serialize -> Parse roundtrip", () => {
 
   function randomBigInt(min: bigint, max: bigint) {
     // increase the chances of negative numbers generation;
-    const rand =
-      getRandomBigInt(1) % 2n === 0n ? getRandomBigInt(1) : getRandomBigInt(1) * -1n;
+    const rand = getRandomBigInt(1) % 2n === 0n ? getRandomBigInt(1) : getRandomBigInt(1) * -1n;
 
     return (rand * (max - min + 1n) + min) / 10_000n;
   }
@@ -78,24 +77,17 @@ describe("Serialize -> Parse roundtrip", () => {
   });
 
   it("Should roundtrip SBigInt", () => {
-    const value = randomBigInt(
-      -9_223_372_036_854_775_808_000n,
-      9_223_372_036_854_775_807_000n
-    );
+    const value = randomBigInt(-9_223_372_036_854_775_808_000n, 9_223_372_036_854_775_807_000n);
     expect(SParse(SConstant(SBigInt(value)))).toBe(value);
   });
 
   it("Should roundtrip SGroupElement", () => {
-    const value = hex.decode(
-      "02000031a06023f7d372f748a816db1765b4e4f1989cf89791c021a37ce09dae37"
-    );
+    const value = hex.decode("02000031a06023f7d372f748a816db1765b4e4f1989cf89791c021a37ce09dae37");
     expect(SParse(SConstant(SGroupElement(value)))).toEqual(value);
   });
 
   it("Should roundtrip SSigmaProp", () => {
-    const value = hex.decode(
-      "0200c662d546939237a0195ef8be81fb0f939285c374b3589cc5d7172c98e33b22"
-    );
+    const value = hex.decode("0200c662d546939237a0195ef8be81fb0f939285c374b3589cc5d7172c98e33b22");
     expect(SParse(SConstant(SSigmaProp(SGroupElement(value))))).toEqual(value);
   });
 });

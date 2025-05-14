@@ -36,13 +36,9 @@ describe("Constructor proxies", () => {
     expect(new SGroupElementType())
       .to.be.instanceof(SGroupElement)
       .and.to.be.instanceOf(SGroupElementType);
-    expect(new SSigmaPropType())
-      .to.be.instanceof(SSigmaProp)
-      .and.to.be.instanceOf(SSigmaPropType);
+    expect(new SSigmaPropType()).to.be.instanceof(SSigmaProp).and.to.be.instanceOf(SSigmaPropType);
     expect(new SUnitType()).to.be.instanceof(SUnit).and.to.be.instanceOf(SUnitType);
-    expect(new SCollType(new SByteType()))
-      .to.be.instanceof(SColl)
-      .and.to.be.instanceOf(SCollType);
+    expect(new SCollType(new SByteType())).to.be.instanceof(SColl).and.to.be.instanceOf(SCollType);
     expect(new STupleType([SBool(), SInt()]))
       .to.be.instanceof(SPair)
       .and.to.be.instanceOf(STupleType);

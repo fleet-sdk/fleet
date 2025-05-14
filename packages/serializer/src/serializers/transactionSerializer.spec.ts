@@ -10,15 +10,12 @@ import {
 import { deserializeTransaction, serializeTransaction } from "./transactionSerializer";
 
 describe("Transaction serializer", () => {
-  test.each(unsignedTransactionVectors)(
-    "Should serialize unsigned transaction [$name]",
-    (tv) => {
-      const bytes = serializeTransaction(tv.json).toBytes();
+  test.each(unsignedTransactionVectors)("Should serialize unsigned transaction [$name]", (tv) => {
+    const bytes = serializeTransaction(tv.json).toBytes();
 
-      expect(hex.encode(bytes)).toBe(tv.hex);
-      expect(hex.encode(blake2b256(bytes))).toBe(tv.hash);
-    }
-  );
+    expect(hex.encode(bytes)).toBe(tv.hex);
+    expect(hex.encode(blake2b256(bytes))).toBe(tv.hash);
+  });
 
   test.each(signedTransactionVectors)("should serialize signed transaction", (tv) => {
     expect(serializeTransaction(tv.json).encode(hex)).toBe(tv.hex);

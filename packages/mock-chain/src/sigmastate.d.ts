@@ -396,11 +396,7 @@ declare module "sigmastate-js/main" {
      * @param hintsBag  - additional hints for a signer (useful for distributed signing)
      * @return - signature or error
      */
-    signMessage(
-      sigmaProp: SigmaProp,
-      message: Int8Array,
-      hintsBag: ProverHints
-    ): Int8Array;
+    signMessage(sigmaProp: SigmaProp, message: Int8Array, hintsBag: ProverHints): Int8Array;
   }
 
   export declare class SigmaPropProver$ {
@@ -424,11 +420,7 @@ declare module "sigmastate-js/main" {
      * @param signature signature for the message
      * @return whether signature is valid or not (valid signature contains proofs for the sigma proposition)
      */
-    verifySignature(
-      sigmaProp: SigmaProp,
-      message: Int8Array,
-      signature: Int8Array
-    ): boolean;
+    verifySignature(sigmaProp: SigmaProp, message: Int8Array, signature: Int8Array): boolean;
   }
   export declare class SigmaPropVerifier$ {
     /** Create a new instance of [[SigmaPropVerifier]]. */
@@ -525,13 +517,7 @@ declare module "sigmastate-js/main" {
      * @see
      * <a href="https://github.com/ScorexFoundation/sigmastate-interpreter/blob/b54a173865a532de09bbcbf10da32ee2a491c8f9/sigmastate/src/main/scala/sigmastate/basics/DiffieHellmanTupleProtocol.scala#L58">implementation</a>
      */
-    withDHTSecret(
-      g: HexString,
-      h: HexString,
-      u: HexString,
-      v: HexString,
-      x: bigint
-    ): ProverBuilder;
+    withDHTSecret(g: HexString, h: HexString, u: HexString, v: HexString, x: bigint): ProverBuilder;
 
     /** This allows adding additional secret for use in proveDlog, when the secret is not
      * part of the wallet.

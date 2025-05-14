@@ -18,9 +18,7 @@ export type CollectionAddOptions = { index?: number };
  * ```
  *
  */
-export abstract class Collection<InternalType, ExternalType>
-  implements Iterable<InternalType>
-{
+export abstract class Collection<InternalType, ExternalType> implements Iterable<InternalType> {
   protected readonly _items: InternalType[];
 
   constructor() {
@@ -90,10 +88,7 @@ export abstract class Collection<InternalType, ExternalType>
    */
   protected abstract _map(item: ExternalType | InternalType): InternalType;
 
-  protected _addOne(
-    item: InternalType | ExternalType,
-    options?: CollectionAddOptions
-  ): number {
+  protected _addOne(item: InternalType | ExternalType, options?: CollectionAddOptions): number {
     if (isDefined(options) && isDefined(options.index)) {
       if (options.index === this.length) {
         this._items.push(this._map(item));
@@ -115,10 +110,7 @@ export abstract class Collection<InternalType, ExternalType>
     return this._items.length;
   }
 
-  protected _addOneOrMore(
-    items: OneOrMore<ExternalType>,
-    options?: CollectionAddOptions
-  ): number {
+  protected _addOneOrMore(items: OneOrMore<ExternalType>, options?: CollectionAddOptions): number {
     if (Array.isArray(items)) {
       if (isDefined(options) && isDefined(options.index)) {
         items = items.reverse();

@@ -230,9 +230,7 @@ describe("Operation name extraction", () => {
     expect(getOpName("query _boxes { boxes { boxId } }")).to.be.equal("_boxes");
     expect(getOpName("query boxes-test { boxes { boxId } }")).to.be.equal("boxes-test");
     expect(getOpName("query boxes1 { boxes { boxId } }")).to.be.equal("boxes1");
-    expect(getOpName(" query boxes ($take: Int) { boxes { boxId } }")).to.be.equal(
-      "boxes"
-    );
+    expect(getOpName(" query boxes ($take: Int) { boxes { boxId } }")).to.be.equal("boxes");
     expect(
       getOpName(`
         query unspent($take: Int, $address: String) {

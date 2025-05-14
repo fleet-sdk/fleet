@@ -20,11 +20,7 @@ export function stringifyBalance(
     line("-", width),
     between("Asset", "Balance", width),
     line("=", width),
-    between(
-      metaName("nanoerg", metadata),
-      metaAmount("nanoerg", balance.nanoergs, metadata),
-      width
-    )
+    between(metaName("nanoerg", metadata), metaAmount("nanoerg", balance.nanoergs, metadata), width)
   ];
 
   if (some(balance.tokens)) {
@@ -66,10 +62,7 @@ export function between(
   maxLeftLength?: number
 ): string {
   const rlen = length - rightStr.length - 1;
-  const r = compact(
-    leftStr,
-    maxLeftLength && maxLeftLength <= rlen ? maxLeftLength : rlen
-  );
+  const r = compact(leftStr, maxLeftLength && maxLeftLength <= rlen ? maxLeftLength : rlen);
   const l = right(rightStr, length - r.length);
 
   return r + l;
