@@ -1,7 +1,7 @@
+import { randomBytes } from "@noble/hashes/utils";
 import { describe, expect, it } from "vitest";
 import { hex, utf8 } from "./coders";
 import { blake2b, blake2b256, sha256 } from "./hashes";
-import { randomBytes } from "@noble/hashes/utils";
 
 describe("Hashes smoke tests", () => {
   it("Should hash message using BLAKE2b256", () => {

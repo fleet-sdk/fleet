@@ -1,4 +1,4 @@
-import { first, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
+import { RECOMMENDED_MIN_FEE_VALUE, first } from "@fleet-sdk/common";
 import { describe, expect, it } from "vitest";
 import { OutputBuilder, SAFE_MIN_BOX_VALUE } from "../../builder/outputBuilder";
 import { NotFoundError } from "../../errors";
@@ -57,11 +57,7 @@ describe("outputs collection", () => {
     expect(collection.at(1)).toBe(second);
 
     const fistPlacedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 3n, address, height);
-    const secondPlacedOutput = new OutputBuilder(
-      SAFE_MIN_BOX_VALUE * 4n,
-      address,
-      height
-    );
+    const secondPlacedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 4n, address, height);
     const newLen = collection.add([fistPlacedOutput, secondPlacedOutput], {
       index: 1
     });

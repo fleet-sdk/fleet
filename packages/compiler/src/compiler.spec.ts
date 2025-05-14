@@ -1,14 +1,14 @@
+import { ErgoAddress, Network } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { SInt } from "@fleet-sdk/serializer";
 import { type HexString, Value, Value$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import {
+  type CompilerOptions,
   compile,
   compilerDefaults,
-  type CompilerOptions,
   parseNamedConstantsMap
 } from "./compiler";
-import { ErgoAddress, Network } from "@fleet-sdk/core";
 
 const compilerTestVectors: {
   name: string;
@@ -187,8 +187,8 @@ describe("Compiler constants map parsing", () => {
   });
 
   it("Should throw is unsupported type is passed", () => {
-    expect(() =>
-      parseNamedConstantsMap({ invalidHex: 23 as unknown as HexString })
-    ).to.throw("Unsupported constant object mapping.");
+    expect(() => parseNamedConstantsMap({ invalidHex: 23 as unknown as HexString })).to.throw(
+      "Unsupported constant object mapping."
+    );
   });
 });

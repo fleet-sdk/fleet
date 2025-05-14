@@ -1,28 +1,28 @@
 import type {
   Box as GQLBox,
-  QueryBoxesArgs,
+  UnconfirmedBox as GQLUnconfirmedBox,
   Header,
-  QueryBlockHeadersArgs,
-  Transaction,
-  QueryTransactionsArgs,
   MempoolTransactionsArgs,
-  UnconfirmedTransaction,
-  UnconfirmedBox as GQLUnconfirmedBox
+  QueryBlockHeadersArgs,
+  QueryBoxesArgs,
+  QueryTransactionsArgs,
+  Transaction,
+  UnconfirmedTransaction
 } from "@ergo-graphql/types";
 import {
   type Base58String,
   type BlockHeader,
   type HexString,
+  NotSupportedError,
   type SignedTransaction,
+  chunk,
   ensureDefaults,
   isEmpty,
   isUndefined,
-  NotSupportedError,
   orderBy,
   some,
   uniq,
-  uniqBy,
-  chunk
+  uniqBy
 } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
@@ -32,12 +32,12 @@ import type {
   ChainProviderBox,
   ChainProviderConfirmedTransaction,
   ChainProviderUnconfirmedTransaction,
+  ConfirmedTransactionWhere,
   HeaderQuery,
   IBlockchainProvider,
   TransactionEvaluationResult,
   TransactionQuery,
   TransactionReductionResult,
-  ConfirmedTransactionWhere,
   UnconfirmedTransactionWhere
 } from "../types/blockchainProvider";
 import {
@@ -79,10 +79,7 @@ export type GraphQLUnconfirmedTransactionWhere = UnconfirmedTransactionWhere & {
 };
 
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
-export type ErgoGraphQLRequestOptions = Omit<
-  GraphQLRequestOptions,
-  "throwOnNonNetworkErrors"
->;
+export type ErgoGraphQLRequestOptions = Omit<GraphQLRequestOptions, "throwOnNonNetworkErrors">;
 
 type ConfirmedBoxesResponse = { boxes: GQLBox[] };
 type UnconfirmedBoxesResponse = { mempool: { boxes: GQLBox[] } };
@@ -154,9 +151,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
     return this as unknown as ErgoGraphQLProvider<M>;
   }
 
-  async *streamBoxes(
-    query: GraphQLBoxQuery & SkipAndTake
-  ): AsyncGenerator<ChainProviderBox<I>[]> {
+  async *streamBoxes(query: GraphQLBoxQuery & SkipAndTake): AsyncGenerator<ChainProviderBox<I>[]> {
     if (isEmpty(query.where)) {
       throw new Error("Cannot fetch unspent boxes without a where clause.");
     }
@@ -268,9 +263,7 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
       while (keepFetching) {
         const response = await this.#getConfirmedTransactions(query);
         if (some(response.data?.transactions)) {
-          yield response.data.transactions.map((t) =>
-            mapConfirmedTransaction(t, this.#biMapper)
-          );
+          yield response.data.transactions.map((t) => mapConfirmedTransaction(t, this.#biMapper));
         }
 
         keepFetching = response.data?.transactions?.length === pageSize;

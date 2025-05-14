@@ -103,9 +103,7 @@ describe("Overall selection", () => {
 describe("Inputs sorting", () => {
   it("Should order inputs ascending by boxId", () => {
     const nanoErgs = sumBy(regularBoxes, (x) => x.value);
-    const selection = new BoxSelector(regularBoxes)
-      .orderBy((x) => x.boxId)
-      .select({ nanoErgs });
+    const selection = new BoxSelector(regularBoxes).orderBy((x) => x.boxId).select({ nanoErgs });
 
     expect(isAscending(selection.map((x) => x.boxId))).toBe(true);
     expect(isAscending(regularBoxes.map((x) => x.boxId))).not.toBe(true);
@@ -133,8 +131,7 @@ describe("Inputs sorting", () => {
 
 describe("Ensure input inclusion", () => {
   it("Should forcedly include inputs that attends to filter criteria", () => {
-    const arbitraryBoxId =
-      "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
+    const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
     const target = { nanoErgs: 10000n };
     const selector = new BoxSelector(regularBoxes).ensureInclusion(
       (input) => input.boxId === arbitraryBoxId
@@ -147,8 +144,7 @@ describe("Ensure input inclusion", () => {
   });
 
   it("Should forcedly include inputs by boxId", () => {
-    const arbitraryBoxId =
-      "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
+    const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
     const selector = new BoxSelector(regularBoxes).ensureInclusion(arbitraryBoxId);
     const boxes = selector.select({ nanoErgs: 10000n });
 
@@ -171,12 +167,8 @@ describe("Ensure input inclusion", () => {
     const boxes = selector.select({ nanoErgs: 10000n });
 
     expect(boxes).toHaveLength(2);
-    expect(boxes[0].boxId).toBe(
-      "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e"
-    );
-    expect(boxes[1].boxId).toBe(
-      "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
-    );
+    expect(boxes[0].boxId).toBe("e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e");
+    expect(boxes[1].boxId).toBe("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d");
   });
 
   it("Should forcedly include inputs by multiple boxId and filter criteria", () => {
@@ -203,24 +195,17 @@ describe("Ensure input inclusion", () => {
     const selector = new BoxSelector(regularBoxes)
       .ensureInclusion("e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e")
       .ensureInclusion("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d")
-      .ensureInclusion(
-        "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
-      );
+      .ensureInclusion("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d");
 
     const boxes = selector.select({ nanoErgs: 10000n });
 
     expect(boxes).toHaveLength(2);
-    expect(boxes[0].boxId).toBe(
-      "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e"
-    );
-    expect(boxes[1].boxId).toBe(
-      "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
-    );
+    expect(boxes[0].boxId).toBe("e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e");
+    expect(boxes[1].boxId).toBe("2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d");
   });
 
   it("Should forcedly include inputs that attends to filter criteria and collect additional inputs until target is reached", () => {
-    const arbitraryBoxId =
-      "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
+    const arbitraryBoxId = "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
     const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
     const target = { nanoErgs: 10000n, tokens: [{ tokenId, amount: 100n }] };
     const selector = new BoxSelector(regularBoxes).ensureInclusion(

@@ -1,13 +1,13 @@
 import type {
   Amount,
   Box,
-  PlainObjectType,
   ContextExtension,
+  DataInput,
+  EIP12UnsignedDataInput,
   EIP12UnsignedInput,
   NonMandatoryRegisters,
-  UnsignedInput,
-  DataInput,
-  EIP12UnsignedDataInput
+  PlainObjectType,
+  UnsignedInput
 } from "@fleet-sdk/common";
 import type { ConstantInput } from "../builder";
 import { ErgoBox } from "./ergoBox";
@@ -37,8 +37,7 @@ export class ErgoUnsignedInput<
       const c = extension[key] as ConstantInput;
       if (!c) continue;
 
-      vars[key as unknown as keyof ContextExtension] =
-        typeof c === "string" ? c : c.toHex();
+      vars[key as unknown as keyof ContextExtension] = typeof c === "string" ? c : c.toHex();
     }
 
     this.#extension = vars;

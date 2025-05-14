@@ -9,8 +9,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "316180000",
         creationHeight: 944571,
-        ergoTree:
-          "0008cd020ea7504024c9e481ed3f146aa215ba28fdfc91f28d3d9866f5e9f6216f92f2fb",
+        ergoTree: "0008cd020ea7504024c9e481ed3f146aa215ba28fdfc91f28d3d9866f5e9f6216f92f2fb",
         additionalRegisters: {},
         assets: [],
         transactionId: "96b5aa7f111a67d863161a5b4333706df020770402a489d6aaab3ecb1c34d55e",
@@ -37,8 +36,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "4d3b34bdd2f36c5eeb74b419d53d85584e4b6744d998055776f7316cc0af6f3f",
         value: "10000000",
         creationHeight: 944573,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -55,8 +53,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b9019b42f5234ceeb0e1354484643314755d6868f322c5ff2f54189b82815438",
         value: "233980000",
         creationHeight: 944573,
-        ergoTree:
-          "0008cd020ea7504024c9e481ed3f146aa215ba28fdfc91f28d3d9866f5e9f6216f92f2fb",
+        ergoTree: "0008cd020ea7504024c9e481ed3f146aa215ba28fdfc91f28d3d9866f5e9f6216f92f2fb",
         additionalRegisters: {},
         assets: []
       }
@@ -89,8 +86,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944413,
-        ergoTree:
-          "0008cd020ea7504024c9e481ed3f146aa215ba28fdfc91f28d3d9866f5e9f6216f92f2fb",
+        ergoTree: "0008cd020ea7504024c9e481ed3f146aa215ba28fdfc91f28d3d9866f5e9f6216f92f2fb",
         additionalRegisters: {},
         assets: [],
         transactionId: "465606aebb56850a98195f20e22f3e894924161799227a17c0ca5bac3fa27509",
@@ -118,8 +114,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a9b7b732cc5a927474ba1714b6d6a7384c92717211880f2e3a8b2ceda2aa4a94",
         value: "180000000",
         creationHeight: 944571,
-        ergoTree:
-          "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
+        ergoTree: "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
         additionalRegisters: {},
         assets: []
       },
@@ -127,8 +122,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "102840334c9888eb615a69812adea595fb9c49a11728122d2b7e2c4f3ea67bb8",
         value: "900000",
         creationHeight: 944571,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -136,8 +130,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "769bb4e2498e94a2e0a796ab27641af6b32edb5bf7fe3d4acb98e5034e358a05",
         value: "720000",
         creationHeight: 944571,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -154,8 +147,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "93740c4767f9e88df4b821569a9e3989e60830118a534cbcd6354f73201b96d2",
         value: "316180000",
         creationHeight: 944571,
-        ergoTree:
-          "0008cd020ea7504024c9e481ed3f146aa215ba28fdfc91f28d3d9866f5e9f6216f92f2fb",
+        ergoTree: "0008cd020ea7504024c9e481ed3f146aa215ba28fdfc91f28d3d9866f5e9f6216f92f2fb",
         additionalRegisters: {},
         assets: []
       }
@@ -169,8 +161,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "356540000",
         creationHeight: 944566,
-        ergoTree:
-          "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
+        ergoTree: "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
         additionalRegisters: {},
         assets: [],
         transactionId: "171c1b638722134738eacba4539da79761c7c9319ab7e1db545ab9ed81b4eda3",
@@ -197,8 +188,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "633d9b02004675efd25db2599f54ff50fd3078ede9cf96ecfee18d98ec3b63b3",
         value: "10000000",
         creationHeight: 944566,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -215,8 +205,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "f568b45ef0161f0cc120ab2a8c65420109a1ae4cc9dacf8b4123c285c8e7c570",
         value: "294340000",
         creationHeight: 944566,
-        ergoTree:
-          "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
+        ergoTree: "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
         additionalRegisters: {},
         assets: []
       }
@@ -249,8 +238,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944412,
-        ergoTree:
-          "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
+        ergoTree: "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
         additionalRegisters: {},
         assets: [],
         transactionId: "6934cbe7532da7e572747129ac3aafbc5d94d61ce65780957ac61e657f457755",
@@ -278,8 +266,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a82aa0e9d8d09c0ecad8fbad203490b9c96e69fb6bebae43b590a448f6caee46",
         value: "140000000",
         creationHeight: 944566,
-        ergoTree:
-          "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
+        ergoTree: "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
         additionalRegisters: {},
         assets: []
       },
@@ -287,8 +274,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a64b6244bcb464f29b9cafddca435db28386f001b6e2dec51da691952f628aa3",
         value: "700000",
         creationHeight: 944566,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -296,8 +282,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b0805bc4519a10246f53996fd291eaa430507714186c343cba71e10b3ec596b6",
         value: "560000",
         creationHeight: 944566,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -314,8 +299,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "552f039922fca0b0896ad052a4afd6a9e96e2fb676ab26e53193a12ab29f4580",
         value: "356540000",
         creationHeight: 944566,
-        ergoTree:
-          "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
+        ergoTree: "0008cd02ca233d90ef82f53a57df74319ab1467f45f23680c5844b2ddacc2a676d275133",
         additionalRegisters: {},
         assets: []
       }
@@ -329,8 +313,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "386810000",
         creationHeight: 944561,
-        ergoTree:
-          "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
+        ergoTree: "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
         additionalRegisters: {},
         assets: [],
         transactionId: "84a25026e7aef019f63611604cd2664b78ddc52a33cef7f5fc36dc8c44247d44",
@@ -357,8 +340,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "cad9a5428eeac553320f96c84a59512031d98955c8c0c7c4e22d2fb4d47030d9",
         value: "10000000",
         creationHeight: 944561,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -375,8 +357,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "245ccbbf2dabf73f531d6ad79dd2e7c0f74c9459897e07dc7394c912ff7404d8",
         value: "304610000",
         creationHeight: 944561,
-        ergoTree:
-          "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
+        ergoTree: "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
         additionalRegisters: {},
         assets: []
       }
@@ -409,8 +390,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944411,
-        ergoTree:
-          "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
+        ergoTree: "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
         additionalRegisters: {},
         assets: [],
         transactionId: "d01acf6a288fe2410e3e8231cbc11821d9e3e96986b700e25bf9a590a7ecaadf",
@@ -438,8 +418,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "93e753204d0a61679db9b6eaa297a4f4ad4075f3efa0036a8675c2beb3857df5",
         value: "110000000",
         creationHeight: 944561,
-        ergoTree:
-          "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
+        ergoTree: "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
         additionalRegisters: {},
         assets: []
       },
@@ -447,8 +426,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "d06d1eebbae7818a65c3b0d61f6d30ae629d2f7c5d0a5b1c7eb3ae060416a7d5",
         value: "550000",
         creationHeight: 944561,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -456,8 +434,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a0f938077a2fa16fa856d02a08ea6cae4144e864f65ada253aefbed1188107d1",
         value: "440000",
         creationHeight: 944561,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -474,8 +451,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b8f08d25494ae38432f8834b14498a034267c4084269bdc54d89be5a44e3378a",
         value: "386810000",
         creationHeight: 944561,
-        ergoTree:
-          "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
+        ergoTree: "0008cd03a2761cc082f94b676516be7a48f118d25339697c73ce347f9803701678a2f528",
         additionalRegisters: {},
         assets: []
       }
@@ -489,8 +465,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "326270000",
         creationHeight: 944556,
-        ergoTree:
-          "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
+        ergoTree: "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
         additionalRegisters: {},
         assets: [],
         transactionId: "0d6414559e5639c087780f616a229d02c1091c702c423d6eb5a212cc9ba44e29",
@@ -517,8 +492,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "34c01e9b2c52bd42f5c7c78f5b6fae8ae2530f7f9f39d1d30bc5a61a81db33a5",
         value: "10000000",
         creationHeight: 944556,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -535,8 +509,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "2ff26f21feec66d46850f9d0b82904b30c95581c68f1ebba58630fe5c5077460",
         value: "274070000",
         creationHeight: 944556,
-        ergoTree:
-          "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
+        ergoTree: "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
         additionalRegisters: {},
         assets: []
       }
@@ -569,8 +542,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944411,
-        ergoTree:
-          "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
+        ergoTree: "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
         additionalRegisters: {},
         assets: [],
         transactionId: "2d5195647169e81a254e908e84d17300a72ab9794a27c729068201a4e8b83c59",
@@ -598,8 +570,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "19a5041533369fbd17d25db425e8cca594b9ce6a7febec23109f7d7afde35afa",
         value: "170000000",
         creationHeight: 944556,
-        ergoTree:
-          "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
+        ergoTree: "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
         additionalRegisters: {},
         assets: []
       },
@@ -607,8 +578,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "3000048efff52904b520abc19b1359924919f2ebc8e4811b79449ec61e1712ef",
         value: "850000",
         creationHeight: 944556,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -616,8 +586,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "c09a9ee7c2c1390294faad0808ed259672e8a323b77a203b1a87238743aca2bd",
         value: "680000",
         creationHeight: 944556,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -634,8 +603,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "9624dd64e87cbdfffb700ffd3b263d6c9c8490e72b675c3d8cd086c0c5a34d37",
         value: "326270000",
         creationHeight: 944556,
-        ergoTree:
-          "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
+        ergoTree: "0008cd03e4bb17f5dcc91c0d66cd752be3adae666cb7e2f32ab826bf394b8e7a88089afa",
         additionalRegisters: {},
         assets: []
       }
@@ -649,8 +617,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "376720000",
         creationHeight: 944549,
-        ergoTree:
-          "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
+        ergoTree: "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
         additionalRegisters: {},
         assets: [],
         transactionId: "bb4fc5a2e02d07fbe69fc5a6e64f69f998a9992f8de03ff2a79950546d7f7085",
@@ -677,8 +644,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "48a1752772671861921ec988d8f6d0ef3beb33f1f59bc91a02403b265bbb3a34",
         value: "10000000",
         creationHeight: 944550,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -695,8 +661,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "59770f07e0565e3eabd277ec284bb7538db7e7ca5f3439a933252977c30bd528",
         value: "294520000",
         creationHeight: 944550,
-        ergoTree:
-          "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
+        ergoTree: "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
         additionalRegisters: {},
         assets: []
       }
@@ -729,8 +694,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944411,
-        ergoTree:
-          "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
+        ergoTree: "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
         additionalRegisters: {},
         assets: [],
         transactionId: "a86c609af537d8ae159c53d09c0de36ea489d1ac1f87438e8873ef2e041b6966",
@@ -758,8 +722,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "6954eb3fadae3d2f994679d53b8e8a04b08e5e71a6a3a039bed5fac03f45617b",
         value: "120000000",
         creationHeight: 944549,
-        ergoTree:
-          "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
+        ergoTree: "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
         additionalRegisters: {},
         assets: []
       },
@@ -767,8 +730,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "47cfee3ca1ea9984704c9ca76878e23c38545f88be4ad67bee7688db5fc3b1c0",
         value: "600000",
         creationHeight: 944549,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -776,8 +738,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b010f7d48aabf932712078c7aa9e5454e37c83610ee2584ad94abb37a4dc8938",
         value: "480000",
         creationHeight: 944549,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -794,8 +755,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b465663a37e74e61e2b35eaa0807ccacf2acd787f0d2920493c27ba75e1c2898",
         value: "376720000",
         creationHeight: 944549,
-        ergoTree:
-          "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
+        ergoTree: "0008cd02c17360fa1ce07f6d885c96333ccb1446db4392d8ae2b24d098c4c57e753b240a",
         additionalRegisters: {},
         assets: []
       }
@@ -809,8 +769,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "326270000",
         creationHeight: 944545,
-        ergoTree:
-          "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
+        ergoTree: "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
         additionalRegisters: {},
         assets: [],
         transactionId: "a4666663bed8af87b5afcc608950c119a624bb50686bd3f8b04eb98fe5f7ee3c",
@@ -837,8 +796,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a10ccfe37af139844eacb5f9d97719fb577a6d41c2d3872606f4d05e42058ebd",
         value: "10000000",
         creationHeight: 944545,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -855,8 +813,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "2ffa8c8c44358e99d002fcd4fda1cb56f2a5d9ba4f25bacdbef347553b3412b0",
         value: "244070000",
         creationHeight: 944545,
-        ergoTree:
-          "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
+        ergoTree: "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
         additionalRegisters: {},
         assets: []
       }
@@ -889,8 +846,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944409,
-        ergoTree:
-          "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
+        ergoTree: "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
         additionalRegisters: {},
         assets: [],
         transactionId: "a1b886a71ee50c3c0ee9f659e2c4c6ab00761773686a0f8d4b692ab9a312e21e",
@@ -918,8 +874,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "60e9ca2ff3e3c360b761a1a93412b6577e014f4a5b1ed5ec1a1e5e47789820f0",
         value: "170000000",
         creationHeight: 944545,
-        ergoTree:
-          "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
+        ergoTree: "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
         additionalRegisters: {},
         assets: []
       },
@@ -927,8 +882,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b14401e04feabc464628584266b8bc14787ca302aa6665d5c5cc2ad076bee341",
         value: "850000",
         creationHeight: 944545,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -936,8 +890,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "5eb8714e811509137498237cf787cb93afb97f7033372d8cf73fe976378dc534",
         value: "680000",
         creationHeight: 944545,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -954,8 +907,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "8ed9cfc5198260b7df586fca32e49eda38360956c82ba54544748b86f7ae9d16",
         value: "326270000",
         creationHeight: 944545,
-        ergoTree:
-          "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
+        ergoTree: "0008cd038b1539b705b2b318b0ae83ba3fd1316bf8dcee09237b4c4b70e5294f1e187427",
         additionalRegisters: {},
         assets: []
       }
@@ -969,8 +921,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "356540000",
         creationHeight: 944541,
-        ergoTree:
-          "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
+        ergoTree: "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
         additionalRegisters: {},
         assets: [],
         transactionId: "f8d7b229466394d66ad5b95e7bceee9a760023db8b688d58a87f1d73bfca02b8",
@@ -997,8 +948,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "d9b4d5b49df73d3b638657baadafb9c4e2bb87394fc145a8496c90dd8fbbec42",
         value: "10000000",
         creationHeight: 944541,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1015,8 +965,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "09a789b2f0bad455d7057f59e836a174777ec37eb87891ed9eb1e8dd8fb0e78f",
         value: "294340000",
         creationHeight: 944541,
-        ergoTree:
-          "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
+        ergoTree: "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
         additionalRegisters: {},
         assets: []
       }
@@ -1049,8 +998,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944408,
-        ergoTree:
-          "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
+        ergoTree: "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
         additionalRegisters: {},
         assets: [],
         transactionId: "5eccec569f33e3421ca1811949744e7500b7c6a67380b74c8843faebdf354c2d",
@@ -1078,8 +1026,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "2f0b21e77deef6db7b1e6814f991d704a902cd32361fa100095e9e42ea539930",
         value: "140000000",
         creationHeight: 944541,
-        ergoTree:
-          "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
+        ergoTree: "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
         additionalRegisters: {},
         assets: []
       },
@@ -1087,8 +1034,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "1ac6e1cadc1c9bbffca12135107888893d4d552fc6f749c5e9f02446cb210cec",
         value: "700000",
         creationHeight: 944541,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -1096,8 +1042,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "bef841bf6f6c837aa2037b72508f445d0bca3325e224ef7a92cc02e7ff6a0696",
         value: "560000",
         creationHeight: 944541,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1114,8 +1059,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "44a0807843bebc95cfd89ca03aef6387c0d97259696e19eaf0b7b4bef22ca2a5",
         value: "356540000",
         creationHeight: 944541,
-        ergoTree:
-          "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
+        ergoTree: "0008cd02c07289aa584e3c7cc3784f3dcad1bb6a977033f07b5dca8cc37674296a6bafcb",
         additionalRegisters: {},
         assets: []
       }
@@ -1129,8 +1073,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "316180000",
         creationHeight: 944538,
-        ergoTree:
-          "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
+        ergoTree: "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
         additionalRegisters: {},
         assets: [],
         transactionId: "85d38956da6ca6e2c291c7dce21066555ed88523e87b78209d54eceba06b861d",
@@ -1157,8 +1100,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "ec644a84497d15ceea911fc0e83b1caeef27f9c8ec89caf08cebb2e78df9d3d3",
         value: "10000000",
         creationHeight: 944538,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1175,8 +1117,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "8beb29609e2b8e805ac173a02d05a59a3ce6e96524c363c2e9b34bb4bcc71662",
         value: "233980000",
         creationHeight: 944538,
-        ergoTree:
-          "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
+        ergoTree: "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
         additionalRegisters: {},
         assets: []
       }
@@ -1209,8 +1150,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944407,
-        ergoTree:
-          "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
+        ergoTree: "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
         additionalRegisters: {},
         assets: [],
         transactionId: "b380b32c30f87d057c1058e39249035afcb0aa5bea0c2b91a52cc7a857f2990a",
@@ -1238,8 +1178,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "70be73dde2f680610ce79719f4a2a2c530cd04a0832191ea6eaab9db490b9767",
         value: "180000000",
         creationHeight: 944538,
-        ergoTree:
-          "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
+        ergoTree: "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
         additionalRegisters: {},
         assets: []
       },
@@ -1247,8 +1186,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "456e253caa1f8a98e3c3a35859a5d91e7a861a58eb51606c0b6e04910429e5d4",
         value: "900000",
         creationHeight: 944538,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -1256,8 +1194,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "99ddc3c9de1d3495d166c665e22084cfdb3ac624e7625e9e3802aaf4e33c977e",
         value: "720000",
         creationHeight: 944538,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1274,8 +1211,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "1d9ac65776eb47cd356922385cec01800007e5c9a0a92d9c3275eff31175a950",
         value: "316180000",
         creationHeight: 944538,
-        ergoTree:
-          "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
+        ergoTree: "0008cd02c3a46461baa15a3f51ef65f369981a04b7ba33db82937158cdefdfe6d22cdcab",
         additionalRegisters: {},
         assets: []
       }
@@ -1289,8 +1225,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "376720000",
         creationHeight: 944536,
-        ergoTree:
-          "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
+        ergoTree: "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
         additionalRegisters: {},
         assets: [],
         transactionId: "6b7427d124fd664df888900bd68cb99771c2dd76d51616a5b1e77431863b7951",
@@ -1317,8 +1252,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "e2273785cc27152ac1e37cf07c2ef13d73d797dffbc976bc2288a2c63c830b62",
         value: "10000000",
         creationHeight: 944536,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1335,8 +1269,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "8b004b4c30b007162f0538a6783c96206a9933bfbcb4ef0fed314329a13d95e4",
         value: "324520000",
         creationHeight: 944536,
-        ergoTree:
-          "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
+        ergoTree: "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
         additionalRegisters: {},
         assets: []
       }
@@ -1369,8 +1302,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944407,
-        ergoTree:
-          "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
+        ergoTree: "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
         additionalRegisters: {},
         assets: [],
         transactionId: "ff1fc17ebbe31837fd9900609878959bb860101009555de0f4c3cbad045207ec",
@@ -1398,8 +1330,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "93fea01af53d3807fde7e58eb12081101416b6700e1b92bd3152fae663e24d58",
         value: "120000000",
         creationHeight: 944536,
-        ergoTree:
-          "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
+        ergoTree: "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
         additionalRegisters: {},
         assets: []
       },
@@ -1407,8 +1338,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "3338b2bed65c30109aa89e58661c0ec1e835b132adec54f656a7d63219b9b54a",
         value: "600000",
         creationHeight: 944536,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -1416,8 +1346,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "ed208a5f94f1151859fbb0ee2dbfce4a8f6f12cd2ee3a3071ef1b2ee39e87075",
         value: "480000",
         creationHeight: 944536,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1434,8 +1363,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "4976a91a763ba75138f8f7c9bdea0620f7df1356e3cb62ba5ec8f22fb5e51849",
         value: "376720000",
         creationHeight: 944536,
-        ergoTree:
-          "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
+        ergoTree: "0008cd027a242f65104189e25a4e000befd61c0925540806afef77ba9897f0d0fa908f81",
         additionalRegisters: {},
         assets: []
       }
@@ -1449,8 +1377,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "356540000",
         creationHeight: 944530,
-        ergoTree:
-          "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
+        ergoTree: "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
         additionalRegisters: {},
         assets: [],
         transactionId: "2e00d851dd0d6790ff01a49826ceca273ae9dcb0456bb980db8021807ffb5c55",
@@ -1477,8 +1404,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a7f705117d676c14feb373e2efe7d064957e24bb657342ac45be1a8b33a90f69",
         value: "10000000",
         creationHeight: 944530,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1495,8 +1421,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "40644a6bbfb96761308b3c32e5308307043af4d166ffbcdbc13cc0d10a1c5dc8",
         value: "274340000",
         creationHeight: 944530,
-        ergoTree:
-          "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
+        ergoTree: "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
         additionalRegisters: {},
         assets: []
       }
@@ -1529,8 +1454,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944407,
-        ergoTree:
-          "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
+        ergoTree: "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
         additionalRegisters: {},
         assets: [],
         transactionId: "a002f61cfbeed6b014738006a28b8ec8568a2faa3299cb5eb5ec14b519d051e7",
@@ -1558,8 +1482,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "63c81a0cd50b4686bd110e9b542f31870aac3943f77ddaecc459bf3b19cd777d",
         value: "140000000",
         creationHeight: 944530,
-        ergoTree:
-          "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
+        ergoTree: "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
         additionalRegisters: {},
         assets: []
       },
@@ -1567,8 +1490,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "338650f35729e40f6c6e35528fd18d409dd484deca1a89201a1222f7c023de34",
         value: "700000",
         creationHeight: 944530,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -1576,8 +1498,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "70d2167324f625a01be9eefac2971d682929a13ce049b9499236fdf2537d0501",
         value: "560000",
         creationHeight: 944530,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1594,8 +1515,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "d8667c7280fa58b774dd5ae03dbd6aa764f1eec3517b5354c7da0e3eafd25be2",
         value: "356540000",
         creationHeight: 944530,
-        ergoTree:
-          "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
+        ergoTree: "0008cd03aa41d39941fa65b3d154c370d425a839aa03c8cd0ad653f56c1916d671566614",
         additionalRegisters: {},
         assets: []
       }
@@ -1609,8 +1529,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "306090000",
         creationHeight: 944524,
-        ergoTree:
-          "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
+        ergoTree: "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
         additionalRegisters: {},
         assets: [],
         transactionId: "83bd2be424101fbdb094fd41701fd29e39afcdf50909806a2a8980afb3bf0628",
@@ -1637,8 +1556,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "fc1a9d0af33a4ebb6eb57beac37bd59fcef5153df0f4a09c095db102d6dc7722",
         value: "10000000",
         creationHeight: 944524,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1655,8 +1573,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "985022fb446f26272a3d84d93d95ef70672a8cb689fb9a11a82ee8a0177d8dee",
         value: "243890000",
         creationHeight: 944524,
-        ergoTree:
-          "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
+        ergoTree: "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
         additionalRegisters: {},
         assets: []
       }
@@ -1689,8 +1606,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944406,
-        ergoTree:
-          "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
+        ergoTree: "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
         additionalRegisters: {},
         assets: [],
         transactionId: "e2d3d9de538d9c17438e81b1eb0c4656d0e667d3a116687818e03afaf28b1fc3",
@@ -1718,8 +1634,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "bab6c94197e1dba9a321ed07c4ac86237f634fb9b0e3ef31848aa15208fa5ac2",
         value: "190000000",
         creationHeight: 944524,
-        ergoTree:
-          "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
+        ergoTree: "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
         additionalRegisters: {},
         assets: []
       },
@@ -1727,8 +1642,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "873442327c6c4f62769e1bbcbcede88d256f4a5cff556418d3483ff994e41a9e",
         value: "950000",
         creationHeight: 944524,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -1736,8 +1650,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "35a47964ad0c4fa3075f4f5a316483085e787d7594b6ac2a2a28ed5e6148a985",
         value: "760000",
         creationHeight: 944524,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1754,8 +1667,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b7c28887c57350be5d011fc0cc6af80f04d7ad4599f2b4c419b2b27354ef43e9",
         value: "306090000",
         creationHeight: 944524,
-        ergoTree:
-          "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
+        ergoTree: "0008cd0230764c22ad64bef1bd79ca2ab148320c03fb6e7c554f10afd24ba6e47b93946d",
         additionalRegisters: {},
         assets: []
       }
@@ -1769,8 +1681,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "376720000",
         creationHeight: 944496,
-        ergoTree:
-          "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
+        ergoTree: "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
         additionalRegisters: {},
         assets: [],
         transactionId: "3e35a54697a24c15134d1956c6bb73557edb8eb8169497daee940bcf7c5c4765",
@@ -1797,8 +1708,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "93ee3a604a32e5c211e25edbf17c28e115bb878319588c280fa41b963c288f47",
         value: "10000000",
         creationHeight: 944497,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1815,8 +1725,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "3bad53d3a955e83ad73a48e39cd2d2f836ab8f9c8c1ed396ec2926dfed952b67",
         value: "314520000",
         creationHeight: 944497,
-        ergoTree:
-          "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
+        ergoTree: "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
         additionalRegisters: {},
         assets: []
       }
@@ -1849,8 +1758,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944405,
-        ergoTree:
-          "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
+        ergoTree: "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
         additionalRegisters: {},
         assets: [],
         transactionId: "65ed643b9eed31118a3e2251e4db7883b84b7212d6b2223b1927cde442ad3d63",
@@ -1878,8 +1786,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "9e16734522675363ced43552841dd7a773aaceead0bb00213ddf2038c319c03a",
         value: "120000000",
         creationHeight: 944496,
-        ergoTree:
-          "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
+        ergoTree: "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
         additionalRegisters: {},
         assets: []
       },
@@ -1887,8 +1794,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "4db04fbef83dfc09e2e81e703552cce8e188736f375a03cebc1f81f0b156a9bd",
         value: "600000",
         creationHeight: 944496,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -1896,8 +1802,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "423d2ad9acfa0ba6f4baeb1dcf0ce1f81d43dd5dda2f327f0768dfac9dfe197f",
         value: "480000",
         creationHeight: 944496,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1914,8 +1819,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "4ceab985357ec105cb5c0ee36194801c1095a10cb81920130c3d6e27e5e22664",
         value: "376720000",
         creationHeight: 944496,
-        ergoTree:
-          "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
+        ergoTree: "0008cd03b983d530643b4727530796e24564776114faa46bcde38dba67f9b9293d616360",
         additionalRegisters: {},
         assets: []
       }
@@ -1929,8 +1833,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "326270000",
         creationHeight: 944493,
-        ergoTree:
-          "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
+        ergoTree: "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
         additionalRegisters: {},
         assets: [],
         transactionId: "42ec2c8dc6a249dc71eb8c6414b1cf072d07550d739d903a3d45df6f7f14d10f",
@@ -1957,8 +1860,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "0fc19d30dec25530aa9fd3dbf7cba0f4ccf74c2ba93fbf4ed71f27389f1a8b78",
         value: "10000000",
         creationHeight: 944494,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -1975,8 +1877,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "3716718dc6f6b0d5d5c8c62fe72fd78673bc07d506c2cc4d1852172bb998902f",
         value: "274070000",
         creationHeight: 944494,
-        ergoTree:
-          "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
+        ergoTree: "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
         additionalRegisters: {},
         assets: []
       }
@@ -2009,8 +1910,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944403,
-        ergoTree:
-          "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
+        ergoTree: "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
         additionalRegisters: {},
         assets: [],
         transactionId: "253744a5be8301b2e49161a0ec3db0ece1ed68cfe78952ceefcf3713c8909882",
@@ -2038,8 +1938,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "467c51b4621f6d216f41a1d59a580e4d45a614ed30f665c90d1899deb8ef60cf",
         value: "170000000",
         creationHeight: 944493,
-        ergoTree:
-          "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
+        ergoTree: "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
         additionalRegisters: {},
         assets: []
       },
@@ -2047,8 +1946,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "940a9b72c39a940ee9b85c113a35bb79c63a6cdc28cc47db4c93607b225471b1",
         value: "850000",
         creationHeight: 944493,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -2056,8 +1954,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b53d84cd2735549b28028a0195fc8cca89d0a949f0c4d4459a3013c3c5067688",
         value: "680000",
         creationHeight: 944493,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2074,8 +1971,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "7be97923e6697499c7dca114249923d4fa7b53d892939d868946e0b10215c93b",
         value: "326270000",
         creationHeight: 944493,
-        ergoTree:
-          "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
+        ergoTree: "0008cd02a6c6840fa75f9eb0222ce5de14af5dd139e9f8133c191899babbc63fcf8da912",
         additionalRegisters: {},
         assets: []
       }
@@ -2089,8 +1985,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "386810000",
         creationHeight: 944490,
-        ergoTree:
-          "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
+        ergoTree: "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
         additionalRegisters: {},
         assets: [],
         transactionId: "2c2e34179cc1250642c68df6fed15a9517c61dbd86a597690e368b26608f8fd1",
@@ -2117,8 +2012,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "77a19ea710e0eb7fa14325dcbb4d2d8967bcfd97964aa068d4f410c70a2ac9c9",
         value: "10000000",
         creationHeight: 944490,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2135,8 +2029,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "bc0ca63dc44d8ee67751fff70e5472abea939a52766ee3c0080419144b8fd63b",
         value: "304610000",
         creationHeight: 944490,
-        ergoTree:
-          "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
+        ergoTree: "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
         additionalRegisters: {},
         assets: []
       }
@@ -2169,8 +2062,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944403,
-        ergoTree:
-          "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
+        ergoTree: "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
         additionalRegisters: {},
         assets: [],
         transactionId: "ad4fec6cdd0071b802b43177a568d42b71a8a37efc3e2715f651ef09af6316ea",
@@ -2198,8 +2090,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "7bcbb8dffab8ffce7cc88f61d148ac5fc2fccc52f4d2b357a5d4f56af11a7d69",
         value: "110000000",
         creationHeight: 944490,
-        ergoTree:
-          "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
+        ergoTree: "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
         additionalRegisters: {},
         assets: []
       },
@@ -2207,8 +2098,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "d68255b1d11ea0666638c555007a2a938d5d1ba93c022819438b87554e2259f4",
         value: "550000",
         creationHeight: 944490,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -2216,8 +2106,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "3f8f5a7852f1dc709272b864f5e9eb001e4c36dc545d60af6cf054ec77e588c3",
         value: "440000",
         creationHeight: 944490,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2234,8 +2123,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "5f21eab4626e98acd3eadcbd82d4dd6cd96f61d402061b9f5992d8d76040ef51",
         value: "386810000",
         creationHeight: 944490,
-        ergoTree:
-          "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
+        ergoTree: "0008cd029ea9e9cd6222d055ff547fea79a4a5eec0c1784305803d8d9f52216a10d8801c",
         additionalRegisters: {},
         assets: []
       }
@@ -2249,8 +2137,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "316180000",
         creationHeight: 944484,
-        ergoTree:
-          "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
+        ergoTree: "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
         additionalRegisters: {},
         assets: [],
         transactionId: "a46cb5d916209ff23bfa025407fd79df624d3ee02c066a7efeada62614e36a71",
@@ -2277,8 +2164,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "418be4a026f332b8f036c0154bccd920f6acca1b513605dc8422a46655f51f2f",
         value: "10000000",
         creationHeight: 944484,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2295,8 +2181,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "44aef74b74c05006bff6d0de857ea82ceb6fd2a3d937b762c9faaa70edd4b384",
         value: "233980000",
         creationHeight: 944484,
-        ergoTree:
-          "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
+        ergoTree: "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
         additionalRegisters: {},
         assets: []
       }
@@ -2329,8 +2214,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944403,
-        ergoTree:
-          "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
+        ergoTree: "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
         additionalRegisters: {},
         assets: [],
         transactionId: "e0495591bf630871826de20db990e24aac3bdeece71794186660ebdc9b2dd096",
@@ -2358,8 +2242,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "edee90b416ba266a4461bdf9ed8c923c6663d1fbce4b91cc5d43c4d17bb5a481",
         value: "180000000",
         creationHeight: 944484,
-        ergoTree:
-          "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
+        ergoTree: "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
         additionalRegisters: {},
         assets: []
       },
@@ -2367,8 +2250,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "edb24ec23c70b8112409c279871305847575e4dac189079b29df444cf38c3c2b",
         value: "900000",
         creationHeight: 944484,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -2376,8 +2258,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "414f4d1934f939439f3705fbd475024f18ca6a00f72d9306df0f8a0044fd01ae",
         value: "720000",
         creationHeight: 944484,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2394,8 +2275,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "0b1a91bb0f60169f2794dfd3d4cae848ee78da770a8971aca5d11dd260f927b7",
         value: "316180000",
         creationHeight: 944484,
-        ergoTree:
-          "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
+        ergoTree: "0008cd0317bc42d2bca8d1ec4482750237a94e8bc3a9490566507b65d9bed57a293ece7e",
         additionalRegisters: {},
         assets: []
       }
@@ -2409,8 +2289,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "376720000",
         creationHeight: 944473,
-        ergoTree:
-          "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
+        ergoTree: "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
         additionalRegisters: {},
         assets: [],
         transactionId: "5db9338af7f9cf520d3108500607e958f085fb2bcea2428f0890767bc3f4c66f",
@@ -2437,8 +2316,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "324feb48b28add9720b0fc322ea804b85a446f5496f4b28d2e27dea427ed7540",
         value: "10000000",
         creationHeight: 944474,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2455,8 +2333,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "2053444fe67b912fb12017e45a2ae93e67b3e49ac3aaff082fb10f4a5d89b7bc",
         value: "324520000",
         creationHeight: 944474,
-        ergoTree:
-          "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
+        ergoTree: "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
         additionalRegisters: {},
         assets: []
       }
@@ -2489,8 +2366,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944402,
-        ergoTree:
-          "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
+        ergoTree: "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
         additionalRegisters: {},
         assets: [],
         transactionId: "594908e24eb035e1885540552422508f675f257a72597cc4bdcca91aafd9bdd6",
@@ -2518,8 +2394,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b2d4fc84c8eb4f93f6a7ea760b561a75709a3a0ebaf5ce7fe02d9b0d8f068434",
         value: "120000000",
         creationHeight: 944473,
-        ergoTree:
-          "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
+        ergoTree: "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
         additionalRegisters: {},
         assets: []
       },
@@ -2527,8 +2402,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "0cabf96d41e72da10aa43aa355703c9e6340e06603e1c764718558e149fefdb0",
         value: "600000",
         creationHeight: 944473,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -2536,8 +2410,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "0ee48dff79159929f9debe738de2afb9762ad43a5bac9f9021640a1a5b805baf",
         value: "480000",
         creationHeight: 944473,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2554,8 +2427,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "058656dc466e419eab6c4972d89657cfd9ee6a341c0bc810041b4f691b4d93d7",
         value: "376720000",
         creationHeight: 944473,
-        ergoTree:
-          "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
+        ergoTree: "0008cd0391f97341c30bf250019d1f8977aa751db64569fff5b1cdddf036493f36e31714",
         additionalRegisters: {},
         assets: []
       }
@@ -2569,8 +2441,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "326270000",
         creationHeight: 944458,
-        ergoTree:
-          "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
+        ergoTree: "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
         additionalRegisters: {},
         assets: [],
         transactionId: "ecfa67448a47965e348563d6e9fde6163171c528ea8c5d384d567aec65afeede",
@@ -2597,8 +2468,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "1cd290eb35880c01ceef3adb5e4c11b08f8c9ac0bcf7580d0b93608cd6cbbfa9",
         value: "10000000",
         creationHeight: 944458,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2615,8 +2485,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "fde49d13747bcbb397e11b478f1dd65fbc88435846f3c10a3b1c009647363e0e",
         value: "244070000",
         creationHeight: 944458,
-        ergoTree:
-          "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
+        ergoTree: "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
         additionalRegisters: {},
         assets: []
       }
@@ -2649,8 +2518,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944402,
-        ergoTree:
-          "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
+        ergoTree: "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
         additionalRegisters: {},
         assets: [],
         transactionId: "e78605ccbd744fcdb4c294dec45ef705d05bb22f66d112c6ab1e41fece49f1cf",
@@ -2678,8 +2546,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "6f51eb11392355924c78d480c3c51eeb95004c3146b3e089afa53c93ed55eabd",
         value: "170000000",
         creationHeight: 944458,
-        ergoTree:
-          "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
+        ergoTree: "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
         additionalRegisters: {},
         assets: []
       },
@@ -2687,8 +2554,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "1e124d05aad8c0a316f915b576d0fa3d176419713fcd709f6ee5b5ab9a657826",
         value: "850000",
         creationHeight: 944458,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -2696,8 +2562,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a74ca24dbf3ffcb7260b5f2aa9b4afbb0bcd8eddea753ed8d92ce30873c20f2e",
         value: "680000",
         creationHeight: 944458,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2714,8 +2579,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "7c1da6ee1ff49568473c8c25bce5f8d11dc42f9689587a118bf34df8f3c797d3",
         value: "326270000",
         creationHeight: 944458,
-        ergoTree:
-          "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
+        ergoTree: "0008cd03a5c7c790584f62deb7f6efc2897428d0b425886444625578a28decb526032995",
         additionalRegisters: {},
         assets: []
       }
@@ -2729,8 +2593,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "356540000",
         creationHeight: 944447,
-        ergoTree:
-          "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
+        ergoTree: "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
         additionalRegisters: {},
         assets: [],
         transactionId: "1f2dac67f4d5099a5be6fe1e4320ec6a2592912f678b17533ce7ccae33f2a942",
@@ -2757,8 +2620,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "cec6bcd8a4c8b8c962b96117afe535a33347870392210e7b0366bdff2576dca4",
         value: "10000000",
         creationHeight: 944449,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2775,8 +2637,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "bb86254c4300a856aa23ecfd7274729c6b674788f64f180878122793a73dfac4",
         value: "304340000",
         creationHeight: 944449,
-        ergoTree:
-          "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
+        ergoTree: "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
         additionalRegisters: {},
         assets: []
       }
@@ -2809,8 +2670,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944401,
-        ergoTree:
-          "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
+        ergoTree: "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
         additionalRegisters: {},
         assets: [],
         transactionId: "b43ceb4711a72578bf57e59ed6f52b2358186afd1474974e973191de8c6ba6ac",
@@ -2838,8 +2698,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "ba7ddef193d32e5eef3b2de7e8053c045340052bbf31321bcb389f8d18d473db",
         value: "140000000",
         creationHeight: 944447,
-        ergoTree:
-          "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
+        ergoTree: "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
         additionalRegisters: {},
         assets: []
       },
@@ -2847,8 +2706,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "c0b38cc412131ca050985c0e8af6243d232376e715add722fadaad1116cd1cdb",
         value: "700000",
         creationHeight: 944447,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -2856,8 +2714,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a60ea80005909563c13e0b4091dd5fadf13784a40b4259ab39162da877444f56",
         value: "560000",
         creationHeight: 944447,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2874,8 +2731,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "d07dbeff78609b6ac07d89905df200b980ecf2be66411d460745dec05694b036",
         value: "356540000",
         creationHeight: 944447,
-        ergoTree:
-          "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
+        ergoTree: "0008cd0231450e52e21c7bb31f1e3295d811e47713c160366402ca161ed102a5e7787049",
         additionalRegisters: {},
         assets: []
       }
@@ -2889,8 +2745,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "386810000",
         creationHeight: 944438,
-        ergoTree:
-          "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
+        ergoTree: "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
         additionalRegisters: {},
         assets: [],
         transactionId: "75156aabdef3652650ca47fc747deea76bab7b5760dfd5c8b434d5bd3258b09b",
@@ -2917,8 +2772,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "5bcafeeb12455965252f6cd9db8fe12fb7301cf78b9dc5ea0009255210cd0dff",
         value: "10000000",
         creationHeight: 944439,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -2935,8 +2789,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "0486e00986fb4b52f8aa662290ab3767fd153f68f0bf52b616fe8d4438a95906",
         value: "324610000",
         creationHeight: 944439,
-        ergoTree:
-          "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
+        ergoTree: "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
         additionalRegisters: {},
         assets: []
       }
@@ -2969,8 +2822,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 944399,
-        ergoTree:
-          "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
+        ergoTree: "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
         additionalRegisters: {},
         assets: [],
         transactionId: "abac572e8be0e6dc0654786b0e7d076780aaa6a48e0fd13f22d319519587da22",
@@ -2998,8 +2850,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "8ab43164eacada3061b1f110a80f112c5802f33a20e92a109fb3fe0e8f943756",
         value: "110000000",
         creationHeight: 944438,
-        ergoTree:
-          "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
+        ergoTree: "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
         additionalRegisters: {},
         assets: []
       },
@@ -3007,8 +2858,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "0442902cd9d83078c00d5e065a88a1cfa8a58a5c03e25987b8ce0dee4ddf06ac",
         value: "550000",
         creationHeight: 944438,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -3016,8 +2866,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "af96861c107ecfb5483d91056842cd58c9367d37dce49b358319cfa0e2b3e616",
         value: "440000",
         creationHeight: 944438,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3034,8 +2883,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "c45f253d48255f8fed524b41d3b19c3642dc29b2f88aa3c6ff556f9ca31fc685",
         value: "386810000",
         creationHeight: 944438,
-        ergoTree:
-          "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
+        ergoTree: "0008cd03b8b91b85fa8e18e9b003eeeb9ed626f85dd1b5a337e26b0cd3e97f92c58f6d36",
         additionalRegisters: {},
         assets: []
       }
@@ -3049,8 +2897,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "356540000",
         creationHeight: 944421,
-        ergoTree:
-          "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
+        ergoTree: "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
         additionalRegisters: {},
         assets: [],
         transactionId: "dedec3db8b78ff93df2f60aa29e68cb2be244dd12a590d547d4ab5d230fc64da",
@@ -3077,8 +2924,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "50f4885941c10dc7e7c77cd2af4f3b9b8317cbc38b293c7de93a69d66817a522",
         value: "10000000",
         creationHeight: 944421,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3095,8 +2941,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "e67081c2d804f9829da2f956094559da8c3b48c0bc1d3cbc9b35bb411eb6042f",
         value: "334340000",
         creationHeight: 944421,
-        ergoTree:
-          "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
+        ergoTree: "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
         additionalRegisters: {},
         assets: []
       }
@@ -3134,8 +2979,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "500000000",
         creationHeight: 926968,
-        ergoTree:
-          "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
+        ergoTree: "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
         additionalRegisters: {},
         assets: [],
         transactionId: "c8be0c89b8b493a3a9aad1031491bd4907b217666619b4bfef1a31ac7b4b2e83",
@@ -3168,8 +3012,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "333bb4b4ea19753e5ea03cdfdab271556bd5bc6e8bf12839f9244d2ae81f3754",
         value: "140000000",
         creationHeight: 944421,
-        ergoTree:
-          "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
+        ergoTree: "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
         additionalRegisters: {},
         assets: []
       },
@@ -3177,8 +3020,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b3425d6beb05c57dbb8ede37f89c590b0890d65a3f92de513734d93cdb2e4198",
         value: "700000",
         creationHeight: 944421,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -3186,8 +3028,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "8014ab34e2343c8e8695e62c2226aca9bd8ebfe77bb905b340dbecb8b1cefa2d",
         value: "560000",
         creationHeight: 944421,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3204,8 +3045,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "8d18c880156a71d8271ae23b204afe8724d72051807b6e1e5566c5f44cac5b9b",
         value: "356540000",
         creationHeight: 944421,
-        ergoTree:
-          "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
+        ergoTree: "0008cd037ee7c07f0dadf8006fb5129da40876c4f9fb57783588735ea3fd932fa7274094",
         additionalRegisters: {},
         assets: []
       }
@@ -3243,8 +3083,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "537136003",
         creationHeight: 941035,
-        ergoTree:
-          "0008cd02f6307b0eb49260d351087b9dddebfc06d2188ca61d851784f83e234339913273",
+        ergoTree: "0008cd02f6307b0eb49260d351087b9dddebfc06d2188ca61d851784f83e234339913273",
         additionalRegisters: {},
         assets: [
           {
@@ -3306,8 +3145,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b7262e264b054d2efec8d5edaeb1ace9d982602c158c72b527d58d5d1faa4819",
         value: "500000000",
         creationHeight: 944063,
-        ergoTree:
-          "0008cd036508e64097e59da0a50d676e435b5d3558c761a4f91a5934e3e96f8834b30519",
+        ergoTree: "0008cd036508e64097e59da0a50d676e435b5d3558c761a4f91a5934e3e96f8834b30519",
         additionalRegisters: {},
         assets: []
       },
@@ -3315,8 +3153,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a1bc39a5827f2bd77d3d40bdecb9fe84861b4df2d809bc16f5a60d60b98dbacf",
         value: "2500000",
         creationHeight: 944063,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -3324,8 +3161,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b244f51636b13c3065e4c3bb7025127895ea809d82fb103581ea571df083b78e",
         value: "2000000",
         creationHeight: 944063,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3342,8 +3178,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "5e68468992cd6f86e2878a067222188a8d96171d5f7d47351a695a44b502a946",
         value: "30436003",
         creationHeight: 944063,
-        ergoTree:
-          "0008cd02f6307b0eb49260d351087b9dddebfc06d2188ca61d851784f83e234339913273",
+        ergoTree: "0008cd02f6307b0eb49260d351087b9dddebfc06d2188ca61d851784f83e234339913273",
         additionalRegisters: {},
         assets: [
           {
@@ -3410,8 +3245,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "192940000",
         creationHeight: 918435,
-        ergoTree:
-          "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
+        ergoTree: "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
         additionalRegisters: {},
         assets: [],
         transactionId: "19058761e11590f284f076381d5617d8d8cf2142bd337a64d32829496945177a",
@@ -3444,8 +3278,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "2139aca5f197b5b35c70d85584bcc1d1e20a309352fa390a0937233ac8f4e42e",
         value: "180000000",
         creationHeight: 944059,
-        ergoTree:
-          "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
+        ergoTree: "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
         additionalRegisters: {},
         assets: []
       },
@@ -3453,8 +3286,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "597ef939ea6c97ae172e04d39e77a6dfa238853d7f763ffb1d8a7844655813d1",
         value: "900000",
         creationHeight: 944059,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -3462,8 +3294,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "d3edfb9fa97cb6a75ff0da51f2541b29f826db8a8b30faa924f66bdf5766358a",
         value: "720000",
         creationHeight: 944059,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3480,8 +3311,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "7fa9c64c8a0e8a76774cfaf6b99533070602afc27700026fc9f6495a71442205",
         value: "9120000",
         creationHeight: 944059,
-        ergoTree:
-          "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
+        ergoTree: "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
         additionalRegisters: {},
         assets: []
       }
@@ -3495,8 +3325,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "400000",
         creationHeight: 943987,
-        ergoTree:
-          "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
+        ergoTree: "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
         additionalRegisters: {},
         assets: [
           {
@@ -3512,8 +3341,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "307060000",
         creationHeight: 918441,
-        ergoTree:
-          "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
+        ergoTree: "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
         additionalRegisters: {},
         assets: [],
         transactionId: "0389ab74edcfc50a3a1a87acfdcaa8ffc71e0ba82c1f16d0bb4a13c042994c4d",
@@ -3545,8 +3373,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b365972bc05d6cfcfac1f4de9517ca96c959018e67eb84fb5bd0c54d19e41b27",
         value: "10000000",
         creationHeight: 944059,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3563,8 +3390,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "0ac168948ce005195f0d31046d5badb8140cb051020ceaf9c83d04d81e7a56c8",
         value: "294260000",
         creationHeight: 944059,
-        ergoTree:
-          "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
+        ergoTree: "0008cd02f1a05783de97a32065fdbcd553027836239680f1b66518c89eb4759ed5cb8786",
         additionalRegisters: {},
         assets: [
           {
@@ -3583,8 +3409,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "400000",
         creationHeight: 943987,
-        ergoTree:
-          "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
+        ergoTree: "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
         additionalRegisters: {},
         assets: [
           {
@@ -3600,8 +3425,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "308060000",
         creationHeight: 918441,
-        ergoTree:
-          "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
+        ergoTree: "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
         additionalRegisters: {},
         assets: [],
         transactionId: "fa370944d588b180fe0aaa63783db466a5330248c4cb00612ea98129d392ae06",
@@ -3633,8 +3457,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "e5506faa8423c4e17e4bbf31e984aa23d0e878f7cdfbd53d7fe51fad21208043",
         value: "10000000",
         creationHeight: 944049,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3651,8 +3474,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b08f730a0c0356143be4a67235b288ea14c87b189a135d03f2093b04fb3b7fda",
         value: "295260000",
         creationHeight: 944049,
-        ergoTree:
-          "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
+        ergoTree: "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
         additionalRegisters: {},
         assets: [
           {
@@ -3695,8 +3517,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "192940000",
         creationHeight: 918433,
-        ergoTree:
-          "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
+        ergoTree: "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
         additionalRegisters: {},
         assets: [],
         transactionId: "87cf8a03e1f46f247742c11918e02a1d35779a336fe9f40095358d49520e150d",
@@ -3729,8 +3550,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "d443641effcfd2dc7f07e5d0da3ad7f005e57125c543505d9d8e3114b4fb51f7",
         value: "140000000",
         creationHeight: 944049,
-        ergoTree:
-          "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
+        ergoTree: "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
         additionalRegisters: {},
         assets: []
       },
@@ -3738,8 +3558,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "a6a34d98fa0d39772e5c46623ef868b26605c89357a7c3910865173475e471b4",
         value: "700000",
         creationHeight: 944049,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -3747,8 +3566,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "88ac304430e48bb20c942149bab4a48e35a312ebe4f173b54509a7051374ab44",
         value: "560000",
         creationHeight: 944049,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3765,8 +3583,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "7762427f0a5c1dcb51c2a08920481abbb94d7a2a6e6f57884ffb2f926320484d",
         value: "49480000",
         creationHeight: 944049,
-        ergoTree:
-          "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
+        ergoTree: "0008cd02b2bbb9a2c8b211114033e293731f421e98bdecce021cf13ff13ec9949951a77d",
         additionalRegisters: {},
         assets: []
       }
@@ -3780,8 +3597,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "400000",
         creationHeight: 943974,
-        ergoTree:
-          "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
+        ergoTree: "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
         additionalRegisters: {},
         assets: [
           {
@@ -3797,8 +3613,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "307060000",
         creationHeight: 918441,
-        ergoTree:
-          "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
+        ergoTree: "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
         additionalRegisters: {},
         assets: [],
         transactionId: "2f05df5359e9cc3b9539ea24cf7a75f3036f04bcbb3aab80a145ca4e4da577a4",
@@ -3830,8 +3645,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "145f965370135bfe197412c1448c59d66412a3ffdde51e0df8b3b638fcba4ebc",
         value: "10000000",
         creationHeight: 944041,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3848,8 +3662,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "3ab674291126b47dd390e470fd45e57aca642447d9d8ab85c7475849db6191c9",
         value: "294260000",
         creationHeight: 944041,
-        ergoTree:
-          "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
+        ergoTree: "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
         additionalRegisters: {},
         assets: [
           {
@@ -3892,8 +3705,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "192940000",
         creationHeight: 918431,
-        ergoTree:
-          "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
+        ergoTree: "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
         additionalRegisters: {},
         assets: [],
         transactionId: "c9cc72bab26ee62b44a9f384a2c335da3e8bc1fa43b83147c63620f057202a2e",
@@ -3926,8 +3738,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "16723fbf74ebd7df7cac8d50f2a525c4cc09fffcf6929a116c254c9a4f073027",
         value: "160000000",
         creationHeight: 944041,
-        ergoTree:
-          "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
+        ergoTree: "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
         additionalRegisters: {},
         assets: []
       },
@@ -3935,8 +3746,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "34862dbb45864f5510694eba5cd07657c6e89d5560f1420d72e5d433de049e06",
         value: "800000",
         creationHeight: 944041,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -3944,8 +3754,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "b66074b191cbba0853bfb69f3031623147a5774dcb38d95884c6343243a2bfde",
         value: "640000",
         creationHeight: 944041,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -3962,8 +3771,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "83b723723956977315a3501c62f42b3367f3bab746e431aa50ef9d702fc7c98b",
         value: "29300000",
         creationHeight: 944041,
-        ergoTree:
-          "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
+        ergoTree: "0008cd026795974e127d1ba1b0ff04167dfcefd150ec15981926cecfc9be18415d4c886d",
         additionalRegisters: {},
         assets: []
       }
@@ -3977,8 +3785,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "400000",
         creationHeight: 943974,
-        ergoTree:
-          "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
+        ergoTree: "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
         additionalRegisters: {},
         assets: [
           {
@@ -3994,8 +3801,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "308060000",
         creationHeight: 918436,
-        ergoTree:
-          "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
+        ergoTree: "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
         additionalRegisters: {},
         assets: [],
         transactionId: "5b1fdb82f88e1e62574a2abd528664bfee44407a2b3674d4697dd2180f9112cf",
@@ -4027,8 +3833,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "6e47d4e0126280d1ce766cd26c1a75ad80e6ceb9af1425fde655ce0e5b093a6d",
         value: "10000000",
         creationHeight: 944036,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -4045,8 +3850,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "7e182afe6aac63c6ed0394f918447f29a312333b16ceedd523e1f928eaf25f3d",
         value: "295260000",
         creationHeight: 944036,
-        ergoTree:
-          "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
+        ergoTree: "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
         additionalRegisters: {},
         assets: [
           {
@@ -4089,8 +3893,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         extension: {},
         value: "192940000",
         creationHeight: 918426,
-        ergoTree:
-          "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
+        ergoTree: "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
         additionalRegisters: {},
         assets: [],
         transactionId: "18193b4cfc97003c8d406f5a8d9ba316137008bd05ed730498d468742d7ff75a",
@@ -4123,8 +3926,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "8704c35a0a7145582abad57701c075027be6c44dab35c4207a5c80234a096d93",
         value: "110000000",
         creationHeight: 944036,
-        ergoTree:
-          "0008cd024b383cbe3eccafcf5be21b48f747abe2c366865f5c834206bec397224c1d7e40",
+        ergoTree: "0008cd024b383cbe3eccafcf5be21b48f747abe2c366865f5c834206bec397224c1d7e40",
         additionalRegisters: {},
         assets: []
       },
@@ -4132,8 +3934,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "187074c0687ef1fc60162762101b88230c2d2d983f1d257860a201f510dd5168",
         value: "550000",
         creationHeight: 944036,
-        ergoTree:
-          "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
+        ergoTree: "0008cd03a11d3028b9bc57b6ac724485e99960b89c278db6bab5d2b961b01aee29405a02",
         additionalRegisters: {},
         assets: []
       },
@@ -4141,8 +3942,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "64c4378033324dac97036368c36cf23c89a5a32f07037a1bc6c29d74ac8adbd6",
         value: "440000",
         creationHeight: 944036,
-        ergoTree:
-          "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
+        ergoTree: "0008cd03d09997ce2bd43e89114cfc6bf63319423493a9aa098b2488f150add9b506fd18",
         additionalRegisters: {},
         assets: []
       },
@@ -4159,8 +3959,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "cb913cd36408c9164c2c5a13edad2dffeccf2b9415a238b870169723115fb4e7",
         value: "79750000",
         creationHeight: 944036,
-        ergoTree:
-          "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
+        ergoTree: "0008cd03afdd190ad8e11fba1d38ea3a4845c648a48b1545be0ad26baf653d4127e2f578",
         additionalRegisters: {},
         assets: []
       }
@@ -4261,8 +4060,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "c1a1fef430761bec87cdd88ab6a5f1a0d648fff10dab0b0d42a9ececac22d32e",
         value: "24831775",
         creationHeight: 978957,
-        ergoTree:
-          "0008cd039ceff717124b23b04445aaa617a268fec38275ff60d3fd04f7a5e2990e8da9b6",
+        ergoTree: "0008cd039ceff717124b23b04445aaa617a268fec38275ff60d3fd04f7a5e2990e8da9b6",
         additionalRegisters: {
           R4: "05c0843d",
           R5: "05a08ae9b19f0d"
@@ -4278,8 +4076,7 @@ export const mockedUnsignedTransactions: EIP12UnsignedTransaction[] = [
         boxId: "2b43aac3f10aa0a119d732a98800c8800eab13040877763a9bcf01d158b4fb33",
         value: "568878225",
         creationHeight: 978957,
-        ergoTree:
-          "0008cd03685e5b930df266e9f84ee860c2dac45960014638baa32ad51ac160d335377c18",
+        ergoTree: "0008cd03685e5b930df266e9f84ee860c2dac45960014638baa32ad51ac160d335377c18",
         additionalRegisters: {},
         assets: []
       },

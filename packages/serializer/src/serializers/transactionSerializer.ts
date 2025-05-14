@@ -6,11 +6,11 @@ import type {
   UnsignedInput,
   UnsignedTransaction
 } from "@fleet-sdk/common";
-import { SigmaByteReader, SigmaByteWriter } from "../coders";
-import { deserializeEmbeddedBox, serializeBox } from "./boxSerializer";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
-import type { ByteInput } from "../types/constructors";
+import { SigmaByteReader, SigmaByteWriter } from "../coders";
 import { SConstant } from "../sigmaConstant";
+import type { ByteInput } from "../types/constructors";
+import { deserializeEmbeddedBox, serializeBox } from "./boxSerializer";
 
 type Nullish<T> = T | null | undefined;
 type Input = UnsignedInput | SignedInput;
@@ -44,10 +44,7 @@ function writeSignedInput(writer: SigmaByteWriter, input: SignedInput): void {
 function writeUnsignedInput(writer: SigmaByteWriter, input: Input): void {
   writer.writeHex(input.boxId);
   writeProof(writer, null);
-  writeExtension(
-    writer,
-    isSignedInput(input) ? input.spendingProof?.extension : input.extension
-  );
+  writeExtension(writer, isSignedInput(input) ? input.spendingProof?.extension : input.extension);
 }
 
 function isSignedInput(input: Input): input is SignedInput {
@@ -83,9 +80,7 @@ function writeExtension(
     values.push([key, value]);
   }
 
-  writer.writeArray(values, ([key, value], w) =>
-    w.writeUInt(Number(key)).writeHex(value)
-  );
+  writer.writeArray(values, ([key, value], w) => w.writeUInt(Number(key)).writeHex(value));
 }
 
 function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {
@@ -124,9 +119,7 @@ function readInput(reader: SigmaByteReader): SignedInput | UnsignedInput {
     extension[reader.readUInt()] = SConstant.from(reader).toHex();
   }
 
-  return proofBytes
-    ? { boxId, spendingProof: { proofBytes, extension } }
-    : { boxId, extension };
+  return proofBytes ? { boxId, spendingProof: { proofBytes, extension } } : { boxId, extension };
 }
 
 /**

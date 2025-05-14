@@ -1,4 +1,4 @@
-import { _0n, _127n, _128n, _7n, ensureBigInt } from "@fleet-sdk/common";
+import { _0n, _7n, _127n, _128n, ensureBigInt } from "@fleet-sdk/common";
 import type { SigmaByteReader } from "./sigmaByteReader";
 import type { SigmaByteWriter } from "./sigmaByteWriter";
 

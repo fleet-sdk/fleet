@@ -1,11 +1,5 @@
-import { _0n, concatBytes, FleetError } from "@fleet-sdk/common";
-import {
-  bigintBE,
-  blake2b256,
-  hex,
-  randomBytes,
-  validateEcPoint
-} from "@fleet-sdk/crypto";
+import { FleetError, _0n, concatBytes } from "@fleet-sdk/common";
+import { bigintBE, blake2b256, hex, randomBytes, validateEcPoint } from "@fleet-sdk/crypto";
 import { secp256k1 } from "@noble/curves/secp256k1";
 
 const { ProjectivePoint: ECPoint, CURVE } = secp256k1;
@@ -43,10 +37,7 @@ export function sign(message: Uint8Array, secretKey: Uint8Array) {
  * @returns The generated signature as a Uint8Array, or undefined if the verification fails.
  * @throws Error if failed to generate commitment.
  */
-export function genSignature(
-  message: Uint8Array,
-  secretKey: Uint8Array
-): undefined | Uint8Array {
+export function genSignature(message: Uint8Array, secretKey: Uint8Array): undefined | Uint8Array {
   const sk = bigintBE.encode(secretKey);
   const pk = G.multiply(sk).toRawBytes();
   const k = genRandomSecret();

@@ -1,7 +1,7 @@
 import { assert, type Box } from "@fleet-sdk/common";
 import type { SigmaByteReader, SigmaByteWriter } from "../coders";
 import type { SConstant } from "../sigmaConstant";
-import { isColl, isTuple, type SCollType, type STupleType, type SType } from "../types";
+import { type SCollType, type STupleType, type SType, isColl, isTuple } from "../types";
 import { descriptors } from "../types/descriptors";
 import { deserializeBox, serializeBox } from "./boxSerializer";
 
@@ -83,9 +83,7 @@ export const dataSerializer = {
     if (type.code === descriptors.unit.code) return writer;
     if (type.code === descriptors.box.code) return serializeBox(data as Box, writer);
 
-    throw Error(
-      `Serialization error: '0x${type.code.toString(16)}' type not implemented.`
-    );
+    throw Error(`Serialization error: '0x${type.code.toString(16)}' type not implemented.`);
   },
 
   deserialize(type: SType, reader: SigmaByteReader): unknown {
@@ -135,9 +133,7 @@ export const dataSerializer = {
           }
         }
         case descriptors.tuple.code: {
-          return (type as STupleType).elementsType.map((t) =>
-            this.deserialize(t, reader)
-          );
+          return (type as STupleType).elementsType.map((t) => this.deserialize(t, reader));
         }
         case descriptors.unit.code:
           return undefined;

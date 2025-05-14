@@ -45,8 +45,7 @@ describe("UTxO Collection", () => {
     const collection = new MockUTxOCollection();
 
     const candidate = {
-      ergoTree:
-        "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
+      ergoTree: "0008cd03a621f820dbed198b42a2dca799a571911f2dabbd2e4d441c9aad558da63f084d",
       creationHeight: 804138,
       value: "1000000000",
       assets: [

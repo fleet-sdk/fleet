@@ -1,12 +1,3 @@
-import { serializeTransaction } from "@fleet-sdk/serializer";
-import { regularBoxes, validBoxes, mockedUnsignedTransactions } from "_test-vectors";
-import { describe, expect, it } from "vitest";
-import { OutputBuilder, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "../builder";
-import { ErgoUnsignedInput } from "./ergoUnsignedInput";
-import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
-import { ErgoBoxCandidate } from "./ergoBoxCandidate";
-import { ErgoAddress } from "./ergoAddress";
-import { blake2b256, hex } from "@fleet-sdk/crypto";
 import type {
   DataInput,
   EIP12UnsignedDataInput,
@@ -15,6 +6,15 @@ import type {
   UnsignedTransaction
 } from "@fleet-sdk/common";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
+import { blake2b256, hex } from "@fleet-sdk/crypto";
+import { serializeTransaction } from "@fleet-sdk/serializer";
+import { mockedUnsignedTransactions, regularBoxes, validBoxes } from "_test-vectors";
+import { describe, expect, it } from "vitest";
+import { OutputBuilder, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "../builder";
+import { ErgoAddress } from "./ergoAddress";
+import { ErgoBoxCandidate } from "./ergoBoxCandidate";
+import { ErgoUnsignedInput } from "./ergoUnsignedInput";
+import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
 
 describe("Model", () => {
   it("Should generate the right transactionId and boxIds for outputs", () => {
@@ -26,9 +26,7 @@ describe("Model", () => {
       );
 
       expect(unsigned.id).to.be.equal(tx.id);
-      expect(unsigned.outputs.map((x) => x.boxId)).to.be.deep.equal(
-        tx.outputs.map((x) => x.boxId)
-      );
+      expect(unsigned.outputs.map((x) => x.boxId)).to.be.deep.equal(tx.outputs.map((x) => x.boxId));
     }
   });
 
@@ -49,10 +47,7 @@ describe("Model", () => {
       .from(regularBoxes)
       .withDataFrom(regularBoxes[0])
       .to(
-        new OutputBuilder(
-          SAFE_MIN_BOX_VALUE,
-          "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
-        )
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin")
       )
       .payMinFee()
       .sendChangeTo("9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin")
@@ -60,9 +55,7 @@ describe("Model", () => {
 
     const plainObject = transaction.toPlainObject();
 
-    expect(transaction.inputs.map((x) => x.boxId)).toEqual(
-      plainObject.inputs.map((x) => x.boxId)
-    );
+    expect(transaction.inputs.map((x) => x.boxId)).toEqual(plainObject.inputs.map((x) => x.boxId));
     expect(transaction.dataInputs.map((x) => x.boxId)).toEqual(
       plainObject.dataInputs.map((x) => x.boxId)
     );
@@ -98,10 +91,7 @@ describe("Model", () => {
       .from(regularBoxes)
       .withDataFrom(regularBoxes[0])
       .to(
-        new OutputBuilder(
-          SAFE_MIN_BOX_VALUE,
-          "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin"
-        )
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, "9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin")
       )
       .payMinFee()
       .sendChangeTo("9i3g6d958MpZAqWn9hrTHcqbBiY5VPYBBY6vRDszZn4koqnahin")
@@ -138,13 +128,9 @@ describe("Chaining", () => {
     expect(chainArray).to.have.length(3);
 
     const [first, second, third] = chainArray;
-    expect(first.outputs.map((x) => x.boxId)).to.containSubset(
-      second.inputs.map((x) => x.boxId)
-    );
+    expect(first.outputs.map((x) => x.boxId)).to.containSubset(second.inputs.map((x) => x.boxId));
 
-    expect(second.outputs.map((x) => x.boxId)).to.containSubset(
-      third.inputs.map((x) => x.boxId)
-    );
+    expect(second.outputs.map((x) => x.boxId)).to.containSubset(third.inputs.map((x) => x.boxId));
   });
 
   it("Should chain transactions and override change address and fee from the father to all children", () => {
@@ -252,8 +238,7 @@ describe("Chaining", () => {
 
     // check object structure
     expect(nodeTxns.flatMap((x) => x.inputs).every((x) => !isEip12Input(x))).to.be.true;
-    expect(nodeTxns.flatMap((x) => x.dataInputs).every((x) => !isEip12Input(x))).to.be
-      .true;
+    expect(nodeTxns.flatMap((x) => x.dataInputs).every((x) => !isEip12Input(x))).to.be.true;
 
     expect(eip12Txns.flatMap((x) => x.inputs).every(isEip12Input)).to.be.true;
     expect(eip12Txns.flatMap((x) => x.dataInputs).every(isEip12Input)).to.be.true;

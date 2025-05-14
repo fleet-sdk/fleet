@@ -3,20 +3,20 @@ import {
   type Base58String,
   type Box,
   type CollectionAddOptions,
+  FEE_CONTRACT,
   type HexString,
+  Network,
   type OneOrMore,
+  RECOMMENDED_MIN_FEE_VALUE,
   type TokenAmount,
   _0n,
   byteSizeOf,
   chunk,
   ensureBigInt,
-  FEE_CONTRACT,
   first,
   isDefined,
   isHex,
   isUndefined,
-  Network,
-  RECOMMENDED_MIN_FEE_VALUE,
   some,
   utxoDiff,
   utxoSum
@@ -24,20 +24,15 @@ import {
 import { estimateVLQSize } from "@fleet-sdk/serializer";
 import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
-import {
-  ErgoAddress,
-  InputsCollection,
-  OutputsCollection,
-  TokensCollection
-} from "../models";
+import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
 import {
   BOX_VALUE_PER_BYTE,
-  estimateMinBoxValue,
   OutputBuilder,
-  SAFE_MIN_BOX_VALUE
+  SAFE_MIN_BOX_VALUE,
+  estimateMinBoxValue
 } from "./outputBuilder";
-import { createPluginContext, type FleetPluginContext } from "./pluginContext";
+import { type FleetPluginContext, createPluginContext } from "./pluginContext";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
@@ -162,10 +157,7 @@ export class TransactionBuilder {
     }
   }
 
-  to(
-    outputs: OneOrMore<OutputBuilder>,
-    options?: CollectionAddOptions
-  ): TransactionBuilder {
+  to(outputs: OneOrMore<OutputBuilder>, options?: CollectionAddOptions): TransactionBuilder {
     this.#outputs.add(outputs, options);
     return this;
   }
@@ -264,9 +256,7 @@ export class TransactionBuilder {
 
     this.outputs
       .toArray()
-      .map((output) =>
-        output.setCreationHeight(this.#creationHeight, { replace: false })
-      );
+      .map((output) => output.setCreationHeight(this.#creationHeight, { replace: false }));
     const outputs = this.outputs.clone();
 
     if (isDefined(this.#feeAmount)) {
@@ -477,8 +467,7 @@ function estimateChangeSize({
 
   if (tokens.length > maxTokensPerBox) {
     if (tokens.length % maxTokensPerBox > 0) {
-      size +=
-        estimateVLQSize(maxTokensPerBox) * Math.floor(tokens.length / maxTokensPerBox);
+      size += estimateVLQSize(maxTokensPerBox) * Math.floor(tokens.length / maxTokensPerBox);
       size += estimateVLQSize(tokens.length % maxTokensPerBox);
     } else {
       size += estimateVLQSize(maxTokensPerBox) * neededBoxes;

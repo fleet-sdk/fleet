@@ -4,9 +4,9 @@ import {
   type BoxCandidate,
   type BoxId,
   Collection,
+  type OneOrMore,
   ensureUTxOBigInt,
-  isUndefined,
-  type OneOrMore
+  isUndefined
 } from "@fleet-sdk/common";
 import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "@fleet-sdk/core";

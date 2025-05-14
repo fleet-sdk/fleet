@@ -5,14 +5,14 @@ import {
   SByte,
   SColl,
   SCollType,
-  SConstant as SerSConstant,
   SGroupElement,
   SInt,
   SLong,
   SShort,
   SSigmaProp,
   SType,
-  SUnit
+  SUnit,
+  SConstant as SerSConstant
 } from "@fleet-sdk/serializer";
 
 /**

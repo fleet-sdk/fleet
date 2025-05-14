@@ -36,12 +36,8 @@ describe("Hex <-> Bytes serialization", () => {
     expect(hex.decode("deadbeef")).to.be.deep.equal(ui8a([0xde, 0xad, 0xbe, 0xef]));
     expect(hex.decode("DEADBEEF")).to.be.deep.equal(ui8a([0xde, 0xad, 0xbe, 0xef]));
     expect(hex.decode("deadBEEF")).to.be.deep.equal(ui8a([0xde, 0xad, 0xbe, 0xef]));
-    expect(hex.decode("cafe123456")).to.be.deep.equal(
-      ui8a([0xca, 0xfe, 0x12, 0x34, 0x56])
-    );
-    expect(hex.decode("CAFE123456")).to.be.deep.equal(
-      ui8a([0xca, 0xfe, 0x12, 0x34, 0x56])
-    );
+    expect(hex.decode("cafe123456")).to.be.deep.equal(ui8a([0xca, 0xfe, 0x12, 0x34, 0x56]));
+    expect(hex.decode("CAFE123456")).to.be.deep.equal(ui8a([0xca, 0xfe, 0x12, 0x34, 0x56]));
   });
 
   it("Should convert bytes to hex", () => {

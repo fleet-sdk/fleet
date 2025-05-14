@@ -20,8 +20,7 @@ export function ensureBytes(input: ByteInput): Uint8Array {
 export function blake2b(message: ByteInput, options?: Blake2bOptions): Uint8Array {
   if (options?.key) options.key = ensureBytes(options.key);
   if (options?.salt) options.salt = ensureBytes(options.salt);
-  if (options?.personalization)
-    options.personalization = ensureBytes(options.personalization);
+  if (options?.personalization) options.personalization = ensureBytes(options.personalization);
 
   return _blake2b(ensureBytes(message), options);
 }

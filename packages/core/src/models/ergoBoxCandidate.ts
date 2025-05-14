@@ -1,12 +1,7 @@
-import type {
-  NonMandatoryRegisters,
-  TokenAmount,
-  BoxCandidate,
-  Amount
-} from "@fleet-sdk/common";
+import type { Amount, BoxCandidate, NonMandatoryRegisters, TokenAmount } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
-import { ErgoBox } from "./ergoBox";
 import type { TransactionOutputFlags } from "../builder";
+import { ErgoBox } from "./ergoBox";
 
 export class ErgoBoxCandidate<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
   value: bigint;

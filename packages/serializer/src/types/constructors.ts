@@ -18,9 +18,7 @@ import {
 export type BigIntInput = string | bigint;
 export type ByteInput = Uint8Array | string;
 
-export type SConstructor<T = unknown, S extends SType = SType | SCollType<SType>> = (
-  arg?: T
-) => S;
+export type SConstructor<T = unknown, S extends SType = SType | SCollType<SType>> = (arg?: T) => S;
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 type Any = any;
@@ -69,11 +67,7 @@ function monoProxy<T extends SType, I, O = I>(
  */
 function genericProxy<T extends SType, R>(
   ctor: Constructable<T>,
-  handler: (
-    target: Constructable<T>,
-    thisArgs: unknown,
-    args: GenericProxyArgs<R>
-  ) => unknown
+  handler: (target: Constructable<T>, thisArgs: unknown, args: GenericProxyArgs<R>) => unknown
 ) {
   return new Proxy(ctor, {
     apply: handler
@@ -88,15 +82,9 @@ export const SShort = monoProxy<SShortType, number>(SShortType, descriptors.shor
 
 export const SInt = monoProxy<SIntType, number>(SIntType, descriptors.int);
 
-export const SLong = monoProxy<SLongType, BigIntInput, bigint>(
-  SLongType,
-  descriptors.long
-);
+export const SLong = monoProxy<SLongType, BigIntInput, bigint>(SLongType, descriptors.long);
 
-export const SBigInt = monoProxy<SBigIntType, BigIntInput, bigint>(
-  SBigIntType,
-  descriptors.bigInt
-);
+export const SBigInt = monoProxy<SBigIntType, BigIntInput, bigint>(SBigIntType, descriptors.bigInt);
 
 export const SGroupElement = monoProxy<SGroupElementType, ByteInput, Uint8Array>(
   SGroupElementType,

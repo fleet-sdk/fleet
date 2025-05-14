@@ -1,6 +1,9 @@
 import { type Box, ensureBigInt } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
+import fc from "fast-check";
+import { Value$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
+import { SPair } from "../dist";
 import {
   bigintVectors,
   boolVectors,
@@ -15,9 +18,21 @@ import {
   tupleTestVectors
 } from "./_test-vectors/constantVectors";
 import { SigmaByteWriter } from "./coders";
+import {
+  MAX_I8,
+  MAX_I16,
+  MAX_I32,
+  MAX_I64,
+  MAX_I256,
+  MIN_I8,
+  MIN_I16,
+  MIN_I32,
+  MIN_I64,
+  MIN_I256
+} from "./coders/numRanges";
 import { dataSerializer } from "./serializers";
-import { decode, parse, SConstant, stypeof } from "./sigmaConstant";
-import type { SGroupElementType, SPrimitiveType } from "./types";
+import { SConstant, decode, parse, stypeof } from "./sigmaConstant";
+import type { SGroupElementType } from "./types";
 import {
   SBigInt,
   SBool,
@@ -32,21 +47,6 @@ import {
   SUnit
 } from "./types/";
 import { SBox, STuple } from "./types/constructors";
-import { Value$ } from "sigmastate-js/main";
-import fc from "fast-check";
-import {
-  MAX_I16,
-  MAX_I256,
-  MAX_I32,
-  MAX_I64,
-  MAX_I8,
-  MIN_I16,
-  MIN_I256,
-  MIN_I32,
-  MIN_I64,
-  MIN_I8
-} from "./coders/numRanges";
-import { SPair } from "../dist";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
@@ -172,9 +172,7 @@ describe("stypeof", () => {
     expect(stypeof(SGroupElement(hex.decode("deadbeef")).toBytes())).to.be.instanceOf(
       SGroupElement
     );
-    expect(stypeof(SSigmaProp(SGroupElement("deadbeef")).toBytes())).to.be.instanceOf(
-      SSigmaProp
-    );
+    expect(stypeof(SSigmaProp(SGroupElement("deadbeef")).toBytes())).to.be.instanceOf(SSigmaProp);
     expect(stypeof(SColl(SByte, [1, 2, 3]).toBytes())).to.be.instanceOf(SColl);
     expect(stypeof(STuple(SByte(1), SByte(2)).toBytes())).to.be.instanceOf(STupleType);
     expect(stypeof(SUnit().toBytes())).to.be.instanceOf(SUnit);
@@ -301,12 +299,7 @@ describe("Tuple serialization", () => {
     // quadruple
     expect(
       SConstant.from(
-        STuple(
-          SColl(SBool, [true, false, true]),
-          SBigInt(10n),
-          SBool(false),
-          SShort(2)
-        ).toHex()
+        STuple(SColl(SBool, [true, false, true]), SBigInt(10n), SBool(false), SShort(2)).toHex()
       ).data
     ).to.be.deep.equal([[true, false, true], 10n, false, 2]);
 
@@ -317,9 +310,8 @@ describe("Tuple serialization", () => {
       ).data
     ).to.be.deep.equal([false, 10n, false, 2, 1232n]);
     expect(
-      SConstant.from(
-        STuple(SInt(1), SInt(2), SInt(3), SInt(2), SInt(4), SInt(5), SInt(6)).toHex()
-      ).data
+      SConstant.from(STuple(SInt(1), SInt(2), SInt(3), SInt(2), SInt(4), SInt(5), SInt(6)).toHex())
+        .data
     ).to.be.deep.equal([1, 2, 3, 2, 4, 5, 6]);
   });
 

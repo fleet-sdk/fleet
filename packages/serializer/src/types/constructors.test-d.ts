@@ -55,9 +55,7 @@ describe("Constructor proxies types", () => {
     expectTypeOf(SBigInt(1n)).toMatchTypeOf<SConstant<bigint, SBigIntType>>();
     expectTypeOf(SBigInt("1")).toMatchTypeOf<SConstant<bigint, SBigIntType>>();
 
-    expectTypeOf(SGroupElement)
-      .parameter(0)
-      .toMatchTypeOf<Uint8Array | string | undefined>();
+    expectTypeOf(SGroupElement).parameter(0).toMatchTypeOf<Uint8Array | string | undefined>();
     expectTypeOf(SGroupElement()).toMatchTypeOf<SGroupElementType>();
     expectTypeOf(SGroupElement(Uint8Array.from([1, 2, 3]))).toMatchTypeOf<
       SConstant<Uint8Array, SGroupElementType>
@@ -66,9 +64,7 @@ describe("Constructor proxies types", () => {
       SConstant<Uint8Array, SGroupElementType>
     >();
 
-    expectTypeOf(SSigmaProp)
-      .parameter(0)
-      .toMatchTypeOf<SConstant<Uint8Array> | undefined>();
+    expectTypeOf(SSigmaProp).parameter(0).toMatchTypeOf<SConstant<Uint8Array> | undefined>();
     expectTypeOf(SSigmaProp()).toMatchTypeOf<SSigmaPropType>();
     expectTypeOf(SSigmaProp(SGroupElement("deadbeef"))).toMatchTypeOf<
       SConstant<SConstant<Uint8Array>, SSigmaPropType>
@@ -127,9 +123,7 @@ describe("Constructor proxies types", () => {
     expectTypeOf(
       SColl(SColl(SByte), [Uint8Array.from([1, 2, 3]), Uint8Array.from([4, 5, 6])]).data
     ).toMatchTypeOf<Uint8Array[]>();
-    expectTypeOf(SColl(SColl(SByte), ["deadbeef", "cafe"]).data).toMatchTypeOf<
-      Uint8Array[]
-    >();
+    expectTypeOf(SColl(SColl(SByte), ["deadbeef", "cafe"]).data).toMatchTypeOf<Uint8Array[]>();
 
     expectTypeOf(SPair(SInt(1), SBool(false)).data).toMatchTypeOf<[number, boolean]>();
     expectTypeOf(SPair(SBool(true), SInt(1)).data).toMatchTypeOf<[boolean, number]>();

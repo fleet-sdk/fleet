@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.8.2/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "ignore": [
       "**/coverage/*",
@@ -15,7 +15,7 @@
   },
   "formatter": {
     "indentStyle": "space",
-    "lineWidth": 90
+    "lineWidth": 100
   },
   "javascript": {
     "formatter": {
@@ -28,11 +28,15 @@
     "rules": {
       "recommended": true,
       "style": {
-        "noParameterAssign": { "level": "off" }
+        "noParameterAssign": "off",
+        "noYodaExpression": "error"
+      },
+      "correctness": {
+        "noUnusedImports": "error"
       },
       "suspicious": {
-        "noConsoleLog": { "level": "error" },
-        "noAssignInExpressions": { "level": "off" }
+        "noConsoleLog": "error",
+        "noAssignInExpressions": "off"
       }
     }
   }

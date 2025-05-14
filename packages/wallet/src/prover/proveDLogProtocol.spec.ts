@@ -66,9 +66,7 @@ describe("ProveDLog protocol", () => {
     const proof = hex.decode(
       "3506a7213dc1be4ad822a9cbab2f4a188778cfb3b2b4cfea76a4fe71760715fed7e2de9c13f492c7981663b03986f454d494da39a269c70c"
     );
-    const pk = hex.decode(
-      "01010ba8a2cba190547dd5569f2421d2f60426637c40bd325d1bea0f1b3e8d83be"
-    );
+    const pk = hex.decode("01010ba8a2cba190547dd5569f2421d2f60426637c40bd325d1bea0f1b3e8d83be");
 
     expect(() => verify(msg, proof, pk)).to.throw("Invalid Public Key.");
   });
@@ -85,8 +83,7 @@ describe("ProveDLog protocol", () => {
           const signature = sign(msg, sk);
 
           expect(verify(msg, signature, pk)).to.be.true;
-          expect(verify_signature(Address.from_public_key(pk), msg, signature)).to.be
-            .true;
+          expect(verify_signature(Address.from_public_key(pk), msg, signature)).to.be.true;
         }
       )
     );

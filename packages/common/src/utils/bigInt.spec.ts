@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   _0n,
+  _1n,
+  _7n,
   _10n,
+  _63n,
   _127n,
   _128n,
-  _1n,
-  _63n,
-  _7n,
   decimalize,
   ensureBigInt,
   max,
@@ -103,9 +103,7 @@ describe("undecimalize()", () => {
     expect(undecimalize("1", { decimals: 0 })).toBe(1n);
     expect(undecimalize("1", 0)).toBe(1n);
     expect(undecimalize("0,0011", { decimals: 9, decimalMark: "," })).toBe(1100000n);
-    expect(undecimalize("129-8379183", { decimals: 9, decimalMark: "-" })).toBe(
-      129837918300n
-    );
+    expect(undecimalize("129-8379183", { decimals: 9, decimalMark: "-" })).toBe(129837918300n);
 
     expect(undecimalize("-129.8379183", { decimals: 9 })).toBe(-129837918300n);
     expect(undecimalize("-129.8379183", 9)).toBe(-129837918300n);

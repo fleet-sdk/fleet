@@ -9,9 +9,7 @@ describe("Address validation", () => {
   });
 
   it("Should not validate addresses with empty body", () => {
-    const unpacked = unpackAddress(
-      base58.decode(ErgoMessage.fromData("hello world").encode())
-    );
+    const unpacked = unpackAddress(base58.decode(ErgoMessage.fromData("hello world").encode()));
     unpacked.body = new Uint8Array(0);
     expect(validateUnpackedAddress(unpacked)).to.be.false;
   });

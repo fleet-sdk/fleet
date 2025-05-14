@@ -3,12 +3,12 @@ import {
   Collection,
   type CollectionAddOptions,
   FleetError,
-  isDefined,
-  isUndefined,
   type NewToken,
   type OneOrMore,
   type TokenAmount,
-  type TokenId
+  type TokenId,
+  isDefined,
+  isUndefined
 } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import { NotFoundError, UndefinedMintingContext } from "../../errors";
@@ -60,10 +60,7 @@ export class TokensCollection extends Collection<OutputToken<bigint>, OutputToke
     return this.length;
   }
 
-  public override add(
-    items: OneOrMore<TokenAmount<Amount>>,
-    options?: TokenAddOptions
-  ): number {
+  public override add(items: OneOrMore<TokenAmount<Amount>>, options?: TokenAddOptions): number {
     if (Array.isArray(items)) {
       if (items.some((x) => !x.tokenId)) throw new FleetError("TokenID is required.");
     } else if (!items.tokenId) {
@@ -108,9 +105,7 @@ export class TokensCollection extends Collection<OutputToken<bigint>, OutputToke
       index = this._items.findIndex((token) => token.tokenId === tokenIdOrIndex);
 
       if (this._isIndexOutOfBounds(index)) {
-        throw new NotFoundError(
-          `TokenId '${tokenIdOrIndex}' not found in assets collection.`
-        );
+        throw new NotFoundError(`TokenId '${tokenIdOrIndex}' not found in assets collection.`);
       }
     }
 

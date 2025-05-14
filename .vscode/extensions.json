@@ -1,7 +1,3 @@
 {
-  "recommendations": [
-    "biomejs.biome",
-    "streetsidesoftware.code-spell-checker",
-    "vitest.explorer"
-  ]
+  "recommendations": ["biomejs.biome", "streetsidesoftware.code-spell-checker", "vitest.explorer"]
 }

@@ -1,28 +1,23 @@
 import { type Amount, type BoxCandidate, Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
+import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
-import { estimateBoxSize, SByte, SColl } from "@fleet-sdk/serializer";
+import { SByte, SColl, estimateBoxSize } from "@fleet-sdk/serializer";
 import { invalidBoxes, manyTokensBoxes, regularBoxes } from "_test-vectors";
+import { mockUTxO } from "packages/mock-chain/src";
 import { describe, expect, it, vi } from "vitest";
 import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
-import {
-  ErgoAddress,
-  ErgoUnsignedInput,
-  InputsCollection,
-  MAX_TOKENS_PER_BOX
-} from "../models";
+import { ErgoAddress, ErgoUnsignedInput, InputsCollection, MAX_TOKENS_PER_BOX } from "../models";
 import {
   BOX_VALUE_PER_BYTE,
-  estimateMinBoxValue,
   OutputBuilder,
-  SAFE_MIN_BOX_VALUE
+  SAFE_MIN_BOX_VALUE,
+  estimateMinBoxValue
 } from "./outputBuilder";
 import { TransactionBuilder } from "./transactionBuilder";
-import { mockUTxO } from "packages/mock-chain/src";
-import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
 
 const height = 844540;
 const a1 = {
@@ -79,9 +74,7 @@ describe("basic construction", () => {
   });
 
   it("Should create transaction builder with inputs from multiple sources", () => {
-    const builder = new TransactionBuilder(height)
-      .from(regularBoxes)
-      .and.from(manyTokensBoxes);
+    const builder = new TransactionBuilder(height).from(regularBoxes).and.from(manyTokensBoxes);
 
     expect(builder.inputs).toHaveLength(regularBoxes.length + manyTokensBoxes.length);
     expect(builder.dataInputs).toHaveLength(0);
@@ -135,17 +128,13 @@ describe("basic construction", () => {
   });
 
   it("Should set change address by base58 encoded address", () => {
-    const builder = new TransactionBuilder(height)
-      .from(regularBoxes)
-      .sendChangeTo(a1.address);
+    const builder = new TransactionBuilder(height).from(regularBoxes).sendChangeTo(a1.address);
 
     expect(builder.changeAddress?.toString()).toBe(a1.address);
   });
 
   it("Should set change address by ErgoTree", () => {
-    const builder = new TransactionBuilder(height)
-      .from(regularBoxes)
-      .sendChangeTo(a1.ergoTree);
+    const builder = new TransactionBuilder(height).from(regularBoxes).sendChangeTo(a1.ergoTree);
 
     expect(builder.changeAddress?.toString()).toBe(a1.address);
     expect(builder.changeAddress?.ergoTree).toBe(a1.ergoTree);
@@ -154,9 +143,7 @@ describe("basic construction", () => {
 
   it("Should set change address by ErgoAddress", () => {
     const address = ErgoAddress.fromBase58(a1.address);
-    const builder = new TransactionBuilder(height)
-      .from(regularBoxes)
-      .sendChangeTo(address);
+    const builder = new TransactionBuilder(height).from(regularBoxes).sendChangeTo(address);
 
     expect(builder.changeAddress).toBe(address);
   });
@@ -307,8 +294,7 @@ describe("Building", () => {
       {
         boxId: "d55741e4dfea148e0f930c332c1bc9526030d5cd9df744d94eafac6652ccf89d",
         value: "1000000",
-        ergoTree:
-          "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
+        ergoTree: "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
         creationHeight: 97228,
         assets: [
           {
@@ -324,8 +310,7 @@ describe("Building", () => {
       {
         boxId: "887ba2dcbed4a6003909d2b10b75cdaa10be1186e43f3ba023a4d4802d6312dc",
         value: "1000000",
-        ergoTree:
-          "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
+        ergoTree: "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
         creationHeight: 97230,
         assets: [
           {
@@ -342,8 +327,7 @@ describe("Building", () => {
 
     const expectedSendingBox = {
       value: "1000000",
-      ergoTree:
-        "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
+      ergoTree: "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
       creationHeight: 97238,
       assets: [
         {
@@ -383,8 +367,7 @@ describe("Building", () => {
 
     const expectedChangeBox = {
       value: "2000000",
-      ergoTree:
-        "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
+      ergoTree: "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca",
       creationHeight: 97238,
       assets: [
         {
@@ -412,9 +395,7 @@ describe("Building", () => {
       )
       .and.from(babelBox)
       .payFee("1200000")
-      .sendChangeTo(
-        "0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca"
-      )
+      .sendChangeTo("0008cd03896037ee8629d957111cb584ef6fd5128e718c0f9ce3a30bc0eb4450827053ca")
       .to(
         new OutputBuilder(
           "995600000",
@@ -616,9 +597,7 @@ describe("Building", () => {
         })
       )
       .eject(({ selection }) =>
-        selection((selector) =>
-          selector.ensureInclusion((input) => input.boxId === boxId)
-        )
+        selection((selector) => selector.ensureInclusion((input) => input.boxId === boxId))
       )
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .sendChangeTo(a1.address)
@@ -847,9 +826,7 @@ describe("Building", () => {
       .from(regularBoxes)
       .sendChangeTo(a1.address)
       .configureSelector((selector) => selector.ensureInclusion((i) => some(i.assets)))
-      .configure((settings) =>
-        settings.setMaxTokensPerChangeBox(tokensPerBox).isolateErgOnChange()
-      )
+      .configure((settings) => settings.setMaxTokensPerChangeBox(tokensPerBox).isolateErgOnChange())
       .build();
 
     expect(transaction.inputs).toHaveLength(4);
@@ -935,9 +912,7 @@ describe("Building", () => {
     const unsignedTransaction = new TransactionBuilder(height)
       .from(regularBoxes[1])
       .and.from(input)
-      .configureSelector((selector) =>
-        selector.ensureInclusion((input) => input.value > 0n)
-      )
+      .configureSelector((selector) => selector.ensureInclusion((input) => input.value > 0n))
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .sendChangeTo(a2.ergoTree);
 
@@ -967,9 +942,7 @@ describe("Token minting", () => {
       .build();
 
     const mintingBox = transaction.outputs[0];
-    expect(mintingBox.assets).toEqual([
-      { tokenId: transaction.inputs[0].boxId, amount: 100n }
-    ]);
+    expect(mintingBox.assets).toEqual([{ tokenId: transaction.inputs[0].boxId, amount: 100n }]);
     expect(mintingBox.additionalRegisters).toEqual({
       R4: "0e0954657374546f6b656e",
       R5: "0e104465736372697074696f6e2074657374",
@@ -1138,8 +1111,7 @@ describe("Non-standardized token minting", () => {
 describe("Token burning", () => {
   it("Should explicitly burn tokens", () => {
     const nftTokenId = "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2";
-    const regularTokenId =
-      "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
+    const regularTokenId = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
 
     const transaction = new TransactionBuilder(height)
       .from(regularBoxes)
@@ -1157,8 +1129,7 @@ describe("Token burning", () => {
 
   it("Should burn tokens by omitting change address and explicitly allowing token burning", () => {
     const inputs = regularBoxes.filter(
-      (input) =>
-        input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
+      (input) => input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
     );
 
     // tokens can alternatively be burned by omitting the change address
@@ -1206,8 +1177,7 @@ describe("Token burning", () => {
       .from(
         regularBoxes.filter(
           (input) =>
-            input.boxId ===
-            "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
+            input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
         )
       )
       .to(new OutputBuilder(outputValue - 1000000n, a1.address)) // will try to burn 1000000n
@@ -1221,8 +1191,7 @@ describe("Token burning", () => {
   it("Should fail if trying to burn ERG even if burning is explicitly allowed", () => {
     const outputValue = 1000000000n - RECOMMENDED_MIN_FEE_VALUE;
     const inputs = regularBoxes.filter(
-      (input) =>
-        input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
+      (input) => input.boxId === "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d"
     );
 
     const builder = new TransactionBuilder(height)

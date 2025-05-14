@@ -3,12 +3,12 @@ import { BlockchainProviderError } from "@fleet-sdk/common";
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { resolveString } from "./_tests";
 import {
-  createGqlOperation,
-  getOpName,
-  gql,
   type GraphQLOperation,
   type GraphQLSuccessResponse,
-  type GraphQLVariables
+  type GraphQLVariables,
+  createGqlOperation,
+  getOpName,
+  gql
 } from "./graphql";
 
 const DEFAULT_HEADERS = {
@@ -230,9 +230,7 @@ describe("Operation name extraction", () => {
     expect(getOpName("query _boxes { boxes { boxId } }")).to.be.equal("_boxes");
     expect(getOpName("query boxes-test { boxes { boxId } }")).to.be.equal("boxes-test");
     expect(getOpName("query boxes1 { boxes { boxId } }")).to.be.equal("boxes1");
-    expect(getOpName(" query boxes ($take: Int) { boxes { boxId } }")).to.be.equal(
-      "boxes"
-    );
+    expect(getOpName(" query boxes ($take: Int) { boxes { boxId } }")).to.be.equal("boxes");
     expect(
       getOpName(`
         query unspent($take: Int, $address: String) {

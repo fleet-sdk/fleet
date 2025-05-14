@@ -1,33 +1,30 @@
 import {
-  _0n,
-  _1n,
-  type Amount,
-  areRegistersDenselyPacked,
   assert,
+  type Amount,
   type Box,
   type BoxCandidate,
-  ensureBigInt,
   type ErgoTreeHex,
   type HexString,
-  isDefined,
-  isEmpty,
-  isHex,
-  isUndefined,
   type NewToken,
   type NonMandatoryRegisters,
   type OneOrMore,
   type TokenAmount,
   type TokenId,
-  type UnsignedInput
+  type UnsignedInput,
+  _0n,
+  _1n,
+  areRegistersDenselyPacked,
+  ensureBigInt,
+  isDefined,
+  isEmpty,
+  isHex,
+  isUndefined
 } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
-import { estimateBoxSize, SByte, SColl, type SConstant } from "@fleet-sdk/serializer";
+import { SByte, SColl, type SConstant, estimateBoxSize } from "@fleet-sdk/serializer";
 import { InvalidRegistersPacking, UndefinedCreationHeight } from "../errors";
 import { ErgoAddress, ErgoTree } from "../models";
-import {
-  type TokenAddOptions,
-  TokensCollection
-} from "../models/collections/tokensCollection";
+import { type TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
 import { ErgoBoxCandidate } from "../models/ergoBoxCandidate";
 
 export const BOX_VALUE_PER_BYTE = BigInt(360);
@@ -36,9 +33,7 @@ export const SAFE_MIN_BOX_VALUE = BigInt(1000000);
 export type BoxValueEstimationCallback = (outputBuilder: OutputBuilder) => bigint;
 export type TransactionOutputFlags = { change: boolean };
 
-export function estimateMinBoxValue(
-  valuePerByte = BOX_VALUE_PER_BYTE
-): BoxValueEstimationCallback {
+export function estimateMinBoxValue(valuePerByte = BOX_VALUE_PER_BYTE): BoxValueEstimationCallback {
   return (output) => {
     return BigInt(output.estimateSize()) * valuePerByte;
   };
@@ -173,8 +168,7 @@ export class OutputBuilder {
       const r = registers[key] as ConstantInput;
       if (!r) continue;
 
-      hexRegisters[key as keyof NonMandatoryRegisters] =
-        typeof r === "string" ? r : r.toHex();
+      hexRegisters[key as keyof NonMandatoryRegisters] = typeof r === "string" ? r : r.toHex();
     }
 
     if (!areRegistersDenselyPacked(hexRegisters)) throw new InvalidRegistersPacking();
@@ -278,19 +272,18 @@ export type R4ToR9Registers<T = HexString> = {
   R9: T;
 } & NonMandatoryRegisters<T>;
 
-export type SequentialNonMandatoryRegisters<T extends AdditionalRegistersInput> =
-  T extends {
-    R9: ConstantInput;
-  }
-    ? R4ToR9Registers<ConstantInput>
-    : T extends { R8: ConstantInput }
-      ? R4ToR8Registers<ConstantInput>
-      : T extends { R7: ConstantInput }
-        ? R4ToR7Registers<ConstantInput>
-        : T extends { R6: ConstantInput }
-          ? R4ToR6Registers<ConstantInput>
-          : T extends { R5: ConstantInput }
-            ? R4ToR5Registers<ConstantInput>
-            : T extends { R4: ConstantInput }
-              ? OnlyR4Register<ConstantInput>
-              : T;
+export type SequentialNonMandatoryRegisters<T extends AdditionalRegistersInput> = T extends {
+  R9: ConstantInput;
+}
+  ? R4ToR9Registers<ConstantInput>
+  : T extends { R8: ConstantInput }
+    ? R4ToR8Registers<ConstantInput>
+    : T extends { R7: ConstantInput }
+      ? R4ToR7Registers<ConstantInput>
+      : T extends { R6: ConstantInput }
+        ? R4ToR6Registers<ConstantInput>
+        : T extends { R5: ConstantInput }
+          ? R4ToR5Registers<ConstantInput>
+          : T extends { R4: ConstantInput }
+            ? OnlyR4Register<ConstantInput>
+            : T;

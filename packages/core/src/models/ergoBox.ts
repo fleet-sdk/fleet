@@ -1,11 +1,11 @@
 import type {
   Amount,
   Box,
-  NonMandatoryRegisters,
   BoxCandidate,
-  TokenAmount,
+  DataInput,
+  NonMandatoryRegisters,
   PlainObjectType,
-  DataInput
+  TokenAmount
 } from "@fleet-sdk/common";
 import { FleetError, isDefined, isUndefined } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
@@ -74,9 +74,7 @@ export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
       this.#boxId = box.boxId;
     } else {
       if (!transactionId || isUndefined(index)) {
-        throw new FleetError(
-          "TransactionId and Index must be provided for Box generation."
-        );
+        throw new FleetError("TransactionId and Index must be provided for Box generation.");
       }
 
       this.#candidate = box instanceof ErgoBoxCandidate ? box : new ErgoBoxCandidate(box);

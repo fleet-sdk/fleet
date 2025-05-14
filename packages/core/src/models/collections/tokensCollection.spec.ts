@@ -37,9 +37,7 @@ describe("Tokens collection", () => {
     expect(collection.contains(tokenB)).toBeTruthy();
 
     expect(
-      collection.contains(
-        "d601123e8838b95cdaebe24e594276b2a89cd38e98add98405bb5327520ecf6c"
-      )
+      collection.contains("d601123e8838b95cdaebe24e594276b2a89cd38e98add98405bb5327520ecf6c")
     ).toBeFalsy();
   });
 
@@ -173,15 +171,9 @@ describe("Tokens collection", () => {
     collection.add({ tokenId: tokenA, amount: 100n }, { sum: false });
     expect(collection).toHaveLength(3);
     const tokensArray = collection.toArray();
-    expect(
-      tokensArray.find((x) => x.tokenId === tokenA && x.amount === 50n)
-    ).not.toBeFalsy();
-    expect(
-      tokensArray.find((x) => x.tokenId === tokenB && x.amount === 10n)
-    ).not.toBeFalsy();
-    expect(
-      tokensArray.find((x) => x.tokenId === tokenA && x.amount === 100n)
-    ).not.toBeFalsy();
+    expect(tokensArray.find((x) => x.tokenId === tokenA && x.amount === 50n)).not.toBeFalsy();
+    expect(tokensArray.find((x) => x.tokenId === tokenB && x.amount === 10n)).not.toBeFalsy();
+    expect(tokensArray.find((x) => x.tokenId === tokenA && x.amount === 100n)).not.toBeFalsy();
   });
 
   it("Should add multiple tokens and sum if the same tokenId is already included", () => {

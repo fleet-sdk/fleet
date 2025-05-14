@@ -538,8 +538,7 @@ export const ergoTsTestVectors = [
     isValid: true
   },
   {
-    address:
-      "88dhgzEuTXaSLUWK1Ro8mB5xfhwP4y8osUycdBV16EBgycjcBebwd2He7QGiXC1qiSM1KZ6bAcpE2iCv",
+    address: "88dhgzEuTXaSLUWK1Ro8mB5xfhwP4y8osUycdBV16EBgycjcBebwd2He7QGiXC1qiSM1KZ6bAcpE2iCv",
     network: Network.Mainnet,
     isValid: true
   },

@@ -114,11 +114,7 @@ describe("Transaction signing", () => {
 
     // sign
     const prover = new Prover();
-    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [
-      rootKey,
-      child1,
-      child2
-    ]);
+    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [rootKey, child1, child2]);
 
     // verify
     const proof = toBytes(signedTx.inputs[0].spendingProof?.proofBytes);
@@ -155,11 +151,7 @@ describe("Transaction signing", () => {
 
     // sign
     const prover = new Prover();
-    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [
-      rootKey,
-      child1,
-      child2
-    ]);
+    const signedTx = prover.signTransaction(unsignedTx.toEIP12Object(), [rootKey, child1, child2]);
 
     // verify
     const txBytes = unsignedTx.toBytes();
@@ -439,8 +431,7 @@ describe("Message proof verification", () => {
     const message = ErgoMessage.fromData("hello world");
     const proof = prover.signMessage(message, key);
 
-    expect(prover.verify(message.serialize().encode(hex), hex.encode(proof), key)).to.be
-      .true;
+    expect(prover.verify(message.serialize().encode(hex), hex.encode(proof), key)).to.be.true;
   });
 
   it("Should verify from ErgoMessage", () => {

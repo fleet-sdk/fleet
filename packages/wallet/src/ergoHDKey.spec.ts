@@ -93,9 +93,7 @@ describe("Extended keys", () => {
       "0488b21e000000000000000000412bc02c85a3499d85f985ee6068c23f2345eb1c8b3fc34309df13b6a5ac56e803cf03e43683a9b7965603a5cc222bd31fa269d12527cda358965716c794c82253";
 
     const key = ErgoHDKey.fromExtendedKey(xpk).deriveChild(0);
-    expect(key.address.encode()).to.be.equal(
-      "9gfJXuRPGwocBsVvKc6GPp294Y3i24v3rd5GP6UXQiV1bjChoDB"
-    );
+    expect(key.address.encode()).to.be.equal("9gfJXuRPGwocBsVvKc6GPp294Y3i24v3rd5GP6UXQiV1bjChoDB");
   });
 
   it("Should create and restore from private encoded extended key", async () => {
@@ -157,12 +155,8 @@ describe("Extended keys", () => {
       )
     );
 
-    const key = ErgoHDKey.fromExtendedKey(encodedXPriv)
-      .derive("m/44'/429'/0'/0")
-      .deriveChild(0);
-    expect(key.address.encode()).to.be.equal(
-      "9i13CmR9JpR2F6S81kokfApsWEpZsfoTPw7gRCjhX433VEsfBqq"
-    );
+    const key = ErgoHDKey.fromExtendedKey(encodedXPriv).derive("m/44'/429'/0'/0").deriveChild(0);
+    expect(key.address.encode()).to.be.equal("9i13CmR9JpR2F6S81kokfApsWEpZsfoTPw7gRCjhX433VEsfBqq");
   });
 });
 
@@ -197,9 +191,9 @@ describe("Key derivation", () => {
     const mnemonic = generateMnemonic();
 
     const fleetKey = ErgoHDKey.fromMnemonicSync(mnemonic);
-    const wasmKey = SigmaRust.ExtSecretKey.derive_master(
-      mnemonicToSeedSync(mnemonic)
-    ).derive(SigmaRust.DerivationPath.from_string(ERGO_CHANGE_PATH));
+    const wasmKey = SigmaRust.ExtSecretKey.derive_master(mnemonicToSeedSync(mnemonic)).derive(
+      SigmaRust.DerivationPath.from_string(ERGO_CHANGE_PATH)
+    );
 
     expect(fleetKey.publicKey).to.be.deep.equal(wasmKey.public_key().pub_key_bytes());
     expect(fleetKey.privateKey).to.be.deep.equal(wasmKey.secret_key_bytes());
@@ -208,9 +202,7 @@ describe("Key derivation", () => {
       const fleetChild = fleetKey.deriveChild(i);
       const wasmChild = wasmKey.child(i.toString());
 
-      expect(fleetChild.publicKey).to.be.deep.equal(
-        wasmChild.public_key().pub_key_bytes()
-      );
+      expect(fleetChild.publicKey).to.be.deep.equal(wasmChild.public_key().pub_key_bytes());
       expect(fleetChild.privateKey).to.be.deep.equal(wasmChild.secret_key_bytes());
     }
   });
@@ -231,9 +223,7 @@ describe("Key derivation", () => {
       const fleetChild = fleetKey.deriveChild(i);
       const wasmChild = wasmKey.child(i.toString());
 
-      expect(fleetChild.publicKey).to.be.deep.equal(
-        wasmChild.public_key().pub_key_bytes()
-      );
+      expect(fleetChild.publicKey).to.be.deep.equal(wasmChild.public_key().pub_key_bytes());
       expect(fleetChild.privateKey).to.be.deep.equal(wasmChild.secret_key_bytes());
     }
   });

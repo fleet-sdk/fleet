@@ -1,22 +1,22 @@
 import {
-  _0n,
   type Amount,
   type Box,
   type BoxCandidate,
   type BoxId,
-  ensureBigInt,
   type FilterPredicate,
+  type OneOrMore,
+  type SortingDirection,
+  type SortingSelector,
+  type TokenTargetAmount,
+  _0n,
+  ensureBigInt,
   first,
   hasDuplicatesBy,
   isEmpty,
   isUndefined,
-  type OneOrMore,
   orderBy,
   some,
-  type SortingDirection,
-  type SortingSelector,
   sumBy,
-  type TokenTargetAmount,
   utxoSum
 } from "@fleet-sdk/common";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";
@@ -81,9 +81,7 @@ export class BoxSelector<T extends Box<bigint>> {
     }
 
     if (some(selected)) {
-      unselected = unselected.filter(
-        (box) => !selected.some((sel) => sel.boxId === box.boxId)
-      );
+      unselected = unselected.filter((box) => !selected.some((sel) => sel.boxId === box.boxId));
 
       if (remaining.nanoErgs && remaining.nanoErgs > _0n) {
         remaining.nanoErgs -= sumBy(selected, (input) => input.value);
@@ -123,10 +121,7 @@ export class BoxSelector<T extends Box<bigint>> {
     };
   }
 
-  private _getUnreachedTargets(
-    inputs: Box<bigint>[],
-    target: SelectionTarget
-  ): SelectionTarget {
+  private _getUnreachedTargets(inputs: Box<bigint>[], target: SelectionTarget): SelectionTarget {
     const unreached: SelectionTarget = {
       nanoErgs: undefined,
       tokens: undefined
@@ -206,17 +201,14 @@ export class BoxSelector<T extends Box<bigint>> {
     return false;
   }
 
-  public static buildTargetFrom(
-    boxes: Box<Amount>[] | BoxCandidate<Amount>[]
-  ): SelectionTarget {
+  public static buildTargetFrom(boxes: Box<Amount>[] | BoxCandidate<Amount>[]): SelectionTarget {
     const tokens: { [tokenId: string]: bigint } = {};
     let nanoErgs = _0n;
 
     for (const box of boxes) {
       nanoErgs += ensureBigInt(box.value);
       for (const token of box.assets) {
-        tokens[token.tokenId] =
-          (tokens[token.tokenId] || _0n) + ensureBigInt(token.amount);
+        tokens[token.tokenId] = (tokens[token.tokenId] || _0n) + ensureBigInt(token.amount);
       }
     }
 

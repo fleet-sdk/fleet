@@ -1,24 +1,21 @@
+import { isEmpty } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
+import signedTransactionVectors from "../_test-vectors/signedTransactions.json";
 import {
   deserializableTxVectors,
   raffleSignedTransaction,
   unsignedTransactionVectors
 } from "../_test-vectors/transactionVectors";
 import { deserializeTransaction, serializeTransaction } from "./transactionSerializer";
-import signedTransactionVectors from "../_test-vectors/signedTransactions.json";
-import { isEmpty } from "@fleet-sdk/common";
 
 describe("Transaction serializer", () => {
-  test.each(unsignedTransactionVectors)(
-    "Should serialize unsigned transaction [$name]",
-    (tv) => {
-      const bytes = serializeTransaction(tv.json).toBytes();
+  test.each(unsignedTransactionVectors)("Should serialize unsigned transaction [$name]", (tv) => {
+    const bytes = serializeTransaction(tv.json).toBytes();
 
-      expect(hex.encode(bytes)).toBe(tv.hex);
-      expect(hex.encode(blake2b256(bytes))).toBe(tv.hash);
-    }
-  );
+    expect(hex.encode(bytes)).toBe(tv.hex);
+    expect(hex.encode(blake2b256(bytes))).toBe(tv.hash);
+  });
 
   test.each(signedTransactionVectors)("should serialize signed transaction", (tv) => {
     expect(serializeTransaction(tv.json).encode(hex)).toBe(tv.hex);

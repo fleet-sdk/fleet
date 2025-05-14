@@ -5,30 +5,22 @@ import { validateEcPoint } from "./ecpoint";
 const testVectors = [
   {
     name: "valid compressed, positive Y coordinate",
-    point: hex.decode(
-      "0289b72d85b8a72b0a53960bafddadb74a149c6c1785d2bb46c244401e61d80b4d"
-    ),
+    point: hex.decode("0289b72d85b8a72b0a53960bafddadb74a149c6c1785d2bb46c244401e61d80b4d"),
     valid: true
   },
   {
     name: "valid compressed, negative Y coordinate",
-    point: hex.decode(
-      "0376b32d0bb20f15004649946db5679adce657bef77c487add608115ce8050b16e"
-    ),
+    point: hex.decode("0376b32d0bb20f15004649946db5679adce657bef77c487add608115ce8050b16e"),
     valid: true
   },
   {
     name: "invalid compressed",
-    point: hex.decode(
-      "0476b32d0bb20f15004649946db5679adce657bef77c487add608115ce8050b16e"
-    ),
+    point: hex.decode("0476b32d0bb20f15004649946db5679adce657bef77c487add608115ce8050b16e"),
     valid: false
   },
   {
     name: "invalid compressed",
-    point: hex.decode(
-      "0576b32d0bb20f15004649946db5679adce657bef77c487add608115ce8050b16e"
-    ),
+    point: hex.decode("0576b32d0bb20f15004649946db5679adce657bef77c487add608115ce8050b16e"),
     valid: false
   },
   {
@@ -61,9 +53,7 @@ const testVectors = [
   },
   {
     name: "length > 33 and < 65",
-    point: hex.decode(
-      "0289b72d85b8a72b0a53960bafddadb74a149c6c1785d2bb46c244401e61d80b4d4e"
-    ),
+    point: hex.decode("0289b72d85b8a72b0a53960bafddadb74a149c6c1785d2bb46c244401e61d80b4d4e"),
     valid: false
   },
   {

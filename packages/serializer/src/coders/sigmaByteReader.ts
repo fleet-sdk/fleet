@@ -1,9 +1,9 @@
-import { isEmpty, startsWith } from "@fleet-sdk/common";
+import { startsWith } from "@fleet-sdk/common";
 import { type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { hexToBigInt } from "./bigint";
+import { MAX_I8, MAX_U8 } from "./numRanges";
 import { readBigVLQ, readVLQ } from "./vlq";
 import { zigZag32, zigZag64 } from "./zigZag";
-import { MAX_I8, MAX_U8 } from "./numRanges";
 
 export class SigmaByteReader {
   readonly #bytes: Uint8Array;

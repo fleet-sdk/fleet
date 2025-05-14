@@ -1,10 +1,4 @@
-import {
-  type Box,
-  isDefined,
-  some,
-  type TokenId,
-  type TokenTargetAmount
-} from "@fleet-sdk/common";
+import { type Box, type TokenId, type TokenTargetAmount, isDefined, some } from "@fleet-sdk/common";
 import { _0n, isEmpty, isUndefined, sumBy, utxoSum } from "@fleet-sdk/common";
 import type { SelectionTarget } from "../boxSelector";
 import type { ISelectionStrategy } from "./ISelectionStrategy";
@@ -64,9 +58,7 @@ export class AccumulativeSelectionStrategy implements ISelectionStrategy {
 
     if (isUndefined(target)) {
       if (tokenId) {
-        selection = inputs.filter((x) =>
-          x.assets.some((asset) => asset.tokenId === tokenId)
-        );
+        selection = inputs.filter((x) => x.assets.some((asset) => asset.tokenId === tokenId));
       } else {
         selection = inputs;
       }

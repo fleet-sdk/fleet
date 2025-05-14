@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
-  english,
-  portuguese,
-  simplifiedChinese,
-  traditionalChinese,
   czech,
+  english,
   french,
   italian,
   japanese,
   korean,
-  spanish
+  portuguese,
+  simplifiedChinese,
+  spanish,
+  traditionalChinese
 } from "./wordlists";
 
 describe("wordlists", () => {

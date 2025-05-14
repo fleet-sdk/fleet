@@ -175,9 +175,7 @@ describe("String formatting functions", () => {
 
     justified = between(tokenId, balance, 60, 40);
     expect(justified).to.have.length(60);
-    expect(justified).to.be.equal(
-      "0cd8c9f416e5b1ca9f...e53c0dc30ebf83324b           4243243433"
-    );
+    expect(justified).to.be.equal("0cd8c9f416e5b1ca9f...e53c0dc30ebf83324b           4243243433");
 
     justified = between(tokenId, balance, 15, 10);
     expect(justified).to.have.length(15);

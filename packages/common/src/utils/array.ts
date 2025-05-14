@@ -205,11 +205,7 @@ export function areEqualBy<T>(
  * startsWith(array, target2); // false
  * ```
  */
-export function startsWith<T>(
-  array: ArrayLike<T>,
-  target: ArrayLike<T>,
-  offset = 0
-): boolean {
+export function startsWith<T>(array: ArrayLike<T>, target: ArrayLike<T>, offset = 0): boolean {
   if (array === target) return true;
   if (target.length > array.length) return false;
 

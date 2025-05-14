@@ -1,6 +1,6 @@
 import {
-  base58check as base58checkCoder,
   base58 as base58Coder,
+  base58check as base58checkCoder,
   base64 as base64Coder
 } from "@scure/base";
 import { sha256 } from "../hashes";

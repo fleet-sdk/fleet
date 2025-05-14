@@ -1,18 +1,5 @@
-import {
-  AddressType,
-  areEqual,
-  type Base58String,
-  isHex,
-  Network
-} from "@fleet-sdk/common";
-import {
-  base58,
-  blake2b256,
-  type ByteInput,
-  ensureBytes,
-  hex,
-  utf8
-} from "@fleet-sdk/crypto";
+import { AddressType, type Base58String, Network, areEqual, isHex } from "@fleet-sdk/common";
+import { type ByteInput, base58, blake2b256, ensureBytes, hex, utf8 } from "@fleet-sdk/crypto";
 import { SigmaByteWriter } from "@fleet-sdk/serializer";
 import type { JsonObject, JsonValue } from "type-fest";
 import { encodeAddress, unpackAddress, validateUnpackedAddress } from "./utils";
@@ -89,8 +76,7 @@ export class ErgoMessage {
   static decode(encodedHash: Base58String): ErgoMessage {
     const unpacked = unpackAddress(base58.decode(encodedHash));
     if (unpacked.type !== AddressType.ADH) throw new Error("Invalid message type");
-    if (!validateUnpackedAddress(unpacked))
-      throw new Error("Invalid encoded message hash");
+    if (!validateUnpackedAddress(unpacked)) throw new Error("Invalid encoded message hash");
 
     return new ErgoMessage({ hash: unpacked.body, network: unpacked.network });
   }
