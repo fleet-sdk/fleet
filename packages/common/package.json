@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/common",
-  "version": "0.8.3",
+  "version": "0.8.5",
   "description": "Internal utility functions, constants and types shared across @fleet-sdk packages.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

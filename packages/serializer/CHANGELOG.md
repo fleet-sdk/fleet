@@ -1,5 +1,16 @@
 # @fleet-sdk/serializer
 
+## 0.8.5
+
+### Patch Changes
+
+- be6867a: Add `deserializeBox` function
+- 3b2a774: Add `deserializeTransaction` function
+- 2e627a5: Add `SBox` constant serialization and deserialization.
+- Updated dependencies [07bafd5]
+  - @fleet-sdk/common@0.8.5
+  - @fleet-sdk/crypto@0.8.5
+
 ## 0.8.3
 
 ### Patch Changes
