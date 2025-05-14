@@ -1,27 +1,27 @@
 import {
-  _0n,
-  _1n,
-  type Amount,
-  areRegistersDenselyPacked,
   assert,
+  type Amount,
   type Box,
   type BoxCandidate,
-  ensureBigInt,
   type ErgoTreeHex,
   type HexString,
-  isDefined,
-  isEmpty,
-  isHex,
-  isUndefined,
   type NewToken,
   type NonMandatoryRegisters,
   type OneOrMore,
   type TokenAmount,
   type TokenId,
-  type UnsignedInput
+  type UnsignedInput,
+  _0n,
+  _1n,
+  areRegistersDenselyPacked,
+  ensureBigInt,
+  isDefined,
+  isEmpty,
+  isHex,
+  isUndefined
 } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
-import { estimateBoxSize, SByte, SColl, type SConstant } from "@fleet-sdk/serializer";
+import { SByte, SColl, type SConstant, estimateBoxSize } from "@fleet-sdk/serializer";
 import { InvalidRegistersPacking, UndefinedCreationHeight } from "../errors";
 import { ErgoAddress, ErgoTree } from "../models";
 import {

@@ -1,9 +1,9 @@
 import {
   type Box,
-  isDefined,
-  some,
   type TokenId,
-  type TokenTargetAmount
+  type TokenTargetAmount,
+  isDefined,
+  some
 } from "@fleet-sdk/common";
 import { _0n, isEmpty, isUndefined, sumBy, utxoSum } from "@fleet-sdk/common";
 import type { SelectionTarget } from "../boxSelector";

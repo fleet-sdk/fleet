@@ -4,13 +4,13 @@ import {
   type BoxCandidate,
   type EIP12UnsignedInput,
   type EIP12UnsignedTransaction,
-  isHex,
   type NonMandatoryRegisters,
   type SignedTransaction,
+  isHex,
   some
 } from "@fleet-sdk/common";
 import { ErgoMessage, ErgoUnsignedTransaction } from "@fleet-sdk/core";
-import { blake2b256, type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
+import { type ByteInput, blake2b256, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { serializeBox, serializeTransaction } from "@fleet-sdk/serializer";
 import type { ErgoHDKey } from "../ergoHDKey";
 import { sign, verify } from "./proveDLogProtocol";

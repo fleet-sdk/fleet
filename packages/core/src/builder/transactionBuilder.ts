@@ -3,20 +3,20 @@ import {
   type Base58String,
   type Box,
   type CollectionAddOptions,
+  FEE_CONTRACT,
   type HexString,
+  Network,
   type OneOrMore,
+  RECOMMENDED_MIN_FEE_VALUE,
   type TokenAmount,
   _0n,
   byteSizeOf,
   chunk,
   ensureBigInt,
-  FEE_CONTRACT,
   first,
   isDefined,
   isHex,
   isUndefined,
-  Network,
-  RECOMMENDED_MIN_FEE_VALUE,
   some,
   utxoDiff,
   utxoSum
@@ -33,11 +33,11 @@ import {
 import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
 import {
   BOX_VALUE_PER_BYTE,
-  estimateMinBoxValue,
   OutputBuilder,
-  SAFE_MIN_BOX_VALUE
+  SAFE_MIN_BOX_VALUE,
+  estimateMinBoxValue
 } from "./outputBuilder";
-import { createPluginContext, type FleetPluginContext } from "./pluginContext";
+import { type FleetPluginContext, createPluginContext } from "./pluginContext";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 

@@ -1,8 +1,10 @@
 import { type Amount, type BoxCandidate, Network } from "@fleet-sdk/common";
 import { ensureBigInt, first, some, sumBy, utxoSum } from "@fleet-sdk/common";
+import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
 import { utf8 } from "@fleet-sdk/crypto";
-import { estimateBoxSize, SByte, SColl } from "@fleet-sdk/serializer";
+import { SByte, SColl, estimateBoxSize } from "@fleet-sdk/serializer";
 import { invalidBoxes, manyTokensBoxes, regularBoxes } from "_test-vectors";
+import { mockUTxO } from "packages/mock-chain/src";
 import { describe, expect, it, vi } from "vitest";
 import { InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
@@ -16,13 +18,11 @@ import {
 } from "../models";
 import {
   BOX_VALUE_PER_BYTE,
-  estimateMinBoxValue,
   OutputBuilder,
-  SAFE_MIN_BOX_VALUE
+  SAFE_MIN_BOX_VALUE,
+  estimateMinBoxValue
 } from "./outputBuilder";
 import { TransactionBuilder } from "./transactionBuilder";
-import { mockUTxO } from "packages/mock-chain/src";
-import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
 
 const height = 844540;
 const a1 = {

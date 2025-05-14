@@ -1,11 +1,11 @@
 import { assert, first, last } from "@fleet-sdk/common";
 import type { SigmaByteReader, SigmaByteWriter } from "../coders";
-import { isColl, isTuple, SCollType, STupleType, type SType } from "../types";
+import { SCollType, STupleType, type SType, isColl, isTuple } from "../types";
 import {
+  PRIMITIVE_TYPE_RANGE,
   constructorCode,
   descriptors,
-  getPrimitiveType,
-  PRIMITIVE_TYPE_RANGE
+  getPrimitiveType
 } from "../types/descriptors";
 
 export const typeSerializer = {

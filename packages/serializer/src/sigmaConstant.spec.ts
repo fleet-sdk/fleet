@@ -1,6 +1,9 @@
 import { type Box, ensureBigInt } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
+import fc from "fast-check";
+import { Value$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
+import { SPair } from "../dist";
 import {
   bigintVectors,
   boolVectors,
@@ -15,8 +18,20 @@ import {
   tupleTestVectors
 } from "./_test-vectors/constantVectors";
 import { SigmaByteWriter } from "./coders";
+import {
+  MAX_I8,
+  MAX_I16,
+  MAX_I32,
+  MAX_I64,
+  MAX_I256,
+  MIN_I8,
+  MIN_I16,
+  MIN_I32,
+  MIN_I64,
+  MIN_I256
+} from "./coders/numRanges";
 import { dataSerializer } from "./serializers";
-import { decode, parse, SConstant, stypeof } from "./sigmaConstant";
+import { SConstant, decode, parse, stypeof } from "./sigmaConstant";
 import type { SGroupElementType, SPrimitiveType } from "./types";
 import {
   SBigInt,
@@ -32,21 +47,6 @@ import {
   SUnit
 } from "./types/";
 import { SBox, STuple } from "./types/constructors";
-import { Value$ } from "sigmastate-js/main";
-import fc from "fast-check";
-import {
-  MAX_I16,
-  MAX_I256,
-  MAX_I32,
-  MAX_I64,
-  MAX_I8,
-  MIN_I16,
-  MIN_I256,
-  MIN_I32,
-  MIN_I64,
-  MIN_I8
-} from "./coders/numRanges";
-import { SPair } from "../dist";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {

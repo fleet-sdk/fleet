@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   _0n,
+  _1n,
+  _7n,
   _10n,
+  _63n,
   _127n,
   _128n,
-  _1n,
-  _63n,
-  _7n,
   decimalize,
   ensureBigInt,
   max,

@@ -1,8 +1,8 @@
+import fc from "fast-check";
 import { describe, expect, it, test } from "vitest";
 import { SigmaByteReader } from "./sigmaByteReader";
 import { SigmaByteWriter } from "./sigmaByteWriter";
 import { estimateVLQSize, readBigVLQ, readVLQ, writeBigVLQ, writeVLQ } from "./vlq";
-import fc from "fast-check";
 
 describe("VLQ encoding/decoding", () => {
   const testVectors = [

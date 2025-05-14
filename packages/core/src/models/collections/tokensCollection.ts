@@ -3,12 +3,12 @@ import {
   Collection,
   type CollectionAddOptions,
   FleetError,
-  isDefined,
-  isUndefined,
   type NewToken,
   type OneOrMore,
   type TokenAmount,
-  type TokenId
+  type TokenId,
+  isDefined,
+  isUndefined
 } from "@fleet-sdk/common";
 import { ensureBigInt } from "@fleet-sdk/common";
 import { NotFoundError, UndefinedMintingContext } from "../../errors";

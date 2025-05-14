@@ -1,8 +1,8 @@
+import { Network } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
-import { ErgoTree } from "./ergoTree";
-import { Network } from "@fleet-sdk/common";
 import { ErgoAddress } from "./ergoAddress";
+import { ErgoTree } from "./ergoTree";
 
 describe("ErgoTree model", () => {
   test.each([

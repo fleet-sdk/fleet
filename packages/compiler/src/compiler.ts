@@ -1,10 +1,10 @@
 import {
   assert,
+  Network,
   ensureDefaults,
   ergoTreeHeaderFlags,
   isEmpty,
-  isHex,
-  Network
+  isHex
 } from "@fleet-sdk/common";
 import { SConstant } from "@fleet-sdk/serializer";
 import {

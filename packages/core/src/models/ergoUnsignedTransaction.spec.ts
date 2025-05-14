@@ -1,12 +1,3 @@
-import { serializeTransaction } from "@fleet-sdk/serializer";
-import { regularBoxes, validBoxes, mockedUnsignedTransactions } from "_test-vectors";
-import { describe, expect, it } from "vitest";
-import { OutputBuilder, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "../builder";
-import { ErgoUnsignedInput } from "./ergoUnsignedInput";
-import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
-import { ErgoBoxCandidate } from "./ergoBoxCandidate";
-import { ErgoAddress } from "./ergoAddress";
-import { blake2b256, hex } from "@fleet-sdk/crypto";
 import type {
   DataInput,
   EIP12UnsignedDataInput,
@@ -15,6 +6,15 @@ import type {
   UnsignedTransaction
 } from "@fleet-sdk/common";
 import { FEE_CONTRACT, RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
+import { blake2b256, hex } from "@fleet-sdk/crypto";
+import { serializeTransaction } from "@fleet-sdk/serializer";
+import { mockedUnsignedTransactions, regularBoxes, validBoxes } from "_test-vectors";
+import { describe, expect, it } from "vitest";
+import { OutputBuilder, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "../builder";
+import { ErgoAddress } from "./ergoAddress";
+import { ErgoBoxCandidate } from "./ergoBoxCandidate";
+import { ErgoUnsignedInput } from "./ergoUnsignedInput";
+import { ErgoUnsignedTransaction } from "./ergoUnsignedTransaction";
 
 describe("Model", () => {
   it("Should generate the right transactionId and boxIds for outputs", () => {

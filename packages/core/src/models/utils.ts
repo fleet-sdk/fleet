@@ -1,11 +1,11 @@
 import {
   AddressType,
-  areEqual,
   type Base58String,
+  type Network,
+  areEqual,
   concatBytes,
   first,
-  isEmpty,
-  type Network
+  isEmpty
 } from "@fleet-sdk/common";
 import { base58, blake2b256, validateEcPoint } from "@fleet-sdk/crypto";
 import { SigmaByteWriter } from "@fleet-sdk/serializer";

@@ -1,4 +1,4 @@
-import { _0n, concatBytes, FleetError } from "@fleet-sdk/common";
+import { FleetError, _0n, concatBytes } from "@fleet-sdk/common";
 import {
   bigintBE,
   blake2b256,

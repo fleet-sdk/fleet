@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { exponentialRetry, request } from "./networking";
 import { resolveData } from "./_tests";
+import { exponentialRetry, request } from "./networking";
 
 describe("exponentialRetry", () => {
   afterEach(() => {

@@ -1,7 +1,7 @@
 import { fail } from "node:assert";
 import { ensureBigInt, first } from "@fleet-sdk/common";
 import { TransactionBuilder } from "@fleet-sdk/core";
-import { parse, SByte, SColl } from "@fleet-sdk/serializer";
+import { SByte, SColl, parse } from "@fleet-sdk/serializer";
 import { regularBoxes } from "_test-vectors";
 import { babelBoxes } from "_test-vectors";
 import { describe, expect, it } from "vitest";

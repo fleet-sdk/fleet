@@ -1,11 +1,11 @@
 import { type Box, byteSizeOf, ensureBigInt, first } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { manyTokensBoxes, regularBoxes, validBoxes } from "_test-vectors";
+import { mockUTxO } from "packages/mock-chain/src";
 import { describe, expect, it, test } from "vitest";
 import { boxVectors, deserializationTestVectors } from "../_test-vectors/boxVectors";
-import { estimateBoxSize, deserializeBox, serializeBox } from "./boxSerializer";
 import { SigmaByteReader } from "../coders";
-import { mockUTxO } from "packages/mock-chain/src";
+import { deserializeBox, estimateBoxSize, serializeBox } from "./boxSerializer";
 
 describe("ErgoBox serialization", () => {
   it.each(boxVectors)("Should serialize [$json.boxId]", (tv) => {

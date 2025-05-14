@@ -8,7 +8,7 @@ import {
   UndefinedMintingContext
 } from "../errors";
 import { ErgoAddress, ErgoTree, TokensCollection } from "../models";
-import { estimateMinBoxValue, OutputBuilder, SAFE_MIN_BOX_VALUE } from "./outputBuilder";
+import { OutputBuilder, SAFE_MIN_BOX_VALUE, estimateMinBoxValue } from "./outputBuilder";
 
 const address = "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c";
 const ergoTreeHex =

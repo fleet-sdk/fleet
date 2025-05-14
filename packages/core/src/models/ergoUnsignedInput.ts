@@ -1,13 +1,13 @@
 import type {
   Amount,
   Box,
-  PlainObjectType,
   ContextExtension,
+  DataInput,
+  EIP12UnsignedDataInput,
   EIP12UnsignedInput,
   NonMandatoryRegisters,
-  UnsignedInput,
-  DataInput,
-  EIP12UnsignedDataInput
+  PlainObjectType,
+  UnsignedInput
 } from "@fleet-sdk/common";
 import type { ConstantInput } from "../builder";
 import { ErgoBox } from "./ergoBox";

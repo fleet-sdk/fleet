@@ -1,22 +1,22 @@
 import {
-  _0n,
   type Amount,
   type Box,
   type BoxCandidate,
   type BoxId,
-  ensureBigInt,
   type FilterPredicate,
+  type OneOrMore,
+  type SortingDirection,
+  type SortingSelector,
+  type TokenTargetAmount,
+  _0n,
+  ensureBigInt,
   first,
   hasDuplicatesBy,
   isEmpty,
   isUndefined,
-  type OneOrMore,
   orderBy,
   some,
-  type SortingDirection,
-  type SortingSelector,
   sumBy,
-  type TokenTargetAmount,
   utxoSum
 } from "@fleet-sdk/common";
 import { DuplicateInputSelectionError } from "../../errors/duplicateInputSelectionError";

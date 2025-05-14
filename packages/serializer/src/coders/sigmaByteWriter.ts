@@ -1,17 +1,17 @@
-import { blake2b256, type Coder, hex } from "@fleet-sdk/crypto";
+import { type Coder, blake2b256, hex } from "@fleet-sdk/crypto";
 import { bigIntToHex } from "./bigint";
+import {
+  MAX_I16,
+  MAX_I32,
+  MAX_I64,
+  MAX_I256,
+  MIN_I16,
+  MIN_I32,
+  MIN_I64,
+  MIN_I256
+} from "./numRanges";
 import { writeBigVLQ, writeVLQ } from "./vlq";
 import { zigZag32, zigZag64 } from "./zigZag";
-import {
-  MIN_I16,
-  MAX_I16,
-  MIN_I32,
-  MAX_I32,
-  MIN_I64,
-  MAX_I64,
-  MIN_I256,
-  MAX_I256
-} from "./numRanges";
 
 export class SigmaByteWriter {
   readonly #bytes: Uint8Array;

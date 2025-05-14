@@ -1,4 +1,4 @@
-import { FEE_CONTRACT, type Amount, type Box } from "@fleet-sdk/common";
+import { type Amount, type Box, FEE_CONTRACT } from "@fleet-sdk/common";
 import { mockUTxO } from "packages/mock-chain/src";
 
 export const boxVectors: {

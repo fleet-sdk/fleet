@@ -2,8 +2,8 @@ import {
   type Amount,
   type Box,
   type BoxId,
-  type OneOrMore,
-  Collection
+  Collection,
+  type OneOrMore
 } from "@fleet-sdk/common";
 import { isDefined } from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "../../errors";

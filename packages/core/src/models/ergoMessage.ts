@@ -1,14 +1,14 @@
 import {
   AddressType,
-  areEqual,
   type Base58String,
-  isHex,
-  Network
+  Network,
+  areEqual,
+  isHex
 } from "@fleet-sdk/common";
 import {
+  type ByteInput,
   base58,
   blake2b256,
-  type ByteInput,
   ensureBytes,
   hex,
   utf8

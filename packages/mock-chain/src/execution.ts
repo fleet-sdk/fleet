@@ -1,4 +1,4 @@
-import { ensureDefaults, Network } from "@fleet-sdk/common";
+import { Network, ensureDefaults } from "@fleet-sdk/common";
 import type { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { bigintBE, hex } from "@fleet-sdk/crypto";
 import type { ErgoHDKey } from "@fleet-sdk/wallet";

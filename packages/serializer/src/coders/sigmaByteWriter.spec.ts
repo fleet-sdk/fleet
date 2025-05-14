@@ -2,17 +2,17 @@ import { concatBytes } from "@fleet-sdk/common";
 import { blake2b256, hex, sha256 } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
 import { MAX_CONSTANT_LENGTH } from "../sigmaConstant";
-import { SigmaByteWriter } from "./sigmaByteWriter";
 import {
-  MIN_I16,
   MAX_I16,
-  MIN_I32,
   MAX_I32,
-  MIN_I64,
   MAX_I64,
-  MIN_I256,
-  MAX_I256
+  MAX_I256,
+  MIN_I16,
+  MIN_I32,
+  MIN_I64,
+  MIN_I256
 } from "./numRanges";
+import { SigmaByteWriter } from "./sigmaByteWriter";
 
 describe("Sigma Writer", () => {
   it("Should put a single byte at time", () => {

@@ -6,9 +6,9 @@ import {
 } from "@fleet-sdk/common";
 import { concatBytes, endsWith, first, startsWith } from "@fleet-sdk/common";
 import {
+  type ByteInput,
   base58,
   blake2b256,
-  type ByteInput,
   ensureBytes,
   hex,
   validateEcPoint
@@ -16,11 +16,11 @@ import {
 import { InvalidAddress } from "../errors/invalidAddress";
 import {
   BLAKE_256_HASH_LENGTH,
+  type UnpackedAddress,
   encodeAddress,
   getAddressType,
   getNetworkType,
   unpackAddress,
-  type UnpackedAddress,
   validateAddress,
   validateUnpackedAddress
 } from "./utils";

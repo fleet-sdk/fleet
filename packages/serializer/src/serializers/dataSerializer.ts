@@ -1,7 +1,7 @@
 import { assert, type Box } from "@fleet-sdk/common";
 import type { SigmaByteReader, SigmaByteWriter } from "../coders";
 import type { SConstant } from "../sigmaConstant";
-import { isColl, isTuple, type SCollType, type STupleType, type SType } from "../types";
+import { type SCollType, type STupleType, type SType, isColl, isTuple } from "../types";
 import { descriptors } from "../types/descriptors";
 import { deserializeBox, serializeBox } from "./boxSerializer";
 

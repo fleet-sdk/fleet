@@ -1,11 +1,11 @@
 import type {
   Amount,
   Box,
-  NonMandatoryRegisters,
   BoxCandidate,
-  TokenAmount,
+  DataInput,
+  NonMandatoryRegisters,
   PlainObjectType,
-  DataInput
+  TokenAmount
 } from "@fleet-sdk/common";
 import { FleetError, isDefined, isUndefined } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";

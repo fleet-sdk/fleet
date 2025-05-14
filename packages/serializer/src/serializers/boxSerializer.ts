@@ -1,8 +1,8 @@
 import {
+  FEE_CONTRACT,
   byteSizeOf,
   ensureBigInt,
   ergoTreeHeaderFlags,
-  FEE_CONTRACT,
   isDefined,
   isUndefined
 } from "@fleet-sdk/common";
@@ -13,10 +13,10 @@ import type {
   NonMandatoryRegisters,
   TokenAmount
 } from "@fleet-sdk/common";
-import { estimateVLQSize, SigmaByteReader, SigmaByteWriter } from "../coders";
 import { blake2b256, hex, validateEcPoint } from "@fleet-sdk/crypto";
-import type { ByteInput } from "../types/constructors";
+import { SigmaByteReader, SigmaByteWriter, estimateVLQSize } from "../coders";
 import { SConstant } from "../sigmaConstant";
+import type { ByteInput } from "../types/constructors";
 
 const MAX_UINT16_VALUE = 65535;
 

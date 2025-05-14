@@ -1,7 +1,7 @@
-import { describe, expect, it, test } from "vitest";
-import { zigZag32, zigZag64 } from "./zigZag";
 import fc from "fast-check";
+import { describe, expect, it, test } from "vitest";
 import { MAX_I32, MAX_I64, MIN_I32, MIN_I64 } from "./numRanges";
+import { zigZag32, zigZag64 } from "./zigZag";
 
 describe("ZigZag 32-bit codec", () => {
   const tv = [

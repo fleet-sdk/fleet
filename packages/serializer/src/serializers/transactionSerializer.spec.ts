@@ -1,13 +1,13 @@
+import { isEmpty } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
+import signedTransactionVectors from "../_test-vectors/signedTransactions.json";
 import {
   deserializableTxVectors,
   raffleSignedTransaction,
   unsignedTransactionVectors
 } from "../_test-vectors/transactionVectors";
 import { deserializeTransaction, serializeTransaction } from "./transactionSerializer";
-import signedTransactionVectors from "../_test-vectors/signedTransactions.json";
-import { isEmpty } from "@fleet-sdk/common";
 
 describe("Transaction serializer", () => {
   test.each(unsignedTransactionVectors)(

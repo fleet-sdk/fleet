@@ -1,28 +1,28 @@
 import type {
   Box as GQLBox,
-  QueryBoxesArgs,
+  UnconfirmedBox as GQLUnconfirmedBox,
   Header,
-  QueryBlockHeadersArgs,
-  Transaction,
-  QueryTransactionsArgs,
   MempoolTransactionsArgs,
-  UnconfirmedTransaction,
-  UnconfirmedBox as GQLUnconfirmedBox
+  QueryBlockHeadersArgs,
+  QueryBoxesArgs,
+  QueryTransactionsArgs,
+  Transaction,
+  UnconfirmedTransaction
 } from "@ergo-graphql/types";
 import {
   type Base58String,
   type BlockHeader,
   type HexString,
+  NotSupportedError,
   type SignedTransaction,
+  chunk,
   ensureDefaults,
   isEmpty,
   isUndefined,
-  NotSupportedError,
   orderBy,
   some,
   uniq,
-  uniqBy,
-  chunk
+  uniqBy
 } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
@@ -32,12 +32,12 @@ import type {
   ChainProviderBox,
   ChainProviderConfirmedTransaction,
   ChainProviderUnconfirmedTransaction,
+  ConfirmedTransactionWhere,
   HeaderQuery,
   IBlockchainProvider,
   TransactionEvaluationResult,
   TransactionQuery,
   TransactionReductionResult,
-  ConfirmedTransactionWhere,
   UnconfirmedTransactionWhere
 } from "../types/blockchainProvider";
 import {

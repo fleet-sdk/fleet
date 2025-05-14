@@ -1,10 +1,10 @@
+import { RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
 import { regularBoxes } from "_test-vectors";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NotAllowedTokenBurning } from "../errors";
 import { OutputBuilder } from "./outputBuilder";
-import { createPluginContext, type FleetPluginContext } from "./pluginContext";
+import { type FleetPluginContext, createPluginContext } from "./pluginContext";
 import { TransactionBuilder } from "./transactionBuilder";
-import { RECOMMENDED_MIN_FEE_VALUE } from "@fleet-sdk/common";
 
 describe("Plugin context", () => {
   const creationHeight = 894169;

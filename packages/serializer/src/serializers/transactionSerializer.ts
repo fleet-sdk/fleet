@@ -6,11 +6,11 @@ import type {
   UnsignedInput,
   UnsignedTransaction
 } from "@fleet-sdk/common";
-import { SigmaByteReader, SigmaByteWriter } from "../coders";
-import { deserializeEmbeddedBox, serializeBox } from "./boxSerializer";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
-import type { ByteInput } from "../types/constructors";
+import { SigmaByteReader, SigmaByteWriter } from "../coders";
 import { SConstant } from "../sigmaConstant";
+import type { ByteInput } from "../types/constructors";
+import { deserializeEmbeddedBox, serializeBox } from "./boxSerializer";
 
 type Nullish<T> = T | null | undefined;
 type Input = UnsignedInput | SignedInput;

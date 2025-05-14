@@ -4,8 +4,8 @@ import { hasDuplicatesBy, uniq } from "./array";
 import { isEmpty } from "./assertions";
 import { sumBy } from "./bigInt";
 import {
-  areRegistersDenselyPacked,
   type BoxSummary,
+  areRegistersDenselyPacked,
   ensureUTxOBigInt,
   utxoDiff,
   utxoFilter,

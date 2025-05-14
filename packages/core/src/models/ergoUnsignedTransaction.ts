@@ -1,18 +1,18 @@
 import {
   type BoxSummary,
-  type PlainObjectType,
   type EIP12UnsignedTransaction,
+  FleetError,
+  type PlainObjectType,
   type UnsignedTransaction,
   utxoDiff,
-  utxoSum,
-  FleetError
+  utxoSum
 } from "@fleet-sdk/common";
 import { blake2b256, hex } from "@fleet-sdk/crypto";
 import { serializeTransaction } from "@fleet-sdk/serializer";
 import { TransactionBuilder } from "../builder";
-import type { ErgoUnsignedInput } from "./ergoUnsignedInput";
 import type { ErgoBox } from "./ergoBox";
 import type { ErgoBoxCandidate } from "./ergoBoxCandidate";
+import type { ErgoUnsignedInput } from "./ergoUnsignedInput";
 import { ErgoUnsignedTransactionChain } from "./ergoUnsignedTransactionChain";
 
 type TransactionType<T> = T extends "default"

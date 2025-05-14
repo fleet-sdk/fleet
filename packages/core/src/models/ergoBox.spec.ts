@@ -1,4 +1,4 @@
-import type { Amount, BoxCandidate, NonMandatoryRegisters, Box } from "@fleet-sdk/common";
+import type { Amount, Box, BoxCandidate, NonMandatoryRegisters } from "@fleet-sdk/common";
 import {
   invalidBoxes,
   manyTokensBoxes,

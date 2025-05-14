@@ -1,7 +1,7 @@
 import {
+  type HexString,
   ensureDefaults,
   first,
-  type HexString,
   isUndefined,
   some
 } from "@fleet-sdk/common";

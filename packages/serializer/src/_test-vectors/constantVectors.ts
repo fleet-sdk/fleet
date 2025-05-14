@@ -1,4 +1,5 @@
 import { hex, utf8 } from "@fleet-sdk/crypto";
+import { validBoxes } from "_test-vectors";
 import type { SConstant } from "../sigmaConstant";
 import {
   SBigInt,
@@ -12,7 +13,6 @@ import {
   SShort
 } from "../types";
 import { type SConstructor, STuple } from "../types/constructors";
-import { validBoxes } from "_test-vectors";
 
 const u8a = (input: number[]) => Uint8Array.from(input);
 

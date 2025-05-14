@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { SigmaByteReader } from "./sigmaByteReader";
 
 const u8a = (bytes: number[]) => new Uint8Array(bytes);
