@@ -242,14 +242,14 @@ describe("Not implemented types", () => {
       coerce: (val: unknown) => val
     } as unknown as SGroupElementType;
 
-    expect(() => {
-      new SConstant(unimplementedType, "").toBytes();
-    }).to.throw("Serialization error: type not implemented.");
+    expect(() => new SConstant(unimplementedType, "").toBytes()).to.throw(
+      "Serialization error: type not implemented."
+    );
 
     // not implemented SSigmaProp expression
-    expect(() => {
-      SSigmaProp(new SConstant(unimplementedType, Uint8Array.from([0]))).toBytes();
-    }).to.throw("Serialization error: SigmaProp operation not implemented.");
+    expect(() =>
+      SSigmaProp(new SConstant(unimplementedType, Uint8Array.from([0]))).toBytes()
+    ).to.throw("Serialization error: SigmaProp operation not implemented.");
 
     // not implemented SSigmaProp expression
     expect(() => {
@@ -258,24 +258,16 @@ describe("Not implemented types", () => {
   });
 
   it("Should fail when trying to deserialize a not implemented SigmaProp expression", () => {
-    expect(() => {
-      SConstant.from("08ce");
-    }).to.throw();
+    expect(() => SConstant.from("08ce")).to.throw();
   });
 
   it("Should fail when trying to deserialize empty bytes", () => {
-    expect(() => {
-      SConstant.from("");
-    }).to.throw("Empty constant bytes.");
-    expect(() => {
-      SConstant.from(Uint8Array.from([]));
-    }).to.throw("Empty constant bytes.");
+    expect(() => SConstant.from("")).to.throw("Empty constant bytes.");
+    expect(() => SConstant.from(Uint8Array.from([]))).to.throw("Empty constant bytes.");
   });
 
   it("Should fail when trying to deserialize a not implemented type", () => {
-    expect(() => {
-      SConstant.from("deadbeef");
-    }).to.throw();
+    expect(() => SConstant.from("deadbeef")).to.throw();
   });
 });
 
