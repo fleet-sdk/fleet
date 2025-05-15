@@ -1319,7 +1319,7 @@ describe("Plugins", () => {
       .extend(plugin)
       .sendChangeTo(a2.address);
 
-    let builtTx = tx.build();
+    const builtTx = tx.build();
 
     expect(tx.outputs).toHaveLength(1);
     expect(builtTx.outputs).toHaveLength(2); // output from plugin and change
@@ -1328,7 +1328,7 @@ describe("Plugins", () => {
     expect(plugin).toBeCalledTimes(1);
 
     for (let i = 0; i < 5; i++) {
-      builtTx = tx.build();
+      tx.build();
     }
 
     expect(plugin).toBeCalledTimes(1); // should not do subsequent calls

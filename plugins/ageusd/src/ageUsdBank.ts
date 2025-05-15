@@ -278,7 +278,7 @@ export class AgeUSDBank {
 
   getReserveRatioFor(action: ActionType, amount: Amount, coin: CoinType): bigint {
     amount = big(amount);
-    let newReserve = _0n;
+    let newReserve: bigint;
     let newCirculatingStable = this.circulatingStableCoins;
 
     if (action === "minting") {
@@ -352,7 +352,7 @@ export class AgeUSDBank {
     if (!minting && this.getReserveRatioFor(action, _1n, coin) <= target) return _0n;
 
     let low = _0n;
-    let mid = _0n;
+    let mid: bigint;
     let high = minting ? big(this.reserveCoin.amount) : this.circulatingReserveCoins;
     let newRatio = _0n;
 
