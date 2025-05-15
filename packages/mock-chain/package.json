@@ -45,7 +45,7 @@
     "sigmastate-js": "0.4.6"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=18"
   },
   "files": [
     "dist",
