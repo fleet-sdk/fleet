@@ -92,7 +92,7 @@ export function readBigVLQ(reader: SigmaByteReader): bigint {
 
   let value = _0n;
   let shift = _0n;
-  let lower7bits = _0n;
+  let lower7bits: bigint;
 
   do {
     lower7bits = BigInt(reader.readByte());

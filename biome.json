@@ -28,13 +28,17 @@
     "rules": {
       "recommended": true,
       "style": {
+        "recommended": true,
         "noParameterAssign": "off",
         "noYodaExpression": "error"
       },
       "correctness": {
-        "noUnusedImports": "error"
+        "recommended": true,
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
       },
       "suspicious": {
+        "recommended": true,
         "noConsoleLog": "error",
         "noAssignInExpressions": "off"
       }

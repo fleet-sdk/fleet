@@ -208,7 +208,6 @@ describe("request", () => {
   });
 
   it("Should retry the request using fallbacks and return fail if no response", async () => {
-    const mockResponse = { data: "response" };
     const fetchMock = vi
       .spyOn(global, "fetch")
       .mockRejectedValueOnce(new Error("Failed"))

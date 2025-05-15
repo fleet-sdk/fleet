@@ -82,17 +82,14 @@ describe("ErgoBox serialization", () => {
     expect(() => estimateBoxSize(output)).toThrow();
   });
 
-  test.each(deserializationTestVectors)(
-    "roundtrip box serialization, case: $name",
-    ({ name, box }) => {
-      const serialized = serializeBox(box).toBytes();
-      const deserialized = deserializeBox(serialized);
-      expect(deserialized).toEqual(box);
+  test.each(deserializationTestVectors)("roundtrip box serialization, case: $name", ({ box }) => {
+    const serialized = serializeBox(box).toBytes();
+    const deserialized = deserializeBox(serialized);
+    expect(deserialized).toEqual(box);
 
-      const boxId = hex.encode(blake2b256(serialized));
-      expect(deserialized.boxId).toEqual(boxId);
-    }
-  );
+    const boxId = hex.encode(blake2b256(serialized));
+    expect(deserialized.boxId).toEqual(boxId);
+  });
 
   it("Should deserialize from SigmaByteReader", () => {
     const box = deserializationTestVectors[0].box;

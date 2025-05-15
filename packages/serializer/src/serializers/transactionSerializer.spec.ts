@@ -23,7 +23,7 @@ describe("Transaction serializer", () => {
 
   test.each(deserializableTxVectors)(
     "should roundtrip transaction serialization, case: $name",
-    ({ name, tx }) => {
+    ({ tx }) => {
       const serialized = serializeTransaction(tx).toBytes();
       const deserialized = deserializeTransaction(serialized);
 
