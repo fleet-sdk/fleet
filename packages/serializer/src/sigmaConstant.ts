@@ -22,7 +22,12 @@ export class SConstant<D = unknown, T extends SType = SType> {
 
     const type = typeSerializer.deserialize(reader);
     const data = dataSerializer.deserialize(type, reader);
-    return new SConstant(type as T, data as D);
+    return new SConstant(type as T, data as D).#withBytes(reader.bytes);
+  }
+
+  #withBytes(bytes: Uint8Array): SConstant<D, T> {
+    this.#bytes = bytes;
+    return this;
   }
 
   get type(): T {
@@ -33,11 +38,19 @@ export class SConstant<D = unknown, T extends SType = SType> {
     return this.#data;
   }
 
+  /**
+   * Returns the serialized representation of the current instance as a `Uint8Array`.
+   * If the bytes have already been computed and cached, returns the cached value.
+   * Otherwise, serializes the instance and returns the resulting bytes.
+   */
   get bytes(): Uint8Array {
     if (this.#bytes) return this.#bytes;
     return this.serialize();
   }
 
+  /**
+   * Serializes the current object into a `Uint8Array`.
+   */
   serialize(): Uint8Array {
     const writer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     typeSerializer.serialize(this.type, writer);
@@ -48,7 +61,7 @@ export class SConstant<D = unknown, T extends SType = SType> {
   }
 
   toHex(): string {
-    return hex.encode(this.bytes);
+    return hex.encode(this.serialize());
   }
 }
 
