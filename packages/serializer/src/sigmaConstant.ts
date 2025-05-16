@@ -9,6 +9,7 @@ export const MAX_CONSTANT_LENGTH = 4096;
 export class SConstant<D = unknown, T extends SType = SType> {
   readonly #type: T;
   readonly #data: D;
+  #bytes?: Uint8Array;
 
   constructor(type: T, data: D) {
     this.#type = type;
@@ -21,7 +22,6 @@ export class SConstant<D = unknown, T extends SType = SType> {
 
     const type = typeSerializer.deserialize(reader);
     const data = dataSerializer.deserialize(type, reader);
-
     return new SConstant(type as T, data as D);
   }
 
@@ -33,16 +33,22 @@ export class SConstant<D = unknown, T extends SType = SType> {
     return this.#data;
   }
 
-  toBytes(): Uint8Array {
+  get bytes(): Uint8Array {
+    if (this.#bytes) return this.#bytes;
+    return this.serialize();
+  }
+
+  serialize(): Uint8Array {
     const writer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     typeSerializer.serialize(this.type, writer);
     dataSerializer.serialize(this.data, this.type, writer);
 
-    return writer.toBytes();
+    this.#bytes = writer.toBytes();
+    return this.#bytes;
   }
 
   toHex(): string {
-    return hex.encode(this.toBytes());
+    return hex.encode(this.bytes);
   }
 }
 
