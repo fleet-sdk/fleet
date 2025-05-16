@@ -9,6 +9,7 @@ export const MAX_CONSTANT_LENGTH = 4096;
 export class SConstant<D = unknown, T extends SType = SType> {
   readonly #type: T;
   readonly #data: D;
+  #bytes?: Uint8Array;
 
   constructor(type: T, data: D) {
     this.#type = type;
@@ -21,8 +22,12 @@ export class SConstant<D = unknown, T extends SType = SType> {
 
     const type = typeSerializer.deserialize(reader);
     const data = dataSerializer.deserialize(type, reader);
+    return new SConstant(type as T, data as D).#withBytes(reader.bytes);
+  }
 
-    return new SConstant(type as T, data as D);
+  #withBytes(bytes: Uint8Array): SConstant<D, T> {
+    this.#bytes = bytes;
+    return this;
   }
 
   get type(): T {
@@ -33,16 +38,37 @@ export class SConstant<D = unknown, T extends SType = SType> {
     return this.#data;
   }
 
-  toBytes(): Uint8Array {
+  /**
+   * Returns the serialized representation of the current instance as a `Uint8Array`.
+   * If the bytes have already been computed and cached, returns the cached value.
+   * Otherwise, serializes the instance and returns the resulting bytes.
+   */
+  get bytes(): Uint8Array {
+    if (this.#bytes) return this.#bytes;
+    return this.serialize();
+  }
+
+  /**
+   * Serializes the current object into a `Uint8Array`.
+   */
+  serialize(): Uint8Array {
     const writer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
     typeSerializer.serialize(this.type, writer);
     dataSerializer.serialize(this.data, this.type, writer);
 
-    return writer.toBytes();
+    this.#bytes = writer.toBytes();
+    return this.#bytes;
+  }
+
+  /**
+   * @deprecated use `serialize` instead
+   */
+  toBytes(): Uint8Array {
+    return this.serialize();
   }
 
   toHex(): string {
-    return hex.encode(this.toBytes());
+    return hex.encode(this.serialize());
   }
 }
 
