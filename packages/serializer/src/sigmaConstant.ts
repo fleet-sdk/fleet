@@ -60,6 +60,13 @@ export class SConstant<D = unknown, T extends SType = SType> {
     return this.#bytes;
   }
 
+  /**
+   * @deprecated use `serialize` instead
+   */
+  toBytes(): Uint8Array {
+    return this.serialize();
+  }
+
   toHex(): string {
     return hex.encode(this.serialize());
   }
