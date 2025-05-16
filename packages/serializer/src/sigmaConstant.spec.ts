@@ -191,7 +191,6 @@ describe("bytes memoization", () => {
     const bytes1 = sconst.bytes; // memoize
     const bytes2 = sconst.bytes; // should return from cache
     expect(bytes1).to.be.equal(bytes2);
-
     expect(SConstant.prototype.serialize).toHaveBeenCalledTimes(1);
 
     const bytes3 = sconst.toBytes(); // should call serialize again and memoize
