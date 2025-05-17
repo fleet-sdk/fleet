@@ -98,6 +98,10 @@ export class SigmaByteReader {
     return hexToBigInt(hex.encode(this.readBytes(len)));
   }
 
+  readRemainingBytes(): Uint8Array {
+    return this.readBytes(this.#bytes.length - this.#cursor);
+  }
+
   /**
    * Returns bytes without advancing the cursor.
    */

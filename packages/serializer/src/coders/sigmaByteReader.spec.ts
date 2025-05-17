@@ -61,4 +61,13 @@ describe("Sigma byte reader", () => {
     expect(reader.match(u8a([0x04, 0x05, 0x06]), 3)).toBe(true);
     expect(reader.match(u8a([0x04, 0x05, 0x06, 0x07]), 3)).toBe(false);
   });
+
+  it("should read remaining bytes", () => {
+    const bytes = u8a([0x01, 0x02, 0x03, 0x04]);
+    const reader = new SigmaByteReader(bytes);
+
+    expect(reader.readByte()).toBe(0x01);
+    expect(reader.readRemainingBytes()).toEqual(u8a([0x02, 0x03, 0x04]));
+    expect(reader.readRemainingBytes()).toEqual(new Uint8Array(0)); // no bytes left
+  });
 });
