@@ -1,5 +1,6 @@
 import { Network } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
+import { ErgoTree$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import { ErgoAddress } from "./ergoAddress";
 import { ErgoTree } from "./ergoTree";
@@ -56,6 +57,25 @@ describe("ErgoTree model", () => {
     const treeHex = "100104c801d191a37300";
     const tree = new ErgoTree(treeHex);
     expect(tree.toAddress().ergoTree).to.be.equal(treeHex);
+  });
+});
+
+describe("constant segregation", () => {
+  it("Should parse constants", () => {
+    const treeHex = "18090104c801d191a37300";
+
+    const tree = new ErgoTree(treeHex);
+    expect(tree.constants).not.to.be.undefined;
+    expect(tree.constants).to.have.length(1);
+    expect(tree.constants?.[0].data).to.be.equal(100);
+
+    const sigmaJsTree = ErgoTree$.fromHex(treeHex);
+    expect(sigmaJsTree.constants()).not.to.be.undefined;
+    expect(sigmaJsTree.constants()).to.have.length(1);
+    expect(sigmaJsTree.constants()[0].data).to.be.equal(100);
+
+    // todo: move to template generation specific test
+    expect(sigmaJsTree.templateHex()).to.be.equal(hex.encode(tree.template));
   });
 });
 
