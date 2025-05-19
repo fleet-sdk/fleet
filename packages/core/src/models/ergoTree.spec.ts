@@ -2,6 +2,7 @@ import { Network } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { ErgoTree$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
+import { SInt } from "../constantSerializer";
 import { ErgoAddress } from "./ergoAddress";
 import { ErgoTree } from "./ergoTree";
 
@@ -60,7 +61,7 @@ describe("ErgoTree model", () => {
   });
 });
 
-describe("constant segregation", () => {
+describe("Constant handling", () => {
   it("Should parse constants", () => {
     const treeHex = "18090104c801d191a37300";
 
@@ -76,6 +77,23 @@ describe("constant segregation", () => {
 
     // todo: move to template generation specific test
     expect(sigmaJsTree.templateHex()).to.be.equal(hex.encode(tree.template));
+  });
+
+  it("should replace constant", () => {
+    const originalTreeHex = "100104c801d191a37300"; // sigmaProp(HEIGHT > 100)
+    const originalTree = new ErgoTree(originalTreeHex);
+
+    expect(originalTree.constants).to.have.length(1);
+    expect(originalTree.constants?.[0].data).to.be.equal(100);
+
+    originalTree.replaceConstant(0, SInt(200));
+    expect(originalTree.constants?.[0].data).to.be.equal(200);
+
+    const patchedTreeHex = originalTree.toHex();
+    const patchedTree = new ErgoTree(patchedTreeHex);
+    expect(originalTree.template).to.be.deep.equal(patchedTree.template);
+    expect(patchedTree.constants).to.have.length(1);
+    expect(patchedTree.constants?.[0].data).to.be.equal(200);
   });
 });
 

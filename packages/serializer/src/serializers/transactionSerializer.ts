@@ -20,10 +20,10 @@ export function serializeTransaction(transaction: Transaction): SigmaByteWriter 
   const tokenIds = getDistinctTokenIds(transaction.outputs);
 
   return new SigmaByteWriter(100_000)
-    .writeArray<Input>(transaction.inputs, (input, w) => writeInput(w, input))
-    .writeArray(transaction.dataInputs, (dataInput, w) => w.writeHex(dataInput.boxId))
-    .writeArray(tokenIds, (tokenId, w) => w.writeHex(tokenId))
-    .writeArray(transaction.outputs, (output, w) => serializeBox(output, w, tokenIds));
+    .writeArray<Input>(transaction.inputs, (w, input) => writeInput(w, input))
+    .writeArray(transaction.dataInputs, (w, dataInput) => w.writeHex(dataInput.boxId))
+    .writeArray(tokenIds, (w, tokenId) => w.writeHex(tokenId))
+    .writeArray(transaction.outputs, (w, output) => serializeBox(output, w, tokenIds));
 }
 
 function writeInput(writer: SigmaByteWriter, input: Input): void {
@@ -80,7 +80,7 @@ function writeExtension(
     values.push([key, value]);
   }
 
-  writer.writeArray(values, ([key, value], w) => w.writeUInt(Number(key)).writeHex(value));
+  writer.writeArray(values, (w, [key, value]) => w.writeUInt(Number(key)).writeHex(value));
 }
 
 function getDistinctTokenIds(outputs: readonly BoxCandidate<Amount>[]) {
@@ -128,7 +128,7 @@ function readInput(reader: SigmaByteReader): SignedInput | UnsignedInput {
  */
 function computeId(reader: SigmaByteReader, inputs: Input[]): string {
   const bytes = new SigmaByteWriter(reader.bytes.length)
-    .writeArray(inputs, (input, writer) => writeUnsignedInput(writer, input)) // write inputs as unsigned
+    .writeArray(inputs, (w, input) => writeUnsignedInput(w, input)) // write inputs as unsigned
     .writeBytes(reader.bytes.subarray(reader.cursor))
     .toBytes();
 
