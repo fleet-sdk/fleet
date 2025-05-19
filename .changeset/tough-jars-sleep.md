@@ -2,4 +2,4 @@
 "@fleet-sdk/compiler": patch
 ---
 
-🚨 BREAKING CHANGES 🚨: Replace `CompilerOutput` with `ErgoTree`
+Replace `CompilerOutput` with `ErgoTree`

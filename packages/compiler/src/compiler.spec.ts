@@ -96,9 +96,9 @@ describe("ErgoScript Compiler", () => {
     expect(tree.version).to.be.equal(tv.options.version);
 
     if (tv.options.version === 1) {
-      expect(tree.hasSizeInfo).to.be.true;
+      expect(tree.hasSize).to.be.true;
     } else if (tv.options.version === 0) {
-      expect(tree.hasSizeInfo).to.be.equal(tv.options.includeSize);
+      expect(tree.hasSize).to.be.equal(tv.options.includeSize);
     }
 
     if (tv.options.segregateConstants) {
@@ -137,7 +137,7 @@ describe("ErgoScript Compiler", () => {
     expect(tree.toHex()).to.be.equal("19090104c801d191a37300");
     expect(tree.hasSegregatedConstants).to.be.equal(segregateConstants);
     expect(tree.version).to.be.equal(version);
-    expect(tree.hasSizeInfo).to.be.equal(
+    expect(tree.hasSize).to.be.equal(
       version > 0 || (version === 0 && compilerDefaults.includeSize)
     );
   });
