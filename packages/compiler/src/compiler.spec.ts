@@ -89,22 +89,22 @@ describe("ErgoScript Compiler", () => {
     const tree = compile(tv.script, tv.options);
 
     expect(tree.toHex()).to.be.equal(tv.tree);
-    expect(tree.template.toHex()).to.be.equal(tv.template);
-    expect(hex.encode(tree.template.toBytes())).to.be.equal(tv.template);
+    expect(hex.encode(tree.template)).to.be.equal(tv.template);
+    expect(hex.encode(tree.template)).to.be.equal(tv.template);
 
     expect(tree.hasSegregatedConstants).to.be.equal(tv.options.segregateConstants);
     expect(tree.version).to.be.equal(tv.options.version);
 
     if (tv.options.version === 1) {
-      expect(tree.hasSize).to.be.true;
+      expect(tree.hasSizeInfo).to.be.true;
     } else if (tv.options.version === 0) {
-      expect(tree.hasSize).to.be.equal(tv.options.includeSize);
+      expect(tree.hasSizeInfo).to.be.equal(tv.options.includeSize);
     }
 
     if (tv.options.segregateConstants) {
       expect(tree.constants).not.to.be.empty;
     } else {
-      expect(tree.constants).to.be.empty;
+      expect(tree.constants).to.be.undefined;
     }
   });
 
@@ -137,7 +137,7 @@ describe("ErgoScript Compiler", () => {
     expect(tree.toHex()).to.be.equal("19090104c801d191a37300");
     expect(tree.hasSegregatedConstants).to.be.equal(segregateConstants);
     expect(tree.version).to.be.equal(version);
-    expect(tree.hasSize).to.be.equal(
+    expect(tree.hasSizeInfo).to.be.equal(
       version > 0 || (version === 0 && compilerDefaults.includeSize)
     );
   });
