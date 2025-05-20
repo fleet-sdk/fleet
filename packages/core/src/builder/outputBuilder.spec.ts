@@ -70,6 +70,21 @@ describe("Constructor", () => {
     expect(builder.address).toBe(ergoAddress);
   });
 
+  it("Should construct from a box", () => {
+    const box = regularBoxes[1];
+    const builder = OutputBuilder.from(box);
+
+    expect(builder.value).toBe(box.value);
+    expect(builder.ergoTree).toBe(box.ergoTree);
+    expect(builder.creationHeight).to.be.undefined; // should not copy creationHeight
+
+    const builded = builder.setCreationHeight(box.creationHeight).build();
+    expect(builded.value).toBe(box.value);
+    expect(builded.ergoTree).toBe(box.ergoTree);
+    expect(builded.assets).to.be.deep.equal(box.assets);
+    expect(builded.additionalRegisters).to.be.deep.equal(box.additionalRegisters);
+  });
+
   it("Should fail if value is less than or equal to zero", () => {
     expect(() => {
       new OutputBuilder(0n, address, height);

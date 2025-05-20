@@ -23,7 +23,7 @@ import {
 import { utf8 } from "@fleet-sdk/crypto";
 import { SByte, SColl, type SConstant, estimateBoxSize } from "@fleet-sdk/serializer";
 import { InvalidRegistersPacking, UndefinedCreationHeight } from "../errors";
-import { ErgoAddress, ErgoTree } from "../models";
+import { ErgoAddress, type ErgoBox, ErgoTree, type ErgoUnsignedInput } from "../models";
 import { type TokenAddOptions, TokensCollection } from "../models/collections/tokensCollection";
 import { ErgoBoxCandidate } from "../models/ergoBoxCandidate";
 
@@ -103,6 +103,12 @@ export class OutputBuilder {
 
   get flags(): TransactionOutputFlags {
     return this.#flags;
+  }
+
+  static from(box: Box<Amount> | ErgoBoxCandidate | ErgoBox | ErgoUnsignedInput) {
+    return new OutputBuilder(box.value, box.ergoTree)
+      .addTokens(box.assets)
+      .setAdditionalRegisters(box.additionalRegisters);
   }
 
   setValue(value: Amount | BoxValueEstimationCallback): OutputBuilder {
