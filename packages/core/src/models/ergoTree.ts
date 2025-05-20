@@ -17,7 +17,7 @@ export class ErgoTree {
 
   #byteReader?: SigmaByteReader;
   #root!: Uint8Array;
-  #constants!: SConstant[];
+  #constants: SConstant[] = [];
 
   constructor(input: HexString | Uint8Array, network?: Network) {
     this.#byteReader = new SigmaByteReader(input);
@@ -46,13 +46,13 @@ export class ErgoTree {
     return (this.#header & ergoTreeHeaderFlags.sizeInclusion) !== 0;
   }
 
-  get constants(): SConstant[] | undefined {
-    if (!this.hasSegregatedConstants) return undefined;
-    return this.#parse().#constants;
+  get constants(): ReadonlyArray<SConstant> {
+    if (!this.hasSegregatedConstants) return [];
+    return this.#parse().#constants.slice();
   }
 
-  get template(): Uint8Array {
-    return this.#parse().#root;
+  get template(): Readonly<Uint8Array> {
+    return this.#parse().#root.slice();
   }
 
   get #parsed(): boolean {
@@ -92,24 +92,24 @@ export class ErgoTree {
   serialize(): Uint8Array {
     if (this.#byteReader) return this.#byteReader.bytes;
 
-    const constantsSize = this.hasSegregatedConstants
-      ? estimateVLQSize(this.#constants.length) +
-        this.#constants.reduce((acc, constant) => acc + constant.bytes.length, 0)
-      : 0;
+    const segregatedFlag = this.hasSegregatedConstants;
+    const sizeFlag = this.hasSize;
+
+    let constantsSize = 0;
+    if (segregatedFlag) {
+      constantsSize =
+        estimateVLQSize(this.#constants.length) +
+        this.#constants.reduce((acc, constant) => acc + constant.bytes.length, 0);
+    }
 
     const treeSize = constantsSize + this.#root.length;
     let totalSize = HEADER_SIZE + treeSize;
-    if (this.hasSize) totalSize += estimateVLQSize(totalSize);
+    if (sizeFlag) totalSize += estimateVLQSize(totalSize);
 
     const writer = new SigmaByteWriter(totalSize).write(this.#header);
-    if (this.hasSize) {
-      writer.writeUInt(treeSize);
-    }
-
-    return writer
-      .writeArray(this.#constants, (w, constant) => w.writeBytes(constant.bytes))
-      .writeBytes(this.#root)
-      .toBytes();
+    if (sizeFlag) writer.writeUInt(treeSize);
+    if (segregatedFlag) writer.writeArray(this.#constants, (w, c) => w.writeBytes(c.bytes));
+    return writer.writeBytes(this.#root).toBytes();
   }
 
   #parse(): ErgoTree {
