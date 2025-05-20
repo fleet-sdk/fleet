@@ -97,8 +97,8 @@ export class ErgoTree {
         this.#constants.reduce((acc, constant) => acc + constant.bytes.length, 0)
       : 0;
 
-    const treeSize = constantsSize + this.#root.length + this.#root.length;
-    let totalSize = HEADER_SIZE + constantsSize + this.#root.length;
+    const treeSize = constantsSize + this.#root.length;
+    let totalSize = HEADER_SIZE + treeSize;
     if (this.hasSize) totalSize += estimateVLQSize(totalSize);
 
     const writer = new SigmaByteWriter(totalSize).write(this.#header);

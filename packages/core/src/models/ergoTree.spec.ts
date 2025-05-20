@@ -1,5 +1,6 @@
 import { Network } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
+import { SigmaByteReader, estimateVLQSize } from "@fleet-sdk/serializer";
 import { ErgoTree$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import { SInt } from "../constantSerializer";
@@ -94,6 +95,40 @@ describe("Constant handling", () => {
     expect(originalTree.template).to.be.deep.equal(patchedTree.template);
     expect(patchedTree.constants).to.have.length(1);
     expect(patchedTree.constants?.[0].data).to.be.equal(200);
+  });
+
+  it("Should replace constant with a bigger one", () => {
+    const originalTreeHex = "18090104c801d191a37300"; // sigmaProp(HEIGHT > 100), 100 needs 1 byte
+    const originalTree = new ErgoTree(originalTreeHex);
+    expect(originalTree.hasSize).to.be.true;
+    expect(originalTree.constants).to.have.length(1);
+    expect(originalTree.constants?.[0].data).to.be.equal(100);
+
+    let reader = new SigmaByteReader(originalTreeHex);
+    reader.readByte(); // skip header
+    let size = reader.readUInt();
+    const originalTreeSize = 1 + estimateVLQSize(size) + size; // header + vlq size + body
+    expect(originalTree.bytes.length).to.be.equal(originalTreeSize); // header + vlq size + body
+
+    originalTree.replaceConstant(0, SInt(20000)); // 20000 needs 3 bytes
+    expect(originalTree.constants?.[0].data).to.be.equal(20000);
+
+    const patchedTreeHex = originalTree.toHex();
+    const patchedTree = new ErgoTree(patchedTreeHex);
+    expect(originalTree.template).to.be.deep.equal(patchedTree.template);
+    expect(patchedTree.constants).to.have.length(1);
+    expect(patchedTree.constants?.[0].data).to.be.equal(20000);
+
+    // check if the size is updated
+    reader = new SigmaByteReader(patchedTreeHex);
+    reader.readByte(); // skip header
+    size = reader.readUInt();
+    const patchedTreeSize = 1 + estimateVLQSize(size) + size; // header + vlq size + body
+    expect(patchedTree.bytes.length).to.be.equal(patchedTreeSize); // header + vlq size + body
+    expect(patchedTreeSize).to.be.greaterThan(
+      originalTreeSize,
+      "original tree size should be smaller"
+    );
   });
 });
 
