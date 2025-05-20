@@ -20,9 +20,10 @@ export class SConstant<D = unknown, T extends SType = SType> {
     const reader = bytes instanceof SigmaByteReader ? bytes : new SigmaByteReader(bytes);
     if (reader.isEmpty) throw new Error("Empty constant bytes.");
 
+    const start = reader.cursor;
     const type = typeSerializer.deserialize(reader);
     const data = dataSerializer.deserialize(type, reader);
-    return new SConstant(type as T, data as D).#withBytes(reader.bytes);
+    return new SConstant(type as T, data as D).#withBytes(reader.bytes.slice(start, reader.cursor));
   }
 
   #withBytes(bytes: Uint8Array): SConstant<D, T> {

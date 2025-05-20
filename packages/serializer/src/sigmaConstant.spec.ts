@@ -17,7 +17,7 @@ import {
   sigmaPropVectors,
   tupleTestVectors
 } from "./_test-vectors/constantVectors";
-import { SigmaByteWriter } from "./coders";
+import { SigmaByteReader, SigmaByteWriter } from "./coders";
 import {
   MAX_I8,
   MAX_I16,
@@ -190,13 +190,30 @@ describe("bytes memoization", () => {
 
     const bytes1 = sconst.bytes; // memoize
     const bytes2 = sconst.bytes; // should return from cache
-    expect(bytes1).to.be.equal(bytes2);
+    expect(bytes1).to.be.deep.equal(bytes2);
     expect(SConstant.prototype.serialize).toHaveBeenCalledTimes(1);
 
     const bytes3 = sconst.toBytes(); // should call serialize again and memoize
     const bytes4 = sconst.bytes; // should return from cache
-    expect(bytes3).to.be.equal(bytes4);
+    expect(bytes3).to.be.deep.equal(bytes4);
     expect(SConstant.prototype.serialize).toHaveBeenCalledTimes(2);
+  });
+
+  it("should save right bytes when reading from a SigmaByteReader", () => {
+    const reader = new SigmaByteReader(
+      new SigmaByteWriter(1000)
+        .writeBytes(SBigInt(100n).serialize())
+        .writeBytes(SBool(true).serialize())
+        .toBytes()
+    );
+
+    const bigint = SConstant.from(reader);
+    expect(bigint.data).to.be.equal(100n);
+    expect(bigint.bytes).to.be.deep.equal(SBigInt(100n).serialize());
+
+    const bool = SConstant.from(reader);
+    expect(bool.data).to.be.equal(true);
+    expect(bool.bytes).to.be.deep.equal(SBool(true).serialize());
   });
 });
 
