@@ -6,6 +6,7 @@ import {
   isEmpty,
   isHex
 } from "@fleet-sdk/common";
+import { ErgoTree } from "@fleet-sdk/core";
 import { SConstant } from "@fleet-sdk/serializer";
 import {
   SigmaCompiler$,
@@ -13,7 +14,6 @@ import {
   Value,
   Value$
 } from "sigmastate-js/main";
-import { CompilerOutput } from "./compilerOutput";
 
 export type NamedConstantsMap = {
   [key: string]: string | Value | SConstant;
@@ -74,7 +74,7 @@ export const compilerDefaults: Required<CompilerOptions> = {
  * @param options - Optional compiler options to customize the compilation process.
  * @returns The output of the compilation process.
  */
-export function compile(script: string, options?: CompilerOptions): CompilerOutput {
+export function compile(script: string, options?: CompilerOptions): ErgoTree {
   const opt = ensureDefaults(options, compilerDefaults);
   assert(opt.version < 8, `Version should be lower than 8, got ${opt.version}`);
 
@@ -86,14 +86,13 @@ export function compile(script: string, options?: CompilerOptions): CompilerOutp
   const compiler =
     opt.network === "mainnet" ? SigmaCompiler$.forMainnet() : SigmaCompiler$.forTestnet();
 
-  const tree = compiler.compile(
-    parseNamedConstantsMap(opt.map),
-    opt.segregateConstants,
-    headerFlags,
-    script
+  const output = Uint8Array.from(
+    compiler
+      .compile(parseNamedConstantsMap(opt.map), opt.segregateConstants, headerFlags, script)
+      .bytes().u
   );
 
-  return new CompilerOutput(tree, opt.network === "mainnet" ? Network.Mainnet : Network.Testnet);
+  return new ErgoTree(output, opt.network === "mainnet" ? Network.Mainnet : Network.Testnet);
 }
 
 export function parseNamedConstantsMap(map: NamedConstantsMap): SigmaCompilerNamedConstantsMap {

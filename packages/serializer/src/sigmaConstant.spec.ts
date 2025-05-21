@@ -2,7 +2,7 @@ import { type Box, ensureBigInt } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import fc from "fast-check";
 import { Value$ } from "sigmastate-js/main";
-import { describe, expect, it, test } from "vitest";
+import { describe, expect, it, test, vitest } from "vitest";
 import { SPair } from "../dist";
 import {
   bigintVectors,
@@ -17,7 +17,7 @@ import {
   sigmaPropVectors,
   tupleTestVectors
 } from "./_test-vectors/constantVectors";
-import { SigmaByteWriter } from "./coders";
+import { SigmaByteReader, SigmaByteWriter } from "./coders";
 import {
   MAX_I8,
   MAX_I16,
@@ -163,25 +163,57 @@ describe("SColl serialization and parsing", () => {
 
 describe("stypeof", () => {
   it("Should return the type of a valid constant", () => {
-    expect(stypeof(SBool(true).toBytes())).to.be.instanceOf(SBool);
-    expect(stypeof(SByte(1).toBytes())).to.be.instanceOf(SByte);
-    expect(stypeof(SShort(1).toBytes())).to.be.instanceOf(SShort);
-    expect(stypeof(SInt(1).toBytes())).to.be.instanceOf(SInt);
-    expect(stypeof(SLong(1n).toBytes())).to.be.instanceOf(SLong);
-    expect(stypeof(SBigInt(1n).toBytes())).to.be.instanceOf(SBigInt);
-    expect(stypeof(SGroupElement(hex.decode("deadbeef")).toBytes())).to.be.instanceOf(
-      SGroupElement
-    );
-    expect(stypeof(SSigmaProp(SGroupElement("deadbeef")).toBytes())).to.be.instanceOf(SSigmaProp);
-    expect(stypeof(SColl(SByte, [1, 2, 3]).toBytes())).to.be.instanceOf(SColl);
-    expect(stypeof(STuple(SByte(1), SByte(2)).toBytes())).to.be.instanceOf(STupleType);
-    expect(stypeof(SUnit().toBytes())).to.be.instanceOf(SUnit);
+    expect(stypeof(SBool(true).bytes)).to.be.instanceOf(SBool);
+    expect(stypeof(SByte(1).bytes)).to.be.instanceOf(SByte);
+    expect(stypeof(SShort(1).bytes)).to.be.instanceOf(SShort);
+    expect(stypeof(SInt(1).bytes)).to.be.instanceOf(SInt);
+    expect(stypeof(SLong(1n).bytes)).to.be.instanceOf(SLong);
+    expect(stypeof(SBigInt(1n).bytes)).to.be.instanceOf(SBigInt);
+    expect(stypeof(SGroupElement(hex.decode("deadbeef")).bytes)).to.be.instanceOf(SGroupElement);
+    expect(stypeof(SSigmaProp(SGroupElement("deadbeef")).bytes)).to.be.instanceOf(SSigmaProp);
+    expect(stypeof(SColl(SByte, [1, 2, 3]).bytes)).to.be.instanceOf(SColl);
+    expect(stypeof(STuple(SByte(1), SByte(2)).bytes)).to.be.instanceOf(STupleType);
+    expect(stypeof(SUnit().bytes)).to.be.instanceOf(SUnit);
   });
 
   it("Should return SUnit for empty bytes", () => {
     expect(stypeof(Uint8Array.from([]))).to.be.equal(undefined);
     expect(stypeof(undefined)).to.be.equal(undefined);
     expect(stypeof("deadbeef")).to.be.equal(undefined);
+  });
+});
+
+describe("bytes memoization", () => {
+  it("Should memoize bytes", () => {
+    vitest.spyOn(SConstant.prototype, "serialize");
+    const sconst = SInt(1);
+
+    const bytes1 = sconst.bytes; // memoize
+    const bytes2 = sconst.bytes; // should return from cache
+    expect(bytes1).to.be.deep.equal(bytes2);
+    expect(SConstant.prototype.serialize).toHaveBeenCalledTimes(1);
+
+    const bytes3 = sconst.toBytes(); // should call serialize again and memoize
+    const bytes4 = sconst.bytes; // should return from cache
+    expect(bytes3).to.be.deep.equal(bytes4);
+    expect(SConstant.prototype.serialize).toHaveBeenCalledTimes(2);
+  });
+
+  it("should save right bytes when reading from a SigmaByteReader", () => {
+    const reader = new SigmaByteReader(
+      new SigmaByteWriter(1000)
+        .writeBytes(SBigInt(100n).serialize())
+        .writeBytes(SBool(true).serialize())
+        .toBytes()
+    );
+
+    const bigint = SConstant.from(reader);
+    expect(bigint.data).to.be.equal(100n);
+    expect(bigint.bytes).to.be.deep.equal(SBigInt(100n).serialize());
+
+    const bool = SConstant.from(reader);
+    expect(bool.data).to.be.equal(true);
+    expect(bool.bytes).to.be.deep.equal(SBool(true).serialize());
   });
 });
 
@@ -240,14 +272,14 @@ describe("Not implemented types", () => {
       coerce: (val: unknown) => val
     } as unknown as SGroupElementType;
 
-    expect(() => new SConstant(unimplementedType, "").toBytes()).to.throw(
+    expect(() => new SConstant(unimplementedType, "").bytes).to.throw(
       "Serialization error: type not implemented."
     );
 
     // not implemented SSigmaProp expression
-    expect(() =>
-      SSigmaProp(new SConstant(unimplementedType, Uint8Array.from([0]))).toBytes()
-    ).to.throw("Serialization error: SigmaProp operation not implemented.");
+    expect(() => SSigmaProp(new SConstant(unimplementedType, Uint8Array.from([0]))).bytes).to.throw(
+      "Serialization error: SigmaProp operation not implemented."
+    );
 
     // not implemented SSigmaProp expression
     expect(() => {

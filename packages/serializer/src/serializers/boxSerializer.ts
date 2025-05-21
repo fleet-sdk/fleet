@@ -51,11 +51,11 @@ function writeTokens(
   tokenIds?: string[]
 ): void {
   if (tokenIds) {
-    writer.writeArray(tokens, (token, w) =>
+    writer.writeArray(tokens, (w, token) =>
       w.writeUInt(tokenIds.indexOf(token.tokenId)).writeBigUInt(ensureBigInt(token.amount))
     );
   } else {
-    writer.writeArray(tokens, (token, w) =>
+    writer.writeArray(tokens, (w, token) =>
       w.writeHex(token.tokenId).writeBigUInt(ensureBigInt(token.amount))
     );
   }
@@ -72,7 +72,7 @@ function writeRegisters(writer: SigmaByteWriter, registers: NonMandatoryRegister
     values.push(value);
   }
 
-  writer.writeArray(values, (value, w) => w.writeHex(value));
+  writer.writeArray(values, (w, value) => w.writeHex(value));
 }
 
 /**

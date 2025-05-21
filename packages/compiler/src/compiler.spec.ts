@@ -19,6 +19,13 @@ const compilerTestVectors: {
 }[] = [
   {
     name: "v0 - Segregated constants",
+    script: "sigmaProp(HEIGHT > 100 && HEIGHT < 200)",
+    tree: "100204c801049003d1ed91a373008fa37301",
+    template: "d1ed91a373008fa37301",
+    options: { version: 0, segregateConstants: true, includeSize: false }
+  },
+  {
+    name: "v0 - Segregated constants",
     script: "sigmaProp(HEIGHT > 100)",
     tree: "100104c801d191a37300",
     template: "d191a37300",
@@ -89,8 +96,8 @@ describe("ErgoScript Compiler", () => {
     const tree = compile(tv.script, tv.options);
 
     expect(tree.toHex()).to.be.equal(tv.tree);
-    expect(tree.template.toHex()).to.be.equal(tv.template);
-    expect(hex.encode(tree.template.toBytes())).to.be.equal(tv.template);
+    expect(hex.encode(tree.template)).to.be.equal(tv.template);
+    expect(hex.encode(tree.template)).to.be.equal(tv.template);
 
     expect(tree.hasSegregatedConstants).to.be.equal(tv.options.segregateConstants);
     expect(tree.version).to.be.equal(tv.options.version);

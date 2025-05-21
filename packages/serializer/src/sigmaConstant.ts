@@ -1,14 +1,16 @@
 import { type ByteInput, hex } from "@fleet-sdk/crypto";
-import { SigmaByteReader, SigmaByteWriter } from "./coders";
+import { SigmaByteReader, SigmaByteWriter, estimateVLQSize } from "./coders";
 import { dataSerializer } from "./serializers/dataSerializer";
 import { typeSerializer } from "./serializers/typeSerializer";
-import type { SType } from "./types";
+import type { SCollType, SType } from "./types";
+import { descriptors, isColl, isTuple } from "./types/descriptors";
 
 export const MAX_CONSTANT_LENGTH = 4096;
 
 export class SConstant<D = unknown, T extends SType = SType> {
   readonly #type: T;
   readonly #data: D;
+  #bytes?: Uint8Array;
 
   constructor(type: T, data: D) {
     this.#type = type;
@@ -19,10 +21,15 @@ export class SConstant<D = unknown, T extends SType = SType> {
     const reader = bytes instanceof SigmaByteReader ? bytes : new SigmaByteReader(bytes);
     if (reader.isEmpty) throw new Error("Empty constant bytes.");
 
+    const start = reader.cursor;
     const type = typeSerializer.deserialize(reader);
     const data = dataSerializer.deserialize(type, reader);
+    return new SConstant(type as T, data as D).#withBytes(reader.bytes.slice(start, reader.cursor));
+  }
 
-    return new SConstant(type as T, data as D);
+  #withBytes(bytes: Uint8Array): SConstant<D, T> {
+    this.#bytes = bytes;
+    return this;
   }
 
   get type(): T {
@@ -33,17 +40,66 @@ export class SConstant<D = unknown, T extends SType = SType> {
     return this.#data;
   }
 
-  toBytes(): Uint8Array {
-    const writer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
+  /**
+   * Returns the serialized representation of the current instance as a `Uint8Array`.
+   * If the bytes have already been computed and cached, returns the cached value.
+   * Otherwise, serializes the instance and returns the resulting bytes.
+   */
+  get bytes(): Uint8Array {
+    if (this.#bytes) return this.#bytes;
+    return this.serialize();
+  }
+
+  /**
+   * Serializes the current object into a `Uint8Array`.
+   */
+  serialize(): Uint8Array {
+    const writer = new SigmaByteWriter(guessConstantBytesSize(this.type, this.data));
     typeSerializer.serialize(this.type, writer);
     dataSerializer.serialize(this.data, this.type, writer);
 
-    return writer.toBytes();
+    this.#bytes = writer.toBytes();
+    return this.#bytes;
+  }
+
+  /**
+   * @deprecated use `serialize` instead
+   */
+  toBytes(): Uint8Array {
+    return this.serialize();
   }
 
   toHex(): string {
-    return hex.encode(this.toBytes());
+    return hex.encode(this.serialize());
   }
+}
+
+function guessConstantBytesSize(type: SType, data?: unknown): number {
+  const dataSize = 1;
+
+  // left some safe room for integer types
+  if (type.code === descriptors.short.code) return dataSize + 8;
+  if (type.code === descriptors.int.code) return dataSize + 16;
+  if (type.code === descriptors.long.code) return dataSize + 32;
+  if (type.code === descriptors.bigInt.code) return dataSize + 64;
+
+  if (type.code === descriptors.bool.code) return dataSize + 1;
+  if (type.code === descriptors.byte.code) return dataSize + 1;
+  if (type.code === descriptors.unit.code) return dataSize + 0;
+  if (type.code === descriptors.groupElement.code) return dataSize + 33;
+  if (type.code === descriptors.sigmaProp.code) return dataSize + 35; // only prove DLog is implemented, so it's safe to assume 35 bytes
+
+  // handle collections, but avoid complex types
+  if (isColl(type) && !isColl(type.elementsType) && !isTuple(type.elementsType)) {
+    const len = (data as Uint8Array).length;
+    return (
+      dataSize +
+      estimateVLQSize(len) +
+      guessConstantBytesSize((type as SCollType).elementsType) * len
+    );
+  }
+
+  return MAX_CONSTANT_LENGTH;
 }
 
 /**
