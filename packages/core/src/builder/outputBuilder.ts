@@ -166,12 +166,10 @@ export class OutputBuilder {
     return this;
   }
 
-  setAdditionalRegisters<T extends AdditionalRegistersInput>(
-    registers: SequentialNonMandatoryRegisters<T>
-  ): OutputBuilder {
+  setAdditionalRegisters(registers: NonMandatoryRegisters<ConstantInput>): OutputBuilder {
     const hexRegisters: NonMandatoryRegisters = {};
     for (const key in registers) {
-      const r = registers[key] as ConstantInput;
+      const r = registers[key as keyof NonMandatoryRegisters];
       if (!r) continue;
 
       hexRegisters[key as keyof NonMandatoryRegisters] = typeof r === "string" ? r : r.toHex();
@@ -237,8 +235,6 @@ export class OutputBuilder {
 
 export type ConstantInput = SConstant | HexString;
 
-export type AdditionalRegistersInput = NonMandatoryRegisters<ConstantInput>;
-
 export type OnlyR4Register<T = HexString> = {
   R4: T;
 } & NonMandatoryRegisters<T>;
@@ -277,19 +273,3 @@ export type R4ToR9Registers<T = HexString> = {
   R8: T;
   R9: T;
 } & NonMandatoryRegisters<T>;
-
-export type SequentialNonMandatoryRegisters<T extends AdditionalRegistersInput> = T extends {
-  R9: ConstantInput;
-}
-  ? R4ToR9Registers<ConstantInput>
-  : T extends { R8: ConstantInput }
-    ? R4ToR8Registers<ConstantInput>
-    : T extends { R7: ConstantInput }
-      ? R4ToR7Registers<ConstantInput>
-      : T extends { R6: ConstantInput }
-        ? R4ToR6Registers<ConstantInput>
-        : T extends { R5: ConstantInput }
-          ? R4ToR5Registers<ConstantInput>
-          : T extends { R4: ConstantInput }
-            ? OnlyR4Register<ConstantInput>
-            : T;
