@@ -1,5 +1,4 @@
-import { Network } from "@fleet-sdk/common";
-import { FEE_CONTRACT } from "../../builder";
+import { FEE_CONTRACT, Network } from "@fleet-sdk/common";
 
 export const FEE_MAINNET_ADDRESS_TV =
   "2iHkR7CWvD1R4j1yZg5bkeDRQavjAaVPeTDFGGLZduHyfWMuYpmhHocX8GJoaieTx78FntzJbCBVL6rf96ocJoZdmWBL2fci7NqWgAirppPQmZ7fN9V6z13Ay6brPriBKYqLp1bT2Fk4FkFLCfdPpe";
