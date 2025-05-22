@@ -167,16 +167,12 @@ export class OutputBuilder {
   }
 
   setAdditionalRegisters(registers: NonMandatoryRegisters<ConstantInput>): OutputBuilder {
-    const hexRegisters: NonMandatoryRegisters = {};
     for (const key in registers) {
       const r = registers[key as keyof NonMandatoryRegisters];
       if (!r) continue;
 
-      hexRegisters[key as keyof NonMandatoryRegisters] = typeof r === "string" ? r : r.toHex();
+      this.#registers[key as keyof NonMandatoryRegisters] = typeof r === "string" ? r : r.toHex();
     }
-
-    if (!areRegistersDenselyPacked(hexRegisters)) throw new InvalidRegistersPacking();
-    this.#registers = hexRegisters;
 
     return this;
   }
@@ -187,8 +183,9 @@ export class OutputBuilder {
   }
 
   build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): ErgoBoxCandidate {
-    let tokens: TokenAmount<bigint>[];
+    if (!areRegistersDenselyPacked(this.#registers)) throw new InvalidRegistersPacking();
 
+    let tokens: TokenAmount<bigint>[];
     if (this.minting) {
       const mintingTokenId = transactionInputs ? transactionInputs[0]?.boxId : undefined;
       tokens = this.assets.toArray(mintingTokenId);

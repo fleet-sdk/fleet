@@ -293,6 +293,18 @@ describe("Additional registers", () => {
     builder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeHex, height);
   });
 
+  it("should merge additional registers", () => {
+    builder.setAdditionalRegisters({ R4: "0101", R6: "0102" });
+    expect(builder.additionalRegisters).toEqual({ R4: "0101", R6: "0102" });
+
+    expect(() => builder.build()).toThrow(InvalidRegistersPacking); // R5 is missing
+
+    builder.setAdditionalRegisters({ R5: "0103" });
+    expect(builder.additionalRegisters).toEqual({ R4: "0101", R5: "0103", R6: "0102" });
+
+    expect(() => builder.build()).not.toThrow();
+  });
+
   it("Should bind registers properly", () => {
     builder.setAdditionalRegisters({
       R4: "0580c0fc82aa02",
@@ -335,28 +347,37 @@ describe("Additional registers", () => {
    * R9 without adding register R4 to R8, for example.
    */
   it("Should throw if some register is skipped", () => {
+    let outputBuilder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeHex, height);
     // R4 not included
     expect(() => {
-      builder.setAdditionalRegisters({
-        R5: "0580c0fc82aa02"
-      } as NonMandatoryRegisters);
+      outputBuilder
+        .setAdditionalRegisters({
+          R5: "0580c0fc82aa02"
+        } as NonMandatoryRegisters)
+        .build();
     }).toThrow(InvalidRegistersPacking);
 
+    outputBuilder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeHex, height);
     // R5 not included
     expect(() => {
-      builder.setAdditionalRegisters({
-        R4: "0580c0fc82aa02",
-        R6: "0580c0fc82aa02"
-      } as NonMandatoryRegisters);
+      outputBuilder
+        .setAdditionalRegisters({
+          R4: "0580c0fc82aa02",
+          R6: "0580c0fc82aa02"
+        } as NonMandatoryRegisters)
+        .build();
     }).toThrow(InvalidRegistersPacking);
 
+    outputBuilder = new OutputBuilder(SAFE_MIN_BOX_VALUE, ergoTreeHex, height);
     // R5 explicitly set to undefined
     expect(() => {
-      builder.setAdditionalRegisters({
-        R4: "0580c0fc82aa02",
-        R5: undefined,
-        R6: "0580c0fc82aa02"
-      } as NonMandatoryRegisters);
+      outputBuilder
+        .setAdditionalRegisters({
+          R4: "0580c0fc82aa02",
+          R5: undefined,
+          R6: "0580c0fc82aa02"
+        } as NonMandatoryRegisters)
+        .build();
     }).toThrow(InvalidRegistersPacking);
   });
 });
