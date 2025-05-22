@@ -31,14 +31,10 @@ export function BabelSwapPlugin(babelBox: Box<Amount>, token: TokenAmount<Amount
 
   return ({ addInputs, addOutputs }) => {
     const outputsLength = addOutputs(
-      new OutputBuilder(changeAmount, input.ergoTree)
-        .addTokens(input.assets)
+      OutputBuilder.from(input)
+        .setValue(changeAmount)
         .addTokens(token)
-        .setAdditionalRegisters({
-          R4: input.additionalRegisters.R4,
-          R5: input.additionalRegisters.R5,
-          R6: SColl(SByte, input.boxId)
-        })
+        .setAdditionalRegisters({ R6: SColl(SByte, input.boxId) })
     );
 
     addInputs(input.setContextExtension({ 0: SInt(outputsLength - 1) }));
