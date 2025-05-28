@@ -1,5 +1,5 @@
 ---
-"@fleet-sdk/compiler": patch
+"@fleet-sdk/common": patch
 "@fleet-sdk/serializer": patch
 ---
 
