@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.9.1
+
+### Patch Changes
+
+- 59018ee: No relevant changes
+
 ## 0.8.5
 
 ### Patch Changes
