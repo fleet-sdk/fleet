@@ -1,5 +1,19 @@
 # @fleet-sdk/core
 
+## 0.9.0
+
+### Minor Changes
+
+- eeb2f66: Add `ErgoTree` template extraction
+- eeb2f66: Add `ErgoTree` constant replacement
+
+### Patch Changes
+
+- a33850a: Add `OutputBuilder` creation from `Box` object
+- Updated dependencies [c558227]
+- Updated dependencies [ed7e44c]
+  - @fleet-sdk/serializer@0.9.0
+
 ## 0.8.5
 
 ### Patch Changes

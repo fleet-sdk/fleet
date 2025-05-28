@@ -1,5 +1,12 @@
 # @fleet-sdk/serializer
 
+## 0.9.0
+
+### Patch Changes
+
+- c558227: Memoize `SConstant` bytes for efficient re-encoding
+- ed7e44c: Add `SigmaByteReader#readRemainingBytes` method
+
 ## 0.8.5
 
 ### Patch Changes
