@@ -1,5 +1,14 @@
 # @fleet-sdk/serializer
 
+## 0.9.1
+
+### Patch Changes
+
+- 59018ee: No relevant changes
+- Updated dependencies [59018ee]
+  - @fleet-sdk/common@0.9.1
+  - @fleet-sdk/crypto@0.9.1
+
 ## 0.9.0
 
 ### Patch Changes
