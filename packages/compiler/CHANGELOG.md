@@ -1,5 +1,11 @@
 # @fleet-sdk/compiler
 
+## 0.9.2
+
+### Patch Changes
+
+- b0ce84a: Improve compatibility with Sigma.JS fullOpt build
+
 ## 0.9.1
 
 ### Patch Changes

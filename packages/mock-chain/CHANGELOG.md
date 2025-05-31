@@ -1,5 +1,11 @@
 # @fleet-sdk/mock-chain
 
+## 0.9.2
+
+### Patch Changes
+
+- 23f528e: Assume `height = 1` as new default in the `MockChain` constructor
+
 ## 0.9.1
 
 ### Patch Changes
