@@ -54,7 +54,7 @@ export class MockChain {
   constructor(heightOrOptions?: number | MockChainOptions) {
     const options =
       !heightOrOptions || typeof heightOrOptions === "number"
-        ? { height: heightOrOptions ?? 0 }
+        ? { height: heightOrOptions ?? 1 }
         : heightOrOptions;
 
     const state = ensureDefaults(options, {
@@ -218,7 +218,7 @@ export class MockChain {
 }
 
 function log(str: string) {
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsoleLog: for debugging purposes
   console.log(str);
 }
 

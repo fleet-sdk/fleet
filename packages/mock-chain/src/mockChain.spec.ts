@@ -15,7 +15,7 @@ describe("Mock chain instantiation", () => {
   it("Should create with default parameters", () => {
     const chain = new MockChain();
 
-    expect(chain.height).to.be.equal(0);
+    expect(chain.height).to.be.equal(1);
     expect(chain.timestamp).to.be.closeTo(new Date().getTime(), 100);
     expect(chain.parties).to.have.length(0);
   });
