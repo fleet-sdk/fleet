@@ -128,7 +128,13 @@ export class MockChain {
     );
   }
 
-  addParty(contractOrParty: HexString | MockChainParty, name?: string): NonKeyedMockChainParty {
+  addParty(contractOrParty: KeyedMockChainParty): KeyedMockChainParty;
+  addParty(contractOrParty: NonKeyedMockChainParty, name?: string): NonKeyedMockChainParty;
+  addParty(contractOrParty: HexString, name?: string): KeyedMockChainParty;
+  addParty(
+    contractOrParty: HexString | MockChainParty,
+    name?: string
+  ): NonKeyedMockChainParty | KeyedMockChainParty {
     return this.#pushParty(
       typeof contractOrParty === "string"
         ? new NonKeyedMockChainParty(this, contractOrParty, name)
