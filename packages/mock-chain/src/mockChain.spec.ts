@@ -95,10 +95,45 @@ describe("Mock chain instantiation", () => {
     chain.reset();
 
     // should clear and reset state to original values
+    expect(chain.parties).to.have.length(2); // parties should not be cleared by default
     expect(chain.height).to.be.equal(creationHeight);
     expect(chain.timestamp).to.be.equal(creationTimestamp);
     expect(bob.utxos).to.have.length(0);
     expect(alice.utxos).to.have.length(0);
+  });
+
+  it("Should reset the chain and clean up the parties", () => {
+    const chain = new MockChain(234897);
+    const creationHeight = chain.height;
+    const creationTimestamp = chain.timestamp;
+
+    const bob = chain
+      .newParty()
+      .withBalance({ nanoergs: 1000000n })
+      .withBalance({ nanoergs: 19827398237n });
+    const alice = chain.newParty().withBalance({ nanoergs: 6000000n });
+
+    expect(bob.utxos).to.have.length(2);
+    expect(alice.utxos).to.have.length(1);
+
+    chain.newBlocks(100);
+
+    expect(chain.height).to.be.greaterThan(creationHeight);
+    expect(chain.timestamp).to.be.greaterThan(creationTimestamp);
+
+    // reset the chain
+    chain.reset({ clearParties: true });
+
+    // should clear and reset state to original values
+    expect(chain.parties).to.have.length(0); // parties should be cleared
+    expect(chain.height).to.be.equal(creationHeight);
+    expect(chain.timestamp).to.be.equal(creationTimestamp);
+    expect(bob.utxos).to.have.length(0);
+    expect(alice.utxos).to.have.length(0);
+
+    bob.addBalance({ nanoergs: 1000000n });
+    expect(bob.utxos).to.have.length(1); // parties should be re-added after adding balance
+    expect(chain.parties).to.have.length(1);
   });
 
   it("Should simulate new blocks", () => {
