@@ -68,6 +68,11 @@ export abstract class MockChainParty {
   addUTxOs(utxos: MockUTxOInput): MockChainParty {
     this._utxos.add(utxos);
 
+    // Ensure the party is registered in the chain
+    if (!this._chain.parties.includes(this)) {
+      this._chain.addParty(this);
+    }
+
     return this;
   }
 

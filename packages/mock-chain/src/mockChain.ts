@@ -42,6 +42,10 @@ export type BlockState = {
   parameters: BlockchainParameters;
 };
 
+export type ResetOptions = {
+  clearParties?: boolean;
+};
+
 export class MockChain {
   readonly #parties: MockChainParty[];
   readonly #tip: BlockState;
@@ -104,10 +108,14 @@ export class MockChain {
     }
   }
 
-  reset() {
+  reset(options?: ResetOptions) {
     this.clearUTxOSet();
     this.#tip.height = this.#base.height;
     this.#tip.timestamp = this.#base.timestamp;
+
+    if (options?.clearParties) {
+      this.#parties.length = 0;
+    }
   }
 
   newParty(name?: string): KeyedMockChainParty;
@@ -120,8 +128,12 @@ export class MockChain {
     );
   }
 
-  addParty(ergoTree: HexString, name?: string): NonKeyedMockChainParty {
-    return this.#pushParty(new NonKeyedMockChainParty(this, ergoTree, name));
+  addParty(contractOrParty: HexString | MockChainParty, name?: string): NonKeyedMockChainParty {
+    return this.#pushParty(
+      typeof contractOrParty === "string"
+        ? new NonKeyedMockChainParty(this, contractOrParty, name)
+        : contractOrParty
+    );
   }
 
   #pushParty<T extends MockChainParty>(party: T): T {
