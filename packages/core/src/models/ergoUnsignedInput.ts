@@ -20,10 +20,10 @@ type ContextExtensionInput = ContextExtension<ConstantInput>;
 export class ErgoUnsignedInput<
   R extends NonMandatoryRegisters = NonMandatoryRegisters
 > extends ErgoBox<R> {
-  #extension?: ContextExtension;
+  #extension: ContextExtension = {};
 
   get extension(): ContextExtension {
-    return this.#extension || {};
+    return this.#extension;
   }
 
   constructor(box: InputBox<R>) {
@@ -32,15 +32,13 @@ export class ErgoUnsignedInput<
   }
 
   setContextExtension(extension: ContextExtensionInput): ErgoUnsignedInput {
-    const vars: ContextExtension = {};
     for (const key in extension) {
       const c = extension[key] as ConstantInput;
       if (!c) continue;
 
-      vars[key as unknown as keyof ContextExtension] = typeof c === "string" ? c : c.toHex();
+      this.#extension[key as unknown as keyof ContextExtension] =
+        typeof c === "string" ? c : c.toHex();
     }
-
-    this.#extension = vars;
 
     return this;
   }

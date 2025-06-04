@@ -37,8 +37,8 @@ describe("Tweaking", () => {
       3: "0101"
     });
 
-    input.setContextVars({ 0: SBool(false) });
-    expect(input.extension).toEqual({ 0: "0100" });
+    input.setContextVars({ 0: SBool(false) }); // replace existing value at 0 and keep others
+    expect(input.extension).toEqual({ 0: "0100", 1: "0580c0fc82aa02", 3: "0101" });
   });
 });
 

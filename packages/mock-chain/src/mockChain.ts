@@ -10,6 +10,7 @@ import { mockBlockchainStateContext } from "./objectMocking";
 import { KeyedMockChainParty, type MockChainParty, NonKeyedMockChainParty } from "./party";
 
 const BLOCK_TIME_MS = 120000;
+const DEFAULT_HEIGHT = 1;
 
 export type AssetMetadata = {
   name?: string;
@@ -54,11 +55,11 @@ export class MockChain {
   constructor(heightOrOptions?: number | MockChainOptions) {
     const options =
       !heightOrOptions || typeof heightOrOptions === "number"
-        ? { height: heightOrOptions ?? 1 }
+        ? { height: heightOrOptions ?? DEFAULT_HEIGHT }
         : heightOrOptions;
 
     const state = ensureDefaults(options, {
-      height: 0,
+      height: DEFAULT_HEIGHT,
       timestamp: new Date().getTime(),
       parameters: ensureDefaults(options.parameters, BLOCKCHAIN_PARAMETERS)
     });
