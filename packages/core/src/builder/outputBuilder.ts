@@ -198,7 +198,7 @@ export class OutputBuilder {
         });
       }
     } else {
-      tokens = this.assets.toArray();
+      tokens = this.assets.toArray().filter((x) => x.amount > _0n);
     }
 
     if (isUndefined(this.creationHeight)) throw new UndefinedCreationHeight();

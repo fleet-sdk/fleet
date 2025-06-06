@@ -581,6 +581,20 @@ describe("Building", () => {
     expect(output.value).toBe(29000n);
   });
 
+  it("Should filter out token with zero amounts on build", () => {
+    const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+      .addTokens({ tokenId: tokenA, amount: 50n })
+      .addTokens({ tokenId: tokenB, amount: 0n });
+    expect(output.assets).toHaveLength(2);
+    expect(output.assets.toArray().find((x) => x.tokenId === tokenA)?.amount).toEqual(50n);
+    expect(output.assets.toArray().find((x) => x.tokenId === tokenB)?.amount).toEqual(0n);
+
+    const candidate = output.build();
+
+    expect(candidate.assets).toHaveLength(1);
+    expect(candidate.assets).to.deep.equal([{ tokenId: tokenA, amount: 50n }]);
+  });
+
   it("Should replace dynamic value estimation by fixed value", () => {
     const output = new OutputBuilder(estimateMinBoxValue(), address, height);
     expect(output.value).toBe(28440n);
