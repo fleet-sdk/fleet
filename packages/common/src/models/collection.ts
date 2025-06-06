@@ -92,7 +92,6 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
     if (isDefined(options) && isDefined(options.index)) {
       if (options.index === this.length) {
         this._items.push(this._map(item));
-
         return this.length;
       }
 
@@ -101,12 +100,10 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
       }
 
       this._items.splice(options.index, 0, this._map(item));
-
       return this.length;
     }
 
     this._items.push(this._map(item));
-
     return this._items.length;
   }
 
