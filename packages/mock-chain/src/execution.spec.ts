@@ -56,4 +56,26 @@ describe("Transaction executor", () => {
     const bobKey = bob.key as ErgoHDKey;
     expect(execute(unsigned, [bobKey])).to.contain({ success: true });
   });
+
+  it("Should execute transaction in EIP-12 format", () => {
+    const bob = new KeyedMockChainParty(chain, "bob");
+    const input = mockUTxO({
+      ergoTree: bob.address.ergoTree,
+      value: 10000000n,
+      assets: [],
+      creationHeight: 10328490,
+      additionalRegisters: {}
+    });
+
+    const unsigned = new TransactionBuilder(1032850)
+      .from(input)
+      .sendChangeTo("9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga")
+      .payMinFee()
+      .build()
+      .toEIP12Object();
+
+    expect(bob.key).not.to.be.undefined;
+    const bobKey = bob.key as ErgoHDKey;
+    expect(execute(unsigned, [bobKey])).to.contain({ success: true });
+  });
 });
