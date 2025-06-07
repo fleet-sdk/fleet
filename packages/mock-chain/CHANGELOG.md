@@ -1,5 +1,16 @@
 # @fleet-sdk/mock-chain
 
+## 0.9.3
+
+### Patch Changes
+
+- d21f405: Add parties cleanup and re-inclusion
+- Updated dependencies [5125398]
+- Updated dependencies [fd4ffd7]
+- Updated dependencies [799fff2]
+  - @fleet-sdk/core@0.9.3
+  - @fleet-sdk/wallet@0.9.3
+
 ## 0.9.2
 
 ### Patch Changes
