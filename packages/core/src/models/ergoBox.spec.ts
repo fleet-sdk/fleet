@@ -31,6 +31,14 @@ describe("Construction", () => {
     expect(ergoBox.index).to.be.equal(tv.index);
   });
 
+  test.each(regularBoxes)("Should construct from an ErgoBox candidate", (tv) => {
+    const ergoBox = new ErgoBox(new ErgoBox(tv), tv.transactionId, tv.index);
+
+    expect(ergoBox.boxId).to.be.equal(tv.boxId);
+    expect(ergoBox.transactionId).to.be.equal(tv.transactionId);
+    expect(ergoBox.index).to.be.equal(tv.index);
+  });
+
   it("Should throw if transactionId or index is not provided for box candidate", () => {
     const box = regularBoxes[0];
     const candidate = boxToCandidate(box);

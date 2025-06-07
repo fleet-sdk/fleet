@@ -1,23 +1,36 @@
 import { SBool } from "@fleet-sdk/serializer";
 import { regularBoxes } from "_test-vectors";
-import { describe, expect, it } from "vitest";
+import { ErgoBox } from "packages/core/dist";
+import { describe, expect, it, test } from "vitest";
 import { ErgoUnsignedInput } from "./ergoUnsignedInput";
 
 describe("Construction", () => {
-  it("Should construct from a vanilla object", () => {
-    for (const box of regularBoxes) {
-      const input = new ErgoUnsignedInput(box);
+  test.each(regularBoxes)("Should construct from a vanilla object", (box) => {
+    const input = new ErgoUnsignedInput(box);
 
-      expect(input.boxId).toBe(box.boxId);
-      expect(input.value).toBe(box.value);
-      expect(input.ergoTree).toBe(box.ergoTree);
-      expect(input.assets).toEqual(box.assets);
-      expect(input.creationHeight).toBe(box.creationHeight);
-      expect(input.additionalRegisters).toBe(box.additionalRegisters);
-      expect(input.transactionId).toBe(box.transactionId);
-      expect(input.index).toBe(box.index);
-      expect(input.extension).to.be.deep.equal({});
-    }
+    expect(input.boxId).toBe(box.boxId);
+    expect(input.value).toBe(box.value);
+    expect(input.ergoTree).toBe(box.ergoTree);
+    expect(input.assets).toEqual(box.assets);
+    expect(input.creationHeight).toBe(box.creationHeight);
+    expect(input.additionalRegisters).toBe(box.additionalRegisters);
+    expect(input.transactionId).toBe(box.transactionId);
+    expect(input.index).toBe(box.index);
+    expect(input.extension).to.be.deep.equal({});
+  });
+
+  test.each(regularBoxes)("Should construct from a ErgoBox object", (box) => {
+    const input = new ErgoUnsignedInput(new ErgoBox(box));
+
+    expect(input.boxId).toBe(box.boxId);
+    expect(input.value).toBe(box.value);
+    expect(input.ergoTree).toBe(box.ergoTree);
+    expect(input.assets).toEqual(box.assets);
+    expect(input.creationHeight).toBe(box.creationHeight);
+    expect(input.additionalRegisters).toBe(box.additionalRegisters);
+    expect(input.transactionId).toBe(box.transactionId);
+    expect(input.index).toBe(box.index);
+    expect(input.extension).to.be.deep.equal({});
   });
 });
 
