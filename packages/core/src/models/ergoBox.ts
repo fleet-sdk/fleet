@@ -62,12 +62,18 @@ export class ErgoBox<R extends NonMandatoryRegisters = NonMandatoryRegisters> {
   constructor(candidate: ErgoBoxCandidate<R>, transactionId: string, index: number);
   constructor(candidate: BoxCandidate<Amount, R>, transactionId: string, index: number);
   constructor(box: Box<Amount, R>);
+  constructor(box: ErgoBox<R>);
   constructor(
-    box: Box<Amount, R> | ErgoBoxCandidate<R> | BoxCandidate<Amount, R>,
+    box: Box<Amount, R> | ErgoBox<R> | ErgoBoxCandidate<R> | BoxCandidate<Amount, R>,
     transactionId?: string,
     index?: number
   ) {
-    if (isBox(box)) {
+    if (box instanceof ErgoBox) {
+      this.#candidate = box.#candidate;
+      this.#transactionId = box.transactionId;
+      this.#index = box.index;
+      this.#boxId = box.boxId;
+    } else if (isBox(box)) {
       this.#candidate = new ErgoBoxCandidate(box);
       this.#transactionId = box.transactionId;
       this.#index = box.index;
