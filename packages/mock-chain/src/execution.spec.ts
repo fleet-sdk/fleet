@@ -16,7 +16,8 @@ describe("Transaction executor", () => {
       .from(regularBoxes)
       .sendChangeTo("9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga")
       .payMinFee()
-      .build();
+      .build()
+      .toEIP12Object();
 
     expect(bob.key).not.to.be.undefined;
     const bobKey = bob.key;
@@ -30,7 +31,8 @@ describe("Transaction executor", () => {
       .from(regularBoxes)
       .sendChangeTo("9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga")
       .payMinFee()
-      .build();
+      .build()
+      .toEIP12Object();
 
     expect(key.isNeutered()).to.be.true;
     expect(() => execute(unsigned, [key])).to.throw();
@@ -50,7 +52,8 @@ describe("Transaction executor", () => {
       .from(input)
       .sendChangeTo("9hq9HfNKnK1GYHo8fobgDanuMMDnawB9BPw5tWTga3H91tpnTga")
       .payMinFee()
-      .build();
+      .build()
+      .toEIP12Object();
 
     expect(bob.key).not.to.be.undefined;
     const bobKey = bob.key as ErgoHDKey;

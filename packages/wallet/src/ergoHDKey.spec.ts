@@ -33,7 +33,7 @@ describe("Instantiation", () => {
     expect(first(key.address.getPublicKeys())).to.be.deep.equal(key.publicKey);
   });
 
-  it("Should should result in the same key from seed and from equivalent mnemonic", () => {
+  it("Should result in the same key from seed and from equivalent mnemonic", () => {
     const mnemonic = generateMnemonic();
     const seed = mnemonicToSeedSync(mnemonic);
     const keyFromSeed = ErgoHDKey.fromMasterSeed(seed);

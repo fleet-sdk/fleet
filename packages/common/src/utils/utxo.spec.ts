@@ -314,7 +314,7 @@ describe("UTxO filter", () => {
     ).to.has.length.lessThanOrEqual(2);
   });
 
-  it("Should should return empty array for empty inputs and non-matching filters", () => {
+  it("Should return empty array for empty inputs and non-matching filters", () => {
     expect(utxoFilter(regularBoxes, { by: (box) => box.value === 0n })).to.be.empty;
     expect(utxoFilter([], { max: { count: 10 } })).to.be.empty;
   });

@@ -54,7 +54,7 @@ describe("Transaction signing", () => {
     expect(verify_signature(addr, txBytes, proof)).to.be.true;
   });
 
-  it("Should should determine key from registers", async () => {
+  it("Should determine key from registers", async () => {
     // generate keys
     const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
     const child1 = rootKey.deriveChild(1);

@@ -483,7 +483,7 @@ describe("Building", () => {
     expect(boxCandidate.assets.at(1).tokenId).to.be.undefined;
   });
 
-  it("Should should add default values if non mandatory minting field are filled", () => {
+  it("Should add default values if non mandatory minting field are filled", () => {
     const boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
       .mintToken({
         amount: 100n
@@ -506,7 +506,7 @@ describe("Building", () => {
     });
   });
 
-  it("Should should preserve explicitly defined registers", () => {
+  it("Should preserve explicitly defined registers", () => {
     const boxCandidate = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
       .mintToken({
         amount: 100n,

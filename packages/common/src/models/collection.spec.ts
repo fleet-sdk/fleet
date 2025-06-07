@@ -55,7 +55,7 @@ describe("collection base", () => {
     expect(collection.at(1)).toBe(6);
   });
 
-  it("Should should fail when trying to add out of range", () => {
+  it("Should fail when trying to add out of range", () => {
     const collection = new MockCollection();
 
     expect(() => {

@@ -1,5 +1,12 @@
-import { type HexString, ensureDefaults, first, isUndefined, some } from "@fleet-sdk/common";
-import type { ErgoUnsignedTransaction } from "@fleet-sdk/core";
+import {
+  type EIP12UnsignedTransaction,
+  type HexString,
+  ensureDefaults,
+  first,
+  isUndefined,
+  some
+} from "@fleet-sdk/common";
+import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { type ByteInput, utf8 } from "@fleet-sdk/crypto";
 import { decode } from "@fleet-sdk/serializer";
 import pc from "picocolors";
@@ -150,7 +157,7 @@ export class MockChain {
   }
 
   execute(
-    unsignedTransaction: ErgoUnsignedTransaction,
+    unsignedTransaction: ErgoUnsignedTransaction | EIP12UnsignedTransaction,
     options?: TransactionExecutionOptions,
     baseCost?: number
   ): boolean {
@@ -166,7 +173,12 @@ export class MockChain {
       }
     });
 
-    const result = execute(unsignedTransaction, keys, {
+    const txObject =
+      unsignedTransaction instanceof ErgoUnsignedTransaction
+        ? unsignedTransaction.toEIP12Object()
+        : unsignedTransaction;
+
+    const result = execute(txObject, keys, {
       context,
       baseCost,
       parameters: this.#tip.parameters
@@ -185,7 +197,9 @@ export class MockChain {
       ? this.#parties.map((party) => party.toString())
       : undefined;
 
-    const { inputs, outputs } = unsignedTransaction.toPlainObject();
+    this.#pushMetadata(txObject);
+
+    const { inputs, outputs } = txObject;
     for (const party of this.#parties) {
       for (let i = inputs.length - 1; i >= 0; i--) {
         if (party.utxos.exists(inputs[i].boxId)) {
@@ -200,8 +214,6 @@ export class MockChain {
         }
       }
     }
-
-    this.#pushMetadata(unsignedTransaction);
 
     this.newBlock();
 
@@ -218,7 +230,7 @@ export class MockChain {
     return true;
   }
 
-  #pushMetadata(transaction: ErgoUnsignedTransaction) {
+  #pushMetadata(transaction: EIP12UnsignedTransaction) {
     const firstInputId = first(transaction.inputs).boxId;
     const box = transaction.outputs.find((output) =>
       output.assets.some((asset) => asset.tokenId === firstInputId)
