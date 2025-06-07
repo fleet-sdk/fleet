@@ -236,7 +236,7 @@ describe("Contract execution and chain mocking", () => {
     expect(consoleMock).toHaveBeenCalledWith("State changes:\n");
   });
 
-  it("Should should execute transaction but not log", () => {
+  it("Should execute transaction but not log", () => {
     const chain = new MockChain();
 
     const bob = chain.newParty().withBalance({
@@ -271,7 +271,7 @@ describe("Contract execution and chain mocking", () => {
     expect(consoleMock).not.toBeCalled();
   });
 
-  it("Should should execute from eip-12 unsigned transaction object", () => {
+  it("Should execute from eip-12 unsigned transaction object", () => {
     const chain = new MockChain();
 
     const bob = chain.newParty().withBalance({
@@ -319,7 +319,7 @@ describe("Contract execution and chain mocking", () => {
     });
   });
 
-  it("Should should execute minting transaction", () => {
+  it("Should execute minting transaction", () => {
     const chain = new MockChain();
     const bob = chain.newParty().withBalance({ nanoergs: 1000000000n });
     const unsignedTransaction = new TransactionBuilder(38479)
