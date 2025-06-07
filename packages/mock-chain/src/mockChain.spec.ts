@@ -271,6 +271,31 @@ describe("Contract execution and chain mocking", () => {
     expect(consoleMock).not.toBeCalled();
   });
 
+  it("Should should execute from eip-12 unsigned transaction object", () => {
+    const chain = new MockChain();
+
+    const bob = chain.newParty().withBalance({
+      nanoergs: 1000000000n,
+      tokens: [{ tokenId: SIGUSD_TOKEN_ID, amount: 1000n }]
+    });
+    const alice = chain.newParty();
+
+    const unsignedTransaction = new TransactionBuilder(38479)
+      .from(bob.utxos.toArray())
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, alice.address).addTokens({
+          tokenId: SIGUSD_TOKEN_ID,
+          amount: 100n
+        })
+      )
+      .sendChangeTo(bob.address)
+      .payMinFee()
+      .build()
+      .toEIP12Object();
+
+    expect(() => chain.execute(unsignedTransaction)).not.to.throw();
+  });
+
   it("Should execute burning transaction", () => {
     const chain = new MockChain();
 

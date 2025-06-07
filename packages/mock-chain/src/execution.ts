@@ -6,7 +6,6 @@ import {
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
-import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
 import { bigintBE, hex } from "@fleet-sdk/crypto";
 import type { ErgoHDKey } from "@fleet-sdk/wallet";
 import {
@@ -50,7 +49,7 @@ export type ExecutionParameters = {
 };
 
 export function execute(
-  unsigned: ErgoUnsignedTransaction | EIP12UnsignedTransaction,
+  unsignedTx: EIP12UnsignedTransaction,
   keys: ErgoHDKey[],
   parameters?: ExecutionParameters
 ): TransactionExecutionResult {
@@ -60,7 +59,6 @@ export function execute(
     }
   }
 
-  const tx = unsigned instanceof ErgoUnsignedTransaction ? unsigned.toEIP12Object() : unsigned;
   const params = ensureDefaults(parameters, {
     context: mockBlockchainStateContext(),
     parameters: BLOCKCHAIN_PARAMETERS,
@@ -77,10 +75,10 @@ export function execute(
 
     const reducedTx = prover.reduce(
       params.context,
-      tx,
-      tx.inputs,
-      tx.dataInputs,
-      getBurningTokens(tx),
+      unsignedTx,
+      unsignedTx.inputs,
+      unsignedTx.dataInputs,
+      getBurningTokens(unsignedTx),
       params.baseCost
     );
 
@@ -92,9 +90,7 @@ export function execute(
   }
 }
 
-function getBurningTokens(
-  tx: ErgoUnsignedTransaction | EIP12UnsignedTransaction
-): TokenAmount<bigint>[] {
+function getBurningTokens(tx: EIP12UnsignedTransaction): TokenAmount<bigint>[] {
   const diff = utxoDiff(utxoSum(tx.inputs), utxoSum(tx.outputs));
   if (diff.tokens.length > 0) {
     diff.tokens = diff.tokens.filter((x) => x.tokenId !== tx.inputs[0].boxId);
