@@ -1,5 +1,14 @@
 # @fleet-sdk/compiler
 
+## 0.9.3
+
+### Patch Changes
+
+- Updated dependencies [5125398]
+- Updated dependencies [fd4ffd7]
+- Updated dependencies [799fff2]
+  - @fleet-sdk/core@0.9.3
+
 ## 0.9.2
 
 ### Patch Changes
