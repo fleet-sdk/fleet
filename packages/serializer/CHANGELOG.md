@@ -1,5 +1,13 @@
 # @fleet-sdk/serializer
 
+## 0.10.0
+
+### Patch Changes
+
+- Updated dependencies [b17af12]
+  - @fleet-sdk/common@0.10.0
+  - @fleet-sdk/crypto@0.10.0
+
 ## 0.9.1
 
 ### Patch Changes
