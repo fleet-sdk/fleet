@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/mock-chain",
-  "version": "0.9.2",
+  "version": "0.10.0",
   "description": "Mock chain for Ergo Smart Contracts testing.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

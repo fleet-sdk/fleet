@@ -1,5 +1,20 @@
 # @fleet-sdk/core
 
+## 0.10.0
+
+### Minor Changes
+
+- 799fff2: Filter out tokens with zero amounts on output build
+
+### Patch Changes
+
+- 5125398: Support instantiating `ErgoBox` from another `ErgoBox`
+- fd4ffd7: Support context extension variables merging
+- Updated dependencies [b17af12]
+  - @fleet-sdk/common@0.10.0
+  - @fleet-sdk/crypto@0.10.0
+  - @fleet-sdk/serializer@0.10.0
+
 ## 0.9.1
 
 ### Patch Changes

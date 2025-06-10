@@ -1,5 +1,11 @@
 # @fleet-sdk/common
 
+## 0.10.0
+
+### Patch Changes
+
+- b17af12: No relevant changes
+
 ## 0.9.1
 
 ### Patch Changes
