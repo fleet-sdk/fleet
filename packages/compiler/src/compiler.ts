@@ -88,8 +88,8 @@ export function compile(script: string, options?: CompilerOptions): ErgoTree {
 
   const output = compiler
     .compile(parseNamedConstantsMap(opt.map), opt.segregateConstants, headerFlags, script)
-    // use .toHex() to avoid production errors as fullOpt builder of Sigma-JS renames
-    // .bytes().u to something else
+    // use .toHex() to avoid production errors as fullOpt builder of Sigma-JS renames .bytes().u
+    // to something else
     .toHex();
 
   return new ErgoTree(output, opt.network === "mainnet" ? Network.Mainnet : Network.Testnet);
