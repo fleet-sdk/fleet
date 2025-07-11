@@ -135,6 +135,40 @@ describe("Monomorphic types serialization and parsing", () => {
   });
 });
 
+describe("AVL Tree serialization and parsing", () => {
+  const avlTreeHex = "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c803601800100";
+  const avlTreeWithValueLengthOptHex =
+    "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c80360180010115";
+  it("Should deserialize AVL Tree", () => {
+    expect(Value$.fromHex(avlTreeHex).data).to.deep.equal({
+      digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
+      insertAllowed: true,
+      keyLength: 128,
+      removeAllowed: false,
+      updateAllowed: false,
+      valueLengthOpt: undefined
+    });
+
+    expect(SConstant.from(avlTreeHex).data).to.deep.equal({
+      digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
+      insertAllowed: true,
+      keyLength: 128,
+      removeAllowed: false,
+      updateAllowed: false,
+      valueLengthOpt: undefined
+    });
+
+    expect(SConstant.from(avlTreeWithValueLengthOptHex).data).to.deep.equal({
+      digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
+      insertAllowed: true,
+      keyLength: 128,
+      removeAllowed: false,
+      updateAllowed: false,
+      valueLengthOpt: 21
+    });
+  });
+});
+
 describe("SColl serialization and parsing", () => {
   it.each(collVectors)("Should serialize $name", (tv) => {
     expect(tv.sconst.toHex()).to.be.equal(tv.hex);

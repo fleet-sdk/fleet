@@ -144,6 +144,8 @@ export const typeSerializer = {
         return descriptors.unit;
       case descriptors.box.code:
         return descriptors.box;
+      case descriptors.avlTree.code:
+        return descriptors.avlTree;
     }
 
     throw new Error("Not implemented.");
