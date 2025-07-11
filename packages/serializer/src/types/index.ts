@@ -15,5 +15,6 @@ export {
   SUnit,
   SColl,
   SPair,
-  SBox
+  SBox,
+  SAvlTree
 } from "./constructors";

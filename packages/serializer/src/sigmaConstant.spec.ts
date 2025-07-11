@@ -31,6 +31,7 @@ import {
   MIN_I256
 } from "./coders/numRanges";
 import { dataSerializer } from "./serializers";
+import type { AvlTreeData } from "./serializers/avlTreeSerializer";
 import { SConstant, decode, parse, stypeof } from "./sigmaConstant";
 import type { SGroupElementType } from "./types";
 import {
@@ -46,7 +47,7 @@ import {
   STupleType,
   SUnit
 } from "./types/";
-import { SBox, STuple } from "./types/constructors";
+import { SAvlTree, SBox, STuple } from "./types/constructors";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
@@ -136,35 +137,60 @@ describe("Monomorphic types serialization and parsing", () => {
 });
 
 describe("AVL Tree serialization and parsing", () => {
-  const avlTreeHex = "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c803601800100";
-  const avlTreeWithValueLengthOptHex =
-    "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c80360180010115";
-  it("Should deserialize AVL Tree", () => {
-    expect(Value$.fromHex(avlTreeHex).data).to.deep.equal({
-      digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
-      insertAllowed: true,
-      keyLength: 128,
-      removeAllowed: false,
-      updateAllowed: false,
-      valueLengthOpt: undefined
+  const vectors = [
+    {
+      name: "AVL Tree without valueLengthOpt",
+      hex: "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c803601800100",
+      data: {
+        digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
+        insertAllowed: true,
+        keyLength: 128,
+        removeAllowed: false,
+        updateAllowed: false,
+        valueLengthOpt: undefined
+      }
+    },
+    {
+      name: "AVL Tree with valueLengthOpt",
+      hex: "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c80360180010115",
+      data: {
+        digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
+        insertAllowed: true,
+        keyLength: 128,
+        removeAllowed: false,
+        updateAllowed: false,
+        valueLengthOpt: 21
+      }
+    }
+  ];
+
+  test.each(vectors)("AVL Tree serialization", (tv) => {
+    const decoded = SConstant.from(tv.hex);
+    expect(decoded.type.toString()).to.be.equal("SAvlTree");
+    expect(decoded.data).to.deep.equal(tv.data);
+    expect(Value$.fromHex(tv.hex).data).to.deep.equal(tv.data); // confirm with sigmastate
+  });
+
+  it.each(vectors)("AVL Tree roundtrip", (tv) => {
+    const avlTree = SConstant.from<AvlTreeData>(tv.hex).data;
+    expect(SAvlTree(avlTree).toHex()).to.be.equal(tv.hex);
+  });
+
+  it("Should serialize different flags", () => {
+    const tree = vectors[0].data;
+
+    expect(SConstant.from(SAvlTree({ ...tree, insertAllowed: true }).toHex()).data).to.deep.equal({
+      ...tree,
+      insertAllowed: true
     });
 
-    expect(SConstant.from(avlTreeHex).data).to.deep.equal({
-      digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
-      insertAllowed: true,
-      keyLength: 128,
-      removeAllowed: false,
-      updateAllowed: false,
-      valueLengthOpt: undefined
-    });
+    expect(
+      SConstant.from(SAvlTree({ ...tree, insertAllowed: false, updateAllowed: true }).toHex()).data
+    ).to.deep.equal({ ...tree, insertAllowed: false, updateAllowed: true });
 
-    expect(SConstant.from(avlTreeWithValueLengthOptHex).data).to.deep.equal({
-      digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
-      insertAllowed: true,
-      keyLength: 128,
-      removeAllowed: false,
-      updateAllowed: false,
-      valueLengthOpt: 21
+    expect(SConstant.from(SAvlTree({ ...tree, removeAllowed: true }).toHex()).data).to.deep.equal({
+      ...tree,
+      removeAllowed: true
     });
   });
 });
@@ -301,7 +327,7 @@ describe("Data only decoding", () => {
 describe("Not implemented types", () => {
   it("Should fail while trying to serialize a not implemented type", () => {
     const unimplementedType = {
-      code: 0x64, // AvlTree type code
+      code: 0x66, // SString type code
       embeddable: false,
       coerce: (val: unknown) => val
     } as unknown as SGroupElementType;
@@ -318,7 +344,7 @@ describe("Not implemented types", () => {
     // not implemented SSigmaProp expression
     expect(() => {
       dataSerializer.serialize("", unimplementedType, new SigmaByteWriter(1));
-    }).to.throw("Serialization error: '0x64' type not implemented.");
+    }).to.throw("Serialization error: '0x66' type not implemented.");
   });
 
   it("Should fail when trying to deserialize a not implemented SigmaProp expression", () => {
