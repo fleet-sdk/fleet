@@ -102,6 +102,11 @@ export class SigmaByteReader {
     return this.readBytes(this.#bytes.length - this.#cursor);
   }
 
+  readOption<T>(innerReader: (reader: SigmaByteReader) => T): T | undefined {
+    if (this.readByte()) return innerReader(this);
+    return undefined;
+  }
+
   /**
    * Returns bytes without advancing the cursor.
    */
