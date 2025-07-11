@@ -21,3 +21,13 @@ export class SBoxType extends SMonomorphicType<SConstant<Box<bigint>>> {
     return "SBox";
   }
 }
+
+export class SAvlTreeType extends SMonomorphicType<SConstant<Box<bigint>>> {
+  get code(): 0x64 {
+    return 0x64;
+  }
+
+  toString(): string {
+    return "SAvlTree";
+  }
+}
