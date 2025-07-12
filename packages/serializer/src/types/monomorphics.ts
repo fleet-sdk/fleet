@@ -1,4 +1,5 @@
 import type { Box } from "@fleet-sdk/common";
+import type { AvlTreeData } from "../serializers/avlTreeSerializer";
 import type { SConstant } from "../sigmaConstant";
 import { SMonomorphicType } from "./base";
 
@@ -22,7 +23,7 @@ export class SBoxType extends SMonomorphicType<SConstant<Box<bigint>>> {
   }
 }
 
-export class SAvlTreeType extends SMonomorphicType<SConstant<Box<bigint>>> {
+export class SAvlTreeType extends SMonomorphicType<AvlTreeData> {
   get code(): 0x64 {
     return 0x64;
   }
