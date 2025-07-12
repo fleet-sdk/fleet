@@ -40,7 +40,8 @@
       "suspicious": {
         "recommended": true,
         "noConsoleLog": "error",
-        "noAssignInExpressions": "off"
+        "noAssignInExpressions": "off",
+        "noConstEnum": "off"
       }
     }
   }

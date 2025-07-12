@@ -1,6 +1,6 @@
 import type { SType } from "./base";
 import type { SCollType, STupleType } from "./generics";
-import { SBoxType, SUnitType } from "./monomorphics";
+import { SAvlTreeType, SBoxType, SUnitType } from "./monomorphics";
 import {
   SBigIntType,
   SBoolType,
@@ -62,6 +62,7 @@ export const descriptors = {
   sigmaProp: new SSigmaPropType(),
   unit: new SUnitType(),
   box: new SBoxType(),
+  avlTree: new SAvlTreeType(),
   coll: collDescriptor,
   tuple: tupleDescriptor
 } satisfies { [key: string]: Descriptor };

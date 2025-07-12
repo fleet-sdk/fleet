@@ -5,6 +5,7 @@ import { Value$ } from "sigmastate-js/main";
 import { describe, expect, it, test, vitest } from "vitest";
 import { SPair } from "../dist";
 import {
+  avlTreeVectors,
   bigintVectors,
   boolVectors,
   byteVectors,
@@ -31,6 +32,7 @@ import {
   MIN_I256
 } from "./coders/numRanges";
 import { dataSerializer } from "./serializers";
+import type { AvlTreeData } from "./serializers/avlTreeSerializer";
 import { SConstant, decode, parse, stypeof } from "./sigmaConstant";
 import type { SGroupElementType } from "./types";
 import {
@@ -46,7 +48,7 @@ import {
   STupleType,
   SUnit
 } from "./types/";
-import { SBox, STuple } from "./types/constructors";
+import { SAvlTree, SBox, STuple } from "./types/constructors";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
@@ -132,6 +134,39 @@ describe("Monomorphic types serialization and parsing", () => {
     expect(SUnit().toHex()).toBe(sUnitHex);
     expect(SUnit().type.toString()).toBe("SUnit");
     expect(SConstant.from(sUnitHex).data).to.be.undefined;
+  });
+});
+
+describe("AVL Tree serialization and parsing", () => {
+  test.each(avlTreeVectors)("AVL Tree serialization", (tv) => {
+    const decoded = SConstant.from(tv.hex);
+    expect(decoded.type.toString()).to.be.equal("SAvlTree");
+    expect(decoded.data).to.deep.equal(tv.data);
+    expect(Value$.fromHex(tv.hex).data).to.deep.equal(tv.data); // confirm with sigmastate
+  });
+
+  it.each(avlTreeVectors)("AVL Tree roundtrip", (tv) => {
+    const avlTree = SConstant.from<AvlTreeData>(tv.hex).data;
+    expect(SAvlTree(avlTree).toHex()).to.be.equal(tv.hex);
+  });
+
+  it("Should serialize different flags", () => {
+    const tree = avlTreeVectors[0].data;
+
+    let obj = { ...tree, insertAllowed: true };
+    let hex = SAvlTree(obj).toHex();
+    expect(SConstant.from(hex).data).to.deep.equal(obj);
+    expect(Value$.fromHex(hex).data).to.deep.equal(obj); // confirm with sigmastate
+
+    obj = { ...tree, insertAllowed: false, updateAllowed: true };
+    hex = SAvlTree(obj).toHex();
+    expect(SConstant.from(hex).data).to.deep.equal(obj);
+    expect(Value$.fromHex(hex).data).to.deep.equal(obj); // confirm with sigmastate
+
+    obj = { ...tree, removeAllowed: true };
+    hex = SAvlTree(obj).toHex();
+    expect(SConstant.from(hex).data).to.deep.equal(obj);
+    expect(Value$.fromHex(hex).data).to.deep.equal(obj); // confirm with sigmastate
   });
 });
 
@@ -267,7 +302,7 @@ describe("Data only decoding", () => {
 describe("Not implemented types", () => {
   it("Should fail while trying to serialize a not implemented type", () => {
     const unimplementedType = {
-      code: 0x64, // AvlTree type code
+      code: 0x66, // SString type code
       embeddable: false,
       coerce: (val: unknown) => val
     } as unknown as SGroupElementType;
@@ -284,7 +319,7 @@ describe("Not implemented types", () => {
     // not implemented SSigmaProp expression
     expect(() => {
       dataSerializer.serialize("", unimplementedType, new SigmaByteWriter(1));
-    }).to.throw("Serialization error: '0x64' type not implemented.");
+    }).to.throw("Serialization error: '0x66' type not implemented.");
   });
 
   it("Should fail when trying to deserialize a not implemented SigmaProp expression", () => {

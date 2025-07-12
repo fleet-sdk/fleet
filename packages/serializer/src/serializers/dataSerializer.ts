@@ -3,6 +3,7 @@ import type { SigmaByteReader, SigmaByteWriter } from "../coders";
 import type { SConstant } from "../sigmaConstant";
 import { type SCollType, type STupleType, type SType, isColl, isTuple } from "../types";
 import { descriptors } from "../types/descriptors";
+import { type AvlTreeData, deserializeAvlTree, serializeAvlTree } from "./avlTreeSerializer";
 import { deserializeBox, serializeBox } from "./boxSerializer";
 
 const GROUP_ELEMENT_LENGTH = 33;
@@ -82,6 +83,9 @@ export const dataSerializer = {
 
     if (type.code === descriptors.unit.code) return writer;
     if (type.code === descriptors.box.code) return serializeBox(data as Box, writer);
+    if (type.code === descriptors.avlTree.code) {
+      return serializeAvlTree(data as AvlTreeData, writer);
+    }
 
     throw Error(`Serialization error: '0x${type.code.toString(16)}' type not implemented.`);
   },
@@ -139,6 +143,8 @@ export const dataSerializer = {
           return undefined;
         case descriptors.box.code:
           return deserializeBox(reader);
+        case descriptors.avlTree.code:
+          return deserializeAvlTree(reader);
       }
     }
 

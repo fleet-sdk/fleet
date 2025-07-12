@@ -16,6 +16,8 @@ export const typeSerializer = {
       writer.write(type.code);
     } else if (type.code === descriptors.box.code) {
       writer.write(type.code);
+    } else if (type.code === descriptors.avlTree.code) {
+      writer.write(type.code);
     } else if (isColl(type)) {
       if (type.elementsType.embeddable) {
         writer.write(descriptors.coll.simpleCollTypeCode + type.elementsType.code);
@@ -144,6 +146,8 @@ export const typeSerializer = {
         return descriptors.unit;
       case descriptors.box.code:
         return descriptors.box;
+      case descriptors.avlTree.code:
+        return descriptors.avlTree;
     }
 
     throw new Error("Not implemented.");

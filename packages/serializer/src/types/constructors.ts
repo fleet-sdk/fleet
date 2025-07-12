@@ -1,9 +1,10 @@
 import { type Box, isEmpty } from "@fleet-sdk/common";
+import type { AvlTreeData } from "../serializers/avlTreeSerializer";
 import { SConstant } from "../sigmaConstant";
 import type { SType } from "./base";
 import { descriptors } from "./descriptors";
 import { SCollType, STupleType } from "./generics";
-import { SBoxType, SUnitType } from "./monomorphics";
+import { SAvlTreeType, SBoxType, SUnitType } from "./monomorphics";
 import {
   SBigIntType,
   SBoolType,
@@ -101,6 +102,9 @@ export const SUnit = monoProxy(SUnitType, undefined, true) as unknown as SUnit;
 
 type SBox = (value?: Box) => SConstant<Box<bigint>, SBoxType>;
 export const SBox = monoProxy(SBoxType, undefined, true) as unknown as SBox;
+
+type SAvlTree = (value?: AvlTreeData) => SConstant<AvlTreeData, SAvlTreeType>;
+export const SAvlTree = monoProxy(SAvlTreeType, undefined, true) as unknown as SAvlTree;
 
 type SColl = {
   <D, T extends SByteType>(
