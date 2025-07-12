@@ -1,6 +1,6 @@
 {
   "name": "@fleet-sdk/crypto",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Ergo blockchain crypto primitives.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

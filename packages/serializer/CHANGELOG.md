@@ -1,5 +1,16 @@
 # @fleet-sdk/serializer
 
+## 0.11.0
+
+### Minor Changes
+
+- c175957: Add `SAvlTree` serialization and deserialization
+
+### Patch Changes
+
+- Updated dependencies [fbb4ff0]
+  - @fleet-sdk/crypto@0.11.0
+
 ## 0.10.0
 
 ### Patch Changes
