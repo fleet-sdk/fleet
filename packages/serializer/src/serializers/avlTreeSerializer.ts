@@ -33,18 +33,11 @@ export function serializeAvlTree(
 }
 
 export function deserializeAvlTree(reader: SigmaByteReader): AvlTreeData {
-  const digest = hex.encode(reader.readBytes(DIGEST_SIZE));
-  const { insertAllowed, updateAllowed, removeAllowed } = parseFlags(reader.readByte());
-  const keyLength = reader.readUInt();
-  const valueLengthOpt = reader.readOption((r) => r.readUInt());
-
   return {
-    digest,
-    insertAllowed,
-    updateAllowed,
-    removeAllowed,
-    keyLength,
-    valueLengthOpt
+    digest: hex.encode(reader.readBytes(DIGEST_SIZE)),
+    ...parseFlags(reader.readByte()),
+    keyLength: reader.readUInt(),
+    valueLengthOpt: reader.readOption((r) => r.readUInt())
   };
 }
 

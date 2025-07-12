@@ -109,17 +109,14 @@ export class SigmaByteWriter {
     return this;
   }
 
-  writeOption<T>(
-    value: T | undefined,
-    innerWriter: (writer: SigmaByteWriter) => void
-  ): SigmaByteWriter {
+  writeOption<T>(value: T | undefined, processor: (w: SigmaByteWriter) => void): SigmaByteWriter {
     if (value === undefined) {
       this.write(0x00); // write 0x00 for None
       return this;
     }
 
     this.write(0x01); // write 0x01 for Some
-    innerWriter(this); // call the inner writer to write the Option value
+    processor(this); // call the inner writer to write the Option value
 
     return this;
   }
