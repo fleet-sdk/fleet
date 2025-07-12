@@ -584,3 +584,30 @@ export const sBoxVectors = [
     hex: "63c0843d0008cd02200a1c1b8fa17ec82de54bcaef96f23d7b34196c0410f6f578abdbf163b14b258abd33010cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b0100b66aab1e43874ad8c5583f685a7d6d947238c373f615aee1d04ee604ba2c934000"
   }
 ];
+
+export const avlTreeVectors = [
+  {
+    name: "AVL Tree without valueLengthOpt",
+    hex: "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c803601800100",
+    data: {
+      digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
+      insertAllowed: true,
+      keyLength: 128,
+      removeAllowed: false,
+      updateAllowed: false,
+      valueLengthOpt: undefined
+    }
+  },
+  {
+    name: "AVL Tree with valueLengthOpt",
+    hex: "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c80360180010115",
+    data: {
+      digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
+      insertAllowed: true,
+      keyLength: 128,
+      removeAllowed: false,
+      updateAllowed: false,
+      valueLengthOpt: 21
+    }
+  }
+];

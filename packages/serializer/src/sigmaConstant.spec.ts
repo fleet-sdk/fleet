@@ -5,6 +5,7 @@ import { Value$ } from "sigmastate-js/main";
 import { describe, expect, it, test, vitest } from "vitest";
 import { SPair } from "../dist";
 import {
+  avlTreeVectors,
   bigintVectors,
   boolVectors,
   byteVectors,
@@ -137,61 +138,35 @@ describe("Monomorphic types serialization and parsing", () => {
 });
 
 describe("AVL Tree serialization and parsing", () => {
-  const vectors = [
-    {
-      name: "AVL Tree without valueLengthOpt",
-      hex: "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c803601800100",
-      data: {
-        digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
-        insertAllowed: true,
-        keyLength: 128,
-        removeAllowed: false,
-        updateAllowed: false,
-        valueLengthOpt: undefined
-      }
-    },
-    {
-      name: "AVL Tree with valueLengthOpt",
-      hex: "643100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c80360180010115",
-      data: {
-        digest: "3100d2e101ff01fc047c7f6f00ff80129df69a5090012f01ffca99f5bfff0c8036",
-        insertAllowed: true,
-        keyLength: 128,
-        removeAllowed: false,
-        updateAllowed: false,
-        valueLengthOpt: 21
-      }
-    }
-  ];
-
-  test.each(vectors)("AVL Tree serialization", (tv) => {
+  test.each(avlTreeVectors)("AVL Tree serialization", (tv) => {
     const decoded = SConstant.from(tv.hex);
     expect(decoded.type.toString()).to.be.equal("SAvlTree");
     expect(decoded.data).to.deep.equal(tv.data);
     expect(Value$.fromHex(tv.hex).data).to.deep.equal(tv.data); // confirm with sigmastate
   });
 
-  it.each(vectors)("AVL Tree roundtrip", (tv) => {
+  it.each(avlTreeVectors)("AVL Tree roundtrip", (tv) => {
     const avlTree = SConstant.from<AvlTreeData>(tv.hex).data;
     expect(SAvlTree(avlTree).toHex()).to.be.equal(tv.hex);
   });
 
   it("Should serialize different flags", () => {
-    const tree = vectors[0].data;
+    const tree = avlTreeVectors[0].data;
 
-    expect(SConstant.from(SAvlTree({ ...tree, insertAllowed: true }).toHex()).data).to.deep.equal({
-      ...tree,
-      insertAllowed: true
-    });
+    let obj = { ...tree, insertAllowed: true };
+    let hex = SAvlTree(obj).toHex();
+    expect(SConstant.from(hex).data).to.deep.equal(obj);
+    expect(Value$.fromHex(hex).data).to.deep.equal(obj); // confirm with sigmastate
 
-    expect(
-      SConstant.from(SAvlTree({ ...tree, insertAllowed: false, updateAllowed: true }).toHex()).data
-    ).to.deep.equal({ ...tree, insertAllowed: false, updateAllowed: true });
+    obj = { ...tree, insertAllowed: false, updateAllowed: true };
+    hex = SAvlTree(obj).toHex();
+    expect(SConstant.from(hex).data).to.deep.equal(obj);
+    expect(Value$.fromHex(hex).data).to.deep.equal(obj); // confirm with sigmastate
 
-    expect(SConstant.from(SAvlTree({ ...tree, removeAllowed: true }).toHex()).data).to.deep.equal({
-      ...tree,
-      removeAllowed: true
-    });
+    obj = { ...tree, removeAllowed: true };
+    hex = SAvlTree(obj).toHex();
+    expect(SConstant.from(hex).data).to.deep.equal(obj);
+    expect(Value$.fromHex(hex).data).to.deep.equal(obj); // confirm with sigmastate
   });
 });
 
