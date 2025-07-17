@@ -1,5 +1,16 @@
 # @fleet-sdk/mock-chain
 
+## 0.11.0
+
+### Patch Changes
+
+- Updated dependencies [fbb4ff0]
+- Updated dependencies [c175957]
+  - @fleet-sdk/crypto@0.11.0
+  - @fleet-sdk/wallet@0.11.0
+  - @fleet-sdk/serializer@0.11.0
+  - @fleet-sdk/core@0.11.0
+
 ## 0.10.0
 
 ### Minor Changes

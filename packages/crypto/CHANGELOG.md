@@ -1,5 +1,11 @@
 # @fleet-sdk/crypto
 
+## 0.11.0
+
+### Patch Changes
+
+- fbb4ff0: Bump dependencies
+
 ## 0.10.0
 
 ### Patch Changes
