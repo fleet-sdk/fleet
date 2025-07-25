@@ -18,6 +18,7 @@ export class ErgoTree {
   #byteReader?: SigmaByteReader;
   #root!: Uint8Array;
   #constants: SConstant[] = [];
+  #constantNames: Map<string, number> = new Map();
 
   constructor(input: ByteInput, network?: Network) {
     this.#byteReader = new SigmaByteReader(input);
@@ -27,7 +28,17 @@ export class ErgoTree {
   }
 
   static from(input: JsonCompilerOutput, network?: Network): ErgoTree {
-    return new ErgoTree(reconstructTreeFromObject(input).toBytes(), network);
+    const tree = new ErgoTree(reconstructTreeFromObject(input).toBytes(), network);
+    if (tree.hasSegregatedConstants && input.constants?.length) {
+      for (let i = 0; i < input.constants.length; i++) {
+        const constant = input.constants[i];
+        if (!constant.name) continue;
+
+        tree.#nameConstant(i, constant.name);
+      }
+    }
+
+    return tree;
   }
 
   get bytes(): Uint8Array {
@@ -63,12 +74,19 @@ export class ErgoTree {
     return !!this.#root;
   }
 
-  replaceConstant(index: number, constant: SConstant): ErgoTree {
+  replaceConstant(index: number | string, constant: SConstant): ErgoTree {
     if (!this.hasSegregatedConstants) throw new Error("Constant segregation is not enabled.");
 
     this.#parse();
 
-    const oldConst = this.#constants?.[index];
+    if (typeof index === "string") {
+      const namedIndex = this.#constantNames.get(index);
+      if (namedIndex === undefined) throw new Error(`Constant with name '${index}' not found.`);
+
+      index = namedIndex;
+    }
+
+    const oldConst = this.#constants[index];
     if (!oldConst) throw new Error(`Constant at index ${index} not found.`);
     if (oldConst.type.toString() !== constant.type.toString()) {
       throw new Error(
@@ -78,6 +96,11 @@ export class ErgoTree {
 
     this.#constants[index] = constant;
     this.#byteReader = undefined; // reset reader to force re-serialization
+    return this;
+  }
+
+  #nameConstant(index: number, name: string): ErgoTree {
+    this.#constantNames.set(name, index);
     return this;
   }
 

@@ -1,6 +1,6 @@
 import { Network } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
-import { SBool, SigmaByteReader, estimateVLQSize } from "@fleet-sdk/serializer";
+import { SBool, SLong, SigmaByteReader, estimateVLQSize } from "@fleet-sdk/serializer";
 import { ErgoTree$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import { SInt } from "../constantSerializer";
@@ -305,19 +305,9 @@ describe("JSON object construction", () => {
         expressionTree:
           "d801d601830304730073017302d1ededed9373037304917305b272017306007307917308b27201730900",
         constants: [
-          {
-            value: "04c801",
-            type: "Int"
-          },
-          {
-            value: "049003",
-            type: "Int",
-            name: "_deadline_two"
-          },
-          {
-            value: "04d804",
-            type: "Int"
-          },
+          { value: "04c801", type: "Int" },
+          { value: "049003", type: "Int", name: "_deadline_two" },
+          { value: "04d804", type: "Int" },
           {
             value: "0e20fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40",
             type: "Coll[Byte]"
@@ -328,29 +318,11 @@ describe("JSON object construction", () => {
             name: "$tokenId",
             description: "payment token id"
           },
-          {
-            value: "04ca01",
-            type: "Int",
-            name: "_deadline",
-            description: "Payment deadline"
-          },
-          {
-            value: "0402",
-            type: "Int"
-          },
-          {
-            value: "0100",
-            type: "Bool"
-          },
-          {
-            value: "049003",
-            type: "Int",
-            name: "_deadline_two"
-          },
-          {
-            value: "0404",
-            type: "Int"
-          }
+          { value: "04ca01", type: "Int", name: "_deadline", description: "Payment deadline" },
+          { value: "0402", type: "Int" },
+          { value: "0100", type: "Bool" },
+          { value: "049003", type: "Int", name: "_deadline_two" },
+          { value: "0404", type: "Int" }
         ]
       }
     },
@@ -361,14 +333,8 @@ describe("JSON object construction", () => {
         header: "10",
         expressionTree: "d19173007e730105",
         constants: [
-          {
-            value: "0580897a",
-            type: "Long"
-          },
-          {
-            value: "0402",
-            type: "Int"
-          }
+          { value: "0580897a", type: "Long" },
+          { value: "0402", type: "Int" }
         ]
       }
     },
@@ -385,5 +351,36 @@ describe("JSON object construction", () => {
   test.each(testVectors)("Should construct from JSON object ($name)", (tv) => {
     const tree = ErgoTree.from(tv.compilerOutput);
     expect(tree.toHex()).to.be.equal(tv.tree);
+  });
+
+  it("Should support named constants", () => {
+    const tv = {
+      tree: "1a17030580897a0400059003d191b283010573007301007302",
+      compilerOutput: {
+        header: "1a",
+        expressionTree: "d191b283010573007301007302",
+        constants: [
+          { value: "0580897a", type: "Long" },
+          { value: "0400", type: "Int" },
+          { value: "059003", type: "Long", name: "price2" }
+        ]
+      }
+    };
+
+    const tree = ErgoTree.from(tv.compilerOutput);
+    expect(tree.toHex()).to.be.equal(tv.tree); // no changes made
+
+    // should replace named constant
+    tree.replaceConstant("price2", SLong(2n));
+    expect(tree.constants[2].data).to.be.equal(2n);
+    expect(tree.toHex()).not.to.be.equal(tv.tree);
+
+    // replacing by number should work too
+    expect(() => tree.replaceConstant(0, SLong(3n))).not.to.throw();
+
+    // should throw if named constant is not found
+    expect(() => tree.replaceConstant("non-existing", SLong(2n))).to.throw(
+      "Constant with name 'non-existing' not found."
+    );
   });
 });
