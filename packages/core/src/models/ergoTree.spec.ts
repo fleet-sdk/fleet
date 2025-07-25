@@ -5,7 +5,7 @@ import { ErgoTree$ } from "sigmastate-js/main";
 import { describe, expect, it, test } from "vitest";
 import { SInt } from "../constantSerializer";
 import { ErgoAddress } from "./ergoAddress";
-import { ErgoTree } from "./ergoTree";
+import { ErgoTree, type JsonCompilerOutput } from "./ergoTree";
 
 describe("ErgoTree model", () => {
   test.each([
@@ -288,5 +288,102 @@ describe("Encoding", () => {
     expect(ErgoAddress.decode(new ErgoTree(treeHex, Network.Testnet).encode()).network).to.be.equal(
       Network.Testnet
     );
+  });
+});
+
+describe("JSON object construction", () => {
+  const testVectors: {
+    name: string;
+    tree: string;
+    compilerOutput: JsonCompilerOutput;
+  }[] = [
+    {
+      name: "ErgoTree with segregated constants",
+      tree: "1a740a04c80104900304d8040e20fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e400e106b75d7c82b1c99619f2c6ea6d6585cc904ca01040201000490030404d801d601830304730073017302d1ededed9373037304917305b272017306007307917308b27201730900",
+      compilerOutput: {
+        header: "1a",
+        expressionTree:
+          "d801d601830304730073017302d1ededed9373037304917305b272017306007307917308b27201730900",
+        constants: [
+          {
+            value: "04c801",
+            type: "Int"
+          },
+          {
+            value: "049003",
+            type: "Int",
+            name: "_deadline_two"
+          },
+          {
+            value: "04d804",
+            type: "Int"
+          },
+          {
+            value: "0e20fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40",
+            type: "Coll[Byte]"
+          },
+          {
+            value: "0e106b75d7c82b1c99619f2c6ea6d6585cc9",
+            type: "Coll[Byte]",
+            name: "$tokenId",
+            description: "payment token id"
+          },
+          {
+            value: "04ca01",
+            type: "Int",
+            name: "_deadline",
+            description: "Payment deadline"
+          },
+          {
+            value: "0402",
+            type: "Int"
+          },
+          {
+            value: "0100",
+            type: "Bool"
+          },
+          {
+            value: "049003",
+            type: "Int",
+            name: "_deadline_two"
+          },
+          {
+            value: "0404",
+            type: "Int"
+          }
+        ]
+      }
+    },
+    {
+      name: "Without size flag",
+      tree: "10020580897a0402d19173007e730105",
+      compilerOutput: {
+        header: "10",
+        expressionTree: "d19173007e730105",
+        constants: [
+          {
+            value: "0580897a",
+            type: "Long"
+          },
+          {
+            value: "0402",
+            type: "Int"
+          }
+        ]
+      }
+    },
+    {
+      name: "No constants segregation",
+      tree: "0a08d1910580897a0402",
+      compilerOutput: {
+        header: "0a",
+        expressionTree: "d1910580897a0402"
+      }
+    }
+  ];
+
+  test.each(testVectors)("Should construct from JSON object ($name)", (tv) => {
+    const tree = ErgoTree.from(tv.compilerOutput);
+    expect(tree.toHex()).to.be.equal(tv.tree);
   });
 });

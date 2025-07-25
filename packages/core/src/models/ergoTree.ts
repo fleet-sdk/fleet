@@ -1,5 +1,5 @@
 import { type Base58String, type HexString, Network, ergoTreeHeaderFlags } from "@fleet-sdk/common";
-import { hex } from "@fleet-sdk/crypto";
+import { type ByteInput, hex } from "@fleet-sdk/crypto";
 import {
   SConstant,
   SigmaByteReader,
@@ -19,11 +19,15 @@ export class ErgoTree {
   #root!: Uint8Array;
   #constants: SConstant[] = [];
 
-  constructor(input: HexString | Uint8Array, network?: Network) {
+  constructor(input: ByteInput, network?: Network) {
     this.#byteReader = new SigmaByteReader(input);
 
     this.#header = this.#byteReader.readByte();
     this.#network = network ?? Network.Mainnet;
+  }
+
+  static from(input: JsonCompilerOutput, network?: Network): ErgoTree {
+    return new ErgoTree(reconstructTreeFromObject(input).toBytes(), network);
   }
 
   get bytes(): Uint8Array {
@@ -35,15 +39,15 @@ export class ErgoTree {
   }
 
   get version(): number {
-    return this.#header & VERSION_MASK;
+    return getVersion(this.#header);
   }
 
   get hasSegregatedConstants(): boolean {
-    return (this.#header & ergoTreeHeaderFlags.constantSegregation) !== 0;
+    return hasFlag(this.#header, ergoTreeHeaderFlags.constantSegregation);
   }
 
   get hasSize(): boolean {
-    return (this.#header & ergoTreeHeaderFlags.sizeInclusion) !== 0;
+    return hasFlag(this.#header, ergoTreeHeaderFlags.sizeInclusion);
   }
 
   get constants(): ReadonlyArray<SConstant> {
@@ -128,4 +132,50 @@ export class ErgoTree {
 
     return this;
   }
+}
+
+function hasFlag(header: number, flag: number): boolean {
+  return (header & flag) !== 0;
+}
+
+function getVersion(header: number): number {
+  return header & VERSION_MASK;
+}
+
+function reconstructTreeFromObject(input: JsonCompilerOutput): SigmaByteWriter {
+  const numHead = Number.parseInt(input.header, 16);
+  const sizeDelimited = hasFlag(numHead, ergoTreeHeaderFlags.sizeInclusion);
+  const constSegregated = hasFlag(numHead, ergoTreeHeaderFlags.constantSegregation);
+
+  let len = input.constants?.reduce((acc, c) => acc + c.value.length / 2, 0) ?? 0;
+  len += estimateVLQSize(len);
+  const constBytes =
+    constSegregated && input.constants
+      ? new SigmaByteWriter(len)
+          .writeArray(input.constants, (w, c) => w.writeHex(c.value))
+          .toBytes()
+      : new Uint8Array(0);
+
+  len = constBytes.length + (input.header.length + input.expressionTree.length) / 2;
+  len += estimateVLQSize(len);
+  const writer = new SigmaByteWriter(len).write(numHead);
+
+  if (sizeDelimited) {
+    writer.writeUInt(constBytes.length + input.expressionTree.length / 2);
+  }
+
+  return writer.writeBytes(constBytes).writeHex(input.expressionTree);
+}
+
+export interface ConstantInfo {
+  value: string;
+  type: string;
+  name?: string;
+  description?: string;
+}
+
+export interface JsonCompilerOutput {
+  header: string;
+  expressionTree: string;
+  constants?: ConstantInfo[];
 }
