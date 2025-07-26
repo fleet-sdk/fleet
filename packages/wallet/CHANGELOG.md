@@ -1,5 +1,13 @@
 # @fleet-sdk/wallet
 
+## 0.12.0
+
+### Patch Changes
+
+- Updated dependencies [4f3bdff]
+- Updated dependencies [4f3bdff]
+  - @fleet-sdk/core@0.12.0
+
 ## 0.11.0
 
 ### Patch Changes

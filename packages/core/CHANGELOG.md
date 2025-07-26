@@ -1,5 +1,12 @@
 # @fleet-sdk/core
 
+## 0.12.0
+
+### Minor Changes
+
+- 4f3bdff: Add ErgoTree named constants replacing support
+- 4f3bdff: Add ErgoTree construction from ergoc compiler JSON output
+
 ## 0.11.0
 
 ### Patch Changes
