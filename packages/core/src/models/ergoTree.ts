@@ -1,4 +1,10 @@
-import { type Base58String, type HexString, Network, ergoTreeHeaderFlags } from "@fleet-sdk/common";
+import {
+  type Base58String,
+  type HexString,
+  Network,
+  byteSizeOf,
+  ergoTreeHeaderFlags
+} from "@fleet-sdk/common";
 import { type ByteInput, hex } from "@fleet-sdk/crypto";
 import {
   SConstant,
@@ -170,7 +176,7 @@ function reconstructTreeFromObject(input: JsonCompilerOutput): SigmaByteWriter {
   const sizeDelimited = hasFlag(numHead, ergoTreeHeaderFlags.sizeInclusion);
   const constSegregated = hasFlag(numHead, ergoTreeHeaderFlags.constantSegregation);
 
-  let len = input.constants?.reduce((acc, c) => acc + c.value.length / 2, 0) ?? 0;
+  let len = input.constants?.reduce((acc, c) => acc + byteSizeOf(c.value), 0) ?? 0;
   len += estimateVLQSize(len);
   const constBytes =
     constSegregated && input.constants
@@ -179,12 +185,12 @@ function reconstructTreeFromObject(input: JsonCompilerOutput): SigmaByteWriter {
           .toBytes()
       : new Uint8Array(0);
 
-  len = constBytes.length + (input.header.length + input.expressionTree.length) / 2;
+  len = constBytes.length + byteSizeOf(input.header) + byteSizeOf(input.expressionTree);
   len += estimateVLQSize(len);
   const writer = new SigmaByteWriter(len).write(numHead);
 
   if (sizeDelimited) {
-    writer.writeUInt(constBytes.length + input.expressionTree.length / 2);
+    writer.writeUInt(constBytes.length + byteSizeOf(input.expressionTree));
   }
 
   return writer.writeBytes(constBytes).writeHex(input.expressionTree);
