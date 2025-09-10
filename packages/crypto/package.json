@@ -30,7 +30,7 @@
     "crypto"
   ],
   "scripts": {
-    "build": "tsup --config ../../tsup.config.ts"
+    "build": "tsdown --config ../../tsdown.config.ts --outputOptions.name=FleetSDKCrypto"
   },
   "engines": {
     "node": ">=18"

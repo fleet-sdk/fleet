@@ -36,7 +36,7 @@
     "@fleet-sdk/serializer": "workspace:^"
   },
   "scripts": {
-    "build": "tsup --config ../../tsup.config.ts"
+    "build": "tsdown --config ../../tsdown.config.ts --outputOptions.name=FleetSDKBabelFeesPlugin"
   },
   "engines": {
     "node": ">=18"

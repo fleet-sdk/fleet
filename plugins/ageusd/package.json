@@ -39,7 +39,7 @@
     "@fleet-sdk/mock-chain": "workspace:^"
   },
   "scripts": {
-    "build": "tsup --config ../../tsup.config.ts"
+    "build": "tsdown --config ../../tsdown.config.ts --outputOptions.name=FleetSDKAgeUSDPlugin"
   },
   "engines": {
     "node": ">=18"

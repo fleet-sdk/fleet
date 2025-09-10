@@ -29,7 +29,7 @@
     "blockchain"
   ],
   "scripts": {
-    "build": "tsup --config ../../tsup.config.ts"
+    "build": "tsdown --config ../../tsdown.config.ts --outputOptions.name=FleetSDKCommon"
   },
   "engines": {
     "node": ">=18"
