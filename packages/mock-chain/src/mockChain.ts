@@ -15,6 +15,7 @@ import { printDiff } from "./balancePrinting";
 import { BLOCKCHAIN_PARAMETERS, execute } from "./execution";
 import { mockBlockchainStateContext } from "./objectMocking";
 import { KeyedMockChainParty, type MockChainParty, NonKeyedMockChainParty } from "./party";
+import { type TransactionCheckOptions, validateTransaction } from "./transactionChecks";
 
 const BLOCK_TIME_MS = 120000;
 const DEFAULT_HEIGHT = 1;
@@ -36,6 +37,7 @@ export type TransactionExecutionOptions = {
   signers?: KeyedMockChainParty[];
   throw?: boolean;
   log?: boolean;
+  checks?: TransactionCheckOptions | false;
 };
 
 export type MockChainOptions = {
@@ -177,6 +179,36 @@ export class MockChain {
       unsignedTransaction instanceof ErgoUnsignedTransaction
         ? unsignedTransaction.toEIP12Object()
         : unsignedTransaction;
+
+    // Perform transaction validation checks if enabled (default is to run checks unless explicitly disabled)
+    if (options?.checks !== false) {
+      const validationResult = validateTransaction(
+        txObject,
+        this.#tip.parameters,
+        options?.checks
+      );
+
+      if (options?.log) {
+        // Log warnings
+        for (const warning of validationResult.warnings) {
+          log(pc.yellow(`${pc.bgYellow(pc.bold(" Warning "))} ${warning}`));
+        }
+
+        // Log errors
+        for (const error of validationResult.errors) {
+          log(pc.red(`${pc.bgRed(pc.bold(" Check Error "))} ${error}`));
+        }
+      }
+
+      if (!validationResult.success) {
+        if (options?.throw !== false) {
+          throw new Error(
+            `Transaction validation failed:\n${validationResult.errors.join("\n")}`
+          );
+        }
+        return false;
+      }
+    }
 
     const result = execute(txObject, keys, {
       context,
