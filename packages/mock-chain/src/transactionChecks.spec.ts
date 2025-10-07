@@ -1,19 +1,19 @@
-import { describe, expect, it } from "vitest";
 import {
-  FEE_CONTRACT,
-  type EIP12UnsignedTransaction,
   type BoxCandidate,
-  type EIP12UnsignedInput
+  type EIP12UnsignedInput,
+  type EIP12UnsignedTransaction,
+  FEE_CONTRACT
 } from "@fleet-sdk/common";
-import { 
-  validateTransaction,
+import { describe, expect, it } from "vitest";
+import { BLOCKCHAIN_PARAMETERS } from "./execution";
+import {
+  DEFAULT_MIN_FEE_PER_BYTE,
+  type TransactionCheckOptions,
   checkMinNanoergsPerBox,
   checkMinerFee,
   isFeeContract,
-  DEFAULT_MIN_FEE_PER_BYTE,
-  type TransactionCheckOptions
+  validateTransaction
 } from "./transactionChecks";
-import { BLOCKCHAIN_PARAMETERS } from "./execution";
 
 describe("Transaction Checks", () => {
   describe("checkMinNanoergsPerBox", () => {
@@ -60,7 +60,7 @@ describe("Transaction Checks", () => {
           ],
           additionalRegisters: {
             R4: "0580897a",
-            R5: "0e20" + "a".repeat(64)
+            R5: `0e20${"a".repeat(64)}`
           }
         }
       ];
@@ -85,7 +85,7 @@ describe("Transaction Checks", () => {
         assets: [],
         additionalRegisters: {}
       };
-      
+
       const transaction: EIP12UnsignedTransaction = {
         inputs: [mockInput],
         dataInputs: [],
@@ -124,7 +124,7 @@ describe("Transaction Checks", () => {
         assets: [],
         additionalRegisters: {}
       };
-      
+
       const transaction: EIP12UnsignedTransaction = {
         inputs: [mockInput],
         dataInputs: [],
@@ -157,7 +157,7 @@ describe("Transaction Checks", () => {
         assets: [],
         additionalRegisters: {}
       };
-      
+
       const transaction: EIP12UnsignedTransaction = {
         inputs: [mockInput],
         dataInputs: [],
@@ -185,7 +185,8 @@ describe("Transaction Checks", () => {
     });
 
     it("Should recognize custom fee trees", () => {
-      const customFeeTree = "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a70173007301";
+      const customFeeTree =
+        "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a70173007301";
       const mockInput: EIP12UnsignedInput = {
         boxId: "a".repeat(64),
         extension: {},
@@ -197,7 +198,7 @@ describe("Transaction Checks", () => {
         assets: [],
         additionalRegisters: {}
       };
-      
+
       const transaction: EIP12UnsignedTransaction = {
         inputs: [mockInput],
         dataInputs: [],
@@ -229,7 +230,7 @@ describe("Transaction Checks", () => {
         assets: [],
         additionalRegisters: {}
       };
-      
+
       const transaction: EIP12UnsignedTransaction = {
         inputs: [mockInput],
         dataInputs: [],
@@ -272,7 +273,7 @@ describe("Transaction Checks", () => {
         assets: [],
         additionalRegisters: {}
       };
-      
+
       const transaction: EIP12UnsignedTransaction = {
         inputs: [mockInput],
         dataInputs: [],
@@ -305,7 +306,7 @@ describe("Transaction Checks", () => {
         assets: [],
         additionalRegisters: {}
       };
-      
+
       const transaction: EIP12UnsignedTransaction = {
         inputs: [mockInput],
         dataInputs: [],
@@ -343,7 +344,7 @@ describe("Transaction Checks", () => {
         assets: [],
         additionalRegisters: {}
       };
-      
+
       const transaction: EIP12UnsignedTransaction = {
         inputs: [mockInput],
         dataInputs: [],

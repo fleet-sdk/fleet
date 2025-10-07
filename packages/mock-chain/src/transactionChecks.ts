@@ -1,11 +1,10 @@
 import {
-  type EIP12UnsignedTransaction,
-  type Box,
   type BoxCandidate,
-  type HexString,
-  ensureBigInt,
+  type EIP12UnsignedTransaction,
   FEE_CONTRACT,
-  byteSizeOf
+  type HexString,
+  byteSizeOf,
+  ensureBigInt
 } from "@fleet-sdk/common";
 import { estimateBoxSize } from "@fleet-sdk/serializer";
 import type { BlockchainParameters } from "sigmastate-js/main";
@@ -43,7 +42,7 @@ export const DEFAULT_MIN_FEE_PER_BYTE = BigInt(100);
 
 /**
  * Validates a transaction against various checks including minimum box values and fees.
- * 
+ *
  * @param transaction - The unsigned transaction to validate
  * @param parameters - Blockchain parameters containing minValuePerByte
  * @param options - Configuration options for the checks
@@ -56,7 +55,7 @@ export function validateTransaction(
 ): TransactionCheckResult {
   const errors: string[] = [];
   const warnings: string[] = [];
-  
+
   const opts = {
     checkMinNanoergsPerBox: true,
     checkMinerFee: true,
@@ -73,11 +72,7 @@ export function validateTransaction(
 
   // Check miner fee
   if (opts.checkMinerFee) {
-    const feeCheckResult = checkMinerFee(
-      transaction,
-      opts.minFeePerByte,
-      opts.customFeeErgoTrees
-    );
+    const feeCheckResult = checkMinerFee(transaction, opts.minFeePerByte, opts.customFeeErgoTrees);
     errors.push(...feeCheckResult.errors);
     warnings.push(...feeCheckResult.warnings);
   }
@@ -91,9 +86,9 @@ export function validateTransaction(
 
 /**
  * Checks if each output box meets the minimum nanoergs requirement based on its size.
- * 
+ *
  * The minimum value is calculated as: boxSize * minValuePerByte
- * 
+ *
  * @param outputs - Transaction output boxes to check
  * @param minValuePerByte - Minimum nanoergs per byte (from blockchain parameters)
  * @returns Array of error messages for boxes that don't meet the requirement
@@ -103,31 +98,31 @@ export function checkMinNanoergsPerBox(
   minValuePerByte: number
 ): string[] {
   const errors: string[] = [];
-  
+
   for (let i = 0; i < outputs.length; i++) {
     const box = outputs[i];
     const boxValue = ensureBigInt(box.value);
-    
+
     // Estimate the box size in bytes
     const boxSize = estimateBoxSize(box);
-    
+
     // Calculate minimum required value
     const minValue = BigInt(boxSize) * BigInt(minValuePerByte);
-    
+
     if (boxValue < minValue) {
       errors.push(
         `Output box ${i} has insufficient value: ${boxValue} nanoergs, ` +
-        `minimum required: ${minValue} nanoergs (${boxSize} bytes * ${minValuePerByte} nanoergs/byte)`
+          `minimum required: ${minValue} nanoergs (${boxSize} bytes * ${minValuePerByte} nanoergs/byte)`
       );
     }
   }
-  
+
   return errors;
 }
 
 /**
  * Checks if the transaction includes a valid miner fee box and meets the fee per byte threshold.
- * 
+ *
  * @param transaction - The unsigned transaction to check
  * @param minFeePerByte - Minimum fee per byte in nanoergs
  * @param customFeeErgoTrees - Additional ErgoTree scripts to recognize as fee boxes
@@ -140,95 +135,87 @@ export function checkMinerFee(
 ): { errors: string[]; warnings: string[] } {
   const errors: string[] = [];
   const warnings: string[] = [];
-  
+
   // Find fee boxes (standard fee contract or custom fee trees)
   const validFeeErgoTrees = [FEE_CONTRACT, ...customFeeErgoTrees];
-  const feeBoxes = transaction.outputs.filter(box => 
-    validFeeErgoTrees.includes(box.ergoTree)
-  );
-  
+  const feeBoxes = transaction.outputs.filter((box) => validFeeErgoTrees.includes(box.ergoTree));
+
   if (feeBoxes.length === 0) {
     warnings.push("No miner fee box found in transaction outputs");
     return { errors, warnings };
   }
-  
+
   // Calculate total fee
-  const totalFee = feeBoxes.reduce(
-    (sum, box) => sum + ensureBigInt(box.value),
-    BigInt(0)
-  );
-  
+  const totalFee = feeBoxes.reduce((sum, box) => sum + ensureBigInt(box.value), BigInt(0));
+
   // Calculate transaction size
   const txSize = calculateTransactionSize(transaction);
-  
+
   // Calculate fee per byte
   const feePerByte = txSize > 0 ? totalFee / BigInt(txSize) : BigInt(0);
-  
+
   if (feePerByte < minFeePerByte) {
     errors.push(
       `Transaction fee per byte (${feePerByte} nanoergs/byte) is below minimum ` +
-      `(${minFeePerByte} nanoergs/byte). Total fee: ${totalFee} nanoergs, ` +
-      `Transaction size: ${txSize} bytes`
+        `(${minFeePerByte} nanoergs/byte). Total fee: ${totalFee} nanoergs, ` +
+        `Transaction size: ${txSize} bytes`
     );
   }
-  
+
   // Check for multiple fee boxes (unusual but not necessarily an error)
   if (feeBoxes.length > 1) {
     warnings.push(
       `Transaction contains ${feeBoxes.length} fee boxes with total fee: ${totalFee} nanoergs`
     );
   }
-  
+
   return { errors, warnings };
 }
 
 /**
  * Estimates the size of a transaction in bytes.
  * This is a simplified estimation that may not be 100% accurate but is sufficient for fee checks.
- * 
+ *
  * @param transaction - The unsigned transaction
  * @returns Estimated size in bytes
  */
 function calculateTransactionSize(transaction: EIP12UnsignedTransaction): number {
   let size = 0;
-  
+
   // Base transaction overhead (simplified estimation)
   size += 100; // Base overhead for transaction structure
-  
+
   // Inputs size (simplified: boxId + proof placeholder)
   for (const input of transaction.inputs) {
     size += byteSizeOf(input.boxId);
     size += 100; // Estimated proof size (varies based on script complexity)
-    
+
     if (input.extension && Object.keys(input.extension).length > 0) {
       // Add extension size if present
       size += JSON.stringify(input.extension).length; // Simplified estimation
     }
   }
-  
+
   // Data inputs size
   for (const dataInput of transaction.dataInputs) {
     size += byteSizeOf(dataInput.boxId);
   }
-  
+
   // Outputs size
   for (const output of transaction.outputs) {
     size += estimateBoxSize(output);
   }
-  
+
   return size;
 }
 
 /**
  * Checks if an ErgoTree script is a recognized fee contract.
- * 
+ *
  * @param ergoTree - The ErgoTree script to check
  * @param customFeeErgoTrees - Additional custom fee trees to recognize
  * @returns True if the ErgoTree is a fee contract
  */
-export function isFeeContract(
-  ergoTree: HexString,
-  customFeeErgoTrees: HexString[] = []
-): boolean {
+export function isFeeContract(ergoTree: HexString, customFeeErgoTrees: HexString[] = []): boolean {
   return ergoTree === FEE_CONTRACT || customFeeErgoTrees.includes(ergoTree);
 }
