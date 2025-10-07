@@ -182,11 +182,7 @@ export class MockChain {
 
     // Perform transaction validation checks if enabled (default is to run checks unless explicitly disabled)
     if (options?.checks !== false) {
-      const validationResult = validateTransaction(
-        txObject,
-        this.#tip.parameters,
-        options?.checks
-      );
+      const validationResult = validateTransaction(txObject, this.#tip.parameters, options?.checks);
 
       if (options?.log) {
         // Log warnings
@@ -202,9 +198,7 @@ export class MockChain {
 
       if (!validationResult.success) {
         if (options?.throw !== false) {
-          throw new Error(
-            `Transaction validation failed:\n${validationResult.errors.join("\n")}`
-          );
+          throw new Error(`Transaction validation failed:\n${validationResult.errors.join("\n")}`);
         }
         return false;
       }
