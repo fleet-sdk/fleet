@@ -1,5 +1,5 @@
 import { generateMnemonic as generate, validateMnemonic as validate } from "@scure/bip39";
-import { wordlist as english } from "@scure/bip39/wordlists/english";
+import { wordlist as english } from "@scure/bip39/wordlists/english.js";
 
 export function generateMnemonic(strength = 160, wordlist = english): string {
   return generate(wordlist, strength);
