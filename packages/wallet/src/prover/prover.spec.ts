@@ -54,6 +54,41 @@ describe("Transaction signing", () => {
     expect(verify_signature(addr, txBytes, proof)).to.be.true;
   });
 
+  it("Should sign a transaction with a single secret and a single input and data input", async () => {
+    // generate keys
+    const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());
+
+    // mock inputs
+    const input = mockUTxO({
+      value: 1_000_000_000n,
+      ergoTree: rootKey.address.ergoTree
+    });
+
+    // build the unsigned transaction
+    const unsignedTx = new TransactionBuilder(height)
+      .from(input)
+      .to(new OutputBuilder(10_000_000n, externalAddress))
+      .withDataFrom(mockUTxO({ ergoTree: rootKey.address.ergoTree }))
+      .sendChangeTo(rootKey.address)
+      .payMinFee()
+      .build();
+
+    // sign
+    const prover = new Prover();
+    const signedTx = prover.signTransaction(unsignedTx, [rootKey]);
+
+    // verify
+    const proof = toBytes(signedTx.inputs[0].spendingProof?.proofBytes);
+
+    // verify using own verifier
+    expect(prover.verify(unsignedTx, proof, rootKey)).to.be.true;
+
+    // verify using sigma-rust for comparison
+    const txBytes = unsignedTx.toBytes();
+    const addr = Address.from_public_key(rootKey.publicKey);
+    expect(verify_signature(addr, txBytes, proof)).to.be.true;
+  });
+
   it("Should determine key from registers", async () => {
     // generate keys
     const rootKey = await ErgoHDKey.fromMnemonic(generateMnemonic());

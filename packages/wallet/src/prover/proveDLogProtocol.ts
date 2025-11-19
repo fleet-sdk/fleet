@@ -20,14 +20,14 @@ const MAX_ITERATIONS = 100;
 export function sign(message: Uint8Array, secretKey: Uint8Array) {
   for (let i = 0; i < MAX_ITERATIONS; i++) {
     const signature = genSignature(message, secretKey);
+    /* v8 ignore else -- @preserve */
     if (signature) return signature;
-    /* v8 ignore start */
   }
 
   // This branch is ignored in the coverage report because it depends on randomness.
+  /* v8 ignore next -- @preserve */
   throw new FleetError("Failed to generate signature");
 }
-/* v8 ignore stop */
 
 /**
  * Generates a Schnorr signature for the given message using the provided secret key.
@@ -45,14 +45,14 @@ export function genSignature(message: Uint8Array, secretKey: Uint8Array): undefi
   const c = fiatShamirHash(genCommitment(pk, w, message));
 
   // The next line is ignored in the coverage report because it depends on randomness.
-  /* v8 ignore next */
+  /* v8 ignore next -- @preserve */
   if (c === 0n) throw new FleetError("Failed to generate challenge");
 
   const z = umod(sk * c + k, CURVE.n);
   const signature = concatBytes(bigintBE.decode(c), bigintBE.decode(z));
 
   // The next line is ignored in the coverage report because it depends on randomness.
-  /* v8 ignore next */
+  /* v8 ignore next -- @preserve */
   if (!verify(message, signature, pk)) return;
 
   return signature;
@@ -74,7 +74,7 @@ function genRandomSecret() {
   }
 
   // The next line is ignored in the coverage report because it depends on randomness.
-  /* v8 ignore next */
+  /* v8 ignore next -- @preserve */
   if (r === 0n) throw new FleetError("Failed to generate randomness");
 
   return r;

@@ -6,7 +6,11 @@ export default defineConfig({
   test: {
     coverage: {
       thresholds: {
-        "100": true
+        autoUpdate: true,
+        branches: 99.12,
+        functions: 100,
+        lines: 100,
+        statements: 100
       },
       provider: "v8",
       reporter: ["text", "json", "html"],
@@ -18,9 +22,6 @@ export default defineConfig({
         "**/*.test.ts",
         "**/*.config.*",
         "**/dist/**",
-        "**/common/src/types/index.ts", // probably a vitest bug
-        "**/common/src/types/enums.ts", // no need to test enums directly
-        "**/common/src/constants.ts", // no need to test constants directly
         "**/src/index.ts"
       ]
     }
