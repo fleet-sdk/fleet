@@ -32,7 +32,7 @@
     "tests"
   ],
   "scripts": {
-    "build": "tsup --config ../../tsup.config.ts"
+    "build": "tsdown --config ../../tsdown.config.ts"
   },
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",

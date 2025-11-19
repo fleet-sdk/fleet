@@ -1,10 +1,8 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
   entry: ["src/index.ts"],
   outDir: "./dist",
-  splitting: false,
-  treeshake: true,
   sourcemap: true,
   clean: true,
   dts: { resolve: true },

@@ -36,7 +36,7 @@
     "serialization"
   ],
   "scripts": {
-    "build": "tsup --config ../../tsup.config.ts  --entry ./src/index.ts --entry ./src/wordlists.ts"
+    "build": "tsdown --config ../../tsdown.config.ts --entry ./src/index.ts --entry ./src/wordlists.ts"
   },
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
