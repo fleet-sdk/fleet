@@ -44,7 +44,7 @@
     "@fleet-sdk/crypto": "workspace:^",
     "@fleet-sdk/serializer": "workspace:^",
     "@noble/curves": "^2.0.1",
-    "@scure/bip32": "^1.7.0",
+    "@scure/bip32": "^2.0.1",
     "@scure/bip39": "^2.0.1"
   },
   "engines": {
