@@ -117,8 +117,8 @@ importers:
         specifier: workspace:^
         version: link:../common
       '@noble/hashes':
-        specifier: ^1.8.0
-        version: 1.8.0
+        specifier: ^2.0.1
+        version: 2.0.1
       '@scure/base':
         specifier: ^2.0.0
         version: 2.0.0
