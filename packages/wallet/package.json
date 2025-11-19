@@ -36,7 +36,7 @@
     "serialization"
   ],
   "scripts": {
-    "build": "tsdown --config ../../tsdown.config.ts --entry ./src/index.ts --entry ./src/wordlists.ts --outputOptions.name=FleetSDKWallet --format=esm,cjs"
+    "build": "tsdown --config ../../tsdown.config.ts --entry ./src/index.ts --entry ./src/wordlists.ts"
   },
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",

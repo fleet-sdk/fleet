@@ -37,7 +37,7 @@
     "sigmastate-js": "0.4.6"
   },
   "scripts": {
-    "build": "tsdown --config ../../tsdown.config.ts --outputOptions.name=FleetSDKCompiler"
+    "build": "tsdown --config ../../tsdown.config.ts"
   },
   "engines": {
     "node": ">=18"

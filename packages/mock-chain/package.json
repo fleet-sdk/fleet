@@ -32,7 +32,7 @@
     "tests"
   ],
   "scripts": {
-    "build": "tsdown --config ../../tsdown.config.ts --outputOptions.name=FleetSDKMockChain"
+    "build": "tsdown --config ../../tsdown.config.ts"
   },
   "dependencies": {
     "@fleet-sdk/common": "workspace:^",
