@@ -1,5 +1,15 @@
 # @fleet-sdk/babel-fees-plugin
 
+## 0.1.27
+
+### Patch Changes
+
+- 8987a14: Improve build outputs
+- Updated dependencies [8987a14]
+  - @fleet-sdk/serializer@0.12.1
+  - @fleet-sdk/common@0.12.1
+  - @fleet-sdk/core@0.12.1
+
 ## 0.1.26
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @fleet-sdk/blockchain-providers
 
+## 0.12.1
+
+### Patch Changes
+
+- 8987a14: Improve build outputs
+- Updated dependencies [8987a14]
+  - @fleet-sdk/common@0.12.1
+  - @fleet-sdk/core@0.12.1
+
 ## 0.12.0
 
 ### Patch Changes

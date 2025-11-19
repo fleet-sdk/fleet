@@ -1,5 +1,18 @@
 # @fleet-sdk/compiler
 
+## 0.12.1
+
+### Patch Changes
+
+- 8987a14: Improve build outputs
+- Updated dependencies [d611b3e]
+- Updated dependencies [482fe12]
+- Updated dependencies [8987a14]
+  - @fleet-sdk/crypto@0.12.1
+  - @fleet-sdk/serializer@0.12.1
+  - @fleet-sdk/common@0.12.1
+  - @fleet-sdk/core@0.12.1
+
 ## 0.12.0
 
 ### Patch Changes

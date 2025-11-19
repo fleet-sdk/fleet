@@ -1,5 +1,15 @@
 # @fleet-sdk/crypto
 
+## 0.12.1
+
+### Patch Changes
+
+- d611b3e: Bump `@scure/base` to `v2`
+- 482fe12: Bump `@noble/hashes` to `v2`
+- 8987a14: Improve build outputs
+- Updated dependencies [8987a14]
+  - @fleet-sdk/common@0.12.1
+
 ## 0.11.0
 
 ### Patch Changes
