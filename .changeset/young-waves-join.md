@@ -11,4 +11,4 @@
 "@fleet-sdk/core": patch
 ---
 
-Introduce `iife` build
+Improve build outputs
