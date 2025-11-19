@@ -1,4 +1,4 @@
-import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
 import { hex as scureHex } from "@scure/base";
 import { bench, describe } from "vitest";
 import { regularBoxes, validBoxes } from "../../../_test-vectors/mockedBoxes";

@@ -1,4 +1,4 @@
-import { randomBytes as nobleRandomBytes } from "@noble/hashes/utils";
+import { randomBytes as nobleRandomBytes } from "@noble/hashes/utils.js";
 
 /**
  * Secure PRNG from "@noble/hashes". Uses crypto.getRandomValues, which defers to OS.

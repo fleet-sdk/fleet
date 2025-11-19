@@ -1,5 +1,5 @@
 import { hex } from "@fleet-sdk/crypto";
-import { secp256k1 } from "@noble/curves/secp256k1";
+import { secp256k1 } from "@noble/curves/secp256k1.js";
 import { Address, verify_signature } from "ergo-lib-wasm-nodejs";
 import fc from "fast-check";
 import { describe, expect, it, test } from "vitest";
@@ -79,7 +79,7 @@ describe("ProveDLog protocol", () => {
           sk: fc.uint8Array({ minLength: 32, maxLength: 32 })
         }),
         ({ msg, sk }) => {
-          const pk = getPublicKey(hex.encode(sk));
+          const pk = getPublicKey(sk);
           const signature = sign(msg, sk);
 
           expect(verify(msg, signature, pk)).to.be.true;

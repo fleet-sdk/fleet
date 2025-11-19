@@ -1,4 +1,4 @@
-import { randomBytes } from "@noble/hashes/utils";
+import { randomBytes } from "@noble/hashes/utils.js";
 import { describe, expect, it } from "vitest";
 import { hex, utf8 } from "./coders";
 import { blake2b, blake2b256, sha256 } from "./hashes";

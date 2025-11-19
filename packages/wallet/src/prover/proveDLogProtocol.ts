@@ -1,9 +1,10 @@
 import { FleetError, _0n, concatBytes } from "@fleet-sdk/common";
 import { bigintBE, blake2b256, hex, randomBytes, validateEcPoint } from "@fleet-sdk/crypto";
-import { secp256k1 } from "@noble/curves/secp256k1";
+import { secp256k1 } from "@noble/curves/secp256k1.js";
 
-const { ProjectivePoint: ECPoint, CURVE } = secp256k1;
-const G = ECPoint.BASE;
+const { Point } = secp256k1;
+const G = Point.BASE;
+const N = Point.CURVE().n;
 
 const BLAKE2B_256_DIGEST_LEN = 32;
 const ERGO_SOUNDNESS_BYTES = 24;
@@ -39,16 +40,16 @@ export function sign(message: Uint8Array, secretKey: Uint8Array) {
  */
 export function genSignature(message: Uint8Array, secretKey: Uint8Array): undefined | Uint8Array {
   const sk = bigintBE.encode(secretKey);
-  const pk = G.multiply(sk).toRawBytes();
+  const pk = G.multiply(sk).toBytes();
   const k = genRandomSecret();
-  const w = G.multiply(k).toRawBytes();
+  const w = G.multiply(k).toBytes();
   const c = fiatShamirHash(genCommitment(pk, w, message));
 
   // The next line is ignored in the coverage report because it depends on randomness.
   /* v8 ignore next -- @preserve */
   if (c === 0n) throw new FleetError("Failed to generate challenge");
 
-  const z = umod(sk * c + k, CURVE.n);
+  const z = umod(sk * c + k, N);
   const signature = concatBytes(bigintBE.decode(c), bigintBE.decode(z));
 
   // The next line is ignored in the coverage report because it depends on randomness.
@@ -69,7 +70,7 @@ function genRandomSecret() {
   let c = 0;
 
   while (r === 0n && c < MAX_ITERATIONS) {
-    r = umod(bigintBE.encode(randomBytes(32)), CURVE.n);
+    r = umod(bigintBE.encode(randomBytes(32)), N);
     c++;
   }
 
@@ -105,8 +106,8 @@ export function verify(message: Uint8Array, proof: Uint8Array, publicKey: Uint8A
   const c = bigintBE.encode(proof.slice(0, ERGO_SOUNDNESS_BYTES));
   const z = bigintBE.encode(proof.slice(ERGO_SOUNDNESS_BYTES, ERGO_SCHNORR_SIG_LEN));
 
-  const t = ECPoint.fromHex(publicKey).multiply(CURVE.n - c);
-  const w = G.multiply(z).add(t).toRawBytes();
+  const t = Point.fromBytes(publicKey).multiply(N - c);
+  const w = G.multiply(z).add(t).toBytes();
   const c2 = fiatShamirHash(genCommitment(publicKey, w, message));
 
   return c2 === c;

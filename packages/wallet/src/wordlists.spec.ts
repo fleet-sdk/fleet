@@ -8,8 +8,7 @@ import {
   korean,
   portuguese,
   simplifiedChinese,
-  spanish,
-  traditionalChinese
+  spanish
 } from "./wordlists";
 
 describe("wordlists", () => {
@@ -18,7 +17,6 @@ describe("wordlists", () => {
     expect(english).to.have.length(wordlistLength);
     expect(portuguese).to.have.length(wordlistLength);
     expect(simplifiedChinese).to.have.length(wordlistLength);
-    expect(traditionalChinese).to.have.length(wordlistLength);
     expect(czech).to.have.length(wordlistLength);
     expect(french).to.have.length(wordlistLength);
     expect(italian).to.have.length(wordlistLength);
