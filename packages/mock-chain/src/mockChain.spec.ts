@@ -554,3 +554,89 @@ describe("Contract execution and chain mocking", () => {
     expect(chain.timestamp - params.timestamp).to.be.equal(0);
   });
 });
+
+describe("Transaction validation checks", () => {
+  it("Should validate minimum nanoergs per box", () => {
+    const chain = new MockChain();
+    const alice = chain.newParty("Alice");
+    alice.addBalance({ nanoergs: 10000000n });
+
+    const unsignedTransaction = new TransactionBuilder(chain.height)
+      .from(alice.utxos)
+      .to(new OutputBuilder("100", alice.address)) // Too small value
+      .sendChangeTo(alice.address)
+      .build();
+
+    // Should fail with validation error
+    expect(() => chain.execute(unsignedTransaction, { signers: [alice] }))
+      .to.throw("Transaction validation failed");
+  });
+
+  it("Should validate miner fee", () => {
+    const chain = new MockChain();
+    const alice = chain.newParty("Alice");
+    alice.addBalance({ nanoergs: 10000000n });
+
+    // Transaction without fee
+    const unsignedTransaction = new TransactionBuilder(chain.height)
+      .from(alice.utxos)
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, alice.address))
+      .sendChangeTo(alice.address)
+      .build();
+
+    // Should pass but with warning (logged if log: true)
+    const consoleMock = vi.spyOn(console, "log").mockImplementationOnce(() => {});
+    
+    expect(
+      chain.execute(unsignedTransaction, { signers: [alice], log: true })
+    ).to.be.true;
+    
+    expect(consoleMock).toHaveBeenCalledWith(
+      expect.stringContaining("No miner fee box found")
+    );
+    
+    consoleMock.mockRestore();
+  });
+
+  it("Should allow disabling checks", () => {
+    const chain = new MockChain();
+    const alice = chain.newParty("Alice");
+    alice.addBalance({ nanoergs: 10000000n });
+
+    const unsignedTransaction = new TransactionBuilder(chain.height)
+      .from(alice.utxos)
+      .to(new OutputBuilder("100", alice.address)) // Too small value
+      .sendChangeTo(alice.address)
+      .build();
+
+    // Should pass when checks are disabled
+    expect(
+      chain.execute(unsignedTransaction, { signers: [alice], checks: false })
+    ).to.be.true;
+  });
+
+  it("Should support custom fee trees", () => {
+    const chain = new MockChain();
+    const alice = chain.newParty("Alice");
+    const bob = chain.newParty("Bob"); // Create another party to use their ErgoTree
+    alice.addBalance({ nanoergs: 10000000n });
+    
+    // Use Bob's ErgoTree as a custom fee contract
+    const customFeeTree = bob.ergoTree;
+    
+    const unsignedTransaction = new TransactionBuilder(chain.height)
+      .from(alice.utxos)
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, alice.address))
+      .to(new OutputBuilder(RECOMMENDED_MIN_FEE_VALUE, customFeeTree)) // Custom fee box
+      .sendChangeTo(alice.address)
+      .build();
+
+    // Should pass with custom fee tree
+    expect(
+      chain.execute(unsignedTransaction, { 
+        signers: [alice],
+        checks: { customFeeErgoTrees: [customFeeTree] }
+      })
+    ).to.be.true;
+  });
+});
