@@ -30,3 +30,7 @@ This is a [monorepository](https://monorepo.tools/) which means this contains ma
 - [Ergonames SDK](https://github.com/ergonames/sdk/blob/master/tx-lib/index.js)
 - [Stealth Address example implementation](https://github.com/ross-weir/ergo-stealth-address-example)
 - [SigmaFi UI](https://github.com/capt-nemo429/sigmafi-ui)
+
+## Learning Resources
+
+- [Fleet SDK Educational Tutorial](https://github.com/ayushap18/fleet-sdk-tutorial) - A comprehensive, gamified tutorial covering transactions, tokens, NFTs, smart contracts, and more. Features 86+ tests, 9 practical examples, interactive playground, and VitePress documentation.
