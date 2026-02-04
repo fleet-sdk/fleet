@@ -165,7 +165,7 @@ describe("Key derivation", () => {
     for (const tv of keyAddressesTestVectors) {
       const key = await ErgoHDKey.fromMnemonic(tv.mnemonic);
 
-      for (let i = 0; i < keyAddressesTestVectors.length; i++) {
+      for (let i = 0; i < tv.addresses.length; i++) {
         expect(key.deriveChild(i).address.encode()).to.be.equal(tv.addresses[i]);
       }
     }
