@@ -2,6 +2,25 @@
   "name": "@fleet-sdk/mock-chain",
   "version": "0.12.0",
   "description": "Mock chain for Ergo Smart Contracts testing.",
+  "keywords": [
+    "blockchain",
+    "ergo",
+    "serialization",
+    "tests",
+    "transactions"
+  ],
+  "license": "MIT",
+  "repository": "github:fleet-sdk/fleet",
+  "files": [
+    "dist",
+    "!**/*.spec.*",
+    "!**/*.json",
+    "!tests",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -17,20 +36,10 @@
       }
     }
   },
-  "sideEffects": false,
-  "repository": "github:fleet-sdk/fleet",
-  "license": "MIT",
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
-  "keywords": [
-    "ergo",
-    "blockchain",
-    "transactions",
-    "serialization",
-    "tests"
-  ],
   "scripts": {
     "build": "tsdown --config ../../tsdown.config.ts"
   },
@@ -40,20 +49,11 @@
     "@fleet-sdk/crypto": "workspace:^",
     "@fleet-sdk/serializer": "workspace:^",
     "@fleet-sdk/wallet": "workspace:^",
-    "diff": "^7.0.0",
+    "diff": "^8.0.3",
     "picocolors": "^1.1.1",
     "sigmastate-js": "0.4.6"
   },
   "engines": {
     "node": ">=18"
-  },
-  "files": [
-    "dist",
-    "!**/*.spec.*",
-    "!**/*.json",
-    "!tests",
-    "CHANGELOG.md",
-    "LICENSE",
-    "README.md"
-  ]
+  }
 }
