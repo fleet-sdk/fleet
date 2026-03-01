@@ -22,7 +22,7 @@ export type HDKeyOptions = {
 };
 
 export type PrivateKeyOptions = HDKeyOptions & {
-  privateKey: Uint8Array | bigint;
+  privateKey: Uint8Array;
 };
 
 export type PublicKeyOptions = HDKeyOptions & {
