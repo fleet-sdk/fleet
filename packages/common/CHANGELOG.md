@@ -1,5 +1,12 @@
 # @fleet-sdk/common
 
+## 0.12.1
+
+### Patch Changes
+
+- 9a570f2: Bump dependencies
+- 8987a14: Improve build outputs
+
 ## 0.10.0
 
 ### Patch Changes

@@ -1,5 +1,24 @@
 # @fleet-sdk/mock-chain
 
+## 0.12.1
+
+### Patch Changes
+
+- 9a570f2: Bump dependencies
+- 8987a14: Improve build outputs
+- Updated dependencies [6a5d4b9]
+- Updated dependencies [f2e209f]
+- Updated dependencies [d611b3e]
+- Updated dependencies [9a570f2]
+- Updated dependencies [144ce49]
+- Updated dependencies [482fe12]
+- Updated dependencies [8987a14]
+  - @fleet-sdk/wallet@0.12.1
+  - @fleet-sdk/crypto@0.12.1
+  - @fleet-sdk/common@0.12.1
+  - @fleet-sdk/core@0.12.1
+  - @fleet-sdk/serializer@0.12.1
+
 ## 0.12.0
 
 ### Patch Changes
