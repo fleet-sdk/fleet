@@ -3,7 +3,7 @@ import { SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { hex } from "@fleet-sdk/crypto";
 import { blake2b256, randomBytes } from "@fleet-sdk/crypto";
 import { serializeBox } from "@fleet-sdk/serializer";
-import { AvlTree$, type BlockchainStateContext, GroupElement$ } from "sigmastate-js/main";
+import { AvlTree, type BlockchainStateContext, GroupElement$ } from "sigmastate-js/main";
 
 type MockBoxOptions = Partial<Omit<Box<bigint>, "boxId">> & {
   ergoTree: string;
@@ -105,7 +105,7 @@ export function mockBlockchainStateContext(options?: BlockchainContextMockingOpt
     (h) => ({
       ...h,
       ADProofsRoot: h.adProofsRoot,
-      stateRoot: AvlTree$.fromDigest(h.stateRoot),
+      stateRoot: new AvlTree(h.stateRoot, false, false, false, 32, undefined),
       timestamp: BigInt(h.timestamp),
       nBits: BigInt(h.nBits),
       extensionRoot: h.extensionHash,

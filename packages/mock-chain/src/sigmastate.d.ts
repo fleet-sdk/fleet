@@ -121,10 +121,6 @@ declare module "sigmastate-js/main" {
     static fromPointHex(value: HexString): GroupElement;
   }
 
-  export declare class AvlTree$ {
-    static fromDigest(value: HexString): AvlTree;
-  }
-
   export declare class SigmaProp {}
 
   export declare class SigmaProp$ {

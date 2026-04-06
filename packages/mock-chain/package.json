@@ -51,7 +51,7 @@
     "@fleet-sdk/wallet": "workspace:^",
     "diff": "^8.0.3",
     "picocolors": "^1.1.1",
-    "sigmastate-js": "0.4.6"
+    "sigmastate-js": ">=0.4.6"
   },
   "engines": {
     "node": ">=18"
