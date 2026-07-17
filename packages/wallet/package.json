@@ -45,7 +45,8 @@
     "@fleet-sdk/serializer": "workspace:^",
     "@noble/curves": "^2.0.1",
     "@scure/bip32": "^2.0.1",
-    "@scure/bip39": "^2.0.1"
+    "@scure/bip39": "^2.0.1",
+    "sigmastate-js": "0.4.6"
   },
   "engines": {
     "node": ">=18"
