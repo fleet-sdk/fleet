@@ -1,3 +1,4 @@
 export * from "./ergoHDKey";
 export * from "./mnemonic";
 export * from "./prover/prover";
+export * from "./prover/sigmaJsProver";
