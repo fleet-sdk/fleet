@@ -15,6 +15,7 @@ import { printDiff } from "./balancePrinting";
 import { BLOCKCHAIN_PARAMETERS, execute } from "./execution";
 import { mockBlockchainStateContext } from "./objectMocking";
 import { KeyedMockChainParty, type MockChainParty, NonKeyedMockChainParty } from "./party";
+import type { TransactionChecksOptions } from "./transactionChecks";
 
 const BLOCK_TIME_MS = 120000;
 const DEFAULT_HEIGHT = 1;
@@ -36,6 +37,7 @@ export type TransactionExecutionOptions = {
   signers?: KeyedMockChainParty[];
   throw?: boolean;
   log?: boolean;
+  checks?: TransactionChecksOptions;
 };
 
 export type MockChainOptions = {
@@ -181,7 +183,8 @@ export class MockChain {
     const result = execute(txObject, keys, {
       context,
       baseCost,
-      parameters: this.#tip.parameters
+      parameters: this.#tip.parameters,
+      checks: options?.checks
     });
 
     if (!result.success) {

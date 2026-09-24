@@ -14,6 +14,7 @@ import {
   ProverBuilder$
 } from "sigmastate-js/main";
 import { mockBlockchainStateContext } from "./objectMocking";
+import { type TransactionChecksOptions, checkTransaction } from "./transactionChecks";
 
 /**
  * blockchain parameters at height 1283632
@@ -46,6 +47,7 @@ export type ExecutionParameters = {
   parameters?: BlockchainParameters;
   network?: Network;
   baseCost?: number;
+  checks?: TransactionChecksOptions;
 };
 
 export function execute(
@@ -65,6 +67,11 @@ export function execute(
     network: Network.Mainnet,
     baseCost: 0
   });
+
+  const checkErrors = checkTransaction(unsignedTx, params.parameters, params.checks);
+  if (checkErrors.length > 0) {
+    return { success: false, reason: new Error(checkErrors.join("\n")) };
+  }
 
   try {
     const builder = ProverBuilder$.create(params.parameters, params.network);

@@ -421,7 +421,7 @@ describe("Contract execution and chain mocking", () => {
       .build();
 
     let tokenId = first(unsignedTransaction.inputs).boxId;
-    expect(chain.execute(unsignedTransaction)).to.be.true;
+    expect(chain.execute(unsignedTransaction, { checks: { fee: false } })).to.be.true; // fee-less: this test covers metadata mapping, not fee validation
     expect(chain.assetsMetadata.get(tokenId)).to.be.deep.equal({
       name: "Test Token 1",
       decimals: 2
@@ -439,7 +439,7 @@ describe("Contract execution and chain mocking", () => {
       .build();
 
     tokenId = first(unsignedTransaction.inputs).boxId;
-    expect(chain.execute(unsignedTransaction)).to.be.true;
+    expect(chain.execute(unsignedTransaction, { checks: { fee: false } })).to.be.true; // fee-less: this test covers metadata mapping, not fee validation
     expect(chain.assetsMetadata.get(tokenId)).to.be.deep.equal({
       name: "Test Token 2",
       decimals: 0
@@ -456,7 +456,7 @@ describe("Contract execution and chain mocking", () => {
       .build();
 
     tokenId = first(unsignedTransaction.inputs).boxId;
-    expect(chain.execute(unsignedTransaction)).to.be.true;
+    expect(chain.execute(unsignedTransaction, { checks: { fee: false } })).to.be.true; // fee-less: this test covers metadata mapping, not fee validation
     expect(chain.assetsMetadata.get(tokenId)).to.be.equal(undefined);
 
     unsignedTransaction = new TransactionBuilder(38479)
@@ -474,7 +474,7 @@ describe("Contract execution and chain mocking", () => {
       .build();
 
     tokenId = first(unsignedTransaction.inputs).boxId;
-    expect(chain.execute(unsignedTransaction)).to.be.true;
+    expect(chain.execute(unsignedTransaction, { checks: { fee: false } })).to.be.true; // fee-less: this test covers metadata mapping, not fee validation
     expect(chain.assetsMetadata.get(tokenId)).to.be.deep.equal({
       name: "Test Token 4",
       decimals: undefined
@@ -497,7 +497,7 @@ describe("Contract execution and chain mocking", () => {
       .build();
 
     tokenId = first(unsignedTransaction.inputs).boxId;
-    expect(chain.execute(unsignedTransaction)).to.be.true;
+    expect(chain.execute(unsignedTransaction, { checks: { fee: false } })).to.be.true; // fee-less: this test covers metadata mapping, not fee validation
     expect(chain.assetsMetadata.get(tokenId)).to.be.deep.equal({
       name: "Test Token 5",
       decimals: undefined
