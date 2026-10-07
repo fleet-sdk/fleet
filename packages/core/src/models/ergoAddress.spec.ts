@@ -244,27 +244,54 @@ describe("P2SH", () => {
     }
   });
 
-  it("Should encode arbitrary ErgoTree to P2SH", () => {
-    const testVectors = [
-      {
-        ergoTree: FEE_CONTRACT,
-        p2sh: "8dC5Kgb4DRXYeRxiNDizFSne24UX5BTD27LCkJB"
-      },
-      {
-        ergoTree:
-          "100604000e2003faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf040400040005000500d803d601e30004d602e4c6a70408d603e4c6a7050595e67201d804d604b2a5e4720100d605b2db63087204730000d606db6308a7d60799c1a7c17204d1968302019683050193c27204c2a7938c720501730193e4c672040408720293e4c672040505720393e4c67204060ec5a796830201929c998c7205029591b1720673028cb272067303000273047203720792720773057202",
-        p2sh: "7RDgCgZs1w9XEgBxtyPPKyG32zhkNv3HKzBy9RE"
-      }
+  it("Should hash the serialized proposition, not the ErgoTree bytes", () => {
+    // Reference vectors cross-checked against sigmastate-interpreter's
+    // Pay2SHAddress, which hashes the serialized proposition (the ErgoTree
+    // body without the header): for the proposition 08cd ++ pk below, the
+    // expected addresses are derived from blake2b256(08cd ++ pk), not from
+    // blake2b256(0008cd ++ pk).
+    const pk = "03f2dab42d7333f37f527841998d5212468d0e7a0b7e091709501ed9be8e2fc7f3";
+    const ergoTree = `0008cd${pk}`;
+
+    const testnetAddress = ErgoAddress.fromErgoTree(ergoTree, Network.Testnet);
+    expect(testnetAddress.toP2SH()).toBe("qQqAgn6N6hrNTTu2s19HJg52NK37GENqoeo2W6i");
+    expect(ErgoAddress.fromPublicKey(pk, Network.Testnet).toP2SH()).toBe(
+      "qQqAgn6N6hrNTTu2s19HJg52NK37GENqoeo2W6i"
+    );
+
+    const address = ErgoAddress.fromErgoTree(ergoTree);
+    expect(address.toP2SH()).toBe("7HP8obUp83sMkvaem5zXHNBq8rrt6nQRukXFYY9");
+    expect(ErgoAddress.getAddressType(address.toP2SH())).toBe(AddressType.P2SH);
+    expect(ErgoAddress.getNetworkType(address.toP2SH())).toBe(Network.Mainnet);
+    expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Mainnet))).toBe(Network.Mainnet);
+    expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Testnet))).toBe(Network.Testnet);
+  });
+
+  it("Should skip the tree size when the size inclusion flag is set", () => {
+    const pk = "03f2dab42d7333f37f527841998d5212468d0e7a0b7e091709501ed9be8e2fc7f3";
+    // header 0x08 = version 0 with the size inclusion flag set, followed by
+    // the VLQ-encoded proposition size (0x23 = 35 bytes) and the proposition
+    const ergoTree = `082308cd${pk}`;
+
+    expect(ErgoAddress.fromErgoTree(ergoTree, Network.Testnet).toP2SH()).toBe(
+      "qQqAgn6N6hrNTTu2s19HJg52NK37GENqoeo2W6i"
+    );
+  });
+
+  it("Should throw when converting a constant-segregated ErgoTree to P2SH", () => {
+    // For constant-segregated trees the reference hashes the proposition with
+    // the constants substituted into it, which cannot be derived from the raw
+    // tree bytes alone, so toP2SH() must fail instead of returning an address
+    // whose hash does not match the proposition a spender would supply.
+    const segregatedTrees = [
+      FEE_CONTRACT,
+      "100604000e2003faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf040400040005000500d803d601e30004d602e4c6a70408d603e4c6a7050595e67201d804d604b2a5e4720100d605b2db63087204730000d606db6308a7d60799c1a7c17204d1968302019683050193c27204c2a7938c720501730193e4c672040408720293e4c672040505720393e4c67204060ec5a796830201929c998c7205029591b1720673028cb272067303000273047203720792720773057202"
     ];
 
-    for (const tv of testVectors) {
-      const address = ErgoAddress.fromErgoTree(tv.ergoTree);
-
-      expect(address.toP2SH()).toBe(tv.p2sh);
-      expect(ErgoAddress.getAddressType(address.toP2SH())).toBe(AddressType.P2SH);
-      expect(ErgoAddress.getNetworkType(address.toP2SH())).toBe(Network.Mainnet);
-      expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Mainnet))).toBe(Network.Mainnet);
-      expect(ErgoAddress.getNetworkType(address.toP2SH(Network.Testnet))).toBe(Network.Testnet);
+    for (const ergoTree of segregatedTrees) {
+      expect(() => ErgoAddress.fromErgoTree(ergoTree).toP2SH()).toThrowError(
+        /segregated constants/
+      );
     }
   });
 

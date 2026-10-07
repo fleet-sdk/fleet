@@ -1,4 +1,10 @@
-import { AddressType, type Base58String, type HexString, Network } from "@fleet-sdk/common";
+import {
+  AddressType,
+  type Base58String,
+  type HexString,
+  Network,
+  ergoTreeHeaderFlags
+} from "@fleet-sdk/common";
 import { concatBytes, endsWith, first, startsWith } from "@fleet-sdk/common";
 import {
   type ByteInput,
@@ -8,6 +14,7 @@ import {
   hex,
   validateEcPoint
 } from "@fleet-sdk/crypto";
+import { SigmaByteReader } from "@fleet-sdk/serializer";
 import { InvalidAddress } from "../errors/invalidAddress";
 import {
   BLAKE_256_HASH_LENGTH,
@@ -27,6 +34,35 @@ const P2SH_ERGOTREE_PREFIX = hex.decode("00ea02d193b4cbe4e3010e040004300e18");
 const P2SH_ERGOTREE_SUFFIX = hex.decode("d40801");
 const P2SH_ERGOTREE_LENGTH = 44;
 const P2SH_HASH_LENGTH = 24;
+
+/**
+ * Extract the serialized proposition from an ErgoTree, i.e. the tree bytes
+ * without the header (and without the size field when the size inclusion
+ * flag is set). This is the byte form a P2SH spender supplies and the form
+ * the reference implementation (sigmastate-interpreter's `Pay2SHAddress`)
+ * hashes when creating a pay-to-script-hash address.
+ *
+ * Constant-segregated trees are rejected: the reference hashes the
+ * proposition with the segregated constants substituted into it, and that
+ * form cannot be derived from the raw tree bytes alone.
+ */
+function getPropositionBytes(ergoTree: Uint8Array): Uint8Array {
+  const reader = new SigmaByteReader(ergoTree);
+  const header = reader.readByte();
+
+  if (header & ergoTreeHeaderFlags.constantSegregation) {
+    throw new Error(
+      "Conversion to P2SH is not supported for ErgoTrees with segregated constants, " +
+        "as the script hash must be calculated over the proposition with the constants substituted into it."
+    );
+  }
+
+  if (header & ergoTreeHeaderFlags.sizeInclusion) {
+    reader.readUInt(); // skip the tree size field
+  }
+
+  return reader.readRemainingBytes();
+}
 
 function getErgoTreeType(ergoTree: Uint8Array): AddressType {
   if (ergoTree.length === P2PK_ERGOTREE_LENGTH && startsWith(ergoTree, P2PK_ERGOTREE_PREFIX)) {
@@ -186,7 +222,7 @@ export class ErgoAddress {
   public toP2SH(network?: Network): Base58String {
     if (this.type === AddressType.P2SH) return this.encode();
 
-    const hash = blake2b256(this.#ergoTree).subarray(0, P2SH_HASH_LENGTH);
+    const hash = blake2b256(getPropositionBytes(this.#ergoTree)).subarray(0, P2SH_HASH_LENGTH);
     return encodeAddress(network ?? this.#network, AddressType.P2SH, hash);
   }
 
