@@ -1,4 +1,5 @@
 import { _0n, _7n, _127n, _128n, ensureBigInt } from "@fleet-sdk/common";
+import { MAX_U32 } from "./numRanges";
 import type { SigmaByteReader } from "./sigmaByteReader";
 import type { SigmaByteWriter } from "./sigmaByteWriter";
 
@@ -22,11 +23,16 @@ export function writeVLQ(writer: SigmaByteWriter, value: number): SigmaByteWrite
   if (value < 0) {
     throw new RangeError("Variable Length Quantity not supported for negative numbers.");
   }
+  if (value > MAX_U32) {
+    throw new RangeError(`Value ${value} is out of range for an unsigned 32-bit integer`);
+  }
 
+  // Divide instead of shifting: JS bitwise operators truncate to 32 bits, so
+  // `>>` corrupts every value >= 2^31.
   let val = value;
   do {
-    let lower7bits = val & 0x7f;
-    val >>= 7;
+    let lower7bits = val % 128;
+    val = Math.floor(val / 128);
     if (val > 0) lower7bits |= 0x80;
     writer.write(lower7bits);
   } while (val > 0);
@@ -50,9 +56,15 @@ export function readVLQ(reader: SigmaByteReader): number {
 
   do {
     lower7bits = reader.readByte();
-    value |= (lower7bits & 0x7f) << shift;
+    // Multiply instead of shifting: JS bitwise operators truncate to 32 bits,
+    // so `<<` corrupts every value >= 2^31.
+    value += (lower7bits & 0x7f) * 2 ** shift;
     shift += 7;
   } while ((lower7bits & 0x80) !== 0);
+
+  if (value > MAX_U32) {
+    throw new RangeError(`Value ${value} is out of range for an unsigned 32-bit integer`);
+  }
 
   return value;
 }

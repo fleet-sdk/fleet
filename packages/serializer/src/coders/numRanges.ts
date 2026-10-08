@@ -1,6 +1,8 @@
 export const MIN_U8 = 0x00;
 export const MAX_U8 = 0xff;
 
+export const MAX_U32 = 0xffffffff;
+
 export const MIN_I8 = -0x80;
 export const MAX_I8 = 0x7f;
 

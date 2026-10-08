@@ -17,7 +17,10 @@ describe("VLQ encoding/decoding", () => {
     { uint: 2097151, bytes: Uint8Array.from([0xff, 0xff, 0x7f]) },
     { uint: 2097152, bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x01]) },
     { uint: 268435455, bytes: Uint8Array.from([0xff, 0xff, 0xff, 0x7f]) },
-    { uint: 268435456, bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x01]) }
+    { uint: 268435456, bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x01]) },
+    { uint: 2147483647, bytes: Uint8Array.from([0xff, 0xff, 0xff, 0xff, 0x07]) },
+    { uint: 2147483648, bytes: Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x08]) },
+    { uint: 4294967295, bytes: Uint8Array.from([0xff, 0xff, 0xff, 0xff, 0x0f]) }
   ];
 
   function toVLQBytes(value: number) {
@@ -34,8 +37,21 @@ describe("VLQ encoding/decoding", () => {
     }).toThrow();
   });
 
+  it("Should fail trying to encode values above the unsigned 32-bit range", () => {
+    expect(() => {
+      toVLQBytes(4294967296);
+    }).toThrow(RangeError);
+  });
+
   test.each(testVectors)("Should decode", (tv) => {
     expect(readVLQ(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
+  });
+
+  it("Should fail trying to decode values above the unsigned 32-bit range", () => {
+    // 2^32, encoded as VLQ
+    expect(() => {
+      readVLQ(new SigmaByteReader(Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x10])));
+    }).toThrow(RangeError);
   });
 
   it("Should decode empty Buffer to 0", () => {
@@ -50,7 +66,7 @@ describe("VLQ encoding/decoding", () => {
 
   it("Should encode/decode radom numbers", () => {
     fc.assert(
-      fc.property(fc.integer({ min: 0, max: 100000000 }), (n) => {
+      fc.property(fc.integer({ min: 0, max: 4294967295 }), (n) => {
         expect(readVLQ(new SigmaByteReader(toVLQBytes(n)))).to.be.equal(n);
       })
     );
