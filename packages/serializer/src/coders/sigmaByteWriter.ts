@@ -74,6 +74,12 @@ export class SigmaByteWriter {
   }
 
   write(byte: number): SigmaByteWriter {
+    if (this.#cursor >= this.#bytes.length) {
+      throw new RangeError(
+        `Writing a byte at position ${this.#cursor} exceeds the buffer capacity of ${this.#bytes.length} bytes`
+      );
+    }
+
     this.#bytes[this.#cursor++] = byte;
     return this;
   }
@@ -89,6 +95,12 @@ export class SigmaByteWriter {
   }
 
   writeBits(bits: ArrayLike<boolean>): SigmaByteWriter {
+    if (this.#cursor + Math.ceil(bits.length / 8) > this.#bytes.length) {
+      throw new RangeError(
+        `Writing ${bits.length} bits at position ${this.#cursor} exceeds the buffer capacity of ${this.#bytes.length} bytes`
+      );
+    }
+
     let bitOffset = 0;
 
     for (let i = 0; i < bits.length; i++) {

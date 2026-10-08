@@ -108,6 +108,55 @@ describe("Sigma Writer", () => {
     expect(() => sigmaBuffer.writeI256(MAX_I256 + 1n)).to.throw(i256Err);
   });
 
+  it("Should throw when a single byte write exceeds the buffer capacity", () => {
+    const writer = new SigmaByteWriter(2);
+    writer.write(0x01).write(0x02);
+
+    expect(() => writer.write(0x03)).toThrow(RangeError);
+    expect(() => writer.write(0x03)).toThrow(/exceeds the buffer capacity of 2 bytes/);
+    // a failed write must not advance the cursor or alter the written bytes
+    expect(writer).toHaveLength(2);
+    expect(writer.toBytes()).toEqual(Uint8Array.from([0x01, 0x02]));
+  });
+
+  it("Should throw when a byte array write exceeds the buffer capacity", () => {
+    const writer = new SigmaByteWriter(3);
+    writer.write(0x01);
+
+    expect(() => writer.writeBytes(Uint8Array.from([0x02, 0x03, 0x04]))).toThrow(RangeError);
+    expect(() => writer.writeHex("020304")).toThrow(RangeError);
+    // a failed write must not advance the cursor or alter the written bytes
+    expect(writer).toHaveLength(1);
+    expect(writer.toBytes()).toEqual(Uint8Array.from([0x01]));
+
+    // an exact-fit write still succeeds
+    writer.writeBytes(Uint8Array.from([0x02, 0x03]));
+    expect(writer.toBytes()).toEqual(Uint8Array.from([0x01, 0x02, 0x03]));
+  });
+
+  it("Should throw when a multi-byte VLQ write exceeds the buffer capacity", () => {
+    const writer = new SigmaByteWriter(1);
+
+    // 300 encodes to two VLQ bytes (0xd8 0x04), which cannot fit in one byte
+    expect(() => writer.writeUInt(300)).toThrow(RangeError);
+    expect(() => writer.writeBigUInt(300n)).toThrow(RangeError);
+  });
+
+  it("Should throw when a bit write exceeds the buffer capacity", () => {
+    const writer = new SigmaByteWriter(1);
+
+    // nine bits need two bytes
+    expect(() =>
+      writer.writeBits([true, false, true, false, true, false, true, false, true])
+    ).toThrow(RangeError);
+    expect(writer).toHaveLength(0);
+    expect(writer.toBytes()).toEqual(new Uint8Array(0));
+
+    // eight bits fit exactly in one byte
+    writer.writeBits([true, false, true, false, true, false, true, false]);
+    expect(writer.toBytes()).toEqual(Uint8Array.from([0x55]));
+  });
+
   it("Should write a checksum based on the current stream content", () => {
     const bytes = Uint8Array.from([0x00, 0x00, 0x21, 0xff, 0x15, 0x0c]);
     const blakeHash = blake2b256(bytes);
