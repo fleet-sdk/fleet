@@ -90,8 +90,52 @@ describe("Big VLQ encoding/decoding", () => {
     }).toThrow();
   });
 
+  it("Should encode the maximum unsigned 64-bit value", () => {
+    expect(toBigVLQBytes(18446744073709551615n)).toEqual(
+      Uint8Array.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01])
+    );
+  });
+
+  it("Should fail trying to encode values above the unsigned 64-bit range", () => {
+    expect(() => {
+      toBigVLQBytes(18446744073709551616n);
+    }).toThrow(RangeError);
+  });
+
   test.each(testVectors)("Should decode", (tv) => {
     expect(readBigVLQ(new SigmaByteReader(tv.bytes))).toEqual(tv.uint);
+  });
+
+  it("Should decode the maximum unsigned 64-bit value", () => {
+    expect(
+      readBigVLQ(
+        new SigmaByteReader(
+          Uint8Array.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01])
+        )
+      )
+    ).toEqual(18446744073709551615n);
+  });
+
+  it("Should fail trying to decode values above the unsigned 64-bit range", () => {
+    // 2^64, encoded as VLQ
+    expect(() => {
+      readBigVLQ(
+        new SigmaByteReader(
+          Uint8Array.from([0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x02])
+        )
+      );
+    }).toThrow(RangeError);
+  });
+
+  it("Should fail trying to decode encodings longer than 10 bytes", () => {
+    // 1, encoded in 11 bytes: a 64-bit VLQ never exceeds 10 bytes
+    expect(() => {
+      readBigVLQ(
+        new SigmaByteReader(
+          Uint8Array.from([0x81, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x00])
+        )
+      );
+    }).toThrow(RangeError);
   });
 
   it("Should decode empty Buffer to 0", () => {
@@ -104,7 +148,7 @@ describe("Big VLQ encoding/decoding", () => {
 
   it("Should encode/decode radom numbers", () => {
     fc.assert(
-      fc.property(fc.bigInt({ min: 0n, max: BigInt(Number.MAX_SAFE_INTEGER) }), (n) => {
+      fc.property(fc.bigInt({ min: 0n, max: 18446744073709551615n }), (n) => {
         expect(readBigVLQ(new SigmaByteReader(toBigVLQBytes(n)))).to.be.equal(n);
       })
     );

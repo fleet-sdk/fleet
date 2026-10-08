@@ -1,4 +1,5 @@
 import { _0n, _7n, _127n, _128n, ensureBigInt } from "@fleet-sdk/common";
+import { MAX_U64 } from "./numRanges";
 import type { SigmaByteReader } from "./sigmaByteReader";
 import type { SigmaByteWriter } from "./sigmaByteWriter";
 
@@ -70,6 +71,9 @@ export function writeBigVLQ(writer: SigmaByteWriter, value: bigint): SigmaByteWr
   if (value < _0n) {
     throw new RangeError("Variable Length Quantity not supported for negative numbers");
   }
+  if (value > MAX_U64) {
+    throw new RangeError(`Value ${value} is out of range for an unsigned 64-bit integer`);
+  }
 
   let val = value;
   do {
@@ -92,12 +96,21 @@ export function readBigVLQ(reader: SigmaByteReader): bigint {
 
   let value = _0n;
   let shift = _0n;
+  let byteCount = 0;
   let lower7bits: bigint;
 
   do {
     lower7bits = BigInt(reader.readByte());
+    byteCount++;
     value |= (lower7bits & _127n) << shift;
     shift += _7n;
+
+    // The reference `getULong` reads at most 10 bytes (shifts 0..63) and
+    // returns a 64-bit value: longer encodings are an error there, and a
+    // 10-byte encoding whose value exceeds 2^64 - 1 does not round-trip.
+    if (byteCount > 10 || value > MAX_U64) {
+      throw new RangeError(`Value ${value} is out of range for an unsigned 64-bit integer`);
+    }
   } while ((lower7bits & _128n) !== _0n);
 
   return value;
