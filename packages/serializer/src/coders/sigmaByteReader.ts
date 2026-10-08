@@ -42,6 +42,12 @@ export class SigmaByteReader {
   }
 
   readBits(length: number): ArrayLike<boolean> {
+    if (length < 0 || this.#cursor + Math.ceil(length / 8) > this.#bytes.length) {
+      throw new RangeError(
+        `Reading ${length} bits at position ${this.#cursor} exceeds the input length of ${this.#bytes.length} bytes`
+      );
+    }
+
     const bits = new Array<boolean>(length);
     let bitOffset = 0;
 
@@ -61,10 +67,22 @@ export class SigmaByteReader {
   }
 
   readByte(): number {
+    if (this.#cursor >= this.#bytes.length) {
+      throw new RangeError(
+        `Reading a byte at position ${this.#cursor} exceeds the input length of ${this.#bytes.length} bytes`
+      );
+    }
+
     return this.#bytes[this.#cursor++];
   }
 
   readBytes(length: number): Uint8Array {
+    if (length < 0 || this.#cursor + length > this.#bytes.length) {
+      throw new RangeError(
+        `Reading ${length} bytes at position ${this.#cursor} exceeds the input length of ${this.#bytes.length} bytes`
+      );
+    }
+
     return this.#bytes.subarray(this.#cursor, (this.#cursor += length));
   }
 

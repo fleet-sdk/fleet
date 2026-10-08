@@ -62,6 +62,45 @@ describe("Sigma byte reader", () => {
     expect(reader.match(u8a([0x04, 0x05, 0x06, 0x07]), 3)).toBe(false);
   });
 
+  it("should throw when reading a byte past the end of the input", () => {
+    const reader = new SigmaByteReader(u8a([0x01]));
+
+    expect(reader.readByte()).toBe(0x01);
+    expect(() => reader.readByte()).toThrow(RangeError);
+    expect(() => new SigmaByteReader(u8a([])).readByte()).toThrow(RangeError);
+  });
+
+  it("should throw when reading more bytes than remain", () => {
+    const reader = new SigmaByteReader(u8a([0x01, 0x02, 0x03]));
+
+    expect(reader.readBytes(2)).toEqual(u8a([0x01, 0x02]));
+    expect(() => reader.readBytes(2)).toThrow(RangeError);
+    expect(reader.readBytes(1)).toEqual(u8a([0x03])); // exact remainder still works
+    expect(() => reader.readBytes(1)).toThrow(RangeError);
+    expect(() => reader.readBytes(-1)).toThrow(RangeError);
+  });
+
+  it("should throw when reading bits past the end of the input", () => {
+    const reader = new SigmaByteReader(u8a([0xff]));
+
+    expect(reader.readBits(8)).toEqual([true, true, true, true, true, true, true, true]);
+    expect(() => reader.readBits(1)).toThrow(RangeError);
+    expect(() => new SigmaByteReader(u8a([0xff])).readBits(9)).toThrow(RangeError);
+  });
+
+  it("should throw on a VLQ truncated with the continuation bit set", () => {
+    expect(() => new SigmaByteReader(u8a([0x80])).readUInt()).toThrow(RangeError);
+    expect(() => new SigmaByteReader(u8a([0x80])).readBigUInt()).toThrow(RangeError);
+    expect(() => new SigmaByteReader(u8a([0xff, 0xff])).readUInt()).toThrow(RangeError);
+  });
+
+  it("should throw when a length-prefixed field is truncated", () => {
+    // SLong header is not involved here: readI256 reads a VLQ length (5) and then
+    // expects 5 bytes, but only 2 remain.
+    const reader = new SigmaByteReader(u8a([0x05, 0x01, 0x02]));
+    expect(() => reader.readI256()).toThrow(RangeError);
+  });
+
   it("should read remaining bytes", () => {
     const bytes = u8a([0x01, 0x02, 0x03, 0x04]);
     const reader = new SigmaByteReader(bytes);
