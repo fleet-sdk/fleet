@@ -3,10 +3,12 @@ import { blake2b256, hex, sha256 } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
 import { MAX_CONSTANT_LENGTH } from "../sigmaConstant";
 import {
+  MAX_I8,
   MAX_I16,
   MAX_I32,
   MAX_I64,
   MAX_I256,
+  MIN_I8,
   MIN_I16,
   MIN_I32,
   MIN_I64,
@@ -51,6 +53,25 @@ describe("Sigma Writer", () => {
     expect(sigmaBuffer.toBytes()).toEqual(Uint8Array.from([0x01, 0x00]));
   });
 
+  it("Should put Byte", () => {
+    const testVectors = [
+      { int: 0, hex: "00" },
+      { int: 1, hex: "01" },
+      { int: 76, hex: "4c" },
+      { int: MAX_I8, hex: "7f" },
+      { int: -1, hex: "ff" },
+      { int: MIN_I8, hex: "80" }
+    ];
+
+    const all = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
+    for (const tv of testVectors) {
+      all.writeI8(tv.int);
+      expect(new SigmaByteWriter(tv.hex.length).writeI8(tv.int).encode(hex)).toBe(tv.hex);
+    }
+
+    expect(all.encode(hex)).toEqual(testVectors.map((x) => x.hex).join(""));
+  });
+
   it("Should put Int", () => {
     const testVectors = [
       { int: 0, hex: "00" },
@@ -86,6 +107,11 @@ describe("Sigma Writer", () => {
 
   it("Should fail for out of range values", () => {
     const sigmaBuffer = new SigmaByteWriter(MAX_CONSTANT_LENGTH);
+
+    // Byte
+    const i8Err = "out of range for an 8-bit integer";
+    expect(() => sigmaBuffer.writeI8(MIN_I8 - 1)).to.throw(i8Err);
+    expect(() => sigmaBuffer.writeI8(MAX_I8 + 1)).to.throw(i8Err);
 
     // Short
     const i16Err = "out of range for a 16-bit integer";

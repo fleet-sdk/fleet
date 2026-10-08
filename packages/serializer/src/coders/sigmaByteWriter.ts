@@ -1,10 +1,12 @@
 import { type Coder, blake2b256, hex } from "@fleet-sdk/crypto";
 import { bigIntToHex } from "./bigint";
 import {
+  MAX_I8,
   MAX_I16,
   MAX_I32,
   MAX_I64,
   MAX_I256,
+  MIN_I8,
   MIN_I16,
   MIN_I32,
   MIN_I64,
@@ -37,6 +39,16 @@ export class SigmaByteWriter {
 
   writeBigUInt(value: bigint): SigmaByteWriter {
     return writeBigVLQ(this, value);
+  }
+
+  writeI8(value: number): SigmaByteWriter {
+    if (value < MIN_I8 || value > MAX_I8) {
+      throw new RangeError(`Value ${value} is out of range for an 8-bit integer`);
+    }
+
+    // Negative values are written as their two's complement byte, mirroring
+    // the conversion `readI8` applies when reading.
+    return this.write(value < 0 ? value + 0x100 : value);
   }
 
   writeI16(value: number): SigmaByteWriter {

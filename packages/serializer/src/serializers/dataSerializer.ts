@@ -16,7 +16,7 @@ export const dataSerializer = {
         case descriptors.bool.code:
           return writer.writeBool(data as boolean);
         case descriptors.byte.code:
-          return writer.write(data as number);
+          return writer.writeI8(data as number);
         case descriptors.short.code:
           return writer.writeI16(data as number);
         case descriptors.int.code:

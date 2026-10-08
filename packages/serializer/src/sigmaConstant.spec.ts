@@ -67,6 +67,15 @@ describe("Primitive types serialization and parsing", () => {
     expect(SConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
+  it("Should fail to serialize out-of-range SByte values", () => {
+    const i8Err = "out of range for an 8-bit integer";
+    // 128..255 previously serialized to a byte that parsed back negative,
+    // and values >= 256 silently wrapped modulo 256 (256 became 0).
+    for (const value of [128, 200, 255, 256, -129, -256]) {
+      expect(() => SByte(value).toHex()).to.throw(i8Err);
+    }
+  });
+
   it.each(shortVectors)("Should road-trip SShort($value)", (tv) => {
     const sconst = SShort(tv.value);
 
