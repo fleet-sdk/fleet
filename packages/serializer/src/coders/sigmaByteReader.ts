@@ -1,7 +1,7 @@
 import { startsWith } from "@fleet-sdk/common";
 import { type ByteInput, ensureBytes, hex } from "@fleet-sdk/crypto";
 import { hexToBigInt } from "./bigint";
-import { MAX_I8, MAX_U8 } from "./numRanges";
+import { MAX_I8, MAX_I256, MAX_U8, MIN_I256 } from "./numRanges";
 import { readBigVLQ, readVLQ } from "./vlq";
 import { zigZag32, zigZag64 } from "./zigZag";
 
@@ -95,7 +95,13 @@ export class SigmaByteReader {
 
   readI256(): bigint {
     const len = readVLQ(this);
-    return hexToBigInt(hex.encode(this.readBytes(len)));
+    const value = hexToBigInt(hex.encode(this.readBytes(len)));
+
+    if (value < MIN_I256 || value > MAX_I256) {
+      throw new RangeError(`Value ${value} is out of range for a 256-bit integer`);
+    }
+
+    return value;
   }
 
   readRemainingBytes(): Uint8Array {

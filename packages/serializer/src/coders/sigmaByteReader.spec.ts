@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { MAX_I256, MIN_I256 } from "./numRanges";
 import { SigmaByteReader } from "./sigmaByteReader";
 
 const u8a = (bytes: number[]) => new Uint8Array(bytes);
@@ -60,6 +61,30 @@ describe("Sigma byte reader", () => {
 
     expect(reader.match(u8a([0x04, 0x05, 0x06]), 3)).toBe(true);
     expect(reader.match(u8a([0x04, 0x05, 0x06, 0x07]), 3)).toBe(false);
+  });
+
+  it("should read boundary BigInt values", () => {
+    // MAX_I256: VLQ length 32 + 0x7fff…ff
+    const maxReader = new SigmaByteReader(u8a([0x20, 0x7f, ...new Array(31).fill(0xff)]));
+    expect(maxReader.readI256()).toBe(MAX_I256);
+
+    // MIN_I256: VLQ length 32 + 0x8000…00
+    const minReader = new SigmaByteReader(u8a([0x20, 0x80, ...new Array(31).fill(0x00)]));
+    expect(minReader.readI256()).toBe(MIN_I256);
+  });
+
+  it("should reject BigInt values that don't fit in 256 bits", () => {
+    const i256Err = "out of range for a 256-bit integer";
+
+    // MAX_I256 + 1 (2^255): VLQ length 33 + 0x008000…00
+    const overMaxReader = new SigmaByteReader(u8a([0x21, 0x00, 0x80, ...new Array(31).fill(0x00)]));
+    expect(() => overMaxReader.readI256()).to.throw(i256Err);
+
+    // MIN_I256 - 1 (-2^255 - 1): VLQ length 33 + 0xff7fff…ff
+    const underMinReader = new SigmaByteReader(
+      u8a([0x21, 0xff, 0x7f, ...new Array(31).fill(0xff)])
+    );
+    expect(() => underMinReader.readI256()).to.throw(i256Err);
   });
 
   it("should read remaining bytes", () => {

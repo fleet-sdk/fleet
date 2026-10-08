@@ -100,6 +100,15 @@ describe("Primitive types serialization and parsing", () => {
     expect(SConstant.from(tv.hex).data).to.be.equal(ensureBigInt(tv.value));
   });
 
+  it("Should reject SBigInt constants that don't fit in 256 bits on deserialization", () => {
+    // 45-byte BigInt test vector from sigmastate-interpreter's
+    // DataSerializerSpecification: its value doesn't fit into 256 bits, so the
+    // reference implementation rejects it on deserialization.
+    const hex =
+      "062d80e0ff7f02807fff72807f0a00ff7fb7c57f75c11ba2802970fd250052807fc37f6480ffff007fff18eeba44";
+    expect(() => SConstant.from(hex)).to.throw("out of range for a 256-bit integer");
+  });
+
   it.each(groupElementVectors)("Should road-trip SGroupElement($value)", (tv) => {
     const sconst = SGroupElement(tv.value);
     expect(sconst.toHex()).to.be.equal(tv.hex);
