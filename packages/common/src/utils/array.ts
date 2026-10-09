@@ -81,8 +81,11 @@ export function hasDuplicatesBy<T>(array: T[], selector: ObjectSelector<T>): boo
  * ```
  */
 export function chunk<T>(array: T[], size: number): T[][] {
+  if (!Number.isInteger(size) || size <= 0) {
+    throw new RangeError(`Chunk size '${size}' is out of range, it must be a positive integer.`);
+  }
+
   if (isEmpty(array)) return [];
-  if (array.length <= size) return [array];
 
   const chunks: T[][] = [];
   for (let i = 0; i < array.length; i += size) {

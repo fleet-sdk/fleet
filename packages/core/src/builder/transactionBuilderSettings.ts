@@ -33,6 +33,12 @@ export class TransactionBuilderSettings {
    * Define max number of distinct tokens per change box
    */
   public setMaxTokensPerChangeBox(max: number): TransactionBuilderSettings {
+    if (!Number.isInteger(max) || max < 1 || max > MAX_TOKENS_PER_BOX) {
+      throw new RangeError(
+        `Max tokens per change box '${max}' is out of range, it must be an integer between 1 and ${MAX_TOKENS_PER_BOX}.`
+      );
+    }
+
     this._maxDistinctTokensPerChangeBox = max;
 
     return this;

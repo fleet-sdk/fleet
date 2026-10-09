@@ -162,6 +162,29 @@ describe("Chunk arrays", () => {
   it("Should return empty array if the input is empty", () => {
     expect(chunk([], 2)).toEqual([]);
   });
+
+  it("Should not return the input array itself as the single chunk", () => {
+    const array = [1, 2, 3];
+
+    const chunks = chunk(array, 10);
+
+    expect(chunks).toEqual([[1, 2, 3]]);
+    expect(chunks[0]).not.toBe(array);
+
+    chunks[0].push(4);
+    expect(array).toEqual([1, 2, 3]);
+  });
+
+  it("Should throw on a non-positive chunk size", () => {
+    expect(() => chunk([1, 2, 3], 0)).toThrow(RangeError);
+    expect(() => chunk([1, 2, 3], -2)).toThrow(RangeError);
+  });
+
+  it("Should throw on a non-integer chunk size", () => {
+    expect(() => chunk([1, 2, 3], 2.5)).toThrow(RangeError);
+    expect(() => chunk([1, 2, 3], Number.NaN)).toThrow(RangeError);
+    expect(() => chunk([1, 2, 3], Number.POSITIVE_INFINITY)).toThrow(RangeError);
+  });
 });
 
 describe("Array ordering", () => {

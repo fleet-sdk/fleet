@@ -52,6 +52,26 @@ describe("Transaction builder settings", () => {
     expect(settings.canBurnTokensFromPlugins).toBe(true);
   });
 
+  it("Should reject invalid max tokens per change box values", () => {
+    const settings = new TransactionBuilderSettings();
+
+    for (const invalid of [0, -5, 2.5, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(() => settings.setMaxTokensPerChangeBox(invalid)).toThrow(RangeError);
+    }
+
+    expect(() => settings.setMaxTokensPerChangeBox(MAX_TOKENS_PER_BOX + 1)).toThrow(RangeError);
+    expect(settings.maxTokensPerChangeBox).toBe(MAX_TOKENS_PER_BOX);
+  });
+
+  it("Should accept boundary max tokens per change box values", () => {
+    const settings = new TransactionBuilderSettings();
+
+    expect(settings.setMaxTokensPerChangeBox(1).maxTokensPerChangeBox).toBe(1);
+    expect(settings.setMaxTokensPerChangeBox(MAX_TOKENS_PER_BOX).maxTokensPerChangeBox).toBe(
+      MAX_TOKENS_PER_BOX
+    );
+  });
+
   it("Should allow token burning only from plugins context", () => {
     const settings = new TransactionBuilderSettings().allowTokenBurningFromPlugins(true);
 
