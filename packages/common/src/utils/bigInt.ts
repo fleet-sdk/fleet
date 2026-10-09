@@ -47,15 +47,11 @@ type ParsingOptions = {
 export function undecimalize(input: string, options?: ParsingOptions | number): bigint {
   if (!input) return _0n;
 
-  options = typeof options === "number" ? { decimals: options } : options;
-  if (isUndefined(options)) {
-    options = {};
-  }
+  const parsedOptions = typeof options === "number" ? { decimals: options } : options;
+  const decimals = parsedOptions?.decimals || 0;
+  const decimalMark = parsedOptions?.decimalMark || ".";
 
-  options.decimals = options.decimals || 0;
-  options.decimalMark = options.decimalMark || ".";
-
-  const fragments = input.split(options.decimalMark);
+  const fragments = input.split(decimalMark);
   if (fragments.length > 2) {
     throw new Error("Invalid numeric string.");
   }
@@ -65,9 +61,9 @@ export function undecimalize(input: string, options?: ParsingOptions | number): 
   const negative = integer.startsWith("-") ? "-" : "";
 
   if (!decimal) {
-    decimal = "0".repeat(options.decimals);
-  } else if (decimal.length < options.decimals) {
-    decimal = decimal.padEnd(options.decimals, "0");
+    decimal = "0".repeat(decimals);
+  } else if (decimal.length < decimals) {
+    decimal = decimal.padEnd(decimals, "0");
   }
 
   return BigInt(negative + _stripNonDigits(integer + decimal));
@@ -114,15 +110,19 @@ export function decimalize(value: Amount, options?: FormattingOptions | number):
     return value.toString();
   }
 
-  options = typeof options === "number" ? { decimals: options } : options;
-  options.decimals = options.decimals || 0;
-  options.decimalMark = options.decimalMark || ".";
+  const parsedOptions = typeof options === "number" ? { decimals: options } : options;
+  const decimals = parsedOptions.decimals || 0;
+  const decimalMark = parsedOptions.decimalMark || ".";
 
-  const pow = _10n ** BigInt(options.decimals);
+  const pow = _10n ** BigInt(decimals);
   const integer = value / pow;
   const decimal = value - integer * pow;
 
-  return buildFormattedDecimal(integer.toString(10), decimal.toString(10), options);
+  return buildFormattedDecimal(integer.toString(10), decimal.toString(10), {
+    ...parsedOptions,
+    decimals,
+    decimalMark
+  });
 }
 
 /**

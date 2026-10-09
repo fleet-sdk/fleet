@@ -78,6 +78,17 @@ describe("decimalize()", () => {
     const options = { decimals: 9 };
     expect(decimalize(undecimalize("129.8379183", options), options)).toBe("129.8379183");
   });
+
+  it("Should not mutate the caller's options object", () => {
+    const options = { decimals: 2 };
+    expect(decimalize(1763874n, options)).toBe("17638.74");
+    expect(options).toEqual({ decimals: 2 });
+  });
+
+  it("Should accept a frozen options object", () => {
+    const options = Object.freeze({ decimals: 2 });
+    expect(decimalize(1763874n, options)).toBe("17638.74");
+  });
 });
 
 describe("undecimalize()", () => {
@@ -114,6 +125,22 @@ describe("undecimalize()", () => {
     expect(() => {
       undecimalize("12.23.1");
     }).toThrow();
+  });
+
+  it("Should not mutate the caller's options object", () => {
+    const options = { decimals: 2 };
+    expect(undecimalize("1.23", options)).toBe(123n);
+    expect(options).toEqual({ decimals: 2 });
+  });
+
+  it("Should accept a frozen options object", () => {
+    const options = Object.freeze({ decimals: 2 });
+    expect(undecimalize("1.23", options)).toBe(123n);
+  });
+
+  it("Should accept frozen options relying on defaults", () => {
+    const options = Object.freeze({});
+    expect(undecimalize("1.23", options)).toBe(123n);
   });
 });
 
