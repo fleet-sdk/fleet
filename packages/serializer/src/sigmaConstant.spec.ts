@@ -59,6 +59,16 @@ describe("Primitive types serialization and parsing", () => {
     expect(SConstant.from(tv.hex).data).to.be.equal(tv.value);
   });
 
+  it("Should parse a non-canonical SBool byte as true, like the reference", () => {
+    // sigmastate CoreDataSerializer reads SBoolean as `getUByte() != 0`, and
+    // sigma-rust does the same, so a bool constant byte of 0x02 or 0xff is
+    // true — only 0x00 is false. Canonical encodings (0x00/0x01) are unchanged.
+    expect(SConstant.from("0100").data).to.be.equal(false);
+    expect(SConstant.from("0101").data).to.be.equal(true);
+    expect(SConstant.from("0102").data).to.be.equal(true);
+    expect(SConstant.from("01ff").data).to.be.equal(true);
+  });
+
   it.each(byteVectors)("Should road-trip SByte($value)", (tv) => {
     const sconst = SByte(tv.value);
 

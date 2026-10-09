@@ -62,6 +62,17 @@ describe("Sigma byte reader", () => {
     expect(reader.match(u8a([0x04, 0x05, 0x06, 0x07]), 3)).toBe(false);
   });
 
+  it("should read a boolean as false only for a zero byte", () => {
+    // Reference (sigmastate CoreDataSerializer): `r.getUByte() != 0` —
+    // any non-zero byte is true, not just 0x01.
+    expect(new SigmaByteReader(u8a([0x00])).readBool()).toBe(false);
+    expect(new SigmaByteReader(u8a([0x01])).readBool()).toBe(true);
+    expect(new SigmaByteReader(u8a([0x02])).readBool()).toBe(true);
+    expect(new SigmaByteReader(u8a([0x7f])).readBool()).toBe(true);
+    expect(new SigmaByteReader(u8a([0x80])).readBool()).toBe(true);
+    expect(new SigmaByteReader(u8a([0xff])).readBool()).toBe(true);
+  });
+
   it("should read remaining bytes", () => {
     const bytes = u8a([0x01, 0x02, 0x03, 0x04]);
     const reader = new SigmaByteReader(bytes);

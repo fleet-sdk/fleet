@@ -38,7 +38,9 @@ export class SigmaByteReader {
   }
 
   readBool(): boolean {
-    return this.readByte() === 0x01;
+    // Reference (sigmastate CoreDataSerializer): a boolean is `getUByte() != 0`,
+    // so any non-zero byte is true — not just the canonical 0x01.
+    return this.readByte() !== 0;
   }
 
   readBits(length: number): ArrayLike<boolean> {
