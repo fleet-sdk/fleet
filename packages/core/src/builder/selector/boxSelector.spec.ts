@@ -243,6 +243,30 @@ describe("Validations", () => {
     }).toThrow(InsufficientInputs);
   });
 
+  it("Should fail if tokens target is unreached and no input holds the token", () => {
+    const tokenId = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    const selector = new BoxSelector(regularBoxes);
+
+    let error: unknown;
+    try {
+      selector.select({ tokens: [{ tokenId, amount: 100n }] });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).toBeInstanceOf(InsufficientInputs);
+    expect((error as InsufficientInputs).unreached.tokens).toEqual([{ tokenId, amount: 100n }]);
+  });
+
+  it("Should fail if tokens target is unreached and there are no inputs at all", () => {
+    const tokenId = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    const selector = new BoxSelector([]);
+
+    expect(() => {
+      selector.select({ tokens: [{ tokenId, amount: 100n }] });
+    }).toThrow(InsufficientInputs);
+  });
+
   it("Should fail if any target is unreached", () => {
     const tokenId = "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b";
     const selector = new BoxSelector(regularBoxes);

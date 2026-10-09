@@ -68,7 +68,7 @@ export class BoxSelector<T extends Box<bigint>> {
     let inclusion = this._ensureInclusionBoxIds;
 
     // if the target has a token that is being minted, then the first input should be included
-    if (target.tokens?.some((x) => x.tokenId === unselected[0].boxId)) {
+    if (some(unselected) && target.tokens?.some((x) => x.tokenId === unselected[0].boxId)) {
       inclusion = new Set(this._ensureInclusionBoxIds).add(unselected[0].boxId);
     }
 
@@ -139,7 +139,7 @@ export class BoxSelector<T extends Box<bigint>> {
     for (const tokenTarget of target.tokens) {
       const totalSelected = utxoSum(inputs, tokenTarget.tokenId);
       if (tokenTarget.amount && tokenTarget.amount > totalSelected) {
-        if (tokenTarget.tokenId === first(inputs).boxId) {
+        if (some(inputs) && tokenTarget.tokenId === first(inputs).boxId) {
           // if the token is the same as the first input, then it is being minted
           continue;
         }
