@@ -18,10 +18,8 @@ export function ensureBytes(input: ByteInput): Uint8Array {
 }
 
 export function blake2b(message: ByteInput, options?: Blake2bOptions): Uint8Array {
-  if (options?.key) options.key = ensureBytes(options.key);
-  if (options?.salt) options.salt = ensureBytes(options.salt);
-  if (options?.personalization) options.personalization = ensureBytes(options.personalization);
-
+  // convert hex-string fields into a fresh options object; never mutate the
+  // caller's options object (it may be frozen or reused across calls)
   const opts: Blake2Opts = {
     key: options?.key ? ensureBytes(options?.key) : undefined,
     salt: options?.salt ? ensureBytes(options?.salt) : undefined,

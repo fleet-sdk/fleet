@@ -76,6 +76,49 @@ describe("Hashes smoke tests", () => {
     expect(sha256(byte)).to.be.deep.equal(sha256(hex));
   });
 
+  it("Should not mutate the caller's options object", () => {
+    const msg = utf8.decode("blake2b256");
+    const options = {
+      dkLen: 64,
+      key: "6a9059057f259d733766f6b32081b66c",
+      salt: "d877f8df03fd687ab7c0052e3ce88372",
+      personalization: "77616c6c65747320636865636b73756d" // "wallets checksum"
+    };
+    const snapshot = { ...options };
+
+    const result = blake2b(msg, options);
+
+    // the options object must be left exactly as the caller passed it:
+    // hex-string fields must not be replaced with Uint8Arrays
+    expect(options).to.be.deep.equal(snapshot);
+    expect(options.key).to.be.equal(snapshot.key);
+    expect(options.salt).to.be.equal(snapshot.salt);
+    expect(options.personalization).to.be.equal(snapshot.personalization);
+
+    // and the hash must match hashing with pre-decoded byte options
+    expect(result).to.be.deep.equal(
+      blake2b(msg, {
+        dkLen: 64,
+        key: hex.decode(snapshot.key),
+        salt: hex.decode(snapshot.salt),
+        personalization: hex.decode(snapshot.personalization)
+      })
+    );
+  });
+
+  it("Should accept a frozen options object", () => {
+    const msg = utf8.decode("blake2b256");
+    const options = Object.freeze({
+      key: "6a9059057f259d733766f6b32081b66c",
+      salt: "d877f8df03fd687ab7c0052e3ce88372"
+    });
+
+    expect(() => blake2b(msg, options)).not.to.throw();
+    expect(blake2b(msg, options)).to.be.deep.equal(
+      blake2b(msg, { key: hex.decode(options.key), salt: hex.decode(options.salt) })
+    );
+  });
+
   it("Should hash message using sha256", () => {
     expect(sha256(utf8.decode("sha256"))).to.be.deep.equal(
       hex.decode("5d5b09f6dcb2d53a5fffc60c4ac0d55fabdf556069d6631545f42aa6e3500f2e")
