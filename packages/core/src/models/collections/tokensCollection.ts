@@ -23,7 +23,7 @@ export type OutputToken<T extends Amount = Amount> = {
   amount: T;
 };
 
-type MintingData = { index: number; metadata: NewToken<Amount> };
+type MintingData = { item: OutputToken<bigint>; metadata: NewToken<Amount> };
 
 export class TokensCollection extends Collection<OutputToken<bigint>, OutputToken> {
   #minting: MintingData | undefined;
@@ -38,10 +38,10 @@ export class TokensCollection extends Collection<OutputToken<bigint>, OutputToke
   }
 
   public get minting(): NewToken<bigint> | undefined {
-    if (!this.#minting) return undefined;
+    if (!this.#minting || !this._items.includes(this.#minting.item)) return undefined;
     return {
       ...this.#minting.metadata,
-      amount: this._items[this.#minting.index].amount
+      amount: this.#minting.item.amount
     };
   }
 
@@ -71,12 +71,21 @@ export class TokensCollection extends Collection<OutputToken<bigint>, OutputToke
   }
 
   public mint(token: NewToken<Amount>): number {
-    if (isDefined(this.#minting)) {
+    if (isDefined(this.minting)) {
       throw new FleetError("Only one minting token is allowed per transaction.");
     }
 
+    const previousLength = this.length;
     const len = super.add({ tokenId: token.tokenId, amount: token.amount });
-    this.#minting = { index: len - 1, metadata: token };
+    // If the amount was summed into an existing item, the minting item is that
+    // item; otherwise it is the newly appended one. Track the item itself, not
+    // its index, so later insertions and removals cannot detach the minting
+    // metadata from the token it belongs to.
+    const item =
+      len > previousLength
+        ? this._items[len - 1]
+        : (this._items.find((x) => x.tokenId === token.tokenId) ?? this._items[len - 1]);
+    this.#minting = { item, metadata: token };
     return this.length;
   }
 

@@ -276,6 +276,52 @@ describe("Tokens collection", () => {
     }).toThrow(NotFoundError);
   });
 
+  it("Should keep tracking the minting token after a preceding token is removed", () => {
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.mint({ amount: 100n, name: "test" });
+    collection.add({ tokenId: tokenB, amount: 10n });
+
+    collection.remove(tokenA);
+
+    expect(collection.minting?.amount).toEqual(100n);
+    expect(collection.minting?.name).toEqual("test");
+  });
+
+  it("Should keep tracking the minting token after a token is inserted before it", () => {
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.mint({ amount: 100n, name: "test" });
+
+    collection.add({ tokenId: tokenB, amount: 10n }, { index: 0 });
+
+    expect(collection.minting?.amount).toEqual(100n);
+    expect(collection.minting?.name).toEqual("test");
+  });
+
+  it("Should not report a minting token after the minting token is removed", () => {
+    const collection = new TokensCollection();
+    collection.mint({ amount: 100n, name: "test" });
+    collection.add({ tokenId: tokenA, amount: 50n });
+
+    collection.remove(0);
+
+    expect(collection.minting).toBeUndefined();
+    expect(collection.toArray()).toEqual([{ tokenId: tokenA, amount: 50n }]);
+    expect(() => collection.mint({ amount: 1n, name: "test_2" })).not.toThrow();
+    expect(collection.minting?.name).toEqual("test_2");
+  });
+
+  it("Should not throw when reading minting after the last token is removed", () => {
+    const collection = new TokensCollection();
+    collection.add({ tokenId: tokenA, amount: 50n });
+    collection.mint({ amount: 100n, name: "test" });
+
+    collection.remove(tokenA);
+
+    expect(collection.minting?.amount).toEqual(100n);
+  });
+
   it("Should throw when trying to remove by an out of bounds index", () => {
     const collection = new TokensCollection();
     collection.add([
