@@ -81,6 +81,39 @@ describe("collection base", () => {
     expect(collection.at(4)).toBe(3);
   });
 
+  it("Should not mutate the caller's array when placing multiple items at a specific index", () => {
+    const collection = new MockCollection();
+    collection.add([1, 2, 3]);
+
+    const items = [10, 20, 30];
+    collection.add(items, { index: 1 });
+
+    expect(collection.toArray()).toEqual([1, 10, 20, 30, 2, 3]);
+    expect(items).toEqual([10, 20, 30]);
+  });
+
+  it("Should place a frozen array's items at a specific index", () => {
+    const collection = new MockCollection();
+    collection.add([1, 2, 3]);
+
+    collection.add(Object.freeze([10, 20]), { index: 2 });
+
+    expect(collection.toArray()).toEqual([1, 2, 10, 20, 3]);
+  });
+
+  it("Should not mutate the caller's array when an indexed add fails", () => {
+    const collection = new MockCollection();
+    collection.add([1, 2, 3]);
+
+    const items = [10, 20];
+    expect(() => {
+      collection.add(items, { index: 5 });
+    }).toThrow(RangeError);
+
+    expect(items).toEqual([10, 20]);
+    expect(collection.toArray()).toEqual([1, 2, 3]);
+  });
+
   it("Should create a copy of the internal array", () => {
     const collection = new MockCollection();
     collection.add(numbers);

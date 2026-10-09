@@ -110,11 +110,15 @@ export abstract class Collection<InternalType, ExternalType> implements Iterable
   protected _addOneOrMore(items: OneOrMore<ExternalType>, options?: CollectionAddOptions): number {
     if (Array.isArray(items)) {
       if (isDefined(options) && isDefined(options.index)) {
-        items = items.reverse();
-      }
-
-      for (const item of items) {
-        this._addOne(item, options);
+        // Insert in reverse order so the items keep their original order at
+        // the target index, without mutating the caller's array.
+        for (let i = items.length - 1; i >= 0; i--) {
+          this._addOne(items[i], options);
+        }
+      } else {
+        for (const item of items) {
+          this._addOne(item, options);
+        }
       }
     } else {
       this._addOne(items, options);
