@@ -296,6 +296,52 @@ describe("Contract execution and chain mocking", () => {
     expect(() => chain.execute(unsignedTransaction)).not.to.throw();
   });
 
+  it("Should not mutate the caller's transaction object on execution", () => {
+    const chain = new MockChain();
+
+    const bob = chain.newParty().withBalance({
+      nanoergs: 1000000000n,
+      tokens: [{ tokenId: SIGUSD_TOKEN_ID, amount: 1000n }]
+    });
+    const alice = chain.newParty();
+
+    const unsignedTransaction = new TransactionBuilder(38479)
+      .from(bob.utxos.toArray())
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, alice.address).addTokens({
+          tokenId: SIGUSD_TOKEN_ID,
+          amount: 100n
+        })
+      )
+      .sendChangeTo(bob.address)
+      .payMinFee()
+      .build()
+      .toEIP12Object();
+
+    const outputsBefore = [...unsignedTransaction.outputs];
+    const inputsBefore = [...unsignedTransaction.inputs];
+
+    expect(chain.execute(unsignedTransaction)).to.be.true;
+
+    // the caller's object must be left exactly as it was passed in
+    expect(unsignedTransaction.outputs).to.have.length(outputsBefore.length);
+    expect(unsignedTransaction.outputs).to.deep.equal(outputsBefore);
+    for (let i = 0; i < outputsBefore.length; i++) {
+      expect(unsignedTransaction.outputs[i]).to.be.equal(outputsBefore[i]);
+    }
+    expect(unsignedTransaction.inputs).to.deep.equal(inputsBefore);
+
+    // outputs must still be delivered to the parties
+    expect(alice.balance).to.be.deep.equal({
+      nanoergs: SAFE_MIN_BOX_VALUE,
+      tokens: [{ tokenId: SIGUSD_TOKEN_ID, amount: 100n }]
+    });
+    expect(bob.balance).to.be.deep.equal({
+      nanoergs: 1000000000n - RECOMMENDED_MIN_FEE_VALUE - SAFE_MIN_BOX_VALUE,
+      tokens: [{ tokenId: SIGUSD_TOKEN_ID, amount: 900n }]
+    });
+  });
+
   it("Should execute burning transaction", () => {
     const chain = new MockChain();
 

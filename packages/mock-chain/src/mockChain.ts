@@ -199,7 +199,10 @@ export class MockChain {
 
     this.#pushMetadata(txObject);
 
-    const { inputs, outputs } = txObject;
+    const { inputs } = txObject;
+    // distribute outputs over a copy: splicing the transaction's own array
+    // would mutate the caller's transaction object
+    const outputs = [...txObject.outputs];
     for (const party of this.#parties) {
       for (let i = inputs.length - 1; i >= 0; i--) {
         if (party.utxos.exists(inputs[i].boxId)) {
