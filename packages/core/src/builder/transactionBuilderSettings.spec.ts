@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { MAX_TOKENS_PER_BOX } from "../models";
+import { BOX_VALUE_PER_BYTE } from "./outputBuilder";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
 
 describe("Transaction builder settings", () => {
@@ -57,5 +58,19 @@ describe("Transaction builder settings", () => {
 
     expect(settings.canBurnTokens).toBe(false);
     expect(settings.canBurnTokensFromPlugins).toBe(true);
+  });
+
+  it("Should set valuePerByte with bigint, number, or string", () => {
+    const settings = new TransactionBuilderSettings();
+    expect(settings.valuePerByte).toBe(BOX_VALUE_PER_BYTE);
+
+    expect(settings.setValuePerByte(720n)).toBe(settings);
+    expect(settings.valuePerByte).toBe(720n);
+
+    expect(settings.setValuePerByte(500)).toBe(settings);
+    expect(settings.valuePerByte).toBe(500n);
+
+    expect(settings.setValuePerByte("1000")).toBe(settings);
+    expect(settings.valuePerByte).toBe(1000n);
   });
 });
