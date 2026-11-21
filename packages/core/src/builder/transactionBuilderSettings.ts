@@ -8,7 +8,7 @@ export class TransactionBuilderSettings {
   private _allowTokenBurningFromPlugins: boolean;
   private _isolateErgOnChange: boolean;
   private _valuePerByte: bigint;
-  
+
   constructor() {
     this._maxDistinctTokensPerChangeBox = MAX_TOKENS_PER_BOX;
     this._allowTokenBurning = false;
