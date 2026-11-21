@@ -316,10 +316,10 @@ export class TransactionBuilder {
 
         const chunkedTokens = chunk(change.tokens, this.#settings.maxTokensPerChangeBox);
         for (const tokens of chunkedTokens) {
-        const output = new OutputBuilder(
-          estimateMinBoxValue(this.#settings.valuePerByte),
-          this.#changeAddress
-        )
+          const output = new OutputBuilder(
+            estimateMinBoxValue(this.#settings.valuePerByte),
+            this.#changeAddress
+          )
             .setCreationHeight(this.#creationHeight)
             .addTokens(tokens)
             .setFlags({ change: true });
