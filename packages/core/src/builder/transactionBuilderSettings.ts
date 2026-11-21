@@ -1,16 +1,20 @@
+import { type Amount, ensureBigInt } from "@fleet-sdk/common";
 import { MAX_TOKENS_PER_BOX } from "../models";
+import { BOX_VALUE_PER_BYTE } from "./outputBuilder";
 
 export class TransactionBuilderSettings {
   private _maxDistinctTokensPerChangeBox: number;
   private _allowTokenBurning: boolean;
   private _allowTokenBurningFromPlugins: boolean;
   private _isolateErgOnChange: boolean;
+  private _valuePerByte: bigint;
 
   constructor() {
     this._maxDistinctTokensPerChangeBox = MAX_TOKENS_PER_BOX;
     this._allowTokenBurning = false;
     this._allowTokenBurningFromPlugins = false;
     this._isolateErgOnChange = false;
+    this._valuePerByte = BOX_VALUE_PER_BYTE;
   }
 
   public get maxTokensPerChangeBox(): number {
@@ -27,6 +31,10 @@ export class TransactionBuilderSettings {
 
   public get shouldIsolateErgOnChange(): boolean {
     return this._isolateErgOnChange;
+  }
+
+  public get valuePerByte(): bigint {
+    return this._valuePerByte;
   }
 
   /**
@@ -63,6 +71,15 @@ export class TransactionBuilderSettings {
    */
   public isolateErgOnChange(isolate = true): TransactionBuilderSettings {
     this._isolateErgOnChange = isolate;
+
+    return this;
+  }
+
+  /**
+   * Define minimum nanoERG value per byte for change boxes
+   */
+  public setValuePerByte(valuePerByte: Amount | number): TransactionBuilderSettings {
+    this._valuePerByte = ensureBigInt(valuePerByte);
 
     return this;
   }
