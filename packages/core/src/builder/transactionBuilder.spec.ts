@@ -186,14 +186,16 @@ describe("basic construction", () => {
     const builder = new TransactionBuilder(height).from(regularBoxes);
     expect(builder.settings.canBurnTokens).toBeFalsy();
     expect(builder.settings.maxTokensPerChangeBox).toBe(MAX_TOKENS_PER_BOX);
-
+    expect(builder.settings.valuePerByte).toBe(BOX_VALUE_PER_BYTE);
+    
     builder.configure((settings) => {
-      settings.allowTokenBurning(true).setMaxTokensPerChangeBox(10);
+      settings.allowTokenBurning(true).setMaxTokensPerChangeBox(10).setValuePerByte(500n);
     });
 
     expect(builder.settings.canBurnTokens).toBeTruthy();
     expect(builder.settings.maxTokensPerChangeBox).toBe(10);
-  });
+    expect(builder.settings.valuePerByte).toBe(500n);
+    });
 
   it("Should eject context", () => {
     const builder = new TransactionBuilder(height).from(regularBoxes);
@@ -745,8 +747,8 @@ describe("Building", () => {
     expect(change3.additionalRegisters).toEqual({});
   });
 
-  function _estimateBoxValue(box: BoxCandidate<Amount>) {
-    return BigInt(estimateBoxSize(box)) * BOX_VALUE_PER_BYTE;
+  function _estimateBoxValue(box: BoxCandidate<Amount>, valuePerByte = BOX_VALUE_PER_BYTE) {
+    return BigInt(estimateBoxSize(box)) * valuePerByte;
   }
 
   it("Should produce multiple change boxes based on maxTokensPerChangeBox param", () => {
@@ -844,7 +846,76 @@ describe("Building", () => {
       );
     }
   });
+  it("Should produce token change boxes using custom valuePerByte", () => {
+    const tokensPerBox = 3;
+    const transaction = new TransactionBuilder(height)
+      .from(regularBoxes)
+      .sendChangeTo(a1.address)
+      .configureSelector((selector) => selector.ensureInclusion((i) => some(i.assets)))
+      .configure((settings) => {
+        settings
+          .setMaxTokensPerChangeBox(tokensPerBox)
+          .isolateErgOnChange()
+          .setValuePerByte(500n);
+      })
+      .build();
 
+    expect(transaction.inputs).toHaveLength(4);
+    expect(transaction.dataInputs).toHaveLength(0);
+    expect(transaction.outputs).toHaveLength(8);
+
+    const [firstChange] = transaction.outputs;
+    expect(firstChange.assets).toHaveLength(0);
+
+    for (let i = 1; i < transaction.outputs.length; i++) {
+      expect(transaction.outputs[i].assets).toHaveLength(tokensPerBox);
+      expect(transaction.outputs[i].value).toBe(
+        _estimateBoxValue(transaction.outputs[i].toCandidate(), 500n)
+      );
+    }
+  });
+  it("Should select more inputs when custom valuePerByte requires higher change value", () => {
+    const targetBoxId =
+      "2555e34138d276905fe0bc19240bbeca10f388a71f7b4d2f65a7d0bfd23c846d";
+    const inputs = regularBoxes.filter((box) =>
+      [
+        "3e67b4be7012956aa369538b46d751a4ad0136138760553d5400a10153046e52",
+        "e56847ed19b3dc6b72828fcfb992fdf7310828cf291221269b7ffc72fd66706e",
+        targetBoxId
+      ].includes(box.boxId)
+    );
+    const output = new OutputBuilder(999840000n, a2.address).addTokens({
+      tokenId: "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283",
+      amount: 180n
+    });
+
+    const defaultTx = new TransactionBuilder(height)
+      .from(inputs)
+      .to(output)
+      .payFee(RECOMMENDED_MIN_FEE_VALUE)
+      .sendChangeTo(a1.address)
+      .configureSelector((selector) =>
+        selector.ensureInclusion((box) => box.boxId === targetBoxId)
+      )
+      .build();
+
+    expect(defaultTx.inputs).toHaveLength(2);
+
+    const customTx = new TransactionBuilder(height)
+      .from(inputs)
+      .to(output)
+      .payFee(RECOMMENDED_MIN_FEE_VALUE)
+      .sendChangeTo(a1.address)
+      .configureSelector((selector) =>
+        selector.ensureInclusion((box) => box.boxId === targetBoxId)
+      )
+      .configure((s) => s.setValuePerByte(1000n))
+      .build();
+
+    expect(customTx.inputs).toHaveLength(3);
+  });
+  
+    
   it("Should build in EIP-12 format", () => {
     const transaction = new TransactionBuilder(height)
       .from(regularBoxes)
