@@ -26,12 +26,7 @@ import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../e
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
-import {
-  BOX_VALUE_PER_BYTE,
-  OutputBuilder,
-  SAFE_MIN_BOX_VALUE,
-  estimateMinBoxValue
-} from "./outputBuilder";
+import { OutputBuilder, SAFE_MIN_BOX_VALUE, estimateMinBoxValue } from "./outputBuilder";
 import { type FleetPluginContext, createPluginContext } from "./pluginContext";
 import { BoxSelector } from "./selector";
 import { TransactionBuilderSettings } from "./transactionBuilderSettings";
@@ -298,7 +293,8 @@ export class TransactionBuilder {
           creationHeight: this.#creationHeight,
           tokens: change.tokens,
           maxTokensPerBox: this.settings.maxTokensPerChangeBox,
-          baseIndex: this.outputs.length + 1
+          baseIndex: this.outputs.length + 1,
+          valuePerByte: this.settings.valuePerByte
         });
 
         while (minRequiredNanoErgs > change.nanoErgs) {
@@ -313,13 +309,17 @@ export class TransactionBuilder {
             creationHeight: this.#creationHeight,
             tokens: change.tokens,
             maxTokensPerBox: this.settings.maxTokensPerChangeBox,
-            baseIndex: this.outputs.length + 1
+            baseIndex: this.outputs.length + 1,
+            valuePerByte: this.settings.valuePerByte
           });
         }
 
         const chunkedTokens = chunk(change.tokens, this.#settings.maxTokensPerChangeBox);
         for (const tokens of chunkedTokens) {
-          const output = new OutputBuilder(estimateMinBoxValue(), this.#changeAddress)
+        const output = new OutputBuilder(
+          estimateMinBoxValue(this.#settings.valuePerByte),
+          this.#changeAddress
+        )
             .setCreationHeight(this.#creationHeight)
             .addTokens(tokens)
             .setFlags({ change: true });
@@ -436,11 +436,12 @@ type ChangeEstimationParams = {
   tokens: TokenAmount<bigint>[];
   baseIndex: number;
   maxTokensPerBox: number;
+  valuePerByte: bigint;
 };
 
 function estimateMinChangeValue(params: ChangeEstimationParams): bigint {
   const size = BigInt(estimateChangeSize(params));
-  return size * BOX_VALUE_PER_BYTE;
+  return size * params.valuePerByte;
 }
 
 function estimateChangeSize({
