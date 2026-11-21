@@ -906,7 +906,7 @@ describe("Building", () => {
 
     expect(customTx.inputs).toHaveLength(3);
   });
-    
+
   it("Should build in EIP-12 format", () => {
     const transaction = new TransactionBuilder(height)
       .from(regularBoxes)
