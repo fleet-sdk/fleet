@@ -2,10 +2,12 @@ import {
   type Amount,
   type Base58String,
   type Box,
+  type BoxSummary,
   type CollectionAddOptions,
   FEE_CONTRACT,
   type HexString,
   Network,
+  type NewToken,
   type OneOrMore,
   RECOMMENDED_MIN_FEE_VALUE,
   type TokenAmount,
@@ -15,14 +17,21 @@ import {
   ensureBigInt,
   first,
   isDefined,
+  isEmpty,
   isHex,
   isUndefined,
   some,
   utxoDiff,
   utxoSum
 } from "@fleet-sdk/common";
-import { estimateVLQSize } from "@fleet-sdk/serializer";
-import { InvalidInput, MalformedTransaction, NotAllowedTokenBurning } from "../errors";
+import { utf8 } from "@fleet-sdk/crypto";
+import { SByte, SColl, estimateVLQSize } from "@fleet-sdk/serializer";
+import {
+  InsufficientInputs,
+  InvalidInput,
+  MalformedTransaction,
+  NotAllowedTokenBurning
+} from "../errors";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { ErgoAddress, InputsCollection, OutputsCollection, TokensCollection } from "../models";
 import { ErgoUnsignedTransaction } from "../models/ergoUnsignedTransaction";
@@ -194,8 +203,15 @@ export class TransactionBuilder {
   }
 
   burnTokens(tokens: OneOrMore<TokenAmount<Amount>>): TransactionBuilder {
+    const items = Array.isArray(tokens) ? tokens : [tokens];
+    for (const token of items) {
+      if (ensureBigInt(token.amount) <= _0n) {
+        throw new RangeError("Token burning amount must be greater than zero.");
+      }
+    }
+
     if (!this.#burning) this.#burning = new TokensCollection();
-    this.#burning.add(tokens);
+    this.#burning.add(items);
     return this;
   }
 
@@ -242,25 +258,41 @@ export class TransactionBuilder {
       }
     }
 
-    if (this.#isMinting()) {
+    const mintingInfo = this.#getMintingInfo();
+    if (mintingInfo) {
       if (this.#isMoreThanOneTokenBeingMinted()) {
         throw new MalformedTransaction("only one token can be minted per transaction.");
       }
 
-      if (this.#isTheSameTokenBeingMintedFromOutsideTheMintingBox()) {
+      if (
+        isDefined(mintingInfo.token.tokenId) &&
+        this.#isTokenPresentInOtherOutputs(mintingInfo.output, mintingInfo.token.tokenId)
+      ) {
         throw new NonStandardizedMinting(
           "EIP-4 tokens cannot be minted from outside of the minting box."
         );
       }
     }
 
-    this.outputs
-      .toArray()
-      .map((output) => output.setCreationHeight(this.#creationHeight, { replace: false }));
-    const outputs = this.outputs.clone();
+    const outputs = new OutputsCollection(
+      this.outputs.toArray().map((output) => {
+        const prepared = output.clone();
+        prepared.setCreationHeight(this.#creationHeight, { replace: false });
+
+        if (prepared.minting && isEmpty(prepared.additionalRegisters)) {
+          prepared.setAdditionalRegisters({
+            R4: SColl(SByte, utf8.decode(prepared.minting.name || "")),
+            R5: SColl(SByte, utf8.decode(prepared.minting.description || "")),
+            R6: SColl(SByte, utf8.decode(prepared.minting.decimals?.toString() || "0"))
+          });
+        }
+
+        return prepared;
+      })
+    );
 
     if (isDefined(this.#feeAmount)) {
-      outputs.add(new OutputBuilder(this.#feeAmount, FEE_CONTRACT));
+      outputs.add(new OutputBuilder(this.#feeAmount, FEE_CONTRACT, this.#creationHeight));
     }
 
     const selector = new BoxSelector(this.inputs.toArray());
@@ -279,7 +311,12 @@ export class TransactionBuilder {
       : outputs.sum();
     let inputs = selector.select(target);
 
+    if (isEmpty(inputs)) {
+      throw new MalformedTransaction("at least one input is required.");
+    }
+
     if (isDefined(this.#changeAddress)) {
+      const changeAddress = this.#changeAddress;
       const changeBoxes: OutputBuilder[] = [];
       const firstInputId = inputs[0].boxId;
       const manualMintingTokenId = target.tokens.some((x) => x.tokenId === firstInputId)
@@ -288,38 +325,52 @@ export class TransactionBuilder {
 
       if (manualMintingTokenId) {
         target.tokens = target.tokens.filter((x) => x.tokenId !== manualMintingTokenId);
+        selector.ensureInclusion(manualMintingTokenId);
       }
 
-      let change = utxoDiff(utxoSum(inputs), target);
+      const minErgChangeValue = estimateMinChangeValue({
+        changeAddress,
+        creationHeight: this.#creationHeight,
+        tokens: [],
+        maxTokensPerBox: this.settings.maxTokensPerChangeBox
+      });
 
-      if (some(change.tokens)) {
-        let minRequiredNanoErgs = estimateMinChangeValue({
-          changeAddress: this.#changeAddress,
-          creationHeight: this.#creationHeight,
-          tokens: change.tokens,
-          maxTokensPerBox: this.settings.maxTokensPerChangeBox,
-          baseIndex: this.outputs.length + 1
-        });
-
-        while (minRequiredNanoErgs > change.nanoErgs) {
-          inputs = selector.select({
-            nanoErgs: target.nanoErgs + minRequiredNanoErgs,
-            tokens: target.tokens
-          });
-
-          change = utxoDiff(utxoSum(inputs), target);
-          minRequiredNanoErgs = estimateMinChangeValue({
-            changeAddress: this.#changeAddress,
+      const getMinRequiredNanoErgs = (change: BoxSummary): bigint => {
+        if (some(change.tokens)) {
+          const tokensMinValue = estimateMinChangeValue({
+            changeAddress,
             creationHeight: this.#creationHeight,
             tokens: change.tokens,
-            maxTokensPerBox: this.settings.maxTokensPerChangeBox,
-            baseIndex: this.outputs.length + 1
+            maxTokensPerBox: this.settings.maxTokensPerChangeBox
           });
+
+          if (this.settings.shouldIsolateErgOnChange && change.nanoErgs > tokensMinValue) {
+            return tokensMinValue + minErgChangeValue;
+          }
+
+          return tokensMinValue;
         }
 
+        return change.nanoErgs > _0n ? minErgChangeValue : _0n;
+      };
+
+      let change = utxoDiff(utxoSum(inputs), target);
+      let minRequiredNanoErgs = getMinRequiredNanoErgs(change);
+
+      while (minRequiredNanoErgs > change.nanoErgs) {
+        inputs = selector.select({
+          nanoErgs: target.nanoErgs + minRequiredNanoErgs,
+          tokens: target.tokens
+        });
+
+        change = utxoDiff(utxoSum(inputs), target);
+        minRequiredNanoErgs = getMinRequiredNanoErgs(change);
+      }
+
+      if (some(change.tokens)) {
         const chunkedTokens = chunk(change.tokens, this.#settings.maxTokensPerChangeBox);
         for (const tokens of chunkedTokens) {
-          const output = new OutputBuilder(estimateMinBoxValue(), this.#changeAddress)
+          const output = new OutputBuilder(estimateMinBoxValue(), changeAddress)
             .setCreationHeight(this.#creationHeight)
             .addTokens(tokens)
             .setFlags({ change: true });
@@ -332,7 +383,7 @@ export class TransactionBuilder {
       if (change.nanoErgs > _0n) {
         if (!changeBoxes.length || this.settings.shouldIsolateErgOnChange) {
           changeBoxes.unshift(
-            new OutputBuilder(change.nanoErgs, this.#changeAddress)
+            new OutputBuilder(change.nanoErgs, changeAddress)
               .setCreationHeight(this.#creationHeight)
               .setFlags({ change: true })
           );
@@ -345,15 +396,25 @@ export class TransactionBuilder {
       outputs.add(changeBoxes);
     }
 
+    if (outputs.isEmpty) {
+      throw new MalformedTransaction("at least one output is required.");
+    }
+
+    if (
+      mintingInfo &&
+      isUndefined(mintingInfo.token.tokenId) &&
+      this.#isTokenPresentInOtherOutputs(mintingInfo.output, inputs[0].boxId)
+    ) {
+      throw new NonStandardizedMinting(
+        "EIP-4 tokens cannot be minted from outside of the minting box."
+      );
+    }
+
     for (const input of inputs) {
       if (!input.isValid()) throw new InvalidInput(input.boxId);
     }
 
-    const buildedOutputs = outputs
-      .toArray()
-      .map((output) =>
-        output.setCreationHeight(this.#creationHeight, { replace: false }).build(inputs)
-      );
+    const buildedOutputs = outputs.toArray().map((output) => output.build(inputs));
 
     const unsignedTransaction = new ErgoUnsignedTransaction(
       inputs,
@@ -365,6 +426,10 @@ export class TransactionBuilder {
     let burning = unsignedTransaction.burning;
     if (burning.nanoErgs > _0n) {
       throw new MalformedTransaction("it's not possible to burn ERG.");
+    }
+
+    if (burning.nanoErgs < _0n) {
+      throw new InsufficientInputs({ nanoErgs: -burning.nanoErgs });
     }
 
     if (some(burning.tokens) && some(this.#burning)) {
@@ -381,20 +446,12 @@ export class TransactionBuilder {
     return unsignedTransaction;
   }
 
-  #getMintingOutput(): OutputBuilder | undefined {
+  #getMintingInfo(): { output: OutputBuilder; token: NewToken<bigint> } | undefined {
     for (const output of this.#outputs) {
-      if (output.minting) return output;
+      if (output.minting) return { output, token: output.minting };
     }
 
     return;
-  }
-
-  #isMinting(): boolean {
-    return this.#getMintingOutput() !== undefined;
-  }
-
-  #getMintingTokenId(): string | undefined {
-    return this.#getMintingOutput()?.minting?.tokenId;
   }
 
   #isMoreThanOneTokenBeingMinted(): boolean {
@@ -410,15 +467,10 @@ export class TransactionBuilder {
     return false;
   }
 
-  #isTheSameTokenBeingMintedFromOutsideTheMintingBox(): boolean {
-    const mintingTokenId = this.#getMintingTokenId();
-    if (isUndefined(mintingTokenId)) return false;
-
-    let count = 0;
+  #isTokenPresentInOtherOutputs(mintingOutput: OutputBuilder, tokenId: string): boolean {
     for (const output of this.#outputs) {
-      if (output.assets.contains(mintingTokenId)) {
-        count++;
-        if (count > 1) return true;
+      if (output !== mintingOutput && output.assets.contains(tokenId)) {
+        return true;
       }
     }
 
@@ -430,11 +482,12 @@ function isCollectionLike<T>(obj: unknown): obj is CollectionLike<T> {
   return (obj as CollectionLike<T>).toArray !== undefined;
 }
 
+const MAX_UINT16_VALUE = 65535;
+
 type ChangeEstimationParams = {
   changeAddress: ErgoAddress;
   creationHeight: number;
   tokens: TokenAmount<bigint>[];
-  baseIndex: number;
   maxTokensPerBox: number;
 };
 
@@ -447,19 +500,18 @@ function estimateChangeSize({
   changeAddress,
   creationHeight,
   tokens,
-  baseIndex,
   maxTokensPerBox
 }: ChangeEstimationParams): number {
-  const neededBoxes = Math.ceil(tokens.length / maxTokensPerBox);
+  const neededBoxes = Math.max(1, Math.ceil(tokens.length / maxTokensPerBox));
   let size = 0;
   size += estimateVLQSize(SAFE_MIN_BOX_VALUE);
   size += byteSizeOf(changeAddress.ergoTree);
   size += estimateVLQSize(creationHeight);
   size += estimateVLQSize(0); // empty registers length
   size += 32; // BLAKE 256 hash length
+  size += estimateVLQSize(MAX_UINT16_VALUE);
 
   size = size * neededBoxes;
-  for (let i = 0; i < neededBoxes; i++) size += estimateVLQSize(baseIndex + i);
 
   for (const token of tokens) {
     size += byteSizeOf(token.tokenId) + estimateVLQSize(token.amount);

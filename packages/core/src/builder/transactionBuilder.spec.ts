@@ -6,7 +6,7 @@ import { SByte, SColl, estimateBoxSize } from "@fleet-sdk/serializer";
 import { invalidBoxes, manyTokensBoxes, regularBoxes } from "_test-vectors";
 import { mockUTxO } from "packages/mock-chain/src";
 import { describe, expect, it, vi } from "vitest";
-import { InvalidInput } from "../errors";
+import { InsufficientInputs, InvalidInput } from "../errors";
 import { MalformedTransaction } from "../errors/malformedTransaction";
 import { NonStandardizedMinting } from "../errors/nonStandardizedMinting";
 import { NotAllowedTokenBurning } from "../errors/notAllowedTokenBurning";
@@ -17,6 +17,7 @@ import {
   SAFE_MIN_BOX_VALUE,
   estimateMinBoxValue
 } from "./outputBuilder";
+import { CherryPickSelectionStrategy } from "./selector";
 import { TransactionBuilder } from "./transactionBuilder";
 
 const height = 844540;
@@ -922,6 +923,226 @@ describe("Building", () => {
       0: "0580c0fc82aa02"
     });
   });
+
+  it("Should account for exact token change box size during input selection", () => {
+    const tokenId = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
+    const exactMinTokenChange = 40320n;
+    const shortInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE + exactMinTokenChange - 720n,
+      ergoTree: a1.ergoTree,
+      assets: [{ tokenId, amount: 100n }]
+    });
+    const extraInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE,
+      ergoTree: a1.ergoTree
+    });
+
+    expect(() =>
+      new TransactionBuilder(height)
+        .from(shortInput)
+        .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+        .sendChangeTo(a1.address)
+        .build()
+    ).toThrow(InsufficientInputs);
+
+    const txWithExtra = new TransactionBuilder(height)
+      .from([shortInput, extraInput])
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+      .sendChangeTo(a1.address)
+      .build();
+
+    expect(txWithExtra.inputs).toHaveLength(2);
+    expect(txWithExtra.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+    expect(sumBy(txWithExtra.outputs, (x) => x.value)).toBe(shortInput.value + extraInput.value);
+
+    const exactInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE + exactMinTokenChange,
+      ergoTree: a1.ergoTree,
+      assets: [{ tokenId, amount: 100n }]
+    });
+
+    const txExact = new TransactionBuilder(height)
+      .from(exactInput)
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+      .sendChangeTo(a1.address)
+      .build();
+
+    expect(txExact.inputs).toHaveLength(1);
+    expect(txExact.change).toHaveLength(1);
+    expect(txExact.change[0].value).toBe(exactMinTokenChange);
+    expect(txExact.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+  });
+
+  it("Should enforce minimum box value for ERG-only change boxes", () => {
+    const minErgChange = 28440n;
+    const dustInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE + 10000n,
+      ergoTree: a1.ergoTree
+    });
+    const extraInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE,
+      ergoTree: a1.ergoTree
+    });
+
+    expect(() =>
+      new TransactionBuilder(height)
+        .from(dustInput)
+        .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+        .sendChangeTo(a1.address)
+        .build()
+    ).toThrow(InsufficientInputs);
+
+    const txWithExtra = new TransactionBuilder(height)
+      .from([dustInput, extraInput])
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+      .sendChangeTo(a1.address)
+      .build();
+
+    expect(txWithExtra.inputs).toHaveLength(2);
+    expect(txWithExtra.change).toHaveLength(1);
+    expect(txWithExtra.change[0].value).toBe(1010000n);
+    expect(txWithExtra.change[0].value).toBeGreaterThanOrEqual(minErgChange);
+    expect(txWithExtra.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+
+    const exactInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE,
+      ergoTree: a1.ergoTree
+    });
+
+    const txExactZeroChange = new TransactionBuilder(height)
+      .from([exactInput, extraInput])
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+      .sendChangeTo(a1.address)
+      .build();
+
+    expect(txExactZeroChange.inputs).toHaveLength(1);
+    expect(txExactZeroChange.outputs).toHaveLength(1);
+    expect(txExactZeroChange.change).toHaveLength(0);
+  });
+
+  it("Should enforce minimum box value for isolated ERG change boxes", () => {
+    const tokenId = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
+    const exactMinTokenChange = 40320n;
+    const minErgChange = 28440n;
+
+    const dustIsolatedInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE + exactMinTokenChange + 1000n,
+      ergoTree: a1.ergoTree,
+      assets: [{ tokenId, amount: 100n }]
+    });
+    const extraInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE,
+      ergoTree: a1.ergoTree
+    });
+
+    expect(() =>
+      new TransactionBuilder(height)
+        .from(dustIsolatedInput)
+        .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+        .sendChangeTo(a1.address)
+        .configure((settings) => settings.isolateErgOnChange())
+        .build()
+    ).toThrow(InsufficientInputs);
+
+    const txWithExtra = new TransactionBuilder(height)
+      .from([dustIsolatedInput, extraInput])
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+      .sendChangeTo(a1.address)
+      .configure((settings) => settings.isolateErgOnChange())
+      .build();
+
+    expect(txWithExtra.inputs).toHaveLength(2);
+    expect(txWithExtra.change).toHaveLength(2);
+    expect(txWithExtra.change[0].assets).toHaveLength(0);
+    expect(txWithExtra.change[0].value).toBe(1001000n);
+    expect(txWithExtra.change[0].value).toBeGreaterThanOrEqual(minErgChange);
+    expect(txWithExtra.change[1].value).toBe(exactMinTokenChange);
+    expect(txWithExtra.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+
+    const exactTokenInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE + exactMinTokenChange,
+      ergoTree: a1.ergoTree,
+      assets: [{ tokenId, amount: 100n }]
+    });
+
+    const txExactTokens = new TransactionBuilder(height)
+      .from(exactTokenInput)
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+      .sendChangeTo(a1.address)
+      .configure((settings) => settings.isolateErgOnChange())
+      .build();
+
+    expect(txExactTokens.inputs).toHaveLength(1);
+    expect(txExactTokens.change).toHaveLength(1);
+    expect(txExactTokens.change[0].value).toBe(exactMinTokenChange);
+    expect(txExactTokens.change[0].assets).toEqual([{ tokenId, amount: 100n }]);
+  });
+
+  it("Should fail when building without outputs or selected inputs", () => {
+    expect(() => new TransactionBuilder(height).build()).toThrow(
+      new MalformedTransaction("at least one input is required.")
+    );
+
+    expect(() => new TransactionBuilder(height).from(regularBoxes).build()).toThrow(
+      MalformedTransaction
+    );
+
+    expect(() =>
+      new TransactionBuilder(height)
+        .from(regularBoxes)
+        .sendChangeTo(a1.address)
+        .build()
+    ).toThrow(MalformedTransaction);
+
+    expect(() =>
+      new TransactionBuilder(height).from(first(regularBoxes), { ensureInclusion: true }).build()
+    ).toThrow(new MalformedTransaction("at least one output is required."));
+  });
+
+  it("Should build with creation height zero and estimate min box value", () => {
+    const tx = new TransactionBuilder(0)
+      .from(first(regularBoxes))
+      .to(new OutputBuilder(estimateMinBoxValue(), a2.address))
+      .sendChangeTo(a1.address)
+      .build();
+
+    expect(tx.outputs[0].creationHeight).toBe(0);
+    expect(tx.outputs[0].value).toBe(27720n);
+    expect(tx.outputs[1].creationHeight).toBe(0);
+    expect(tx.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+  });
+
+  it("Should not mutate output creation height across repeated builds", () => {
+    const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address);
+    const builder = new TransactionBuilder(height)
+      .from(first(regularBoxes))
+      .to(output)
+      .payMinFee()
+      .sendChangeTo(a1.address);
+
+    const tx1 = builder.build();
+    expect(tx1.outputs[0].creationHeight).toBe(height);
+    expect(output.creationHeight).toBeUndefined();
+
+    const tx2 = builder.atHeight(height + 10).build();
+    expect(tx2.outputs[0].creationHeight).toBe(height + 10);
+    expect(output.creationHeight).toBeUndefined();
+  });
+
+  it("Should fail with InsufficientInputs if output value increases after selection", () => {
+    let calls = 0;
+    const estimator = () => {
+      calls++;
+      return calls === 1 ? SAFE_MIN_BOX_VALUE : SAFE_MIN_BOX_VALUE + 1000n;
+    };
+
+    const input = mockUTxO({ value: SAFE_MIN_BOX_VALUE, ergoTree: a1.ergoTree });
+    const builder = new TransactionBuilder(height)
+      .from(input)
+      .to(new OutputBuilder(estimator, a1.address));
+
+    expect(() => builder.build()).toThrow(InsufficientInputs);
+  });
 });
 
 describe("Token minting", () => {
@@ -1018,6 +1239,117 @@ describe("Token minting", () => {
       "Malformed transaction: only one token can be minted per transaction."
     );
   });
+
+  it("Should account for EIP-4 registers when estimating min box value for minting", () => {
+    const input = mockUTxO({ value: 5000000n, ergoTree: a1.ergoTree });
+    const mintOutput = new OutputBuilder(estimateMinBoxValue(), a1.address).mintToken({
+      amount: 100n,
+      name: "TestToken",
+      decimals: 4,
+      description: "Description test"
+    });
+
+    const tx = new TransactionBuilder(height)
+      .from(input)
+      .to(mintOutput)
+      .sendChangeTo(a1.address)
+      .payMinFee()
+      .build();
+
+    expect(tx.outputs[0].value).toBe(51840n);
+    expect(tx.outputs[2].value).toBe(input.value - 51840n - RECOMMENDED_MIN_FEE_VALUE);
+    expect(sumBy(tx.outputs, (x) => x.value)).toBe(input.value);
+    expect(tx.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+    expect(mintOutput.additionalRegisters).toEqual({});
+    expect(mintOutput.creationHeight).toBeUndefined();
+
+    const defaultMetaTx = new TransactionBuilder(height)
+      .from(input)
+      .to(new OutputBuilder(estimateMinBoxValue(), a1.address).mintToken({ amount: 100n }))
+      .sendChangeTo(a1.address)
+      .payMinFee()
+      .build();
+
+    expect(defaultMetaTx.outputs[0].value).toBe(42840n);
+    expect(defaultMetaTx.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+
+    const customRegTx = new TransactionBuilder(height)
+      .from(input)
+      .to(
+        new OutputBuilder(estimateMinBoxValue(), a1.address)
+          .mintToken({ amount: 100n, name: "TestToken" })
+          .setAdditionalRegisters({ R4: "0e00" })
+      )
+      .sendChangeTo(a1.address)
+      .payMinFee()
+      .build();
+
+    expect(customRegTx.outputs[0].value).toBe(41040n);
+    expect(customRegTx.outputs[0].additionalRegisters).toEqual({ R4: "0e00" });
+    expect(customRegTx.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+
+    const underfundedInput = mockUTxO({
+      value: 40320n + RECOMMENDED_MIN_FEE_VALUE,
+      ergoTree: a1.ergoTree
+    });
+
+    expect(() =>
+      new TransactionBuilder(height)
+        .from(underfundedInput)
+        .to(mintOutput)
+        .payMinFee()
+        .build()
+    ).toThrow(InsufficientInputs);
+  });
+
+  it("Should preserve minting input during change re-selection with CherryPick and orderBy", () => {
+    const tokenId = "1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489";
+    const mintInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE,
+      ergoTree: a1.ergoTree,
+      assets: [{ tokenId, amount: 10n }]
+    });
+    const ergInput = mockUTxO({
+      value: SAFE_MIN_BOX_VALUE * 2n,
+      ergoTree: a1.ergoTree
+    });
+
+    const cherryPickTx = new TransactionBuilder(height)
+      .from([mintInput, ergInput])
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).mintToken({
+          tokenId: mintInput.boxId,
+          amount: 100n,
+          name: "TestToken"
+        })
+      )
+      .configureSelector((selector) => selector.defineStrategy(new CherryPickSelectionStrategy()))
+      .sendChangeTo(a1.address)
+      .build();
+
+    expect(cherryPickTx.inputs).toHaveLength(2);
+    expect(cherryPickTx.inputs[0].boxId).toBe(mintInput.boxId);
+    expect(cherryPickTx.outputs[0].assets).toEqual([{ tokenId: mintInput.boxId, amount: 100n }]);
+    expect(cherryPickTx.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+
+    const orderedTx = new TransactionBuilder(height)
+      .from([mintInput, ergInput])
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).mintToken({
+          tokenId: mintInput.boxId,
+          amount: 100n,
+          name: "TestToken"
+        })
+      )
+      .configureSelector((selector) => selector.orderBy((box) => box.value, "desc"))
+      .sendChangeTo(a1.address)
+      .build();
+
+    expect(orderedTx.inputs).toHaveLength(2);
+    expect(orderedTx.inputs[0].boxId).toBe(mintInput.boxId);
+    expect(orderedTx.outputs[0].assets).toEqual([{ tokenId: mintInput.boxId, amount: 100n }]);
+    expect(orderedTx.burning).toEqual({ nanoErgs: 0n, tokens: [] });
+  });
 });
 
 /**
@@ -1105,6 +1437,51 @@ describe("Non-standardized token minting", () => {
         .payMinFee()
         .build();
     }).toThrow(NonStandardizedMinting);
+  });
+
+  it("Should fail if trying to mint in a non-standardized way when tokenId is omitted", () => {
+    expect(() => {
+      new TransactionBuilder(height)
+        .from(input)
+        .to(
+          new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({
+            amount: 1n,
+            name: "TestToken",
+            decimals: 4,
+            description: "Description test"
+          })
+        )
+        .and.to(
+          new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address).addTokens({
+            tokenId: mintingTokenId,
+            amount: 1n
+          })
+        )
+        .sendChangeTo(a1.address)
+        .payMinFee()
+        .build();
+    }).toThrow(NonStandardizedMinting);
+  });
+
+  it("Should allow minting alongside unrelated outputs", () => {
+    const transaction = new TransactionBuilder(height)
+      .from(input)
+      .to(
+        new OutputBuilder(SAFE_MIN_BOX_VALUE, a1.address).mintToken({
+          amount: 1n,
+          name: "TestToken",
+          decimals: 4,
+          description: "Description test"
+        })
+      )
+      .and.to(new OutputBuilder(SAFE_MIN_BOX_VALUE, a2.address))
+      .sendChangeTo(a1.address)
+      .payMinFee()
+      .build();
+
+    expect(transaction.outputs).toHaveLength(4);
+    expect(transaction.outputs[0].assets).toEqual([{ tokenId: mintingTokenId, amount: 1n }]);
+    expect(transaction.outputs[1].assets).toEqual([]);
   });
 });
 
@@ -1203,6 +1580,36 @@ describe("Token burning", () => {
     expect(() => {
       builder.build();
     }).toThrow(MalformedTransaction);
+  });
+
+  it("Should reject zero or negative token burning amounts", () => {
+    const tokenIdA = "bf2afb01fde7e373e22f24032434a7b883913bd87a23b62ee8b43eba53c9f6c2";
+    const tokenIdB = "007fd64d1ee54d78dd269c8930a38286caa28d3f29d27cadcb796418ab15c283";
+
+    const builder = new TransactionBuilder(height).from(regularBoxes);
+
+    expect(() => {
+      builder.burnTokens({ tokenId: tokenIdA, amount: 0n });
+    }).toThrow(RangeError);
+
+    expect(() => {
+      builder.burnTokens({ tokenId: tokenIdA, amount: -10n });
+    }).toThrow(RangeError);
+
+    expect(() => {
+      builder.burnTokens([
+        { tokenId: tokenIdA, amount: 1n },
+        { tokenId: tokenIdB, amount: "-5" }
+      ]);
+    }).toThrow(RangeError);
+
+    expect(builder.burning).toBeUndefined();
+
+    builder
+      .burnTokens({ tokenId: tokenIdA, amount: 1n })
+      .burnTokens({ tokenId: tokenIdB, amount: 10n });
+
+    expect(builder.burning).toHaveLength(2);
   });
 });
 
