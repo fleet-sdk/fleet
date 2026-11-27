@@ -137,6 +137,23 @@ describe("ErgoScript Compiler", () => {
     expect(() => compile(mainnetScript, { network: "mainnet" })).not.to.throw();
   });
 
+  it("Should accept Network enum values and undefined for network option", () => {
+    const mainnetTree = compile(mainnetScript, { network: Network.Mainnet });
+    expect(ErgoAddress.decode(mainnetTree.encode()).network).to.be.equal(Network.Mainnet);
+
+    const testnetTree = compile(testnetScript, { network: Network.Testnet });
+    expect(ErgoAddress.decode(testnetTree.encode()).network).to.be.equal(Network.Testnet);
+
+    const defaultTree = compile(mainnetScript, { network: undefined });
+    expect(ErgoAddress.decode(defaultTree.encode()).network).to.be.equal(Network.Mainnet);
+  });
+
+  it.each(["mainet", "", "MAINNET", 99])("Should throw for invalid network (%s)", (network) => {
+    expect(() => {
+      compile(mainnetScript, { network } as unknown as CompilerOptions);
+    }).to.throw(`Invalid network: '${String(network)}'.`);
+  });
+
   it("Should use default if no compiler options is set", () => {
     const { version, segregateConstants } = compilerDefaults;
 
@@ -149,13 +166,14 @@ describe("ErgoScript Compiler", () => {
     );
   });
 
-  it("Should throw if version is greater than max supported", () => {
-    expect(() =>
-      compile("sigmaProp(HEIGHT > 100)", {
-        version: 10
-      } as unknown as CompilerOptions)
-    ).to.throw("Version should be lower than 8, got 10");
-  });
+  it.each([-1, 1.5, 2, 8, 10, Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
+    "Should throw if version is unsupported (%s)",
+    (version) => {
+      expect(() => {
+        compile("sigmaProp(HEIGHT > 100)", { version } as unknown as CompilerOptions);
+      }).to.throw(`Unsupported version: expected 0 or 1, got ${version}.`);
+    }
+  );
 });
 
 describe("Compiler constants map parsing", () => {

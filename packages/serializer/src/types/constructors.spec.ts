@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { SConstant } from "../sigmaConstant";
 import {
   SBigInt,
   SBool,
@@ -51,5 +52,21 @@ describe("SPair constructor", () => {
     expect(() => SPair(SBool(true), SBool())).to.throw("Invalid tuple declaration.");
     // @ts-expect-error invalid pair construction
     expect(() => SPair(SBool(), SBool(true))).to.throw("Invalid tuple declaration.");
+  });
+});
+
+describe("SColl constructor", () => {
+  it("Should construct an empty SConstant from an empty string", () => {
+    const empty = SColl(SByte, "");
+    expect(empty).to.be.instanceOf(SConstant);
+    expect(empty.data).to.be.deep.equal(new Uint8Array());
+    expect(empty.toHex()).to.be.equal("0e00");
+  });
+
+  it("Should return a type constructor when elements are omitted", () => {
+    const typeCtor = SColl(SByte);
+    expect(typeof typeCtor).to.be.equal("function");
+    expect(typeCtor()).to.be.instanceOf(SCollType);
+    expect(typeCtor().toString()).to.be.equal("SColl[SByte]");
   });
 });

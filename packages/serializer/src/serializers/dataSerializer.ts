@@ -28,8 +28,13 @@ export const dataSerializer = {
         case descriptors.groupElement.code:
           return writer.writeBytes(data as Uint8Array);
         case descriptors.sigmaProp.code: {
-          const node = data as SConstant<SConstant<Uint8Array>>;
-          if (node.type === descriptors.groupElement) {
+          if (data instanceof Uint8Array) {
+            writer.write(PROVE_DLOG_OP);
+            return dataSerializer.serialize(data, descriptors.groupElement, writer);
+          }
+
+          const node = data as SConstant<Uint8Array> | undefined;
+          if (node?.type === descriptors.groupElement) {
             writer.write(PROVE_DLOG_OP);
             return dataSerializer.serialize(node.data, node.type, writer);
           }

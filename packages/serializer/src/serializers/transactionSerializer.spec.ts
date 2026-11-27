@@ -53,4 +53,21 @@ describe("Transaction serializer", () => {
 
     expect(serializeTransaction(tx).encode(hex)).toEqual(tv.hex);
   });
+
+  it("should roundtrip transaction with SigmaProp in registers and context extension", () => {
+    const sigmaPropHex = "08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
+    const tx = structuredClone(unsignedTransactionVectors[2].json);
+    tx.inputs[0].extension = { "0": sigmaPropHex };
+    tx.outputs[0].additionalRegisters = { R4: sigmaPropHex };
+
+    const serialized = serializeTransaction(tx).toBytes();
+    const deserialized = deserializeTransaction(serialized);
+
+    expect(deserialized.inputs[0]).toMatchObject({
+      boxId: tx.inputs[0].boxId,
+      extension: { "0": sigmaPropHex }
+    });
+    expect(deserialized.outputs[0].additionalRegisters).toEqual({ R4: sigmaPropHex });
+    expect(deserialized.outputs).toHaveLength(tx.outputs.length);
+  });
 });
