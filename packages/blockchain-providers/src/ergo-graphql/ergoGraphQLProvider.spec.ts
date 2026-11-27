@@ -1,11 +1,11 @@
 import type { Header } from "@ergo-graphql/types";
-import { NotSupportedError, chunk, hasDuplicatesBy } from "@fleet-sdk/common";
+import { Network, NotSupportedError, chunk, hasDuplicatesBy } from "@fleet-sdk/common";
 import { ErgoAddress } from "@fleet-sdk/core";
 import { mockedGraphQLBoxes, mockedGraphQLTransactions } from "_test-vectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ChainProviderBox } from "../types/blockchainProvider";
 import { resolveData, resolveString } from "../utils";
-import { ErgoGraphQLProvider } from "./ergoGraphQLProvider";
+import { ErgoGraphQLProvider, isRequestParam } from "./ergoGraphQLProvider";
 import {
   ALL_BOXES_QUERY,
   CONF_BOXES_QUERY,
@@ -399,6 +399,37 @@ describe("ergo-graphql provider", () => {
       expect(allBoxes).to.have.length(mockedGraphQLBoxes.filter((x) => !x.beingSpent).length);
       expect(fetchSpy).toBeCalledTimes(5);
     });
+
+    it("Should stop streaming without fetching when take is zero or negative", async () => {
+      const fetchSpy = vi.spyOn(global, "fetch");
+
+      const zeroBoxes: ChainProviderBox<bigint>[][] = [];
+      for await (const chunk of _client.streamBoxes({ where: _dumbWhere, take: 0 })) {
+        zeroBoxes.push(chunk);
+      }
+
+      const negativeBoxes: ChainProviderBox<bigint>[][] = [];
+      for await (const chunk of _client.streamBoxes({ where: _dumbWhere, take: -5 })) {
+        negativeBoxes.push(chunk);
+      }
+
+      expect(zeroBoxes).to.be.empty;
+      expect(negativeBoxes).to.be.empty;
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it("Should stop streaming when response lacks boxes or mempool fields", async () => {
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(resolveData({}))
+        .mockResolvedValueOnce(resolveString("null"))
+        .mockResolvedValueOnce(resolveData({ data: {} }));
+
+      expect(await _client.getBoxes(_dumbQuery)).to.be.empty;
+      expect(await _client.getBoxes(_dumbQuery)).to.be.empty;
+      expect(await _client.getBoxes(_dumbQuery)).to.be.empty;
+      expect(fetchSpy).toHaveBeenCalledTimes(3);
+    });
   });
 
   describe("fetch confirmed transactions", () => {
@@ -504,6 +535,49 @@ describe("ergo-graphql provider", () => {
         skip: 100,
         take: 50
       });
+    });
+
+    it("Should deduplicate confirmed transactions across chunks and skip zero take", async () => {
+      const addresses = Array.from({ length: 41 }, (_, i) => `addr_${i}`);
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(resolve({ transactions: mockedGraphQLTransactions.slice(0, 3) }))
+        .mockResolvedValueOnce(resolve({ transactions: mockedGraphQLTransactions.slice(1, 4) }))
+        .mockResolvedValueOnce(resolve({ transactions: mockedGraphQLTransactions.slice(0, 2) }));
+
+      const response = await _client.getConfirmedTransactions({ where: { addresses } });
+      expect(response).to.have.length(4);
+      expect(hasDuplicatesBy(response, (tx) => tx.transactionId)).to.be.false;
+      expect(fetchSpy).toHaveBeenCalledTimes(3);
+
+      let zeroCount = 0;
+      for await (const chunk of _client.streamConfirmedTransactions({
+        where: { transactionId: "txId" },
+        take: 0
+      })) {
+        zeroCount += chunk.length;
+      }
+      expect(zeroCount).to.be.equal(0);
+      expect(fetchSpy).toHaveBeenCalledTimes(3);
+    });
+
+    it("Should encode ergoTrees using configured network for confirmed transactions", async () => {
+      const testnetClient = new ErgoGraphQLProvider({
+        url: "https://gql-testnet.example.com/",
+        network: Network.Testnet
+      });
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(resolve({ transactions: [] }));
+
+      await testnetClient.getConfirmedTransactions({
+        where: { ergoTree: _addresses[0].ergoTree }
+      });
+
+      const callBody = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
+      expect(callBody.variables.addresses).to.be.deep.equal([
+        ErgoAddress.fromErgoTree(_addresses[0].ergoTree, Network.Testnet).encode()
+      ]);
     });
   });
 
@@ -614,6 +688,55 @@ describe("ergo-graphql provider", () => {
         skip: 100,
         take: 50
       });
+    });
+
+    it("Should deduplicate unconfirmed transactions across chunks and skip zero take", async () => {
+      const addresses = Array.from({ length: 41 }, (_, i) => `addr_${i}`);
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(
+          resolve({ mempool: { transactions: mockedGraphQLTransactions.slice(0, 3) } })
+        )
+        .mockResolvedValueOnce(
+          resolve({ mempool: { transactions: mockedGraphQLTransactions.slice(1, 4) } })
+        )
+        .mockResolvedValueOnce(
+          resolve({ mempool: { transactions: mockedGraphQLTransactions.slice(0, 2) } })
+        );
+
+      const response = await _client.getUnconfirmedTransactions({ where: { addresses } });
+      expect(response).to.have.length(4);
+      expect(hasDuplicatesBy(response, (tx) => tx.transactionId)).to.be.false;
+      expect(fetchSpy).toHaveBeenCalledTimes(3);
+
+      let zeroCount = 0;
+      for await (const chunk of _client.streamUnconfirmedTransactions({
+        where: { transactionId: "txId" },
+        take: 0
+      })) {
+        zeroCount += chunk.length;
+      }
+      expect(zeroCount).to.be.equal(0);
+      expect(fetchSpy).toHaveBeenCalledTimes(3);
+    });
+
+    it("Should encode ergoTrees with configured network for unconfirmed transactions", async () => {
+      const testnetClient = new ErgoGraphQLProvider({
+        url: "https://gql-testnet.example.com/",
+        network: Network.Testnet
+      });
+      const fetchSpy = vi
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(resolve({ mempool: { transactions: [] } }));
+
+      await testnetClient.getUnconfirmedTransactions({
+        where: { ergoTree: _addresses[0].ergoTree }
+      });
+
+      const callBody = JSON.parse(fetchSpy.mock.lastCall?.[1]?.body as string);
+      expect(callBody.variables.addresses).to.be.deep.equal([
+        ErgoAddress.fromErgoTree(_addresses[0].ergoTree, Network.Testnet).encode()
+      ]);
     });
   });
 
@@ -732,6 +855,74 @@ describe("ergo-graphql provider", () => {
       message: "Transaction not accepted by the node"
     });
     expect(fetchSpy).toHaveBeenCalledOnce();
+  });
+
+  it("Should fail checkTransaction and submitTransaction on null data or errors", async () => {
+    const tx = { id: "txId", inputs: [], outputs: [], dataInputs: [] };
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce(
+        resolveString('{"data":{"checkTransaction":null},"errors":[{"message":"Invalid script"}]}')
+      )
+      .mockResolvedValueOnce(
+        resolveString('{"data":{"submitTransaction":null},"errors":[{"message":"Double spend"}]}')
+      )
+      .mockResolvedValueOnce(resolveString('{"data":{"checkTransaction":null}}'))
+      .mockResolvedValueOnce(resolveString("{}"))
+      .mockResolvedValueOnce(resolveString('{"data":{"submitTransaction":null}}'))
+      .mockResolvedValueOnce(resolveString("{}"));
+
+    const client = new ErgoGraphQLProvider("https://gql.example.com/");
+
+    expect(await client.checkTransaction(tx)).to.be.deep.equal({
+      success: false,
+      message: "Invalid script"
+    });
+    expect(await client.submitTransaction(tx)).to.be.deep.equal({
+      success: false,
+      message: "Double spend"
+    });
+    expect(await client.checkTransaction(tx)).to.be.deep.equal({
+      success: false,
+      message: "Transaction check returned no transaction ID."
+    });
+    expect(await client.checkTransaction(tx)).to.be.deep.equal({
+      success: false,
+      message: "Transaction check returned no transaction ID."
+    });
+    expect(await client.submitTransaction(tx)).to.be.deep.equal({
+      success: false,
+      message: "Transaction submission returned no transaction ID."
+    });
+    expect(await client.submitTransaction(tx)).to.be.deep.equal({
+      success: false,
+      message: "Transaction submission returned no transaction ID."
+    });
+    expect(fetchSpy).toHaveBeenCalledTimes(6);
+  });
+
+  it("Should validate request params and accept options without url", async () => {
+    const opts = { httpOptions: { headers: { Authorization: "Bearer tok" } } };
+    expect(isRequestParam(null)).to.be.false;
+    expect(isRequestParam(undefined)).to.be.false;
+    expect(isRequestParam("https://gql.example.com/")).to.be.false;
+    expect(isRequestParam([])).to.be.false;
+    expect(isRequestParam({})).to.be.true;
+    expect(isRequestParam(opts)).to.be.true;
+
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(resolve({ blockHeaders: [] }));
+
+    const client = new ErgoGraphQLProvider({
+      httpOptions: { headers: new Headers({ Authorization: "Bearer tok" }) }
+    }).setUrl("https://gql.example.com/");
+
+    await client.getHeaders({ take: 1 });
+
+    expect(fetchSpy).toHaveBeenCalledOnce();
+    expect(fetchSpy.mock.calls[0][0]).to.be.equal("https://gql.example.com/");
+    expect(fetchSpy.mock.calls[0][1]?.headers).to.include({
+      authorization: "Bearer tok"
+    });
   });
 
   it("Should throw not supported error when reduceTransaction is called", async () => {
