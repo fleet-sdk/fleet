@@ -1,7 +1,8 @@
-import { Network } from "@fleet-sdk/common";
+import { AddressType, Network } from "@fleet-sdk/common";
 import { hex } from "@fleet-sdk/crypto";
 import { describe, expect, it, test } from "vitest";
 import { ErgoMessage, type ErgoMessageOptions, MessageType } from "./ergoMessage";
+import { encodeAddress } from "./utils";
 
 const testVectors = [
   {
@@ -103,12 +104,51 @@ describe("ErgoMessage construction", () => {
     );
   });
 
+  it("Should construct from a valid 32-byte hash", () => {
+    const hashHex = testVectors[0].hash;
+    const fromHex = new ErgoMessage({ hash: hashHex });
+    expect(fromHex.type).to.be.equal(MessageType.Hash);
+    expect(hex.encode(fromHex.hash)).to.be.equal(hashHex);
+    expect(fromHex.serialize().toBytes()).toHaveLength(34);
+
+    const fromBytes = new ErgoMessage({ hash: hex.decode(hashHex), network: Network.Testnet });
+    expect(fromBytes.network).to.be.equal(Network.Testnet);
+    expect(fromBytes.serialize().toBytes()).to.be.deep.equal(
+      Uint8Array.from([0x0, Network.Testnet, ...hex.decode(hashHex)])
+    );
+  });
+
+  it("Should throw when hash length is not 32 bytes", () => {
+    expect(() => new ErgoMessage({ hash: new Uint8Array(0) })).to.throw("Invalid hash length");
+    expect(() => new ErgoMessage({ hash: new Uint8Array(31) })).to.throw("Invalid hash length");
+    expect(() => new ErgoMessage({ hash: new Uint8Array(33) })).to.throw("Invalid hash length");
+    expect(() => new ErgoMessage({ hash: "deadbeef" })).to.throw("Invalid hash length");
+  });
+
+  it("Should treat 0x-prefixed strings as UTF-8 string data", () => {
+    const message = ErgoMessage.fromData("0xdeadbeef");
+    expect(message.type).to.be.equal(MessageType.String);
+    expect(message.getData()).to.be.equal("0xdeadbeef");
+  });
+
   it("Should throw when invalid encoded message hash", () => {
     const invalidChecksum = "AdQ5WCyibKZvCFkCAShhic5Z6cP3sG3KFp5ZSdb7gDfBL6b4Sy";
     expect(() => ErgoMessage.decode(invalidChecksum)).to.throw("Invalid encoded message hash");
 
     const invalidType = "9et2sWchC9o4894aaVDzcgfCyDoBV8nNvtnk5hSW3fzBbSwoX31"; // p2pk
     expect(() => ErgoMessage.decode(invalidType)).to.throw("Invalid message type");
+
+    expect(() => ErgoMessage.decode("")).to.throw("Invalid encoded message hash");
+    expect(() => ErgoMessage.decode("9eBy")).to.throw("Invalid encoded message hash");
+
+    const shortHash = encodeAddress(Network.Mainnet, AddressType.ADH, new Uint8Array(16));
+    expect(() => ErgoMessage.decode(shortHash)).to.throw("Invalid encoded message hash");
+
+    const longHash = encodeAddress(Network.Mainnet, AddressType.ADH, new Uint8Array(33));
+    expect(() => ErgoMessage.decode(longHash)).to.throw("Invalid encoded message hash");
+
+    const invalidNetwork = encodeAddress(0x20 as Network, AddressType.ADH, new Uint8Array(32));
+    expect(() => ErgoMessage.decode(invalidNetwork)).to.throw("Invalid encoded message hash");
   });
 });
 

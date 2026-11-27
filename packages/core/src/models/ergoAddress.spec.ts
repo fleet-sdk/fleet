@@ -136,6 +136,10 @@ describe("Construction", () => {
     expect(() => {
       ErgoAddress.decode(message.encode(Network.Mainnet));
     }).toThrow();
+
+    expect(() => {
+      ErgoAddress.decodeUnsafe(message.encode(Network.Mainnet));
+    }).toThrow("Invalid address type");
   });
 
   const invalidAddress = "3Wx6cHkTaAvysMMXSqqvoCL1n273NmcH3auiHymFwTSpKDFzQfW3";
@@ -202,6 +206,12 @@ describe("Address validation", () => {
 
   it("Should not validate too small address string", () => {
     expect(ErgoAddress.validate("9eBy")).toBeFalsy();
+  });
+
+  it("Should not validate empty, non-Base58, or ErgoMessage strings", () => {
+    expect(ErgoAddress.validate("")).toBeFalsy();
+    expect(ErgoAddress.validate("0OIl")).toBeFalsy();
+    expect(ErgoAddress.validate(ErgoMessage.fromData("hello world").encode())).toBeFalsy();
   });
 
   it("Should get network type", () => {

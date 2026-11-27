@@ -178,6 +178,45 @@ describe("utxoDiff()", () => {
       tokens: []
     });
   });
+
+  it("Should handle zero and negative subtrahend token amounts cleanly", () => {
+    const sumA: BoxSummary = {
+      nanoErgs: 100n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 10n },
+        { tokenId: "token_id_2", amount: 10n },
+        { tokenId: "token_id_3", amount: -5n }
+      ]
+    };
+
+    const sumB: BoxSummary = {
+      nanoErgs: 50n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 0n },
+        { tokenId: "token_id_2", amount: -5n },
+        { tokenId: "token_id_3", amount: -5n },
+        { tokenId: "token_id_4", amount: 0n },
+        { tokenId: "token_id_5", amount: -3n }
+      ]
+    };
+
+    expect(utxoDiff(sumA, sumB)).toEqual({
+      nanoErgs: 50n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 10n },
+        { tokenId: "token_id_2", amount: 15n },
+        { tokenId: "token_id_5", amount: 3n }
+      ]
+    });
+
+    expect(utxoDiff(sumA, sumB, true)).toEqual({
+      nanoErgs: 50n,
+      tokens: [
+        { tokenId: "token_id_1", amount: 10n },
+        { tokenId: "token_id_2", amount: 15n }
+      ]
+    });
+  });
 });
 
 describe("Densely pack check - areRegistersDenselyPacked()", () => {
@@ -317,6 +356,75 @@ describe("UTxO filter", () => {
   it("Should return empty array for empty inputs and non-matching filters", () => {
     expect(utxoFilter(regularBoxes, { by: (box) => box.value === 0n })).to.be.empty;
     expect(utxoFilter([], { max: { count: 10 } })).to.be.empty;
+  });
+
+  it("Should return empty array when max.count is zero or negative", () => {
+    expect(utxoFilter(regularBoxes, { max: { count: 0 } })).toEqual([]);
+    expect(utxoFilter(regularBoxes, { max: { count: -1 } })).toEqual([]);
+    expect(utxoFilter(regularBoxes, { max: { count: -5 } })).toEqual([]);
+  });
+
+  it("Should never exceed max.aggregatedDistinctTokens", () => {
+    const base = regularBoxes[0];
+    const boxes = [
+      {
+        ...base,
+        boxId: "box_a",
+        assets: [
+          { tokenId: "t1", amount: 1n },
+          { tokenId: "t2", amount: 1n }
+        ]
+      },
+      {
+        ...base,
+        boxId: "box_b",
+        assets: [
+          { tokenId: "t3", amount: 1n },
+          { tokenId: "t4", amount: 1n },
+          { tokenId: "t5", amount: 1n }
+        ]
+      },
+      {
+        ...base,
+        boxId: "box_c",
+        assets: [{ tokenId: "t3", amount: 1n }]
+      },
+      {
+        ...base,
+        boxId: "box_d",
+        assets: [
+          { tokenId: "t1", amount: 1n },
+          { tokenId: "t2", amount: 1n },
+          { tokenId: "t3", amount: 1n }
+        ]
+      }
+    ];
+
+    const filtered = utxoFilter(boxes, { max: { aggregatedDistinctTokens: 3 } });
+    expect(filtered.map((x) => x.boxId)).toEqual(["box_a", "box_c", "box_d"]);
+    expect(uniq(filtered.flatMap((x) => x.assets.map((t) => t.tokenId)))).toHaveLength(3);
+
+    const overlapping = [
+      boxes[0],
+      {
+        ...base,
+        boxId: "box_overlap",
+        assets: [
+          { tokenId: "t2", amount: 1n },
+          { tokenId: "t3", amount: 1n }
+        ]
+      }
+    ];
+    const filteredOverlapping = utxoFilter(overlapping, { max: { aggregatedDistinctTokens: 3 } });
+    const overlapTokens = uniq(filteredOverlapping.flatMap((x) => x.assets.map((t) => t.tokenId)));
+    expect(filteredOverlapping.map((x) => x.boxId)).toEqual(["box_a", "box_overlap"]);
+    expect(overlapTokens).toHaveLength(3);
+
+    const zeroTokenBoxes = utxoFilter(regularBoxes, { max: { aggregatedDistinctTokens: 0 } });
+    expect(zeroTokenBoxes).toHaveLength(2);
+    expect(zeroTokenBoxes.every((x) => isEmpty(x.assets))).toBe(true);
+
+    expect(utxoFilter(regularBoxes, { max: { aggregatedDistinctTokens: -1 } })).toEqual([]);
   });
 });
 

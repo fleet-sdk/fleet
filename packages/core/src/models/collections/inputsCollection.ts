@@ -1,5 +1,12 @@
-import { type Amount, type Box, type BoxId, Collection, type OneOrMore } from "@fleet-sdk/common";
-import { isDefined } from "@fleet-sdk/common";
+import {
+  type Amount,
+  type Box,
+  type BoxId,
+  Collection,
+  type CollectionAddOptions,
+  type OneOrMore,
+  isDefined
+} from "@fleet-sdk/common";
 import { DuplicateInputError, NotFoundError } from "../../errors";
 import { ErgoUnsignedInput } from "../ergoUnsignedInput";
 
@@ -16,12 +23,12 @@ export class InputsCollection extends Collection<ErgoUnsignedInput, Box<Amount>>
     return input instanceof ErgoUnsignedInput ? input : new ErgoUnsignedInput(input);
   }
 
-  protected override _addOne(box: Box<Amount>): number {
+  protected override _addOne(box: Box<Amount>, options?: CollectionAddOptions): number {
     if (this._items.some((item) => item.boxId === box.boxId)) {
       throw new DuplicateInputError(box.boxId);
     }
 
-    return super._addOne(box);
+    return super._addOne(box, options);
   }
 
   public remove(boxId: BoxId): number;

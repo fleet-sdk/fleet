@@ -88,21 +88,21 @@ export function utxoDiff(
   const subtrahendTokens = new Map(subtrahend.tokens.map((t) => [t.tokenId, t.amount]));
 
   for (const token of minuend.tokens) {
-    const subtrahendAmount = subtrahendTokens.get(token.tokenId) || _0n;
-    const balance = token.amount - (subtrahendAmount || _0n);
+    const subtrahendAmount = subtrahendTokens.get(token.tokenId) ?? _0n;
+    const balance = token.amount - subtrahendAmount;
 
     if (balance !== _0n) {
       tokens.push({ tokenId: token.tokenId, amount: balance });
     }
 
-    if (subtrahendAmount > _0n) {
-      subtrahendTokens.delete(token.tokenId);
-    }
+    subtrahendTokens.delete(token.tokenId);
   }
 
   if (!ignoreSubtrahendLeftoverTokens && subtrahendTokens.size > 0) {
     for (const [tokenId, amount] of subtrahendTokens) {
-      tokens.push({ tokenId, amount: -amount });
+      if (amount !== _0n) {
+        tokens.push({ tokenId, amount: -amount });
+      }
     }
   }
 
@@ -171,7 +171,15 @@ export function utxoFilter<T extends Amount>(utxos: Box<T>[], filterParams: UTxO
     return filtered;
   }
 
+  if (isDefined(max.count) && max.count <= 0) {
+    return [];
+  }
+
   if (isDefined(max.aggregatedDistinctTokens)) {
+    if (max.aggregatedDistinctTokens < 0) {
+      return [];
+    }
+
     const tokenIds = _getDistinctTokenIds(filtered, max.aggregatedDistinctTokens);
     filtered = filtered.filter(
       (utxo) => isEmpty(utxo.assets) || utxo.assets.every((token) => tokenIds.has(token.tokenId))
@@ -189,12 +197,23 @@ function _getDistinctTokenIds(utxos: Box[], max: number): Set<string> {
   const tokenIds = new Set<string>();
 
   for (let i = 0; i < utxos.length && tokenIds.size < max; i++) {
-    if (isEmpty(utxos[i].assets) || utxos[i].assets.length > max) {
+    if (isEmpty(utxos[i].assets)) {
       continue;
     }
 
+    const newTokenIds = new Set<string>();
     for (const token of utxos[i].assets) {
-      tokenIds.add(token.tokenId);
+      if (!tokenIds.has(token.tokenId)) {
+        newTokenIds.add(token.tokenId);
+      }
+    }
+
+    if (tokenIds.size + newTokenIds.size > max) {
+      continue;
+    }
+
+    for (const tokenId of newTokenIds) {
+      tokenIds.add(tokenId);
     }
   }
 

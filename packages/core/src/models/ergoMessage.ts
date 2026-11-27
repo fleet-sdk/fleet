@@ -2,7 +2,14 @@ import { AddressType, type Base58String, Network, areEqual, isHex } from "@fleet
 import { type ByteInput, base58, blake2b256, ensureBytes, hex, utf8 } from "@fleet-sdk/crypto";
 import { SigmaByteWriter } from "@fleet-sdk/serializer";
 import type { JsonObject, JsonValue } from "type-fest";
-import { encodeAddress, unpackAddress, validateUnpackedAddress } from "./utils";
+import {
+  BLAKE_256_HASH_LENGTH,
+  CHECKSUM_LENGTH,
+  encodeAddress,
+  hasValidChecksum,
+  isValidNetwork,
+  unpackAddress
+} from "./utils";
 
 const SERIALIZED_HASH_LENGTH = 34; // invalidation byte (1) + network type (1) + hash (32)
 
@@ -42,7 +49,14 @@ export class ErgoMessage {
       [this.#data, this.#type] = this.#decodeData(options.data);
       this.#hash = blake2b256(this.#data);
     } else if ("hash" in options) {
-      this.#hash = ensureBytes(options.hash);
+      const hash = ensureBytes(options.hash);
+      if (hash.length !== BLAKE_256_HASH_LENGTH) {
+        throw new Error(
+          `Invalid hash length: expected ${BLAKE_256_HASH_LENGTH} bytes, got ${hash.length}`
+        );
+      }
+
+      this.#hash = hash;
       this.#type = MessageType.Hash;
     } else {
       throw new Error("Either hash or message data must be provided");
@@ -74,9 +88,20 @@ export class ErgoMessage {
   }
 
   static decode(encodedHash: Base58String): ErgoMessage {
-    const unpacked = unpackAddress(base58.decode(encodedHash));
+    const bytes = base58.decode(encodedHash);
+    if (bytes.length <= CHECKSUM_LENGTH + 1) {
+      throw new Error("Invalid encoded message hash");
+    }
+
+    const unpacked = unpackAddress(bytes);
     if (unpacked.type !== AddressType.ADH) throw new Error("Invalid message type");
-    if (!validateUnpackedAddress(unpacked)) throw new Error("Invalid encoded message hash");
+    if (
+      !isValidNetwork(unpacked.network) ||
+      unpacked.body.length !== BLAKE_256_HASH_LENGTH ||
+      !hasValidChecksum(unpacked)
+    ) {
+      throw new Error("Invalid encoded message hash");
+    }
 
     return new ErgoMessage({ hash: unpacked.body, network: unpacked.network });
   }

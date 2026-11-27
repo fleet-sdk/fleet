@@ -1,7 +1,7 @@
 import {
   AddressType,
   type Base58String,
-  type Network,
+  Network,
   areEqual,
   concatBytes,
   first,
@@ -12,6 +12,7 @@ import { SigmaByteWriter } from "@fleet-sdk/serializer";
 
 export const CHECKSUM_LENGTH = 4;
 export const BLAKE_256_HASH_LENGTH = 32;
+export const P2SH_HASH_LENGTH = 24;
 
 export type UnpackedAddress = {
   head: Uint8Array;
@@ -27,6 +28,16 @@ export function getNetworkType(addressBytes: Uint8Array): Network {
 
 export function getAddressType(addressBytes: Uint8Array): AddressType {
   return first(addressBytes) & 0x0f;
+}
+
+export function isValidNetwork(network: Network): boolean {
+  return network === Network.Mainnet || network === Network.Testnet;
+}
+
+export function hasValidChecksum(unpacked: UnpackedAddress): boolean {
+  const content = concatBytes(unpacked.head, unpacked.body);
+  const checksum = blake2b256(content).subarray(0, CHECKSUM_LENGTH);
+  return areEqual(checksum, unpacked.checksum);
 }
 
 /**
@@ -58,12 +69,22 @@ export function encodeAddress(
 }
 
 export function validateUnpackedAddress(unpacked: UnpackedAddress): boolean {
-  const content = concatBytes(unpacked.head, unpacked.body);
-  if (isEmpty(unpacked.body)) return false;
-  if (unpacked.type === AddressType.P2PK && !validateEcPoint(unpacked.body)) return false;
+  if (!isValidNetwork(unpacked.network) || isEmpty(unpacked.body)) return false;
 
-  const checksum = blake2b256(content).subarray(0, CHECKSUM_LENGTH);
-  return areEqual(checksum, unpacked.checksum);
+  switch (unpacked.type) {
+    case AddressType.P2PK:
+      if (!validateEcPoint(unpacked.body)) return false;
+      break;
+    case AddressType.P2SH:
+      if (unpacked.body.length !== P2SH_HASH_LENGTH) return false;
+      break;
+    case AddressType.P2S:
+      break;
+    default:
+      return false;
+  }
+
+  return hasValidChecksum(unpacked);
 }
 
 /**
@@ -73,5 +94,15 @@ export function validateUnpackedAddress(unpacked: UnpackedAddress): boolean {
  * @returns A boolean indicating whether the address is valid or not.
  */
 export function validateAddress(encodedAddress: Base58String): boolean {
-  return validateUnpackedAddress(unpackAddress(base58.decode(encodedAddress)));
+  if (!encodedAddress) return false;
+
+  let bytes: Uint8Array;
+  try {
+    bytes = base58.decode(encodedAddress);
+  } catch {
+    return false;
+  }
+
+  if (bytes.length <= CHECKSUM_LENGTH + 1) return false;
+  return validateUnpackedAddress(unpackAddress(bytes));
 }

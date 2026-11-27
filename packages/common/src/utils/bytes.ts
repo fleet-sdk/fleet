@@ -14,9 +14,11 @@ export function concatBytes(...arrays: Uint8Array[]): Uint8Array {
   return r;
 }
 
-export function isHex(value?: string) {
-  if (!value || value.length % 2) return false;
-  return !Number.isNaN(Number(value.startsWith("0x") ? value : `0x${value}`));
+const HEX_PATTERN = /^[0-9a-fA-F]+$/;
+
+export function isHex(value?: string): boolean {
+  if (!value || value.length % 2 !== 0) return false;
+  return HEX_PATTERN.test(value);
 }
 
 /**
