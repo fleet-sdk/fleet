@@ -31,7 +31,9 @@ describe("isHex() test", () => {
       isHex("0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7")
     ).toBeTruthy();
 
-    expect(isHex("0xdeadbeef")).toBeTruthy();
+    expect(isHex("deadbeef")).toBeTruthy();
+    expect(isHex("DEADBEEF")).toBeTruthy();
+    expect(isHex("DeAdBeEf0123456789")).toBeTruthy();
   });
 
   it("Should fail with INVALID hex strings", () => {
@@ -41,6 +43,13 @@ describe("isHex() test", () => {
     ).toBeFalsy();
 
     expect(isHex("deadbee")).toBeFalsy();
+    expect(isHex("0xdeadbeef")).toBeFalsy();
+    expect(isHex("0Xdeadbeef")).toBeFalsy();
+    expect(isHex("deadbeef  ")).toBeFalsy();
+    expect(isHex("  deadbeef")).toBeFalsy();
+    expect(isHex(" deadbeef ")).toBeFalsy();
+    expect(isHex("deadbeef\n\n")).toBeFalsy();
+    expect(isHex("deadbeef\t ")).toBeFalsy();
   });
 
   it("Should fail with falsy arguments", () => {

@@ -46,6 +46,8 @@ type ParsingOptions = {
  */
 export function undecimalize(input: string, options?: ParsingOptions | number): bigint {
   if (!input) return _0n;
+  input = input.trim();
+  if (!input) return _0n;
 
   options = typeof options === "number" ? { decimals: options } : options;
   if (isUndefined(options)) {
@@ -118,11 +120,14 @@ export function decimalize(value: Amount, options?: FormattingOptions | number):
   options.decimals = options.decimals || 0;
   options.decimalMark = options.decimalMark || ".";
 
+  const isNegative = value < _0n;
+  const abs = isNegative ? -value : value;
   const pow = _10n ** BigInt(options.decimals);
-  const integer = value / pow;
-  const decimal = value - integer * pow;
+  const integer = abs / pow;
+  const decimal = abs - integer * pow;
+  const formatted = buildFormattedDecimal(integer.toString(10), decimal.toString(10), options);
 
-  return buildFormattedDecimal(integer.toString(10), decimal.toString(10), options);
+  return isNegative ? `-${formatted}` : formatted;
 }
 
 /**

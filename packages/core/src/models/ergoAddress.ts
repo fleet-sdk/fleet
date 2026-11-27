@@ -11,6 +11,7 @@ import {
 import { InvalidAddress } from "../errors/invalidAddress";
 import {
   BLAKE_256_HASH_LENGTH,
+  P2SH_HASH_LENGTH,
   type UnpackedAddress,
   encodeAddress,
   getAddressType,
@@ -26,7 +27,6 @@ const P2PK_ERGOTREE_LENGTH = 36;
 const P2SH_ERGOTREE_PREFIX = hex.decode("00ea02d193b4cbe4e3010e040004300e18");
 const P2SH_ERGOTREE_SUFFIX = hex.decode("d40801");
 const P2SH_ERGOTREE_LENGTH = 44;
-const P2SH_HASH_LENGTH = 24;
 
 function getErgoTreeType(ergoTree: Uint8Array): AddressType {
   if (ergoTree.length === P2PK_ERGOTREE_LENGTH && startsWith(ergoTree, P2PK_ERGOTREE_PREFIX)) {

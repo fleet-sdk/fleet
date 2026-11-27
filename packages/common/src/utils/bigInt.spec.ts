@@ -74,9 +74,35 @@ describe("decimalize()", () => {
     expect(decimalize(1298379183n)).toBe("1298379183");
   });
 
+  it("Should decimalize negative values", () => {
+    expect(decimalize(-150n, 2)).toBe("-1.5");
+    expect(decimalize(-50n, 2)).toBe("-0.5");
+    expect(decimalize(-5n, 2)).toBe("-0.05");
+    expect(decimalize(-5n, 3)).toBe("-0.005");
+    expect(decimalize(-100n, 2)).toBe("-1");
+    expect(decimalize(-123n, 2)).toBe("-1.23");
+    expect(decimalize(0n, 2)).toBe("0");
+    expect(decimalize(-1298379183n)).toBe("-1298379183");
+    expect(
+      decimalize(-129837918300001n, {
+        decimals: 5,
+        thousandMark: ",",
+        decimalMark: "."
+      })
+    ).toBe("-1,298,379,183.00001");
+    expect(
+      decimalize("-129837918300001", {
+        decimals: 0,
+        thousandMark: "#"
+      })
+    ).toBe("-129#837#918#300#001");
+  });
+
   it("Should do a roundtrip", () => {
     const options = { decimals: 9 };
     expect(decimalize(undecimalize("129.8379183", options), options)).toBe("129.8379183");
+    expect(decimalize(undecimalize("-129.8379183", options), options)).toBe("-129.8379183");
+    expect(decimalize(undecimalize("-0.05", 2), 2)).toBe("-0.05");
   });
 });
 
@@ -108,6 +134,16 @@ describe("undecimalize()", () => {
     expect(undecimalize("-129.8379183", { decimals: 9 })).toBe(-129837918300n);
     expect(undecimalize("-129.8379183", 9)).toBe(-129837918300n);
     expect(undecimalize("-129.8379183")).toBe(-1298379183n);
+  });
+
+  it("Should trim leading and trailing whitespace", () => {
+    expect(undecimalize("   ", 9)).toBe(0n);
+    expect(undecimalize("1.5 ", 2)).toBe(150n);
+    expect(undecimalize(" 1.5", 2)).toBe(150n);
+    expect(undecimalize(" -1.5", 2)).toBe(-150n);
+    expect(undecimalize("  -1.5  ", 2)).toBe(-150n);
+    expect(undecimalize("\t-0.05\n", 2)).toBe(-5n);
+    expect(undecimalize(" 0,0011 ", { decimals: 9, decimalMark: "," })).toBe(1100000n);
   });
 
   it("Should throw if used with wrong number format", () => {

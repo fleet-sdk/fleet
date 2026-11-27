@@ -59,6 +59,62 @@ describe("inputs collection", () => {
     }).toThrow(DuplicateInputError);
   });
 
+  it("Should insert a single item at a specific index", () => {
+    const collection = new InputsCollection([regularBoxes[0], regularBoxes[1]]);
+
+    collection.add(regularBoxes[2], { index: 0 });
+    expect(collection.toArray().map((x) => x.boxId)).toEqual([
+      regularBoxes[2].boxId,
+      regularBoxes[0].boxId,
+      regularBoxes[1].boxId
+    ]);
+
+    collection.add(regularBoxes[3], { index: 2 });
+    expect(collection.toArray().map((x) => x.boxId)).toEqual([
+      regularBoxes[2].boxId,
+      regularBoxes[0].boxId,
+      regularBoxes[3].boxId,
+      regularBoxes[1].boxId
+    ]);
+
+    collection.add(regularBoxes[4], { index: collection.length });
+    expect(collection.toArray().map((x) => x.boxId)).toEqual([
+      regularBoxes[2].boxId,
+      regularBoxes[0].boxId,
+      regularBoxes[3].boxId,
+      regularBoxes[1].boxId,
+      regularBoxes[4].boxId
+    ]);
+  });
+
+  it("Should insert multiple items at a specific index preserving order", () => {
+    const collection = new InputsCollection([regularBoxes[0], regularBoxes[1]]);
+
+    collection.add([regularBoxes[2], regularBoxes[3]], { index: 1 });
+    expect(collection.toArray().map((x) => x.boxId)).toEqual([
+      regularBoxes[0].boxId,
+      regularBoxes[2].boxId,
+      regularBoxes[3].boxId,
+      regularBoxes[1].boxId
+    ]);
+  });
+
+  it("Should throw when adding at an out-of-range index or duplicate with index", () => {
+    const collection = new InputsCollection([regularBoxes[0]]);
+
+    expect(() => {
+      collection.add(regularBoxes[1], { index: -1 });
+    }).toThrow(RangeError);
+
+    expect(() => {
+      collection.add(regularBoxes[1], { index: 2 });
+    }).toThrow(RangeError);
+
+    expect(() => {
+      collection.add(regularBoxes[0], { index: 0 });
+    }).toThrow(DuplicateInputError);
+  });
+
   it("Should remove by boxId", () => {
     const collection = new InputsCollection(regularBoxes);
     const boxId = first(regularBoxes).boxId;
