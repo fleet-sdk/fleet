@@ -284,6 +284,16 @@ describe("Token minting", () => {
       description: "test description"
     });
   });
+
+  it("Should fail if minting amount is less than or equal to zero", () => {
+    expect(() => {
+      builder.mintToken({ amount: 0n, name: "TestToken" });
+    }).toThrow(RangeError);
+
+    expect(() => {
+      builder.mintToken({ amount: -1n, name: "TestToken" });
+    }).toThrow(RangeError);
+  });
 });
 
 describe("Additional registers", () => {
@@ -609,5 +619,55 @@ describe("Building", () => {
 
     output.setValue(estimateMinBoxValue());
     expect(output.value).toBe(28440n);
+  });
+
+  it("Should filter out tokens with zero amounts on build when minting", () => {
+    const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, address, height)
+      .mintToken({ amount: 100n, name: "TestToken" })
+      .addTokens({ tokenId: tokenA, amount: 0n });
+
+    const candidate = output.build(regularBoxes);
+
+    expect(candidate.assets).toEqual([{ tokenId: regularBoxes[0].boxId, amount: 100n }]);
+  });
+
+  it("Should estimate size when creation height is zero and fail when undefined", () => {
+    const outputAtGenesis = new OutputBuilder(estimateMinBoxValue(), address, 0);
+    expect(outputAtGenesis.estimateSize()).toBe(77);
+    expect(outputAtGenesis.value).toBe(27720n);
+
+    const outputWithoutHeight = new OutputBuilder(estimateMinBoxValue(), address);
+    expect(() => outputWithoutHeight.estimateSize()).toThrow("Creation height must be set");
+  });
+
+  it("Should clone output builder without sharing mutable state", () => {
+    const original = new OutputBuilder(estimateMinBoxValue(), address)
+      .addTokens({ tokenId: tokenA, amount: 10n })
+      .mintToken({ amount: 100n, name: "TestToken" })
+      .addTokens({ tokenId: tokenB, amount: 5n })
+      .setAdditionalRegisters({ R4: "0e00" })
+      .setFlags({ change: true });
+
+    const cloned = original.clone();
+    cloned
+      .setCreationHeight(height)
+      .addTokens({ tokenId: tokenA, amount: 20n })
+      .setAdditionalRegisters({ R5: "0e00" })
+      .setFlags({ change: false });
+
+    expect(original.creationHeight).toBeUndefined();
+    expect(original.additionalRegisters).toEqual({ R4: "0e00" });
+    expect(original.flags).toEqual({ change: true });
+    expect(original.assets.at(0)).toEqual({ tokenId: tokenA, amount: 10n });
+    expect(original.assets.at(1).tokenId).toBeUndefined();
+    expect(original.assets.at(2)).toEqual({ tokenId: tokenB, amount: 5n });
+
+    expect(cloned.creationHeight).toBe(height);
+    expect(cloned.additionalRegisters).toEqual({ R4: "0e00", R5: "0e00" });
+    expect(cloned.flags).toEqual({ change: false });
+    expect(cloned.assets.at(0)).toEqual({ tokenId: tokenA, amount: 30n });
+    expect(cloned.assets.at(1).tokenId).toBeUndefined();
+    expect(cloned.assets.at(2)).toEqual({ tokenId: tokenB, amount: 5n });
+    expect(cloned.minting).toEqual({ amount: 100n, name: "TestToken" });
   });
 });

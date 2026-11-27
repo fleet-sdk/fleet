@@ -1,5 +1,4 @@
 import {
-  assert,
   type Amount,
   type Box,
   type BoxCandidate,
@@ -150,6 +149,10 @@ export class OutputBuilder {
   }
 
   mintToken(token: NewToken<Amount>): OutputBuilder {
+    if (ensureBigInt(token.amount) <= _0n) {
+      throw new RangeError("Minting token amount must be greater than zero.");
+    }
+
     this.assets.mint(token);
     return this;
   }
@@ -182,13 +185,36 @@ export class OutputBuilder {
     return this;
   }
 
+  clone(): OutputBuilder {
+    const copy = new OutputBuilder(
+      this.#valueEstimator ?? this.#value,
+      this.#address,
+      this.#creationHeight
+    )
+      .setAdditionalRegisters(this.#registers)
+      .setFlags(this.#flags);
+
+    const minting = this.minting;
+    let minted = false;
+    for (const token of this.#tokens) {
+      if (minting && !minted && token.tokenId === minting.tokenId) {
+        copy.#tokens.mint(minting);
+        minted = true;
+      } else {
+        copy.#tokens.add(token as TokenAmount<bigint>, { sum: false });
+      }
+    }
+
+    return copy;
+  }
+
   build(transactionInputs?: UnsignedInput[] | Box<Amount>[]): ErgoBoxCandidate {
     if (!areRegistersDenselyPacked(this.#registers)) throw new InvalidRegistersPacking();
 
     let tokens: TokenAmount<bigint>[];
     if (this.minting) {
       const mintingTokenId = transactionInputs ? transactionInputs[0]?.boxId : undefined;
-      tokens = this.assets.toArray(mintingTokenId);
+      tokens = this.assets.toArray(mintingTokenId).filter((x) => x.amount > _0n);
 
       if (isEmpty(this.additionalRegisters)) {
         this.setAdditionalRegisters({
@@ -216,7 +242,9 @@ export class OutputBuilder {
   }
 
   estimateSize(value = SAFE_MIN_BOX_VALUE): number {
-    assert(!!this.creationHeight, "Creation height must be set");
+    if (isUndefined(this.creationHeight)) {
+      throw new Error("Creation height must be set");
+    }
 
     const plainBoxObject: BoxCandidate<bigint> = {
       value,
