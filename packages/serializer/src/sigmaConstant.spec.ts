@@ -40,6 +40,7 @@ import {
   SBool,
   SByte,
   SColl,
+  SCollType,
   SGroupElement,
   SInt,
   SLong,
@@ -49,6 +50,7 @@ import {
   SUnit
 } from "./types/";
 import { SAvlTree, SBox, STuple } from "./types/constructors";
+import { descriptors } from "./types/descriptors";
 
 describe("Primitive types serialization and parsing", () => {
   it.each(boolVectors)("Should road-trip SBool($value)", (tv) => {
@@ -117,6 +119,19 @@ describe("Primitive types serialization and parsing", () => {
     expect(SSigmaProp(SGroupElement(hex.decode(tv.value))).toHex()).to.be.equal(tv.hex);
 
     expect(SConstant.from(tv.hex).data).to.be.deep.equal(hex.decode(tv.value));
+    expect(SConstant.from(tv.hex).toHex()).to.be.equal(tv.hex);
+  });
+
+  it("Should round-trip deserialized SSigmaProp in primitive, coll, and tuple forms", () => {
+    const pkHex = "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
+    const propHex = `08cd${pkHex}`;
+    expect(SConstant.from(propHex).toHex()).to.be.equal(propHex);
+
+    const collHex = SColl(SSigmaProp, [SGroupElement(pkHex)]).toHex();
+    expect(SConstant.from(collHex).toHex()).to.be.equal(collHex);
+
+    const tupleHex = STuple(SInt(1), SSigmaProp(SGroupElement(pkHex))).toHex();
+    expect(SConstant.from(tupleHex).toHex()).to.be.equal(tupleHex);
   });
 
   it("Should coerce alternative input types", () => {
@@ -193,6 +208,69 @@ describe("SColl serialization and parsing", () => {
 
   it("Should return a Uint8Array instance when parsing SColl[SByte] type", () => {
     expect(SConstant.from("0e0a46656d616c6520233035").data).to.be.instanceof(Uint8Array);
+  });
+
+  it("Should serialize empty SColl[SByte] from empty string", () => {
+    const empty = SColl(SByte, "");
+    expect(empty).to.be.instanceOf(SConstant);
+    expect(empty.data).to.be.instanceOf(Uint8Array);
+    expect(empty.data).to.be.deep.equal(new Uint8Array());
+    expect(empty.toHex()).to.be.equal("0e00");
+  });
+
+  it("Should serialize empty and non-empty collections of non-embeddable types", () => {
+    const emptyAvl = new SConstant(new SCollType(descriptors.avlTree), []);
+    expect(emptyAvl.toHex()).to.be.equal("0c6400");
+    expect(SConstant.from("0c6400").data).to.be.deep.equal([]);
+    expect(SConstant.from("0c6400").toHex()).to.be.equal("0c6400");
+
+    const emptyBox = new SConstant(new SCollType(descriptors.box), []);
+    expect(emptyBox.toHex()).to.be.equal("0c6300");
+    expect(SConstant.from("0c6300").data).to.be.deep.equal([]);
+    expect(SConstant.from("0c6300").toHex()).to.be.equal("0c6300");
+
+    const emptyUnit = new SConstant(new SCollType(descriptors.unit), []);
+    expect(emptyUnit.toHex()).to.be.equal("0c6200");
+    expect(SConstant.from("0c6200").data).to.be.deep.equal([]);
+    expect(SConstant.from("0c6200").toHex()).to.be.equal("0c6200");
+
+    const avlColl = new SConstant(new SCollType(descriptors.avlTree), [avlTreeVectors[0].data]);
+    expect(SConstant.from(avlColl.toHex()).data).to.be.deep.equal([avlTreeVectors[0].data]);
+
+    const boxColl = new SConstant(new SCollType(descriptors.box), [sBoxVectors[0].value]);
+    expect(boxColl.toHex()).to.be.equal(`0c6301${sBoxVectors[0].hex.slice(2)}`);
+    expect(SConstant.from(boxColl.toHex()).toHex()).to.be.equal(boxColl.toHex());
+  });
+
+  it("Should serialize nested collections and tuples larger than 4096 bytes", () => {
+    const largeBytes = new Uint8Array(5000).fill(0xab);
+    const nestedBytes = SColl(SColl(SByte), [largeBytes]);
+    const nestedBytesHex = nestedBytes.toHex();
+    expect(SConstant.from(nestedBytesHex).data).to.be.deep.equal([largeBytes]);
+    expect(SConstant.from(nestedBytesHex).toHex()).to.be.equal(nestedBytesHex);
+
+    const largeInts = Array.from({ length: 5000 }, (_, i) => i);
+    const nestedIntsHex = SColl(SColl(SInt), [largeInts]).toHex();
+    expect(SConstant.from(nestedIntsHex).data).to.be.deep.equal([largeInts]);
+
+    const firstBytes = new Uint8Array(3000).fill(1);
+    const secondBytes = new Uint8Array(3000).fill(2);
+    const largePair = STuple(SColl(SByte, firstBytes), SColl(SByte, secondBytes));
+    const largePairHex = largePair.toHex();
+    expect(SConstant.from(largePairHex).data).to.be.deep.equal([firstBytes, secondBytes]);
+
+    const firstInts = Array.from({ length: 3000 }, () => 1);
+    const secondInts = Array.from({ length: 3000 }, () => 2);
+    const largeIntTuple = STuple(SColl(SInt, firstInts), SColl(SInt, secondInts));
+    const largeIntTupleHex = largeIntTuple.toHex();
+    expect(SConstant.from(largeIntTupleHex).data).to.be.deep.equal([firstInts, secondInts]);
+
+    const collOfPairsType = new SCollType(
+      new STupleType([new SCollType(descriptors.byte), descriptors.int])
+    );
+    const collOfPairs = new SConstant(collOfPairsType, [[largeBytes, 42]]);
+    const collOfPairsHex = collOfPairs.toHex();
+    expect(SConstant.from(collOfPairsHex).data).to.be.deep.equal([[largeBytes, 42]]);
   });
 });
 
@@ -315,6 +393,10 @@ describe("Not implemented types", () => {
     expect(() => SSigmaProp(new SConstant(unimplementedType, Uint8Array.from([0]))).bytes).to.throw(
       "Serialization error: SigmaProp operation not implemented."
     );
+
+    expect(() => {
+      dataSerializer.serialize(undefined, SSigmaProp(), new SigmaByteWriter(1));
+    }).to.throw("Serialization error: SigmaProp operation not implemented.");
 
     // not implemented SSigmaProp expression
     expect(() => {

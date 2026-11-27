@@ -112,4 +112,20 @@ describe("ErgoBox serialization", () => {
       "ErgoTree parsing without the size flag is not supported."
     );
   });
+
+  it("Should roundtrip box with SigmaProp register", () => {
+    const box = mockUTxO({
+      ergoTree: "19090104c801d191a37300",
+      additionalRegisters: {
+        R4: "08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+      }
+    });
+
+    const serialized = serializeBox(box).toBytes();
+    const deserialized = deserializeBox(serialized);
+    expect(deserialized).toEqual(box);
+
+    const boxId = hex.encode(blake2b256(serialized));
+    expect(deserialized.boxId).toEqual(boxId);
+  });
 });

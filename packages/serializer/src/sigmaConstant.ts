@@ -1,8 +1,10 @@
+import type { Box } from "@fleet-sdk/common";
 import { type ByteInput, hex } from "@fleet-sdk/crypto";
 import { SigmaByteReader, SigmaByteWriter, estimateVLQSize } from "./coders";
+import { estimateBoxSize } from "./serializers/boxSerializer";
 import { dataSerializer } from "./serializers/dataSerializer";
 import { typeSerializer } from "./serializers/typeSerializer";
-import type { SCollType, SType } from "./types";
+import type { SType } from "./types";
 import { descriptors, isColl, isTuple } from "./types/descriptors";
 
 export const MAX_CONSTANT_LENGTH = 4096;
@@ -75,28 +77,82 @@ export class SConstant<D = unknown, T extends SType = SType> {
 }
 
 function guessConstantBytesSize(type: SType, data?: unknown): number {
-  const dataSize = 1;
+  return estimateTypeSize(type) + estimateDataSize(type, data);
+}
 
-  // left some safe room for integer types
-  if (type.code === descriptors.short.code) return dataSize + 8;
-  if (type.code === descriptors.int.code) return dataSize + 16;
-  if (type.code === descriptors.long.code) return dataSize + 32;
-  if (type.code === descriptors.bigInt.code) return dataSize + 64;
+function estimateTypeSize(type: SType): number {
+  if (isColl(type)) {
+    if (type.elementsType.embeddable) return 1;
+    if (isColl(type.elementsType) && type.elementsType.elementsType.embeddable) return 1;
+    return 1 + estimateTypeSize(type.elementsType);
+  }
 
-  if (type.code === descriptors.bool.code) return dataSize + 1;
-  if (type.code === descriptors.byte.code) return dataSize + 1;
-  if (type.code === descriptors.unit.code) return dataSize + 0;
-  if (type.code === descriptors.groupElement.code) return dataSize + 33;
-  if (type.code === descriptors.sigmaProp.code) return dataSize + 35; // only prove DLog is implemented, so it's safe to assume 35 bytes
+  if (isTuple(type)) {
+    const len = type.elementsType.length;
+    let size = len > 4 ? 1 + estimateVLQSize(len) : 1;
+    for (const el of type.elementsType) {
+      size += estimateTypeSize(el);
+    }
 
-  // handle collections, but avoid complex types
-  if (isColl(type) && !isColl(type.elementsType) && !isTuple(type.elementsType)) {
-    const len = (data as Uint8Array).length;
-    return (
-      dataSize +
-      estimateVLQSize(len) +
-      guessConstantBytesSize((type as SCollType).elementsType) * len
-    );
+    return size;
+  }
+
+  return 1;
+}
+
+function estimateDataSize(type: SType, data: unknown): number {
+  switch (type.code) {
+    case descriptors.bool.code:
+    case descriptors.byte.code:
+      return 1;
+    case descriptors.short.code:
+      return 8;
+    case descriptors.int.code:
+      return 16;
+    case descriptors.long.code:
+      return 32;
+    case descriptors.bigInt.code:
+      return 64;
+    case descriptors.groupElement.code:
+      return 33;
+    case descriptors.sigmaProp.code:
+      return 35; // only prove DLog is implemented, so it's safe to assume 35 bytes
+    case descriptors.unit.code:
+      return 0;
+    case descriptors.avlTree.code:
+      return 64;
+    case descriptors.box.code:
+      return estimateBoxSize(data as Box);
+  }
+
+  if (isColl(type)) {
+    const items = data as Uint8Array | unknown[];
+    const len = items.length;
+    let size = estimateVLQSize(len);
+
+    if (type.elementsType.code === descriptors.byte.code) {
+      return size + len;
+    }
+
+    if (type.elementsType.code === descriptors.bool.code) {
+      return size + Math.ceil(len / 8);
+    }
+
+    for (let i = 0; i < len; i++) {
+      size += estimateDataSize(type.elementsType, items[i]);
+    }
+
+    return size;
+  }
+
+  if (isTuple(type)) {
+    const items = data as unknown[];
+    let size = 0;
+    for (let i = 0; i < type.elementsType.length; i++) {
+      size += estimateDataSize(type.elementsType[i], items[i]);
+    }
+
+    return size;
   }
 
   return MAX_CONSTANT_LENGTH;

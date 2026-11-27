@@ -1,4 +1,4 @@
-import { type Box, isEmpty } from "@fleet-sdk/common";
+import { type Box, isEmpty, isUndefined } from "@fleet-sdk/common";
 import type { AvlTreeData } from "../serializers/avlTreeSerializer";
 import { SConstant } from "../sigmaConstant";
 import type { SType } from "./base";
@@ -123,7 +123,7 @@ type SColl = {
 export const SColl = genericProxy<SCollType, SColl>(SCollType, (target, _, args) => {
   const [type, elements] = args;
   const elementsType = type();
-  if (!elements) return () => new target(elementsType);
+  if (isUndefined(elements)) return () => new target(elementsType);
 
   return new SConstant(new target(elementsType), elements);
 });

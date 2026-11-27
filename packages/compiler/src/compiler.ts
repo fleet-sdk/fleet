@@ -38,10 +38,10 @@ type CompilerOptionsBase = {
   segregateConstants?: boolean;
 
   /**
-   * Network type, either "mainnet" or "testnet".
+   * Network type, either "mainnet", "testnet", `Network.Mainnet`, or `Network.Testnet`.
    * @default "mainnet"
    */
-  network?: "mainnet" | "testnet";
+  network?: "mainnet" | "testnet" | Network;
 };
 
 export type CompilerOptionsForErgoTreeV0 = CompilerOptionsBase & {
@@ -76,15 +76,19 @@ export const compilerDefaults: Required<CompilerOptions> = {
  */
 export function compile(script: string, options?: CompilerOptions): ErgoTree {
   const opt = ensureDefaults(options, compilerDefaults);
-  assert(opt.version < 8, `Version should be lower than 8, got ${opt.version}`);
+  assert(
+    opt.version === 0 || opt.version === 1,
+    `Unsupported version: expected 0 or 1, got ${opt.version}.`
+  );
 
   let headerFlags = 0x00 | opt.version;
   if (opt.version > 0 || (opt.version === 0 && opt.includeSize)) {
     headerFlags |= ergoTreeHeaderFlags.sizeInclusion;
   }
 
+  const network = resolveNetwork(opt.network);
   const compiler =
-    opt.network === "mainnet" ? SigmaCompiler$.forMainnet() : SigmaCompiler$.forTestnet();
+    network === Network.Mainnet ? SigmaCompiler$.forMainnet() : SigmaCompiler$.forTestnet();
 
   const output = compiler
     .compile(parseNamedConstantsMap(opt.map), opt.segregateConstants, headerFlags, script)
@@ -92,7 +96,14 @@ export function compile(script: string, options?: CompilerOptions): ErgoTree {
     // to something else
     .toHex();
 
-  return new ErgoTree(output, opt.network === "mainnet" ? Network.Mainnet : Network.Testnet);
+  return new ErgoTree(output, network);
+}
+
+function resolveNetwork(network: "mainnet" | "testnet" | Network): Network {
+  if (network === "mainnet" || network === Network.Mainnet) return Network.Mainnet;
+  if (network === "testnet" || network === Network.Testnet) return Network.Testnet;
+
+  throw new Error(`Invalid network: '${String(network)}'.`);
 }
 
 export function parseNamedConstantsMap(map: NamedConstantsMap): SigmaCompilerNamedConstantsMap {
