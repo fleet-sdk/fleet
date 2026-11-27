@@ -1,3 +1,4 @@
+import { BlockchainProviderError } from "@fleet-sdk/common";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { resolveData } from "./_tests";
 import { exponentialRetry, request } from "./networking";
@@ -249,6 +250,119 @@ describe("request", () => {
     expect(fetchMock).toHaveBeenCalledWith("https://example.com/api/data?param=value", undefined);
     expect(fetchMock).toHaveBeenCalledWith(
       "https://fallback1.com/api/data?param=value1",
+      undefined
+    );
+  });
+
+  it("should throw on non-2xx HTTP status responses", async () => {
+    const parserMock = {
+      parse: vi.fn(),
+      stringify: vi.fn()
+    };
+
+    const fetchMock = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        text: () => Promise.resolve('{"message":"not found"}')
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: "",
+        text: () => Promise.resolve("{}")
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 199,
+        statusText: "",
+        text: () => Promise.resolve("{}")
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        text: () => Promise.resolve("{}")
+      } as unknown as Response);
+
+    const err404 = await request("https://example.com/api", { parser: parserMock }).catch(
+      (e: unknown) => e
+    );
+    expect(err404).to.be.instanceOf(BlockchainProviderError);
+    expect((err404 as BlockchainProviderError).message).to.be.equal("HTTP error 404 Not Found");
+
+    await expect(request("https://example.com/api", { parser: parserMock })).rejects.toThrowError(
+      "HTTP error 500"
+    );
+    await expect(request("https://example.com/api", { parser: parserMock })).rejects.toThrowError(
+      "HTTP error 199"
+    );
+    await expect(request("https://example.com/api", { parser: parserMock })).rejects.toThrowError(
+      "HTTP error"
+    );
+
+    expect(parserMock.parse).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+  });
+
+  it("should skip retries for non-retryable status and throw after retry exhaustion", async () => {
+    const fetchMock = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        text: () => Promise.resolve("{}")
+      } as unknown as Response)
+      .mockResolvedValue({
+        ok: false,
+        status: 503,
+        statusText: "",
+        text: () => Promise.resolve("{}")
+      } as unknown as Response);
+
+    await expect(
+      request("/api/data", {
+        base: "https://example.com",
+        retry: { attempts: 2, delay: 5 }
+      })
+    ).rejects.toThrowError("HTTP error 404 Not Found");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await expect(
+      request("/api/data", {
+        base: "https://example.com",
+        retry: { attempts: 1, delay: 5 }
+      })
+    ).rejects.toThrowError("HTTP error 503");
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("should accept minimal response objects without status or ok fields", async () => {
+    const mockResponse = { ok: 1 };
+    vi.spyOn(global, "fetch").mockResolvedValueOnce({
+      text: () => Promise.resolve(JSON.stringify(mockResponse))
+    } as unknown as Response);
+
+    const result = await request("https://example.com/api/data");
+    expect(result).toEqual(mockResponse);
+  });
+
+  it("should build URLs with base only, empty query, and undefined query values", async () => {
+    const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(resolveData({ ok: true }));
+
+    await request("/api/data", { base: "https://example.com" });
+    expect(fetchMock).toHaveBeenLastCalledWith("https://example.com/api/data", undefined);
+
+    await request("https://example.com/api/data", { query: {} });
+    expect(fetchMock).toHaveBeenLastCalledWith("https://example.com/api/data", undefined);
+
+    await request("/api/data", {
+      base: "https://example.com",
+      query: { param: "value", omitted: undefined }
+    });
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      "https://example.com/api/data?param=value",
       undefined
     );
   });

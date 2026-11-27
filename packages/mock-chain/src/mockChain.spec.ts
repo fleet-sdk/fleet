@@ -1,5 +1,6 @@
 import { first } from "@fleet-sdk/common";
 import {
+  ErgoBox,
   FEE_CONTRACT,
   OutputBuilder,
   RECOMMENDED_MIN_FEE_VALUE,
@@ -8,8 +9,9 @@ import {
 } from "@fleet-sdk/core";
 import { utf8 } from "@fleet-sdk/crypto";
 import { SBool, SByte, SColl } from "@fleet-sdk/serializer";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { MockChain } from "./mockChain";
+import { NonKeyedMockChainParty } from "./party";
 
 describe("Mock chain instantiation", () => {
   it("Should create with default parameters", () => {
@@ -47,6 +49,8 @@ describe("Mock chain instantiation", () => {
     const chain = new MockChain();
     const miner = chain.addParty(FEE_CONTRACT, "Miner Fee");
 
+    expect(miner).to.be.instanceOf(NonKeyedMockChainParty);
+    expectTypeOf(miner).toEqualTypeOf<NonKeyedMockChainParty>();
     expect(chain.parties).to.have.length(1);
     expect(chain.parties[0]).to.be.equal(miner);
 
@@ -552,5 +556,98 @@ describe("Contract execution and chain mocking", () => {
 
     expect(chain.height).to.be.equal(params.height);
     expect(chain.timestamp - params.timestamp).to.be.equal(0);
+  });
+
+  it("Should merge partial blockchain parameters with defaults", () => {
+    const chain = new MockChain({ parameters: { minValuePerByte: 500 } });
+    const bob = chain.newParty().withBalance({ nanoergs: 1000000000n });
+    const alice = chain.newParty();
+
+    const unsignedTransaction = new TransactionBuilder(chain.height)
+      .from(bob.utxos.toArray())
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, alice.address))
+      .sendChangeTo(bob.address)
+      .payMinFee()
+      .build();
+
+    expect(chain.execute(unsignedTransaction)).to.be.true;
+
+    const lowCostChain = new MockChain({ parameters: { maxBlockCost: 1 } });
+    const charlie = lowCostChain.newParty().withBalance({ nanoergs: 1000000000n });
+    const dave = lowCostChain.newParty();
+
+    const lowCostTx = new TransactionBuilder(lowCostChain.height)
+      .from(charlie.utxos.toArray())
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, dave.address))
+      .sendChangeTo(charlie.address)
+      .payMinFee()
+      .build();
+
+    expect(lowCostChain.execute(lowCostTx, { throw: false })).to.be.false;
+  });
+
+  it("Should assign shared transactionId and sequential output indices to created boxes", () => {
+    const chain = new MockChain(100);
+    const bob = chain.newParty("Bob").withBalance({ nanoergs: 1000000000n });
+    const alice = chain.newParty("Alice");
+    const miner = chain.addParty(FEE_CONTRACT, "Miner");
+
+    const tx1 = new TransactionBuilder(chain.height)
+      .from(bob.utxos.toArray())
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, alice.address))
+      .sendChangeTo(bob.address)
+      .payMinFee()
+      .build();
+
+    expect(chain.execute(tx1)).to.be.true;
+
+    const aliceBox1 = alice.utxos.at(0);
+    const minerBox1 = miner.utxos.at(0);
+    const bobBox1 = bob.utxos.at(0);
+
+    expect(aliceBox1.transactionId).to.be.equal(tx1.id);
+    expect(minerBox1.transactionId).to.be.equal(tx1.id);
+    expect(bobBox1.transactionId).to.be.equal(tx1.id);
+
+    expect(aliceBox1.index).to.be.equal(0);
+    expect(minerBox1.index).to.be.equal(1);
+    expect(bobBox1.index).to.be.equal(2);
+
+    expect(aliceBox1.boxId).to.be.equal(tx1.outputs[0].boxId);
+    expect(minerBox1.boxId).to.be.equal(tx1.outputs[1].boxId);
+    expect(bobBox1.boxId).to.be.equal(tx1.outputs[2].boxId);
+
+    expect(ErgoBox.validate(aliceBox1)).to.be.true;
+    expect(ErgoBox.validate(minerBox1)).to.be.true;
+    expect(ErgoBox.validate(bobBox1)).to.be.true;
+
+    const tx2 = new TransactionBuilder(chain.height)
+      .from(bob.utxos.toArray())
+      .to(new OutputBuilder(SAFE_MIN_BOX_VALUE, alice.address))
+      .sendChangeTo(bob.address)
+      .payMinFee()
+      .build();
+
+    expect(chain.execute(tx2.toEIP12Object())).to.be.true;
+
+    const aliceBox2 = alice.utxos.at(1);
+    const minerBox2 = miner.utxos.at(1);
+    const bobBox2 = bob.utxos.at(0);
+
+    expect(aliceBox2.transactionId).to.be.equal(tx2.id);
+    expect(minerBox2.transactionId).to.be.equal(tx2.id);
+    expect(bobBox2.transactionId).to.be.equal(tx2.id);
+
+    expect(aliceBox2.index).to.be.equal(0);
+    expect(minerBox2.index).to.be.equal(1);
+    expect(bobBox2.index).to.be.equal(2);
+
+    expect(aliceBox2.boxId).to.be.equal(tx2.outputs[0].boxId);
+    expect(minerBox2.boxId).to.be.equal(tx2.outputs[1].boxId);
+    expect(bobBox2.boxId).to.be.equal(tx2.outputs[2].boxId);
+
+    expect(ErgoBox.validate(aliceBox2)).to.be.true;
+    expect(ErgoBox.validate(minerBox2)).to.be.true;
+    expect(ErgoBox.validate(bobBox2)).to.be.true;
   });
 });

@@ -13,6 +13,7 @@ import {
   type Base58String,
   type BlockHeader,
   type HexString,
+  type Network,
   NotSupportedError,
   type SignedTransaction,
   chunk,
@@ -79,7 +80,9 @@ export type GraphQLUnconfirmedTransactionWhere = UnconfirmedTransactionWhere & {
 };
 
 export type GraphQLBoxQuery = BoxQuery<GraphQLBoxWhere>;
-export type ErgoGraphQLRequestOptions = Omit<GraphQLRequestOptions, "throwOnNonNetworkErrors">;
+export type ErgoGraphQLRequestOptions = Omit<GraphQLRequestOptions, "throwOnNonNetworkErrors"> & {
+  network?: Network;
+};
 
 type ConfirmedBoxesResponse = { boxes: GQLBox[] };
 type UnconfirmedBoxesResponse = { mempool: { boxes: GQLBox[] } };
@@ -156,10 +159,12 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
       throw new Error("Cannot fetch unspent boxes without a where clause.");
     }
 
-    const notBeingSpent = (box: GQLBox) => !box.beingSpent;
-    const returnedBoxIds = new Set<string>();
     const { from, take } = query;
     const pageSize = take ?? PAGE_SIZE;
+    if (!(pageSize > 0)) return;
+
+    const notBeingSpent = (box: GQLBox) => !box.beingSpent;
+    const returnedBoxIds = new Set<string>();
     const queries = buildGqlBoxQueries(query);
     const isMempoolAware = from !== "blockchain";
 
@@ -168,30 +173,39 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
       let inclPool = from !== "blockchain";
 
       while (inclChain || inclPool) {
-        const { data } = await this.#fetchBoxes(query, inclChain, inclPool);
+        const response = await this.#fetchBoxes(query, inclChain, inclPool);
+        const data = response?.data;
         let boxes: ChainProviderBox<I>[] = [];
 
-        if (inclChain && hasConfirmed(data)) {
-          if (some(data.boxes)) {
-            const confirmedBoxes = (
-              isMempoolAware ? data.boxes.filter(notBeingSpent) : data.boxes
-            ).map((b) => mapConfirmedBox(b, this.#biMapper));
+        if (inclChain) {
+          if (hasConfirmed(data)) {
+            if (some(data.boxes)) {
+              const confirmedBoxes = (
+                isMempoolAware ? data.boxes.filter(notBeingSpent) : data.boxes
+              ).map((b) => mapConfirmedBox(b, this.#biMapper));
 
-            boxes = boxes.concat(confirmedBoxes);
+              boxes = boxes.concat(confirmedBoxes);
+            }
+
+            inclChain = data.boxes.length === pageSize;
+          } else {
+            inclChain = false;
           }
-
-          inclChain = data.boxes.length === pageSize;
         }
 
-        if (isMempoolAware && hasMempool(data)) {
-          if (some(data.mempool.boxes)) {
-            const mempoolBoxes = data.mempool.boxes
-              .filter(notBeingSpent)
-              .map((b) => mapUnconfirmedBox(b, this.#biMapper));
-            boxes = boxes.concat(mempoolBoxes);
-          }
+        if (inclPool) {
+          if (hasMempool(data)) {
+            if (some(data.mempool.boxes)) {
+              const mempoolBoxes = data.mempool.boxes
+                .filter(notBeingSpent)
+                .map((b) => mapUnconfirmedBox(b, this.#biMapper));
+              boxes = boxes.concat(mempoolBoxes);
+            }
 
-          inclPool = data.mempool.boxes.length === pageSize;
+            inclPool = data.mempool.boxes.length === pageSize;
+          } else {
+            inclPool = false;
+          }
         }
 
         if (some(boxes)) {
@@ -223,19 +237,24 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
     query: TransactionQuery<GraphQLUnconfirmedTransactionWhere> & SkipAndTake
   ): AsyncGenerator<ChainProviderUnconfirmedTransaction<I>[]> {
     const pageSize = query.take ?? PAGE_SIZE;
-    const queries = buildGqlUnconfirmedTxQueries(query);
+    if (!(pageSize > 0)) return;
+
+    const returnedTxIds = new Set<string>();
+    const queries = buildGqlUnconfirmedTxQueries(query, this.#options.network);
 
     for (const query of queries) {
       let keepFetching = true;
       while (keepFetching) {
         const response = await this.#getUnconfirmedTransactions(query);
-        if (some(response.data?.mempool?.transactions)) {
-          yield response.data.mempool.transactions.map((t) =>
+        const rawTxs = response.data?.mempool?.transactions;
+        if (some(rawTxs)) {
+          const txs = deduplicateTransactions(rawTxs, returnedTxIds).map((t) =>
             mapUnconfirmedTransaction(t, this.#biMapper)
           );
+          if (some(txs)) yield txs;
         }
 
-        keepFetching = response.data?.mempool?.transactions?.length === pageSize;
+        keepFetching = rawTxs?.length === pageSize;
         if (keepFetching) query.skip += pageSize;
       }
     }
@@ -256,17 +275,24 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
     query: TransactionQuery<GraphQLConfirmedTransactionWhere> & SkipAndTake
   ): AsyncGenerator<ChainProviderConfirmedTransaction<I>[]> {
     const pageSize = query.take ?? PAGE_SIZE;
-    const queries = buildGqlConfirmedTxQueries(query);
+    if (!(pageSize > 0)) return;
+
+    const returnedTxIds = new Set<string>();
+    const queries = buildGqlConfirmedTxQueries(query, this.#options.network);
 
     for (const query of queries) {
       let keepFetching = true;
       while (keepFetching) {
         const response = await this.#getConfirmedTransactions(query);
-        if (some(response.data?.transactions)) {
-          yield response.data.transactions.map((t) => mapConfirmedTransaction(t, this.#biMapper));
+        const rawTxs = response.data?.transactions;
+        if (some(rawTxs)) {
+          const txs = deduplicateTransactions(rawTxs, returnedTxIds).map((t) =>
+            mapConfirmedTransaction(t, this.#biMapper)
+          );
+          if (some(txs)) yield txs;
         }
 
-        keepFetching = response.data?.transactions?.length === pageSize;
+        keepFetching = rawTxs?.length === pageSize;
         if (keepFetching) query.skip += pageSize;
       }
     }
@@ -312,7 +338,12 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   ): Promise<TransactionEvaluationResult> {
     try {
       const response = await this.#checkTransaction({ signedTransaction });
-      return { success: true, transactionId: response.data.checkTransaction };
+      const transactionId = response.data?.checkTransaction;
+      if (!transactionId) {
+        return { success: false, message: "Transaction check returned no transaction ID." };
+      }
+
+      return { success: true, transactionId };
     } catch (e) {
       return { success: false, message: (e as Error).message };
     }
@@ -323,7 +354,12 @@ export class ErgoGraphQLProvider<I = bigint> implements IBlockchainProvider<I> {
   ): Promise<TransactionEvaluationResult> {
     try {
       const response = await this.#sendTransaction({ signedTransaction });
-      return { success: true, transactionId: response.data.submitTransaction };
+      const transactionId = response.data?.submitTransaction;
+      if (!transactionId) {
+        return { success: false, message: "Transaction submission returned no transaction ID." };
+      }
+
+      return { success: true, transactionId };
     } catch (e) {
       return { success: false, message: (e as Error).message };
     }
@@ -359,7 +395,8 @@ function buildGqlBoxQueries(query: GraphQLBoxQuery & SkipAndTake) {
 }
 
 function buildGqlUnconfirmedTxQueries(
-  query: TransactionQuery<GraphQLUnconfirmedTransactionWhere> & SkipAndTake
+  query: TransactionQuery<GraphQLUnconfirmedTransactionWhere> & SkipAndTake,
+  network?: Network
 ) {
   const addresses = uniq(
     [
@@ -367,7 +404,7 @@ function buildGqlUnconfirmedTxQueries(
         typeof address === "string" ? address : address.encode()
       ) ?? [],
       merge(query.where.ergoTrees, query.where.ergoTree)?.map((tree) =>
-        ErgoAddress.fromErgoTree(tree).encode()
+        ErgoAddress.fromErgoTree(tree, network).encode()
       ) ?? []
     ].flat()
   );
@@ -384,10 +421,12 @@ function buildGqlUnconfirmedTxQueries(
 }
 
 function buildGqlConfirmedTxQueries(
-  query: TransactionQuery<GraphQLConfirmedTransactionWhere> & SkipAndTake
+  query: TransactionQuery<GraphQLConfirmedTransactionWhere> & SkipAndTake,
+  network?: Network
 ) {
   return buildGqlUnconfirmedTxQueries(
-    query as TransactionQuery<GraphQLUnconfirmedTransactionWhere>
+    query as TransactionQuery<GraphQLUnconfirmedTransactionWhere>,
+    network
   ).map((baseQuery) => ({
     ...baseQuery,
     headerId: query.where.headerId,
@@ -405,11 +444,26 @@ function merge<T>(array?: T[], el?: T) {
 }
 
 function hasMempool(data: unknown): data is UnconfirmedBoxesResponse {
-  return !!(data as UnconfirmedBoxesResponse)?.mempool?.boxes;
+  return Array.isArray((data as UnconfirmedBoxesResponse)?.mempool?.boxes);
 }
 
 function hasConfirmed(data: unknown): data is ConfirmedBoxesResponse {
-  return !!(data as ConfirmedBoxesResponse)?.boxes;
+  return Array.isArray((data as ConfirmedBoxesResponse)?.boxes);
+}
+
+function deduplicateTransactions<T extends { transactionId: string }>(
+  transactions: T[],
+  returnedIds: Set<string>
+): T[] {
+  const unique: T[] = [];
+  for (const tx of transactions) {
+    if (!returnedIds.has(tx.transactionId)) {
+      returnedIds.add(tx.transactionId);
+      unique.push(tx);
+    }
+  }
+
+  return unique;
 }
 
 function mapConfirmedBox<T>(box: GQLBox, mapper: BiMapper<T>): ChainProviderBox<T> {
@@ -490,5 +544,5 @@ function mapConfirmedTransaction<T>(
 }
 
 export function isRequestParam(obj: unknown): obj is ErgoGraphQLRequestOptions {
-  return typeof obj === "object" && (obj as ErgoGraphQLRequestOptions).url !== undefined;
+  return typeof obj === "object" && obj !== null && !Array.isArray(obj);
 }

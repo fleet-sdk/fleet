@@ -216,6 +216,128 @@ describe("GraphQL query builder", () => {
 
     await expect(operation).rejects.toThrowError(BlockchainProviderError);
   });
+
+  it("Should throw when throwOnNonNetworkErrors is true with null data and errors", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      resolveString('{"data":{"submitTransaction":null},"errors":[{"message":"Rejected"}]}')
+    );
+
+    const operation = createGqlOperation("mutation submit { submitTransaction }", {
+      url: "http://gql.example.com",
+      throwOnNonNetworkErrors: true
+    });
+
+    const err = await operation().catch((e: unknown) => e);
+    expect(err).to.be.instanceOf(BlockchainProviderError);
+    expect((err as BlockchainProviderError).message).to.be.equal("Rejected");
+  });
+
+  it("Should handle null response body when throwOnNonNetworkErrors is true", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(resolveString("null"));
+
+    const operation = createGqlOperation("query test { state { height } }", {
+      url: "http://gql.example.com",
+      throwOnNonNetworkErrors: true
+    });
+
+    const response = await operation();
+    expect(response).to.be.null;
+  });
+
+  it("Should preserve Headers instances and normalize overridden defaults", async () => {
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce(resolveString('{"data":{"state":{"height":1}}}'));
+
+    const query = "query test { state { height } }";
+    const headers = new Headers({
+      Authorization: "Bearer token",
+      "Content-Type": "application/json"
+    });
+    const operation = createGqlOperation<{ state: State }>(query, {
+      url: "https://gql.example.com/",
+      httpOptions: { headers }
+    });
+
+    await operation();
+
+    expect(fetchSpy).toHaveBeenCalledWith("https://gql.example.com/", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        accept: DEFAULT_HEADERS.accept,
+        authorization: "Bearer token"
+      },
+      body: JSON.stringify({
+        operationName: "test",
+        query
+      })
+    });
+  });
+
+  it("Should preserve tuple headers and override defaults case-insensitively", async () => {
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce(resolveString('{"data":{"state":{"height":1}}}'));
+
+    const query = "query test { state { height } }";
+    const operation = createGqlOperation<{ state: State }>(query, {
+      url: "https://gql.example.com/",
+      httpOptions: {
+        headers: [
+          ["Authorization", "Bearer token"],
+          ["Accept", "application/json"]
+        ]
+      }
+    });
+
+    await operation();
+
+    expect(fetchSpy).toHaveBeenCalledWith("https://gql.example.com/", {
+      method: "POST",
+      headers: {
+        "content-type": DEFAULT_HEADERS["content-type"],
+        Authorization: "Bearer token",
+        Accept: "application/json"
+      },
+      body: JSON.stringify({
+        operationName: "test",
+        query
+      })
+    });
+  });
+
+  it("Should override default headers case-insensitively for plain object headers", async () => {
+    const fetchSpy = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce(resolveString('{"data":{"state":{"height":1}}}'));
+
+    const query = "query test { state { height } }";
+    const operation = createGqlOperation<{ state: State }>(query, {
+      url: "https://gql.example.com/",
+      httpOptions: {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": "secret"
+        }
+      }
+    });
+
+    await operation();
+
+    expect(fetchSpy).toHaveBeenCalledWith("https://gql.example.com/", {
+      method: "POST",
+      headers: {
+        accept: DEFAULT_HEADERS.accept,
+        "Content-Type": "application/json",
+        "X-Api-Key": "secret"
+      },
+      body: JSON.stringify({
+        operationName: "test",
+        query
+      })
+    });
+  });
 });
 
 describe("Operation name extraction", () => {
@@ -231,6 +353,11 @@ describe("Operation name extraction", () => {
     expect(getOpName("query boxes-test { boxes { boxId } }")).to.be.equal("boxes-test");
     expect(getOpName("query boxes1 { boxes { boxId } }")).to.be.equal("boxes1");
     expect(getOpName(" query boxes ($take: Int) { boxes { boxId } }")).to.be.equal("boxes");
+    expect(getOpName("query   boxes { boxes { boxId } }")).to.be.equal("boxes");
+    expect(getOpName("query\n\tboxes { boxes { boxId } }")).to.be.equal("boxes");
+    expect(getOpName("# query ignored\nquery actual { state { height } }")).to.be.equal("actual");
+    expect(getOpName("query # comment\nactual { state { height } }")).to.be.equal("actual");
+    expect(getOpName("subscription onBlock { blocks { headerId } }")).to.be.equal("onBlock");
     expect(
       getOpName(`
         query unspent($take: Int, $address: String) {
@@ -254,5 +381,8 @@ describe("Operation name extraction", () => {
     expect(getOpName("query { boxes { boxId } }")).to.be.undefined;
     expect(getOpName("mutation { boxes { boxId } }")).to.be.undefined;
     expect(getOpName(" query ($take: Int) { boxes { boxId } }")).to.be.undefined;
+    expect(getOpName("{ queryBoxes { boxId } }")).to.be.undefined;
+    expect(getOpName("{ mutationResult { id } }")).to.be.undefined;
+    expect(getOpName("# query ignored\nquery { state { height } }")).to.be.undefined;
   });
 });

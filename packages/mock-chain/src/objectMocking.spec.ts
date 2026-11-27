@@ -2,7 +2,7 @@ import { type BoxCandidate, hasDuplicatesBy } from "@fleet-sdk/common";
 import { ErgoBox, SAFE_MIN_BOX_VALUE } from "@fleet-sdk/core";
 import { hex, randomBytes } from "@fleet-sdk/crypto";
 import { describe, expect, it } from "vitest";
-import { mockHeaders, mockUTxO } from "./objectMocking";
+import { mockBlockchainStateContext, mockHeaders, mockUTxO } from "./objectMocking";
 
 describe("mockUTxO()", () => {
   it("Should set default values when omitted", () => {
@@ -60,21 +60,24 @@ describe("mockHeaders()", () => {
     expect(headers).to.have.length(10);
     expect(hasDuplicatesBy(headers, (x) => x.id)).to.be.false;
     expect(hasDuplicatesBy(headers, (x) => x.parentId)).to.be.false;
+    expect(headers[0].height).to.be.equal(10);
+    expect(headers[headers.length - 1].height).to.be.equal(1);
 
     for (let i = 0; i < headers.length - 1; i++) {
       expect(headers[i].height).to.be.greaterThan(0);
       expect(headers[i].parentId).to.be.equal(headers[i + 1].id);
-      expect(headers[i].height).to.be.equal(headers[i + 1].height - 1);
-      expect(headers[i + 1].timestamp - headers[i].timestamp).to.be.equal(120000); // 2 min
+      expect(headers[i].height).to.be.equal(headers[i + 1].height + 1);
+      expect(headers[i].timestamp - headers[i + 1].timestamp).to.be.equal(120000); // 2 min
       expect(headers[i].version).to.be.equal(3);
     }
+    expect(headers[headers.length - 1].version).to.be.equal(3);
   });
 
-  it("Should mock n headers with with parameters", () => {
+  it("Should mock n headers with parameters", () => {
     const params = {
       version: 10,
       fromHeight: 55,
-      fromTimeStamp: new Date().getTime(),
+      fromTimestamp: new Date().getTime(),
       parentId: hex.encode(randomBytes(32))
     };
     const headers = mockHeaders(10, params);
@@ -83,16 +86,54 @@ describe("mockHeaders()", () => {
     expect(hasDuplicatesBy(headers, (x) => x.id)).to.be.false;
     expect(hasDuplicatesBy(headers, (x) => x.parentId)).to.be.false;
 
+    expect(headers[0].version).to.be.equal(params.version);
+    expect(headers[0].height).to.be.equal(params.fromHeight);
+    expect(headers[0].timestamp).to.be.equal(params.fromTimestamp);
+    expect(headers[headers.length - 1].parentId).to.be.equal(params.parentId);
+    expect(headers[headers.length - 1].height).to.be.equal(params.fromHeight - 9);
+
     for (let i = 0; i < headers.length - 1; i++) {
-      if (i === headers.length) {
-        expect(headers[i].version).to.be.equal(params.version);
-        expect(headers[i].height).to.be.equal(params.fromHeight);
-        expect(headers[i].timestamp).to.be.equal(params.fromTimeStamp);
-      } else {
-        expect(headers[i].parentId).to.be.equal(headers[i + 1].id);
-        expect(headers[i].height).to.be.equal(headers[i + 1].height - 1);
-        expect(headers[i + 1].timestamp - headers[i].timestamp).to.be.equal(120000); // 2 min
-        expect(headers[i].version).to.be.equal(params.version);
+      expect(headers[i].parentId).to.be.equal(headers[i + 1].id);
+      expect(headers[i].height).to.be.equal(headers[i + 1].height + 1);
+      expect(headers[i].timestamp - headers[i + 1].timestamp).to.be.equal(120000); // 2 min
+      expect(headers[i].version).to.be.equal(params.version);
+    }
+  });
+});
+
+describe("mockBlockchainStateContext()", () => {
+  it("Should build descending headers and matching preHeader with default options", () => {
+    const context = mockBlockchainStateContext();
+
+    expect(context.sigmaLastHeaders).to.have.length(10);
+    expect(context.sigmaPreHeader.height).to.be.equal(11);
+    expect(context.sigmaPreHeader.parentId).to.be.equal(context.sigmaLastHeaders[0].id);
+    expect(context.previousStateDigest).to.be.equal(context.sigmaLastHeaders[0].stateRoot.digest);
+    expect(context.sigmaLastHeaders[0].height).to.be.equal(10);
+    expect(context.sigmaLastHeaders[9].height).to.be.equal(1);
+    expect(context.sigmaPreHeader.timestamp - context.sigmaLastHeaders[0].timestamp).to.be.equal(
+      120000n
+    );
+  });
+
+  it("Should anchor preHeader to fromHeight and fromTimestamp with prior confirmed headers", () => {
+    const fromHeight = 1000;
+    const fromTimestamp = 1_700_000_000_000;
+    const context = mockBlockchainStateContext({
+      headers: { quantity: 10, fromHeight, fromTimestamp }
+    });
+
+    expect(context.sigmaPreHeader.height).to.be.equal(fromHeight);
+    expect(context.sigmaPreHeader.timestamp).to.be.equal(BigInt(fromTimestamp));
+    expect(context.sigmaPreHeader.parentId).to.be.equal(context.sigmaLastHeaders[0].id);
+    expect(context.previousStateDigest).to.be.equal(context.sigmaLastHeaders[0].stateRoot.digest);
+
+    for (let i = 0; i < context.sigmaLastHeaders.length; i++) {
+      const header = context.sigmaLastHeaders[i];
+      expect(header.height).to.be.equal(fromHeight - i - 1);
+      expect(header.timestamp).to.be.equal(BigInt(fromTimestamp - (i + 1) * 120_000));
+      if (i < context.sigmaLastHeaders.length - 1) {
+        expect(header.parentId).to.be.equal(context.sigmaLastHeaders[i + 1].id);
       }
     }
   });

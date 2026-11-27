@@ -1,4 +1,4 @@
-import { some } from "@fleet-sdk/common";
+import { BlockchainProviderError, some } from "@fleet-sdk/common";
 
 export interface ParserLike {
   parse<T>(text: string): T;
@@ -38,7 +38,7 @@ export async function request<T>(path: string, opt?: Partial<FetchOptions>): Pro
     const attempts = opt.retry.attempts;
     response = await exponentialRetry(async (r) => {
       const response = await fetch(resolveUrl(routes, attempts - r), opt.httpOptions);
-      if (RETRY_STATUS_CODES.has(response.status)) throw new Error(response.statusText);
+      if (RETRY_STATUS_CODES.has(response.status)) throw createHttpError(response);
 
       return response;
     }, opt.retry);
@@ -46,7 +46,25 @@ export async function request<T>(path: string, opt?: Partial<FetchOptions>): Pro
     response = await fetch(url, opt?.httpOptions);
   }
 
+  if (isHttpError(response)) {
+    throw createHttpError(response);
+  }
+
   return (opt?.parser || JSON).parse(await response.text());
+}
+
+function isHttpError(response: Response): boolean {
+  if (typeof response.status === "number") {
+    return response.status < 200 || response.status >= 300;
+  }
+
+  return response.ok === false;
+}
+
+function createHttpError(response: Response): BlockchainProviderError {
+  const status = typeof response.status === "number" ? ` ${response.status}` : "";
+  const text = response.statusText ? ` ${response.statusText}` : "";
+  return new BlockchainProviderError(`HTTP error${status}${text}`);
 }
 
 function resolveUrl(routes: URLLike[], attempt: number) {
@@ -57,11 +75,15 @@ function resolveUrl(routes: URLLike[], attempt: number) {
 }
 
 function buildURL(path: string, query?: Record<string, unknown>, base?: string) {
-  if (!base && !query) return path;
+  if (!base && !some(query)) return path;
 
   const url = new URL(path, base);
   if (some(query)) {
-    for (const key in query) url.searchParams.append(key, String(query[key]));
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined) {
+        url.searchParams.append(key, String(value));
+      }
+    }
   }
 
   return url.toString();

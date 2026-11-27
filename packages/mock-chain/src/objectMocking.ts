@@ -33,7 +33,7 @@ function getRandomId() {
   return hex.encode(randomBytes(32));
 }
 
-const BLOCK_TIME = 2;
+const BLOCK_TIME_MS = 120_000;
 
 export type HeaderMockingOptions = {
   parentId?: string;
@@ -65,14 +65,13 @@ export type Header = {
 
 export function mockHeaders(count: number, options?: HeaderMockingOptions) {
   const headers = new Array<Header>(count);
-  const height = (options?.fromHeight ?? 0) + count;
-  const timestamp = options?.fromTimestamp ? new Date(options.fromTimestamp) : new Date();
+  const height = options?.fromHeight ?? count;
+  const timestamp = options?.fromTimestamp ?? Date.now();
   const version = options?.version ?? 3;
   let parentId = options?.parentId || getRandomId();
 
-  for (let i = 0; i < count; i++) {
+  for (let i = count - 1; i >= 0; i--) {
     const id = getRandomId();
-    if (i > 0) timestamp.setMinutes(timestamp.getMinutes() - BLOCK_TIME);
 
     headers[i] = {
       id,
@@ -82,7 +81,7 @@ export function mockHeaders(count: number, options?: HeaderMockingOptions) {
       adProofsRoot: "094a38dca68383996db603b11d7a4a2c2ca2cfd45946208c89fdcf73fa4bed2f",
       stateRoot: "6c64d4ffdf34b31b81c8fbb7cebb78ce12f5c7e5c61864c6523bf1481c8011c619",
       transactionsRoot: "0c9778e550d39b8423a2247a73a05169369054ef6edaf30f2842b223ed3cc450",
-      timestamp: timestamp.getTime(),
+      timestamp: timestamp - i * BLOCK_TIME_MS,
       nBits: 118081018,
       extensionHash: "33c61204c775128d6d19754d9be6b4c7ab06a2af7d8f95e6662df476a394be51",
       powSolutions: {
@@ -97,7 +96,7 @@ export function mockHeaders(count: number, options?: HeaderMockingOptions) {
     parentId = id;
   }
 
-  return headers.reverse();
+  return headers;
 }
 
 export function mockBlockchainStateContext(options?: BlockchainContextMockingOptions) {

@@ -1,14 +1,9 @@
-import {
-  BlockchainProviderError,
-  clearUndefined,
-  ensureDefaults,
-  isEmpty,
-  some
-} from "@fleet-sdk/common";
+import { BlockchainProviderError, clearUndefined, hasKey, some } from "@fleet-sdk/common";
 import type { FallbackRetryOptions, ParserLike } from "./networking";
 import { request } from "./networking";
 
-const OP_NAME_REGEX = /(query|mutation)\s?([\w\-_]+)?/;
+const OP_NAME_REGEX =
+  /^(?:\s|#[^\r\n]*)*(?:query|mutation|subscription)(?:\s|#[^\r\n]*)+([A-Za-z_][\w-]*)/;
 const DEFAULT_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   accept: "application/graphql-response+json, application/json"
@@ -85,7 +80,7 @@ export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariab
       httpOptions: {
         ...options?.httpOptions,
         method: "POST",
-        headers: ensureDefaults(options?.httpOptions?.headers, DEFAULT_HEADERS),
+        headers: mergeHeaders(options?.httpOptions?.headers),
         body: (options?.parser ?? JSON).stringify({
           operationName: getOpName(query),
           query,
@@ -94,7 +89,7 @@ export function createGqlOperation<R, V extends GraphQLVariables = GraphQLVariab
       }
     });
 
-    if (options?.throwOnNonNetworkErrors && some(response.errors) && isEmpty(response.data)) {
+    if (options?.throwOnNonNetworkErrors && some(response?.errors)) {
       const msg = response.errors[0].message;
       throw new BlockchainProviderError(msg, { cause: response.errors });
     }
@@ -108,5 +103,27 @@ export function gql(query: TemplateStringsArray): string {
 }
 
 export function getOpName(query: string): string | undefined {
-  return OP_NAME_REGEX.exec(query)?.at(2);
+  return OP_NAME_REGEX.exec(query)?.at(1);
+}
+
+function toHeaderEntries(headers: HeadersInit): Iterable<string[]> {
+  if (headers instanceof Headers) return headers as unknown as Iterable<string[]>;
+  if (Array.isArray(headers)) return headers;
+  return Object.entries(headers);
+}
+
+function mergeHeaders(headers?: HeadersInit): Record<string, string> {
+  const result: Record<string, string> = { ...DEFAULT_HEADERS };
+  if (!headers) return result;
+
+  for (const [key, value] of toHeaderEntries(headers)) {
+    const lower = key.toLowerCase();
+    if (hasKey(DEFAULT_HEADERS, lower) && lower !== key) {
+      delete result[lower];
+    }
+
+    result[key] = value;
+  }
+
+  return result;
 }

@@ -2,18 +2,19 @@ import {
   type EIP12UnsignedTransaction,
   type HexString,
   ensureDefaults,
+  ensureUTxOBigInt,
   first,
   isUndefined,
   some
 } from "@fleet-sdk/common";
 import { ErgoUnsignedTransaction } from "@fleet-sdk/core";
-import { type ByteInput, utf8 } from "@fleet-sdk/crypto";
-import { decode } from "@fleet-sdk/serializer";
+import { type ByteInput, blake2b256, hex, utf8 } from "@fleet-sdk/crypto";
+import { decode, serializeTransaction } from "@fleet-sdk/serializer";
 import pc from "picocolors";
 import type { BlockchainParameters } from "sigmastate-js/main";
 import { printDiff } from "./balancePrinting";
 import { BLOCKCHAIN_PARAMETERS, execute } from "./execution";
-import { mockBlockchainStateContext } from "./objectMocking";
+import { mockBlockchainStateContext, mockUTxO } from "./objectMocking";
 import { KeyedMockChainParty, type MockChainParty, NonKeyedMockChainParty } from "./party";
 
 const BLOCK_TIME_MS = 120000;
@@ -64,16 +65,16 @@ export class MockChain {
   constructor(height?: number);
   constructor(options?: MockChainOptions);
   constructor(heightOrOptions?: number | MockChainOptions) {
-    const options =
+    const options: MockChainOptions =
       !heightOrOptions || typeof heightOrOptions === "number"
         ? { height: heightOrOptions ?? DEFAULT_HEIGHT }
         : heightOrOptions;
 
-    const state = ensureDefaults(options, {
-      height: DEFAULT_HEIGHT,
-      timestamp: new Date().getTime(),
-      parameters: ensureDefaults(options.parameters, BLOCKCHAIN_PARAMETERS)
-    });
+    const state: BlockState = {
+      height: options.height ?? DEFAULT_HEIGHT,
+      timestamp: options.timestamp ?? new Date().getTime(),
+      parameters: ensureDefaults(options.parameters, { ...BLOCKCHAIN_PARAMETERS })
+    };
 
     this.#tip = state;
     this.#base = { ...state };
@@ -138,7 +139,7 @@ export class MockChain {
 
   addParty(contractOrParty: KeyedMockChainParty): KeyedMockChainParty;
   addParty(contractOrParty: NonKeyedMockChainParty, name?: string): NonKeyedMockChainParty;
-  addParty(contractOrParty: HexString, name?: string): KeyedMockChainParty;
+  addParty(contractOrParty: HexString, name?: string): NonKeyedMockChainParty;
   addParty(
     contractOrParty: HexString | MockChainParty,
     name?: string
@@ -200,6 +201,14 @@ export class MockChain {
     this.#pushMetadata(txObject);
 
     const { inputs, outputs } = txObject;
+    const transactionId =
+      unsignedTransaction instanceof ErgoUnsignedTransaction
+        ? unsignedTransaction.id
+        : hex.encode(blake2b256(serializeTransaction(txObject).toBytes()));
+    const createdOutputs = outputs.map((output, index) =>
+      mockUTxO({ ...ensureUTxOBigInt(output), transactionId, index })
+    );
+
     for (const party of this.#parties) {
       for (let i = inputs.length - 1; i >= 0; i--) {
         if (party.utxos.exists(inputs[i].boxId)) {
@@ -207,10 +216,10 @@ export class MockChain {
         }
       }
 
-      for (let i = outputs.length - 1; i >= 0; i--) {
-        if (party.ergoTree === outputs[i].ergoTree) {
-          party.utxos.add(outputs[i]);
-          outputs.splice(i, 1);
+      for (let i = createdOutputs.length - 1; i >= 0; i--) {
+        if (party.ergoTree === createdOutputs[i].ergoTree) {
+          party.utxos.add(createdOutputs[i]);
+          createdOutputs.splice(i, 1);
         }
       }
     }
